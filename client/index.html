@@ -1,0 +1,97 @@
+<head>
+  <title>Waartaa</title>
+</head>
+<body>
+  {{> header}}
+  {{> content}}
+  {{> footer}}
+</body>
+
+<template name="header">
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="/">Waartaa</a>
+    <ul class="nav">
+    </ul>
+    <ul class="nav pull-right">
+      {{# if currentUser}}
+      <li>
+        <button id="signout" class="btn btn-success">Sign out</button>
+      </li>
+      {{/if}}
+    </ul>
+  </div>
+</div>
+</template>
+
+<template name="content">
+<div class="content-main container-fluid">
+  {{#if currentUser}}
+    {{> user_loggedin_content}}
+  {{else}}
+    {{> user_loggedout_content}}
+  {{/if}}
+</div>
+</template>
+
+<template name="user_loggedin_content">
+<p>User logged in</p>
+</template>
+
+<template name="user_loggedout_content">
+  {{# if show_signup_form}}
+    {{> signup_form}}
+  {{else}}
+    {{> signin_form}}
+  {{/if}}
+</template>
+
+<template name="signin_form">
+  <form id="user-signin" class="form well offset4 span4">
+    <fieldset>
+      <legend>Sign in</legend>
+      {{# if SigninError}}
+      <div class="alert">
+        <button type="button" class="close" data-dismiss="alert" data-sessionkey="SigninFormError">&times;</button>
+        <strong>Warning!</strong> {{SigninError.reason}}
+      </div>
+      {{/if}}
+      <label for="user-signin-username">Username or email</label>
+      <input id="user-signin-username" class="span4" type="text" required="true" tabindex="1"/>
+      <label for="user-signin-password">Password <a href="#" tabindex="5">(forgot password)</a></label>
+      <input id="user-signin-password" class="span4" type="password" required="true" tabindex="2"/>
+      <div class="row" style="padding-left: 30px;">
+        <button id="signin-btn" type="submit" class="btn btn-success" tabindex="3">Sign in</button>
+        <a id="signup-link" class="btn pull-right" tabindex="4">Sign up</a>
+      </div>
+    </fieldset>
+  </form>
+</template>
+
+<template name="signup_form">
+  <form id="user-signup" class="form well offset4 span4">
+    <fieldset>
+      <legend>Sign up</legend>
+      {{# if SignupError}}
+      <div class="alert">
+        <button type="button" class="close" data-dismiss="alert" data-sessionkey="SignupFormError">&times;</button>
+        <strong>Warning!</strong> {{SignupError.reason}}
+      </div>
+      {{/if}}
+      <label for="user-signup-username">Username</label>
+      <input id="user-signup-username" class="span4" type="text" required="true" tabindex="1"/>
+      <label for="user-signup-password">Password</label>
+      <input id="user-signup-password" class="span4" type="password" required="true" tabindex="2"/>
+      <label for="user-signup-email">Email</label>
+      <input id="user-signup-email" class="span4" type="email" required="true" tabindex="3"/>
+      <div class="row" style="padding-left: 30px;">
+        <button type="submit" id="signup-btn" class="btn btn-success" tabindex="4">Sign up</button>
+        <a id="signin-link" type="submit" class="btn pull-right" tabindex="5">Sign in</a>
+      </div>
+    </fieldset>
+  </form>
+
+</template>
+<template name="footer">
+
+</template>
