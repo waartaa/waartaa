@@ -1,0 +1,15 @@
+user_profiles = {
+  /*
+  username1: {
+    connections: [
+      {
+        name: "Freenode",
+        servers: ['irc.freenode.net'],
+        password: null,
+        nicks: ['nick', 'nick_', 'nick__'],
+        channels: ['#channel1', '#channel2'],
+      }
+    ]
+  }
+  */
+}

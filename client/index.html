@@ -35,7 +35,11 @@
 </template>
 
 <template name="user_loggedin_content">
-<p>User logged in</p>
+  {{> chat}}
+</template>
+
+<template name="account_settings">
+
 </template>
 
 <template name="user_loggedout_content">
@@ -60,7 +64,7 @@
       <input id="user-signin-username" class="span4" type="text" required="true" tabindex="1"/>
       <label for="user-signin-password">Password <a href="#" tabindex="5">(forgot password)</a></label>
       <input id="user-signin-password" class="span4" type="password" required="true" tabindex="2"/>
-      <div class="row" style="padding-left: 30px;">
+      <div class="row-fluid">
         <button id="signin-btn" type="submit" class="btn btn-success" tabindex="3">Sign in</button>
         <a id="signup-link" class="btn pull-right" tabindex="4">Sign up</a>
       </div>
@@ -84,7 +88,7 @@
       <input id="user-signup-password" class="span4" type="password" required="true" tabindex="2"/>
       <label for="user-signup-email">Email</label>
       <input id="user-signup-email" class="span4" type="email" required="true" tabindex="3"/>
-      <div class="row" style="padding-left: 30px;">
+      <div class="row-fluid">
         <button type="submit" id="signup-btn" class="btn btn-success" tabindex="4">Sign up</button>
         <a id="signin-link" type="submit" class="btn pull-right" tabindex="5">Sign in</a>
       </div>

@@ -1,3 +1,18 @@
+Servers = new Meteor.Collection("servers");
+Channels = new Meteor.Collection("channels");
+ChannelLogs = new Meteor.Collection("channel_logs");
+
+subscribe = function () {
+  Meteor.subscribe("servers");
+  Meteor.subscribe("channels");
+  Meteor.subscribe("channel_logs");
+};
+
+subscribe();
+
+Clients = new Meteor.Collection("clients");
+//Meteor.subscribe("clients");
+
 Template.header.events({
   'click #signout': function(){
     Meteor.logout();

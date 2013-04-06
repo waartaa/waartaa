@@ -9,3 +9,8 @@ Accounts.validateNewUser(function (user) {
     throw new Meteor.Error(403, "Email already exists.");
   return true;
 });
+
+Accounts.onCreateUser(function (options, user) {
+  user.profile = user_profiles && user_profiles[user.username] || null;
+  return user;
+});

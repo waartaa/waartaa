@@ -1,0 +1,58 @@
+<template name="chat">
+<div class="row-fluid">
+  {{> chat_connections}}
+  {{> chat_main}}
+  {{> chat_users}}
+</div>
+</template>
+
+<template name="chat_connections">
+  <div class="span2">
+    <ul>
+      {{#each servers}}
+        <li>{{ name }}
+          {{> server_channels}}
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<template name="server_channels">
+  <ul>
+    {{#each channels _id}}
+      <li class="channel" data-id="{{ _id }}">{{ name }}</li>
+    {{/each}}
+  </ul>
+</template>
+
+<template name="chat_main">
+<div class="span8">
+  <table class="table">
+  {{#each channel_logs}}
+    <tr>
+      <td>{{from}}</td>
+      <td>{{message}}</td>
+    </tr>
+  {{/each}}
+  </table>
+  {{> chat_input}}
+</div>
+</template>
+
+<template name="chat_input">
+<form id="chat-input-form">
+  <input id="chat-input" name="chat_input" type="text" class="span12">
+</form>
+</template>
+
+<template name="chat_users">
+<div class="span2">
+  <ul>
+    {{#each channel_users}}
+      <li class="channel-user">{{name}}</li>
+    {{/each}}
+  </ul>
+</div>
+</template>
+
