@@ -80,3 +80,6 @@ Template.signup_form.SignupError = function(){
     return err;
 };
 
+updateHeight();
+
+$(window).resize(updateHeight);

@@ -1,13 +1,14 @@
 <template name="chat">
-<div class="row-fluid">
+<div id="chat" class="row-fluid" style="min-height: 0px;">
   {{> chat_connections}}
   {{> chat_main}}
   {{> chat_users}}
 </div>
+{{> chat_input}}
 </template>
 
 <template name="chat_connections">
-  <div class="span2">
+  <div id="chat-servers" class="span2" style="overflow: auto;">
     <ul>
       {{#each servers}}
         <li>{{ name }}
@@ -27,7 +28,7 @@
 </template>
 
 <template name="chat_main">
-<div class="span8">
+<div id="chat-main" class="span8" style="overflow-y: auto; overflow-x: hidden;">
   <table class="table">
   {{#each channel_logs}}
     <tr>
@@ -36,18 +37,27 @@
     </tr>
   {{/each}}
   </table>
-  {{> chat_input}}
 </div>
 </template>
 
 <template name="chat_input">
-<form id="chat-input-form">
-  <input id="chat-input" name="chat_input" type="text" class="span12">
-</form>
+<div class="navbar-fixed-bottom" style="height: 40px;">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <div class="span2"></div>
+      <div class="span8">
+        <form id="chat-input-form">
+          <input id="chat-input" name="chat_input" type="text" class="span8" style="margin-top: 5px;">
+        </form>
+      </div>
+      <div class="span2"></div>
+    </div>
+  </div>
+</div>
 </template>
 
 <template name="chat_users">
-<div class="span2">
+<div id="chat-channel-users" class="span2" style="overflow: auto;">
   <ul>
     {{#each channel_users}}
       <li class="channel-user">{{name}}</li>

@@ -8,29 +8,40 @@
 </body>
 
 <template name="header">
-<div class="navbar">
+<div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
-    <a class="brand" href="/">Waartaa</a>
-    <ul class="nav">
-    </ul>
-    <ul class="nav pull-right">
-      {{# if currentUser}}
-      <li>
-        <button id="signout" class="btn btn-success">Sign out</button>
-      </li>
-      {{/if}}
-    </ul>
+    <div class="container-fluid">
+      <a class="brand" href="/">Waartaa</a>
+      <ul class="nav">
+      </ul>
+      <ul class="nav pull-right">
+        {{# if currentUser}}
+        <li>
+          <button id="signout" class="btn btn-success">Sign out</button>
+        </li>
+        {{/if}}
+      </ul>
+    </div>
   </div>
 </div>
 </template>
 
 <template name="content">
 <div class="content-main container-fluid">
-  {{#if currentUser}}
-    {{> user_loggedin_content}}
-  {{else}}
-    {{> user_loggedout_content}}
-  {{/if}}
+  <div class="content">
+    <div class="wrapper">
+      <div class="proper-content">
+        {{#if currentUser}}
+          {{> user_loggedin_content}}
+        {{else}}
+          {{> user_loggedout_content}}
+        {{/if}}
+      </div>
+      <div class="push"></div>
+    </div>
+    <div class="footer-wrapper">
+    </div>
+  </div>
 </div>
 </template>
 

@@ -1,3 +1,9 @@
+updateHeight = function () {
+  var body_height = $('body').height();
+  var final_height = body_height - 90;
+  $('#chat, #chat-channel-users, #chat-main, #chat-servers').height(final_height);
+}
+
 Template.chat_connections.servers = function () {
   return Servers.find();
 }
@@ -11,12 +17,16 @@ Template.chat_main.channel_logs = function () {
   return ChannelLogs.find({channel_id: channel_id});
 }
 
+Template.chat_main.rendered = updateHeight;
+
 Template.server_channels.events({
   'click .channel': function (event) {
     var channel_id = $(event.target).data('id');
     Session.set('channel_id', channel_id);
   }
 });
+
+Template.server_channels.rendered = updateHeight;
 
 Template.chat_users.channel_users = function () {
   var channel_id = Session.get('channel_id');
@@ -29,6 +39,8 @@ Template.chat_users.channel_users = function () {
     nicks_list.push({name: key, status: nicks.key})
   return nicks_list;
 }
+
+Template.chat_users.rendered = updateHeight;
 
 Client = {};
 
