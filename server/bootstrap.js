@@ -67,9 +67,67 @@ initializeClients = function() {
             }).run();
           });
           client.addListener('names', function(channel, nicks) {
+            console.log('###############################');
+            console.log(nicks);
             Fiber(function () {
               Channels.update({name: channel, server_name: conn.name}, {$set: {nicks: nicks}});
             }).run();
+          });
+          client.addListener('join', function(channel, nick, message) {
+            Fiber(function (data) {
+              var channel = data.channel;
+              var nick = data.nick;
+              var message = data.message;
+              console.log([channel, nick, message]);
+              var query = {name: channel, server_name: conn.name};
+              console.log(query);
+              var channel = Channels.findOne(query);
+              if (!channel) return;
+              var nicks = channel.nicks;
+              nicks[nick] = '';
+              Channels.update({_id: channel._id}, {$set: {nicks: nicks}});
+            }).run({channel: channel, nick: nick, message: message});
+          });
+          client.addListener('part', function(channel, nick, reason, message) {
+            Fiber(function(data) {
+              var channel = data.channel;
+              var nick = data.nick;
+              var reason = data.reason;
+              var message = data.message;
+              var query = {name: channel, server_name: conn.name};
+              console.log(query);
+              var channelObj = Channels.findOne(query);
+              console.log([channelObj]);
+              if (!channelObj) return;
+              var nicks = channelObj.nicks;
+              delete nicks[nick];
+              Channels.update({_id: channelObj._id}, {$set: {nicks: nicks}});
+            }).run({
+              channel: channel,
+              nick: nick,
+              reason: reason,
+              message: message
+            });
+          });
+          client.addListener('quit', function(nick, reason, channels, message) {
+            Fiber(function (data) {
+              var nick = data.nick;
+              var reason = data.reason;
+              var channels = data.channels;
+              var message = data.message;
+              var channelObjs = Channels.find({name: {$in: channels}, server_name: conn.name});
+              channelObjs.forEach(function (channel) {
+                console.log(channel);
+                var nicks = channel.nicks;
+                delete nicks[nick];
+                Channels.update({_id: channel._id}, {$set: {nicks: nicks}});
+              });
+            }).run({
+              nick: nick,
+              reason: reason,
+              channels: channels,
+              message: message
+            });
           });
           client_server_dict[conn.name] = client;
       }
