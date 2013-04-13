@@ -22,7 +22,16 @@ Template.chat_main.rendered = updateHeight;
 Template.server_channels.events({
   'click .channel': function (event) {
     var channel_id = $(event.target).data('id');
+    $('.channel').parent().removeClass('active');
+    $(event.target).parent().addClass('active');
     Session.set('channel_id', channel_id);
+  }
+});
+
+Template.chat_users.events({
+  'click .channel-user': function (event) {
+    $('.channel-user').parent().removeClass('active');
+    $(event.target).parent().addClass('active');
   }
 });
 

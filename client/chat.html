@@ -9,9 +9,9 @@
 
 <template name="chat_connections">
   <div id="chat-servers" class="span2" style="overflow: auto;">
-    <ul>
+    <ul class="nav nav-list">
       {{#each servers}}
-        <li>{{ name }}
+        <li><a href="#">{{ name }}</a>
           {{> server_channels}}
         </li>
       {{/each}}
@@ -20,9 +20,9 @@
 </template>
 
 <template name="server_channels">
-  <ul>
+  <ul class="nav nav-list">
     {{#each channels _id}}
-      <li class="channel" data-id="{{ _id }}">{{ name }}</li>
+      <li><a class="channel" href="#" data-id="{{ _id }}">{{ name }}</a></li>
     {{/each}}
   </ul>
 </template>
@@ -58,9 +58,9 @@
 
 <template name="chat_users">
 <div id="chat-channel-users" class="span2" style="overflow: auto;">
-  <ul>
+  <ul class="nav nav-list">
     {{#each channel_users}}
-      <li class="channel-user">{{name}}</li>
+      <li><a class="channel-user" href="#">{{name}}</a></li>
     {{/each}}
   </ul>
 </div>
