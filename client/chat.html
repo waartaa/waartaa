@@ -29,7 +29,7 @@
 
 <template name="chat_main">
 <div id="chat-main" class="span8" style="overflow-y: auto; overflow-x: hidden;">
-  <table class="table">
+  <table id="chat-logs" class="table">
   {{#each channel_logs}}
     <tr>
       <td>{{from}}</td>

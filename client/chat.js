@@ -19,8 +19,17 @@ Template.chat_main.channel_logs = function () {
 
 Template.chat_main.rendered = updateHeight;
 
+Template.chat_main.events = {
+  'scroll #chat-main': function (event) {
+    Session.set('scroll_height_' + Session.get('channel_id'),
+      $(event.target).scrollTop());
+  }
+};
+
 Template.server_channels.events({
   'click .channel': function (event) {
+    var cur_channel_id = Session.get('channel_id');
+    Session.set('scroll_height_' + cur_channel_id, $('#chat-main').scrollTop() || null);
     var channel_id = $(event.target).data('id');
     $('.channel').parent().removeClass('active');
     $(event.target).parent().addClass('active');
@@ -51,6 +60,19 @@ Template.chat_users.channel_users = function () {
 
 Template.chat_users.rendered = updateHeight;
 
+Template.chat_main.rendered = function () {
+  setTimeout(function () {
+    var channel_height = Session.get(
+      'scroll_height_' + Session.get('channel_id'));
+    $('#chat-main').scrollTop(channel_height || $('#chat-logs').height());
+    Session.set('scroll_height_' + Session.get('channel_id'), null);
+  }, 0);
+};
+
+Template.chat_main.destroyed = function () {
+  Session.set('scroll_height_' + Session.get('channel_id'), $('#chat-main').scrollTop());
+};
+
 Client = {};
 
 Meteor.subscribe("client", Meteor.user() && Meteor.user().username);
@@ -70,7 +92,8 @@ Template.chat_input.events({
       channel: channel.name,
       channel_id: channel_id,
       message: message
-    })
+    });
     Meteor.call('say', message, channel_id);
+    Session.set('scroll_height_' + channel_id, null);
   }
 });
