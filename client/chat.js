@@ -85,6 +85,8 @@ Template.chat_input.events({
     var channel = Channels.findOne({_id: channel_id});
     var $chat_input = $form.find('#chat-input');
     var message = $chat_input.val();
+    if (!message)
+      return;
     $chat_input.val('');
     ChannelLogs.insert({
       from: 'rtnpro',
