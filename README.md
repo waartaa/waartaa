@@ -9,7 +9,7 @@ Setup
 =====
 1. Install Meteor: ``$ curl https://install.meteor.com | sh``
 1. Clone repo: ``$ git clone https://github.com/rtnpro/waartaa.git``
-1. Change dir to waartaa: ``$ cd waarta``
+1. Change dir to waartaa: ``$ cd waartaa``
 1. Copy sample settings file: ``$ cp server/settings-local.js-dist server/settings-local.js``
    and customize ``server/settings-local.js`` as needed.
 1. Install ``node-irc``: ``cd .meteor/local/build/server; npm install irc; cd path/to/waartaa/dir;``
