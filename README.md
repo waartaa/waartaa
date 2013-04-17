@@ -12,5 +12,6 @@ Setup
 1. Change dir to waartaa: ``$ cd waarta``
 1. Copy sample settings file: ``$ cp server/settings-local.js-dist server/settings-local.js``
    and customize ``server/settings-local.js`` as needed.
+1. Install ``node-irc``: ``cd .meteor/local/build/server; npm install irc; cd path/to/waartaa/dir;``
 1. Run ``waartaa``: ``$ meteor``
 1. Open browser at ``localhost:3000``
