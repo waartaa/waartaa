@@ -12,6 +12,10 @@ Template.server_channels.channels = function (server_id) {
   return Channels.find({server_id: server_id});
 }
 
+Template.chat.rendered = function () {
+  $('.content-main').addClass('no-padding');
+}
+
 Template.chat_main.channel_logs = function () {
   channel_id = Session.get('channel_id');
   return ChannelLogs.find({channel_id: channel_id});

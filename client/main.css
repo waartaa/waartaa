@@ -24,3 +24,17 @@ html, body, .container, .content {
     position: relative;
     height: 50px;
 }
+
+.no-padding {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+@media (min-width: 1200px) {
+  #chat-main {
+    width: 70.94017094017096% !important;
+    margin-left: 0px !important;
+  }
+  #chat-channel-users {
+    margin-left: 0px !important;
+  }
+}
