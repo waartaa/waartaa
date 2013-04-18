@@ -21,8 +21,11 @@ Template.chat_main.rendered = updateHeight;
 
 Template.chat_main.events = {
   'scroll #chat-main': function (event) {
+    var scroll_top = $(event.target).scrollTop();
+    if ((event.target.scrollHeight - scroll_top) <= $(this).outerHeight())
+      scroll_top = null;
     Session.set('scroll_height_' + Session.get('channel_id'),
-      $(event.target).scrollTop());
+      scroll_top);
   }
 };
 
@@ -65,7 +68,6 @@ Template.chat_main.rendered = function () {
     var channel_height = Session.get(
       'scroll_height_' + Session.get('channel_id'));
     $('#chat-main').scrollTop(channel_height || $('#chat-logs').height());
-    Session.set('scroll_height_' + Session.get('channel_id'), null);
   }, 0);
 };
 
