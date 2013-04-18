@@ -83,7 +83,7 @@ initializeClients = function() {
               console.log(query);
               var channel = Channels.findOne(query);
               if (!channel) return;
-              var nicks = channel.nicks;
+              var nicks = channel.nicks || {};
               nicks[nick] = '';
               Channels.update({_id: channel._id}, {$set: {nicks: nicks}});
             }).run({channel: channel, nick: nick, message: message});
