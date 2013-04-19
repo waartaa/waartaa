@@ -22,8 +22,23 @@
 <template name="server_channels">
   <ul class="nav nav-list">
     {{#each channels _id}}
-      <li><a class="channel" href="#" data-id="{{ _id }}">{{ name }}</a></li>
+      <li class="dropdown">
+        <a id="channel-id-{{ _id }}" role="button" class="channel dropdown-toggle" href="#" data-id="{{ _id }}" data-toggle="dropdown">
+          {{ name }}
+          <b class="caret pull-right"></b>
+        </a>
+        {{> channel-menu}}
+      </li>
     {{/each}}
+  </ul>
+</template>
+
+<template name="channel-menu">
+  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="channel-id-{{ _id }}" style="min-width: 80px; width: 80px;">
+    <li>
+      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-remove"></i> Close</a>
+      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-pencil"></i> Edit</a>
+    </li>
   </ul>
 </template>
 
@@ -62,9 +77,24 @@
 <div id="chat-channel-users" class="span2" style="overflow: auto;">
   <ul class="nav nav-list">
     {{#each channel_users}}
-      <li><a class="channel-user" href="#">{{name}}</a></li>
+      <li class="dropdown">
+        <a id="{{ name }}" class="channel-user dropdown-toggle" data-toggle="dropdown" href="#">
+          <i class="icon-user"></i> {{name}}
+          <b class="caret pull-right"></b>
+        </a>
+        {{>user-menu}}
+      </li>
     {{/each}}
   </ul>
 </div>
+</template>
+
+<template name="user-menu">
+  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ name }}" style="min-width: 80px; width: 80px;">
+    <li>
+      <a href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-envelope"></i> PM</a>
+      <a href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-info-sign"></i> WHOIS</a>
+    </li>
+  </ul>
 </template>
 

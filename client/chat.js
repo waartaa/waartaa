@@ -35,6 +35,9 @@ Template.chat_main.events = {
 
 Template.server_channels.events({
   'click .channel': function (event) {
+    if (!$(event.target).hasClass('channel'))
+      return;
+    event.stopPropagation();
     var cur_channel_id = Session.get('channel_id');
     Session.set('scroll_height_' + cur_channel_id, $('#chat-main').scrollTop() || null);
     var channel_id = $(event.target).data('id');
@@ -46,6 +49,9 @@ Template.server_channels.events({
 
 Template.chat_users.events({
   'click .channel-user': function (event) {
+    if ($(event.target).hasClass('caret'))
+      return;
+    event.stopPropagation();
     $('.channel-user').parent().removeClass('active');
     $(event.target).parent().addClass('active');
   }
