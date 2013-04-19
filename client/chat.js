@@ -1,4 +1,5 @@
 updateHeight = function () {
+  highlightChannel();
   var body_height = $('body').height();
   var final_height = body_height - 90;
   $('#chat, #chat-channel-users, #chat-main, #chat-servers').height(final_height);
@@ -14,6 +15,12 @@ Template.server_channels.channels = function (server_id) {
 
 Template.chat.rendered = function () {
   $('.content-main').addClass('no-padding');
+}
+
+function  highlightChannel () {
+  var channel_id = Session.get('channel_id');
+  $('.channel').parent().removeClass('active');
+  $('.channel#channel-id-' + channel_id).parent().addClass('active');
 }
 
 Template.chat_main.channel_logs = function () {
@@ -35,15 +42,14 @@ Template.chat_main.events = {
 
 Template.server_channels.events({
   'click .channel': function (event) {
-    if (!$(event.target).hasClass('channel'))
+    if ($(event.target).hasClass('caret'))
       return;
     event.stopPropagation();
     var cur_channel_id = Session.get('channel_id');
+    $('.dropdown.open').removeClass('open');
     Session.set('scroll_height_' + cur_channel_id, $('#chat-main').scrollTop() || null);
-    var channel_id = $(event.target).data('id');
-    $('.channel').parent().removeClass('active');
-    $(event.target).parent().addClass('active');
-    Session.set('channel_id', channel_id);
+    Session.set('channel_id', $(event.target).data('id'));
+    highlightChannel();
   }
 });
 
@@ -53,6 +59,7 @@ Template.chat_users.events({
       return;
     event.stopPropagation();
     $('.channel-user').parent().removeClass('active');
+    $('.dropdown.open').removeClass('open');
     $(event.target).parent().addClass('active');
   }
 });
