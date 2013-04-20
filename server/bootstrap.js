@@ -8,6 +8,8 @@ reloadUserProfiles = function (users) {
   for (var i=0; i < users.length; i++) {
     var user = users[i];
     var user_profile = user_profiles[user.username];
+    var connections = {};
+    var profile = user.profile;
     for (i in user_profile.connections) {
       var server = user_profile.connections[i];
       var serverObj = Servers.findOne({name: server.name});
@@ -18,6 +20,8 @@ reloadUserProfiles = function (users) {
         })
         serverObj = Servers.findOne({id: server_id});
       }
+      connections[serverObj._id] = server;
+      connections[serverObj._id].pms = (profile.connections[serverObj._id] || {}).pms;
       for (j in server.channels) {
         if (!Channels.findOne({server_id: serverObj._id, name: server.channels[j]})) {
           Channels.insert({
@@ -27,8 +31,9 @@ reloadUserProfiles = function (users) {
         }
       }
     }
+    profile.connections = connections;
     if (user_profile) {
-      Meteor.users.update({_id: user._id}, {$set: {profile: user_profile}});
+      Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
     }
   }
   return users;
@@ -127,6 +132,30 @@ initializeClients = function() {
               reason: reason,
               channels: channels,
               message: message
+            });
+          });
+          client.addListener('pm', function (nick, text, message) {
+            Fiber(function (data) {
+              var nick = data.nick;
+              var text = data.text;
+              var user = data.user;
+              var conn = data.conn;
+              console.log('#######PM######');
+              console.log(conn);
+              console.log(nick);
+              console.log(text);
+              var pm_log_id = PMLogs.insert({from: nick, from_user_id: null,
+                to: user.username, to_user_id: user._id,
+                message: text, time: new Date()});
+              if (conn.pms == undefined)
+                conn.pms = {};
+              if (conn.pms.nick == undefined) {
+                conn.pms[nick] = "";
+                Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
+              }
+              console.log(pm_log_id);
+            }).run({
+              nick: nick, text: text, user: user, conn: conn, profile: profile
             });
           });
           client_server_dict[conn.name] = client;

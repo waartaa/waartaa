@@ -1,6 +1,7 @@
 Servers = new Meteor.Collection("servers");
 Channels = new Meteor.Collection("channels");
 ChannelLogs = new Meteor.Collection("channel_logs");
+PMLogs = new Meteor.Collection("pm_logs");
 clients = new Meteor.Collection('clients');
 
 Meteor.publish('servers', function () {
@@ -8,11 +9,19 @@ Meteor.publish('servers', function () {
   var profile = user.profile;
   var server_names = [];
   if (profile && profile.connections) {
-    for (var i=0; i < profile.connections.length; i++) {
+    for (i in profile.connections) {
       server_names.push(profile.connections[i].name);
     }
   }
   return Servers.find({name: {$in: server_names}});
+});
+
+Meteor.publish('pm_logs', function () {
+  return PMLogs.find({$or: [
+      {from_user_id: this.userId},
+      {to_user_id: this.userId}
+    ]
+  });
 });
 
 getUserChannels = function (user) {
@@ -21,7 +30,7 @@ getUserChannels = function (user) {
   if (profile && profile.connections) {
     var query = {$or: []};
     var query_or = query.$or;
-    for (var i=0; i < profile.connections.length; i++) {
+    for (i in profile.connections) {
       var conn = profile.connections[i];
       query_or.push({
         server_name: conn.name, name: {$in: conn.channels}
@@ -47,11 +56,16 @@ Meteor.publish('channel_logs', function () {
 })
 
 Meteor.methods({
-  say: function(message, channel_id) {
+  say: function(message, id, roomtype) {
     var user = Meteor.users.findOne({_id: this.userId});
-    var channel = Channels.findOne({_id: channel_id});
-    var server = channel.server_name;
     var client = Clients[user.username][server];
-    client.say(channel.name, message);
+    if (roomtype == 'channel') {
+      var channel = Channels.findOne({_id: id});
+      var server = channel.server_name;
+      var to = channel.name;
+    } else if (roomtype == 'pm') {
+      var to = id.substr(id.indexOf('-') + 1);
+    } else return;
+    client.say(to, message);
   }
 });

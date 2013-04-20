@@ -11,19 +11,34 @@
   <div id="chat-servers" class="span2" style="overflow: auto;">
     <ul class="nav nav-list">
       {{#each servers}}
-        <li><a href="#">{{ name }}</a>
+        <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'><a href="#">{{ name }}</a>
           {{> server_channels}}
+          {{> server_pms}}
         </li>
       {{/each}}
     </ul>
   </div>
 </template>
 
+<template name="server_pms">
+  <ul class="nav nav-list">
+    {{#each pms _id}}
+      <li class="dropdown">
+        <a id="{{ server_id }}-{{ name }}" role="button" class="server-room pm dropdown-toggle" href="#" data-toggle="dropdown" data-roomtype="pm" data-nick="{{ name }}" data-serverid="{{ _id }}">
+          <i class="icon-user"></i>
+          {{ name }}
+          <b class="caret pull-right"></b>
+        </a>
+      </li>
+    {{/each}}
+  </ul>
+</template>
+
 <template name="server_channels">
   <ul class="nav nav-list">
     {{#each channels _id}}
       <li class="dropdown">
-        <a id="channel-id-{{ _id }}" role="button" class="channel dropdown-toggle" href="#" data-id="{{ _id }}" data-toggle="dropdown">
+        <a id="channel-id-{{ _id }}" role="button" class="server-room channel dropdown-toggle" href="#" data-id="{{ _id }}" data-roomtype="channel" data-toggle="dropdown">
           {{ name }}
           <b class="caret pull-right"></b>
         </a>
@@ -45,7 +60,7 @@
 <template name="chat_main">
 <div id="chat-main" class="span8" style="overflow-y: auto; overflow-x: hidden;">
   <table id="chat-logs" class="table">
-  {{#each channel_logs}}
+  {{#each chat_logs}}
     <tr>
       <td>{{from}}</td>
       <td>{{message}}</td>
@@ -92,8 +107,8 @@
 <template name="user-menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ name }}" style="min-width: 80px; width: 80px;">
     <li>
-      <a href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-envelope"></i> PM</a>
-      <a href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-info-sign"></i> WHOIS</a>
+      <a class="pm-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-envelope"></i> PM</a>
+      <a class="whois-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-info-sign"></i> WHOIS</a>
     </li>
   </ul>
 </template>
