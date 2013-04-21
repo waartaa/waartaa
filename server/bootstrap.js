@@ -56,6 +56,26 @@ initializeClients = function() {
           var client = new irc.Client(conn.servers[0], user.username, {
             channels: conn.channels
           });
+          client.addListener('registered', function (message) {
+            Fiber(function (data) {
+              var conn = data.conn;
+              var server_id = data.server_id;
+              var user_id = data.user_id;
+              conn.client_data = {
+                opt: client.opt,
+                chans: client.chans,
+                supported: client.supported,
+                nick: client.nick,
+                motd: client.motd
+              };
+              var user = Meteor.users.findOne({_id: user_id});
+              var profile = user.profile;
+              profile.connections[server_id] = conn;
+              var update_dict = {};
+              update_dict['profile.connections.' + server_id] = conn;
+              Meteor.users.update({_id: user._id}, {$set: update_dict});
+            }).run({server_id: j, conn: conn, user_id: user._id});
+          });
           client.addListener('error', function (err) {
             console.log(err);
           });
@@ -72,8 +92,6 @@ initializeClients = function() {
             }).run();
           });
           client.addListener('names', function(channel, nicks) {
-            console.log('###############################');
-            console.log(nicks);
             Fiber(function () {
               Channels.update({name: channel, server_name: conn.name}, {$set: {nicks: nicks}});
             }).run();
@@ -83,14 +101,19 @@ initializeClients = function() {
               var channel = data.channel;
               var nick = data.nick;
               var message = data.message;
-              console.log([channel, nick, message]);
               var query = {name: channel, server_name: conn.name};
-              console.log(query);
               var channel = Channels.findOne(query);
               if (!channel) return;
               var nicks = channel.nicks || {};
               nicks[nick] = '';
               Channels.update({_id: channel._id}, {$set: {nicks: nicks}});
+              if (nick == client.nick) {
+                var update_dict = {};
+                update_dict[
+                  'profile.connections.' + channel.server_id +
+                  '.client_data.chans.' + channel.name] = client.chans[channel.name];
+                Meteor.users.update({_id: user._id}, {$set: update_dict});
+              }
             }).run({channel: channel, nick: nick, message: message});
           });
           client.addListener('part', function(channel, nick, reason, message) {
@@ -100,9 +123,7 @@ initializeClients = function() {
               var reason = data.reason;
               var message = data.message;
               var query = {name: channel, server_name: conn.name};
-              console.log(query);
               var channelObj = Channels.findOne(query);
-              console.log([channelObj]);
               if (!channelObj) return;
               var nicks = channelObj.nicks;
               delete nicks[nick];
@@ -122,7 +143,6 @@ initializeClients = function() {
               var message = data.message;
               var channelObjs = Channels.find({name: {$in: channels}, server_name: conn.name});
               channelObjs.forEach(function (channel) {
-                console.log(channel);
                 var nicks = channel.nicks;
                 delete nicks[nick];
                 Channels.update({_id: channel._id}, {$set: {nicks: nicks}});
@@ -140,10 +160,6 @@ initializeClients = function() {
               var text = data.text;
               var user = data.user;
               var conn = data.conn;
-              console.log('#######PM######');
-              console.log(conn);
-              console.log(nick);
-              console.log(text);
               var pm_log_id = PMLogs.insert({from: nick, from_user_id: null,
                 to: user.username, to_user_id: user._id,
                 message: text, time: new Date()});
@@ -153,7 +169,6 @@ initializeClients = function() {
                 conn.pms[nick] = "";
                 Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
               }
-              console.log(pm_log_id);
             }).run({
               nick: nick, text: text, user: user, conn: conn, profile: profile
             });
