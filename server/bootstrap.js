@@ -49,7 +49,7 @@ initializeClients = function() {
     var connections = profile.connections;
     var user = users[i];
     var client_server_dict = Clients[user.username] || {};
-    for (var j=0; j < connections.length; j++) {
+    for (j in connections) {
       var conn = connections[j];
       if (!Clients[user.username]) {
         connections_updated = true;

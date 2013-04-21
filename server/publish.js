@@ -58,14 +58,16 @@ Meteor.publish('channel_logs', function () {
 Meteor.methods({
   say: function(message, id, roomtype) {
     var user = Meteor.users.findOne({_id: this.userId});
-    var client = Clients[user.username][server];
     if (roomtype == 'channel') {
       var channel = Channels.findOne({_id: id});
       var server = channel.server_name;
       var to = channel.name;
     } else if (roomtype == 'pm') {
       var to = id.substr(id.indexOf('-') + 1);
+      var server_id = id.split('-', 1)[0];
+      var server = Servers.findOne({_id: server_id}).name;
     } else return;
+    var client = Clients[user.username][server];
     client.say(to, message);
   }
 });

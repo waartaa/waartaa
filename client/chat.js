@@ -150,15 +150,15 @@ Template.chat_input.events({
     $chat_input.val('');
     if (Session.get('roomtype') == 'channel') {
       var room_id = Session.get('room_id');
-      var channel = Channels.findOne({_id: channel_id});
+      var channel = Channels.findOne({_id: room_id});
       ChannelLogs.insert({
         from: 'rtnpro',
         user_id: Meteor.user()._id,
         channel: channel.name,
-        channel_id: channel_id,
+        channel_id: room_id,
         message: message
       });
-      Meteor.call('say', message, channel_id, roomtype="channel");
+      Meteor.call('say', message, room_id, roomtype="channel");
     } else if (Session.get('roomtype') == 'pm') {
       var room_id = Session.get('room_id');
       var nick = room_id.substr(room_id.indexOf('-') + 1);
