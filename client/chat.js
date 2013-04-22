@@ -145,6 +145,13 @@ Template.chat_input.events({
     var $form = $(event.target);
     var $chat_input = $form.find('#chat-input');
     var message = $chat_input.val();
+    try {
+      var myNick = Meteor.user().profile.connections[Session.get(
+        'server_id')].client_data.nick;
+    } catch (err) {
+      console.log(err);
+      var myNick = null;
+    }
     if (!message)
       return;
     $chat_input.val('');
@@ -152,7 +159,7 @@ Template.chat_input.events({
       var room_id = Session.get('room_id');
       var channel = Channels.findOne({_id: room_id});
       ChannelLogs.insert({
-        from: 'rtnpro',
+        from: myNick || Meteor.user().username,
         user_id: Meteor.user()._id,
         channel: channel.name,
         channel_id: room_id,
@@ -164,7 +171,7 @@ Template.chat_input.events({
       var room_id = Session.get('room_id');
       var nick = room_id.substr(room_id.indexOf('-') + 1);
       PMLogs.insert({
-        from: Meteor.user().username,
+        from: myNick || Meteor.user().username,
         from_user_id: Meteor.user()._id,
         to: nick,
         message: message,

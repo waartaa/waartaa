@@ -161,8 +161,15 @@ initializeClients = function() {
               var text = data.text;
               var user = data.user;
               var conn = data.conn;
+              var server_id = data.server_id;
+              try {
+                var myNick = user.profile.connections[server_id].client_data.nick;
+              } catch (err) {
+                console.log(err);
+                var myNick = user.username;
+              }
               var pm_log_id = PMLogs.insert({from: nick, from_user_id: null,
-                to: user.username, to_user_id: user._id,
+                to: myNick, to_user_id: user._id,
                 message: text, time: new Date()});
               if (conn.pms == undefined)
                 conn.pms = {};
@@ -171,7 +178,8 @@ initializeClients = function() {
                 Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
               }
             }).run({
-              nick: nick, text: text, user: user, conn: conn, profile: profile
+              nick: nick, text: text, user: user, conn: conn, profile: profile,
+              server_id: j
             });
           });
           client_server_dict[conn.name] = client;
