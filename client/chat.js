@@ -156,7 +156,8 @@ Template.chat_input.events({
         user_id: Meteor.user()._id,
         channel: channel.name,
         channel_id: room_id,
-        message: message
+        message: message,
+        time: new Date(),
       });
       Meteor.call('say', message, room_id, roomtype="channel");
     } else if (Session.get('roomtype') == 'pm') {

@@ -87,7 +87,8 @@ initializeClients = function() {
                 from_user_id: null,
                 message: text,
                 channel_name: to,
-                channel_id: channel._id
+                channel_id: channel._id,
+                time: new Date(),
               });
             }).run();
           });
