@@ -1,1 +1,2 @@
-irc = __meteor_bootstrap__.require('irc');
+irc = Npm.require('irc');
+Fiber = Npm.require('fibers');
