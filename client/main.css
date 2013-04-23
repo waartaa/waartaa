@@ -38,3 +38,9 @@ html, body, .container, .content {
     margin-left: 0px !important;
   }
 }
+
+#chat-input-form .typeahead.dropdown-menu {
+    bottom: 40px !important;
+    top: -70px !important;
+    overflow-y: auto; 
+}

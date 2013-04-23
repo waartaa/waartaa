@@ -78,7 +78,9 @@
         <div class="span2">&nbsp;</div>
         <div class="span8">
           <form id="chat-input-form">
-            <input id="chat-input" name="chat_input" type="text" class="span12" style="margin-top: 5px;">
+            <input id="chat-input" name="chat_input" type="text"
+              class="span12" style="margin-top: 5px;" data-provide="typeahead"
+              autocomplete="off" data-source="{{ nicks }}">
           </form>
         </div>
         <div class="span2">&nbsp;</div>

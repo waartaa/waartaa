@@ -71,9 +71,14 @@ function serverRoomSelectHandler (event) {
     if ($target.data('roomtype') == 'channel') {
       Session.set('roomtype', 'channel');
       Session.set('room_id', $(event.target).data('id'));
+      var channel_nicks = [];
+      for (var nick in Channels.findOne({_id: Session.get('room_id')}).nicks || {})
+        channel_nicks.push(nick);
+      $('#chat-input').attr('data-source', JSON.stringify(channel_nicks));
     } else if ($target.data('roomtype') == 'pm') {
       Session.set('roomtype', 'pm');
       Session.set('room_id', $target.attr('id'));
+      $('#chat-input').removeAttr('data-source');
     }
     highlightChannel();
 } 
@@ -118,7 +123,7 @@ Template.chat_users.channel_users = function () {
     return nicks_list;
   } else
     return [];
-}
+};
 
 Template.chat_users.rendered = updateHeight;
 
