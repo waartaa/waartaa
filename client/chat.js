@@ -24,7 +24,7 @@ function  highlightChannel () {
     $('.server-room#channel-id-' + room_id).parent().addClass('active');
   else if (Session.get('roomtype') == 'pm')
     $('.server-room#' + room_id).parent().addClass('active');
-
+  typeaheadUserNicks();
 }
 
 Template.chat_main.chat_logs = function () {
@@ -58,30 +58,47 @@ Template.chat_main.events = {
   }
 };
 
-function typeaheadUserNicks (channel_nicks) {
-  function extractor(query) {
-      var result = /([^ ]+)$/.exec(query);
-      if(result && result[1])
-          return result[1].trim();
-      return '';
-  }
-  $('#chat-input').typeahead({
-    source: channel_nicks,
-    updater: function(item) {
-        return this.$element.val().replace(/[^ ]*$/,'')+item;
-    },
-    matcher: function (item) {
-      var tquery = extractor(this.query);
-      if(!tquery) return false;
-      return ~item.toLowerCase().indexOf(tquery.toLowerCase())
-    },
-    highlighter: function (item) {
-      var query = extractor(this.query).replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
-      return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-        return '<strong>' + match + '</strong>'
-      })
+function typeaheadUserNicks () {
+  var $chat_input = $('#chat-input');
+  if ($chat_input.length <= 0)
+    return;
+  var initial = true;
+  if ($chat_input.data('typeahead'))
+    initial = false;
+  if (initial) {
+    function extractor(query) {
+        var result = /([^ ]+)$/.exec(query);
+        if(result && result[1])
+            return result[1].trim();
+        return '';
     }
-  });
+    $chat_input.typeahead({
+      source: getChannelNicks(),
+      updater: function(item) {
+          return this.$element.val().replace(/[^ ]*$/,'')+item;
+      },
+      matcher: function (item) {
+        var tquery = extractor(this.query);
+        if(!tquery) return false;
+        return ~item.toLowerCase().indexOf(tquery.toLowerCase())
+      },
+      highlighter: function (item) {
+        var query = extractor(this.query).replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
+        return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+          return '<strong>' + match + '</strong>'
+        })
+      }
+    });
+  }
+  $chat_input.data('typeahead').source = getChannelNicks();
+}
+
+function getChannelNicks () {
+  var channel_nicks = [];
+  var channel = Channels.findOne({_id: Session.get('room_id')}) || {};
+  for (var nick in channel.nicks || {})
+    channel_nicks.push(nick);
+  return channel_nicks;
 }
 
 function serverRoomSelectHandler (event) {
@@ -91,21 +108,18 @@ function serverRoomSelectHandler (event) {
     event.stopPropagation();
     var server_id = $target.parents('.server').data('server-id');
     Session.set('server_id', server_id);
-    var channel_nicks = [];
     $('.dropdown.open').removeClass('open');
       var prev_room_id = Session.get('room_id');
       Session.set('scroll_height_' + prev_room_id, $('#chat-main').scrollTop() || null);
     if ($target.data('roomtype') == 'channel') {
       Session.set('roomtype', 'channel');
       Session.set('room_id', $(event.target).data('id'));
-      for (var nick in Channels.findOne({_id: Session.get('room_id')}).nicks || {})
-        channel_nicks.push(nick);
+      channel_nicks = getChannelNicks();
     } else if ($target.data('roomtype') == 'pm') {
       Session.set('roomtype', 'pm');
       Session.set('room_id', $target.attr('id'));
     }
     highlightChannel();
-    typeaheadUserNicks(channel_nicks);
 } 
 
 Template.chat_connections.events({
