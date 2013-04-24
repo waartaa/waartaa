@@ -58,6 +58,32 @@ Template.chat_main.events = {
   }
 };
 
+function typeaheadUserNicks (channel_nicks) {
+  function extractor(query) {
+      var result = /([^ ]+)$/.exec(query);
+      if(result && result[1])
+          return result[1].trim();
+      return '';
+  }
+  $('#chat-input').typeahead({
+    source: channel_nicks,
+    updater: function(item) {
+        return this.$element.val().replace(/[^ ]*$/,'')+item;
+    },
+    matcher: function (item) {
+      var tquery = extractor(this.query);
+      if(!tquery) return false;
+      return ~item.toLowerCase().indexOf(tquery.toLowerCase())
+    },
+    highlighter: function (item) {
+      var query = extractor(this.query).replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
+      return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+        return '<strong>' + match + '</strong>'
+      })
+    }
+  });
+}
+
 function serverRoomSelectHandler (event) {
     var $target = $(event.target);
     if ($target.hasClass('caret'))
@@ -65,22 +91,21 @@ function serverRoomSelectHandler (event) {
     event.stopPropagation();
     var server_id = $target.parents('.server').data('server-id');
     Session.set('server_id', server_id);
+    var channel_nicks = [];
     $('.dropdown.open').removeClass('open');
       var prev_room_id = Session.get('room_id');
       Session.set('scroll_height_' + prev_room_id, $('#chat-main').scrollTop() || null);
     if ($target.data('roomtype') == 'channel') {
       Session.set('roomtype', 'channel');
       Session.set('room_id', $(event.target).data('id'));
-      var channel_nicks = [];
       for (var nick in Channels.findOne({_id: Session.get('room_id')}).nicks || {})
         channel_nicks.push(nick);
-      $('#chat-input').attr('data-source', JSON.stringify(channel_nicks));
     } else if ($target.data('roomtype') == 'pm') {
       Session.set('roomtype', 'pm');
       Session.set('room_id', $target.attr('id'));
-      $('#chat-input').removeAttr('data-source');
     }
     highlightChannel();
+    typeaheadUserNicks(channel_nicks);
 } 
 
 Template.chat_connections.events({
