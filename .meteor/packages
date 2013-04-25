@@ -7,3 +7,5 @@ insecure
 preserve-inputs
 bootstrap
 accounts-password
+jquery-ui-bootstrap
+jquery-ui
