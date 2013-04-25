@@ -212,6 +212,11 @@ Client = {};
 Meteor.subscribe("client", Meteor.user() && Meteor.user().username);
 
 Template.chat_input.events({
+  'keydown #chat-input': function (e) {
+    var keyCode = e.keyCode || e.which;
+    if (keyCode == 9)
+      e.preventDefault();
+  },
   'submit #chat-input-form': function (event) {
     event.preventDefault();
     var $form = $(event.target);
