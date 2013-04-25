@@ -24,7 +24,7 @@ function  highlightChannel () {
     $('.server-room#channel-id-' + room_id).parent().addClass('active');
   else if (Session.get('roomtype') == 'pm')
     $('.server-room#' + room_id).parent().addClass('active');
-  typeaheadUserNicks();
+  refreshAutocompleteNicksSource();
 }
 
 Template.chat_main.chat_logs = function () {
@@ -58,39 +58,66 @@ Template.chat_main.events = {
   }
 };
 
-function typeaheadUserNicks () {
-  var $chat_input = $('#chat-input');
-  if ($chat_input.length <= 0)
-    return;
-  var initial = true;
-  if ($chat_input.data('typeahead'))
-    initial = false;
-  if (initial) {
-    function extractor(query) {
-        var result = /([^ ]+)$/.exec(query);
-        if(result && result[1])
-            return result[1].trim();
-        return '';
-    }
-    $chat_input.typeahead({
-      source: getChannelNicks(),
-      updater: function(item) {
-          return this.$element.val().replace(/[^ ]*$/,'')+item;
+function autocompleteNicksInitiate () {
+  function split (val) {
+    return val.split(/,\s*/ );
+  }
+
+  function extractLast ( term ) {
+    return split(term).pop();
+  }
+
+  $('#chat-input')
+    .bind('keydown', function (event) {
+      if ( event.keyCode === $.ui.keyCode.TAB &&
+            $( this ).data( "ui-autocomplete" ).menu.active ) {
+          event.preventDefault();
+      }
+    })
+    .autocomplete({
+      autoFocus: true,
+      minLength: 0,
+      source: function( request, response ) {
+        // delegate back to autocomplete, but extract the last term
+        response( $.ui.autocomplete.filter(
+          getChannelNicks(), extractLast( request.term ) ) );
       },
-      matcher: function (item) {
-        var tquery = extractor(this.query);
-        if(!tquery) return false;
-        return ~item.toLowerCase().indexOf(tquery.toLowerCase())
+      focus: function() {
+        // prevent value inserted on focus
+        return false;
       },
-      highlighter: function (item) {
-        var query = extractor(this.query).replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
-        return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-          return '<strong>' + match + '</strong>'
-        })
+      select: function( event, ui ) {
+        var terms = split( this.value );
+        // remove the current input
+        terms.pop();
+        // add the selected item
+        terms.push( ui.item.value );
+        // add placeholder to get the comma-and-space at the end
+        terms.push( "" );
+        this.value = terms.join( ", " );
+        return false;
+      },
+      open: function($event, ui) {
+          var $widget = $("ul.ui-autocomplete");
+          var $input = $("#chat-input");
+          var position = $input.position();
+
+          var top_offset = $widget.find('li').length * 24;
+          if (top_offset > 200)
+            top_offset = 200;
+          $("#chat-input-form").append($widget);
+          $widget.width('auto')
+            .css('max-height', 200)
+            .css('overflow', 'auto')
+            .css("left", position.left + $input.val().length * 6)
+            .css("bottom", 36)
+            .css("top", - top_offset - 2);
       }
     });
-  }
-  $chat_input.data('typeahead').source = getChannelNicks();
+}
+
+function refreshAutocompleteNicksSource () {
+  $('chat-input').autocomplete('option', 'source', getChannelNicks());
 }
 
 function getChannelNicks () {
@@ -242,3 +269,7 @@ Template.chat_users.events = {
     Session.set('room_id', Session.get('server_id') + '-' + nick);
   }
 };
+
+Template.chat_input.rendered = function () {
+  autocompleteNicksInitiate();
+}

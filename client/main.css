@@ -44,3 +44,9 @@ html, body, .container, .content {
     top: -70px !important;
     overflow-y: auto; 
 }
+
+.ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br {
+  border-bottom-right-radius: 2px !important;
+  border-bottom-left-radius: 2px !important;
+  margin-bottom: 0em !important;
+}
