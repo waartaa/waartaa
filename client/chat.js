@@ -61,7 +61,7 @@ Template.chat_main.events = {
 
 function autocompleteNicksInitiate () {
   function split (val) {
-    return val.split(/,\s*/ );
+    return val.split(/(^|[\ ]+)@/ );
   }
 
   function extractLast ( term ) {
@@ -77,11 +77,17 @@ function autocompleteNicksInitiate () {
     })
     .autocomplete({
       autoFocus: true,
-      minLength: 0,
+      minLength: 1,
       source: function( request, response ) {
         // delegate back to autocomplete, but extract the last term
         response( $.ui.autocomplete.filter(
           getChannelNicks(), extractLast( request.term ) ) );
+      },
+      search: function (event, ui) {
+        var $input = $('#chat-input');
+        var val = $input.val() || "";
+        if (val.split(' ').length == 1 && val.length >= 1 && val[0] != '@')
+          return false;
       },
       focus: function() {
         // prevent value inserted on focus
@@ -93,9 +99,9 @@ function autocompleteNicksInitiate () {
         terms.pop();
         // add the selected item
         terms.push( ui.item.value );
-        // add placeholder to get the comma-and-space at the end
-        terms.push( "" );
-        this.value = terms.join( ", " );
+        this.value = terms.join( "" );
+        if (this.value.length >= 1 && this.value[0] == "")
+          this.value = this.value.substr(1);
         return false;
       },
       open: function($event, ui) {
