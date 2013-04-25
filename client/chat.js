@@ -25,6 +25,7 @@ function  highlightChannel () {
   else if (Session.get('roomtype') == 'pm')
     $('.server-room#' + room_id).parent().addClass('active');
   refreshAutocompleteNicksSource();
+  $('#chat-input').focus();
 }
 
 Template.chat_main.chat_logs = function () {
