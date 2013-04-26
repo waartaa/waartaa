@@ -58,24 +58,31 @@
 </template>
 
 <template name="chat_main">
-<div id="chat-main" class="span8" style="overflow-y: auto; overflow-x: hidden;">
-  <table id="chat-logs" class="table">
-  {{# if no_room }}
-    {{#each server_logs}}
-      <tr>
-        <td>{{from}}</td>
-        <td>{{message}}</td>
-      </tr>
-    {{/each}}
-  {{ else }}
-    {{#each chat_logs}}
-      <tr>
-        <td>{{from}}</td>
-        <td>{{message}}</td>
-      </tr>
-    {{/each}}
-  </table>
-  {{/ if }}
+<div id="chat-main" class="span8">
+  <div class="topic">
+    <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+      <li><a href="#">{{topic}}</a></li>
+    </ul>
+  </div>
+  <div id="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
+    <table id="chat-logs" class="table">
+    {{# if no_room }}
+      {{#each server_logs}}
+        <tr>
+          <td>{{from}}</td>
+          <td>{{message}}</td>
+        </tr>
+      {{/each}}
+    {{ else }}
+      {{#each chat_logs}}
+        <tr>
+          <td>{{from}}</td>
+          <td>{{message}}</td>
+        </tr>
+      {{/each}}
+    </table>
+    {{/ if }}
+  </div>
 </div>
 </template>
 

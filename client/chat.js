@@ -3,6 +3,7 @@ updateHeight = function () {
   var body_height = $('body').height();
   var final_height = body_height - 90;
   $('#chat, #chat-channel-users, #chat-main, #chat-servers').height(final_height);
+  $('#chat-logs-container').height(final_height - $('#chat-main .topic').height() - 15);
 }
 
 Template.chat_connections.servers = function () {
@@ -43,6 +44,18 @@ Template.chat_main.chat_logs = function () {
   }
 }
 
+Template.chat_main.topic = function () {
+  try {
+    var channel = Channels.findOne({_id: Session.get('room_id')});
+    if (channel) {
+      var user = Meteor.user();
+      return user.profile.connections[channel.server_id]['client_data']['chans'][channel.name]['topic'];
+    }
+  } catch (err) {
+    return "";
+  }
+};
+
 Template.chat_main.server_logs = function () {
   var server_id = Session.get('server_id');
   return ServerLogs.find({server_id: server_id});
@@ -57,7 +70,7 @@ Template.chat_main.no_room = function () {
 Template.chat_main.rendered = updateHeight;
 
 Template.chat_main.events = {
-  'scroll #chat-main': function (event) {
+  'scroll #chat-logs-container': function (event) {
     var scroll_top = $(event.target).scrollTop();
     if ((event.target.scrollHeight - scroll_top) <= $(this).outerHeight())
       scroll_top = null;
@@ -155,7 +168,7 @@ function serverRoomSelectHandler (event) {
     Session.set('server_id', server_id);
     $('.dropdown.open').removeClass('open');
       var prev_room_id = Session.get('room_id');
-      Session.set('scroll_height_' + prev_room_id, $('#chat-main').scrollTop() || null);
+      Session.set('scroll_height_' + prev_room_id, $('#chat-logs-container').scrollTop() || null);
     if ($target.data('roomtype') == 'channel') {
       Session.set('roomtype', 'channel');
       Session.set('room_id', $(event.target).data('id'));
@@ -222,12 +235,12 @@ Template.chat_main.rendered = function () {
     updateHeight();
     var channel_height = Session.get(
       'scroll_height_' + Session.get('channel_id'));
-    $('#chat-main').scrollTop(channel_height || $('#chat-logs').height());
+    $('#chat-logs-container').scrollTop(channel_height || $('#chat-logs').height());
   }, 0);
 };
 
 Template.chat_main.destroyed = function () {
-  Session.set('scroll_height_' + Session.get('channel_id'), $('#chat-main').scrollTop());
+  Session.set('scroll_height_' + Session.get('channel_id'), $('#chat-logs-container').scrollTop());
 };
 
 Client = {};
