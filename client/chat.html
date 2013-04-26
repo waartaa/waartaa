@@ -11,7 +11,7 @@
   <div id="chat-servers" class="span2" style="overflow: auto;">
     <ul class="nav nav-list">
       {{#each servers}}
-        <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'><a href="#">{{ name }}</a>
+        <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'><a id='server-link-{{ _id }}' class='server-link' data-server-id='{{ _id }}' href="#">{{ name }}</a>
           {{> server_channels}}
           {{> server_pms}}
         </li>
@@ -60,13 +60,22 @@
 <template name="chat_main">
 <div id="chat-main" class="span8" style="overflow-y: auto; overflow-x: hidden;">
   <table id="chat-logs" class="table">
-  {{#each chat_logs}}
-    <tr>
-      <td>{{from}}</td>
-      <td>{{message}}</td>
-    </tr>
-  {{/each}}
+  {{# if no_room }}
+    {{#each server_logs}}
+      <tr>
+        <td>{{from}}</td>
+        <td>{{message}}</td>
+      </tr>
+    {{/each}}
+  {{ else }}
+    {{#each chat_logs}}
+      <tr>
+        <td>{{from}}</td>
+        <td>{{message}}</td>
+      </tr>
+    {{/each}}
   </table>
+  {{/ if }}
 </div>
 </template>
 

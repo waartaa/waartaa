@@ -3,6 +3,7 @@ Channels = new Meteor.Collection("channels");
 ChannelLogs = new Meteor.Collection("channel_logs");
 PMLogs = new Meteor.Collection("pm_logs");
 clients = new Meteor.Collection('clients');
+ServerLogs = new Meteor.Collection("server_logs");
 
 Meteor.publish('servers', function () {
   var user = Meteor.users.findOne({_id: this.userId});
@@ -22,6 +23,10 @@ Meteor.publish('pm_logs', function () {
       {to_user_id: this.userId}
     ]
   });
+});
+
+Meteor.publish('server_logs', function () {
+  return ServerLogs.find({to_user_id: this.userId});
 });
 
 getUserChannels = function (user) {

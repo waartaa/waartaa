@@ -182,6 +182,22 @@ initializeClients = function() {
               server_id: j
             });
           });
+          client.addListener('notice', function (nick, to, text, message) {
+            console.log(nick + '->' + to  + ': ' + text);
+            console.log(message);
+            Fiber(function (data) {
+              if (! data.nick)
+                return;
+              ServerLogs.insert({
+                from: data.nick, from_user_id: null, to: data.to,
+                to_user_id: user._id, server_id: data.server_id,
+                message: data.text, time: new Date(), type: 'notice'
+              });
+            }).run({
+              user: user, nick: nick, to: to, text: text,
+              server_id: j, message: message
+            })
+          });
           client_server_dict[conn.name] = client;
       }
     }

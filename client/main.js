@@ -2,12 +2,14 @@ Servers = new Meteor.Collection("servers");
 Channels = new Meteor.Collection("channels");
 ChannelLogs = new Meteor.Collection("channel_logs");
 PMLogs = new Meteor.Collection("pm_logs");
+ServerLogs = new Meteor.Collection("server_logs");
 
 subscribe = function () {
   Meteor.subscribe("servers");
   Meteor.subscribe("channels");
   Meteor.subscribe("channel_logs");
   Meteor.subscribe("pm_logs");
+  Meteor.subscribe("server_logs");
 };
 
 subscribe();

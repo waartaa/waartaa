@@ -43,6 +43,17 @@ Template.chat_main.chat_logs = function () {
   }
 }
 
+Template.chat_main.server_logs = function () {
+  var server_id = Session.get('server_id');
+  return ServerLogs.find({server_id: server_id});
+};
+
+Template.chat_main.no_room = function () {
+  if (Session.get('room_id'))
+    return false;
+  return true;
+};
+
 Template.chat_main.rendered = updateHeight;
 
 Template.chat_main.events = {
@@ -157,7 +168,13 @@ function serverRoomSelectHandler (event) {
 } 
 
 Template.chat_connections.events({
-  'click .server-room': serverRoomSelectHandler
+  'click .server-room': serverRoomSelectHandler,
+  'click .server-link': function (e) {
+    e.preventDefault();
+    var $target = $(e.target);
+    Session.set('room_id');
+    Session.set('server_id', $target.data('server-id'));
+  }
 });
 
 Template.server_pms.pms = function (id) {
