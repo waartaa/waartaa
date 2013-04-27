@@ -48,8 +48,7 @@ Template.chat_main.topic = function () {
   try {
     var channel = Channels.findOne({_id: Session.get('room_id')});
     if (channel) {
-      var user = Meteor.user();
-      return user.profile.connections[channel.server_id]['client_data']['chans'][channel.name]['topic'];
+      return channel.topic || "";
     }
   } catch (err) {
     return "";

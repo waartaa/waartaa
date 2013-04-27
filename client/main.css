@@ -50,3 +50,13 @@ html, body, .container, .content {
   border-bottom-left-radius: 2px !important;
   margin-bottom: 0em !important;
 }
+
+.topic {
+  color: black;
+  text-decoration: none !important;
+  background-color: #eeeeee !important;
+}
+
+.topic p {
+  margin: 5px;
+}

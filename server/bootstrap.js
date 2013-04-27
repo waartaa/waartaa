@@ -198,6 +198,18 @@ initializeClients = function() {
               server_id: j, message: message
             })
           });
+        client.addListener('topic', function (channel, topic, nick, message) {
+          Fiber(function (data) {
+            var channelObj = Channels.findOne({name: channel, server_id: j});
+            if (channelObj) {
+              if (channelObj.topic != topic) {
+                Channels.update({_id: channelObj._id}, {$set: {topic: topic}});
+              }
+            }
+          }).run({
+            channel: channel, topic: topic, nick: nick, message: message});
+          console.log(channel, topic, nick, message);
+        });
           client_server_dict[conn.name] = client;
       }
     }
