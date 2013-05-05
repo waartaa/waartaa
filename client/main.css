@@ -60,3 +60,18 @@ html, body, .container, .content {
 .topic p {
   margin: 5px;
 }
+
+div.dropdown a {
+  text-decoration: none;
+}
+
+.server-link-ul {
+  position: relative;
+  width: 154px;
+  left: -24px;
+}
+
+.server-label {
+  padding-left: 12px;
+  padding-right: 61px;
+}

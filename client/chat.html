@@ -11,13 +11,32 @@
   <div id="chat-servers" class="span2" style="overflow: auto;">
     <ul class="nav nav-list">
       {{#each servers}}
-        <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'><a id='server-link-{{ _id }}' class='server-link' data-server-id='{{ _id }}' href="#">{{ name }}</a>
+        <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
+          <ul class="server-link-ul nav nav-list">
+            <li class="dropdown">
+              <a id='server-link-{{ _id }}' class='server-link dropdown-toggle' data-server-id='{{ _id }}' href="#" data-toggle="dropdown">
+                <span class="server-label">{{ name }}</span>
+                <i class="dropdown-caret icon-chevron-down"></i>
+              </a>
+              {{> server_menu}}
+            </li>
+          </ul>
           {{> server_channels}}
           {{> server_pms}}
         </li>
       {{/each}}
     </ul>
   </div>
+</template>
+
+<template name="server_menu">
+  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="channel-id-{{ _id }}" style="min-width: 85px; width: 85px;">
+    <li>
+      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-plus"></i> Channel</a>
+      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-pencil"></i> Edit</a>
+      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-remove"></i> Close</a>
+    </li>
+  </ul>
 </template>
 
 <template name="server_pms">

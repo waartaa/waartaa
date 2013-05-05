@@ -21,12 +21,16 @@ Template.chat.rendered = function () {
 function  highlightChannel () {
   var room_id = Session.get('room_id');
   $('.server-room').parent().removeClass('active');
-  if (Session.get('roomtype') == 'channel')
-    $('.server-room#channel-id-' + room_id).parent().addClass('active');
-  else if (Session.get('roomtype') == 'pm')
-    $('.server-room#' + room_id).parent().addClass('active');
-  refreshAutocompleteNicksSource();
-  $('#chat-input').focus();
+  if (room_id) {
+    if (Session.get('roomtype') == 'channel')
+      $('.server-room#channel-id-' + room_id).parent().addClass('active');
+    else if (Session.get('roomtype') == 'pm')
+      $('.server-room#' + room_id).parent().addClass('active');
+    refreshAutocompleteNicksSource();
+    $('#chat-input').focus();
+  } else {
+    var server_id = Session.get('server_id');
+  }
 }
 
 Template.chat_main.chat_logs = function () {
@@ -160,21 +164,25 @@ function getChannelNicks () {
 
 function serverRoomSelectHandler (event) {
     var $target = $(event.target);
-    if ($target.hasClass('caret'))
+    if ($target.hasClass('caret') || $target.hasClass('dropdown-caret'))
       return;
     event.stopPropagation();
-    var server_id = $target.parents('.server').data('server-id');
-    Session.set('server_id', server_id);
     $('.dropdown.open').removeClass('open');
       var prev_room_id = Session.get('room_id');
       Session.set('scroll_height_' + prev_room_id, $('#chat-logs-container').scrollTop() || null);
     if ($target.data('roomtype') == 'channel') {
+      var server_id = $target.parents('.server').data('server-id');
+      Session.set('server_id', server_id);
       Session.set('roomtype', 'channel');
       Session.set('room_id', $(event.target).data('id'));
       channel_nicks = getChannelNicks();
     } else if ($target.data('roomtype') == 'pm') {
+      var server_id = $target.parents('.server').data('server-id');
+      Session.set('server_id', server_id);
       Session.set('roomtype', 'pm');
       Session.set('room_id', $target.attr('id'));
+    } else {
+      Session.set('server_id', $target.parent().data('server-id'));
     }
     highlightChannel();
 } 
@@ -182,10 +190,11 @@ function serverRoomSelectHandler (event) {
 Template.chat_connections.events({
   'click .server-room': serverRoomSelectHandler,
   'click .server-link': function (e) {
-    e.preventDefault();
-    var $target = $(e.target);
-    Session.set('room_id');
-    Session.set('server_id', $target.data('server-id'));
+    if (!$(e.target).hasClass('dropdown-caret')) {
+      Session.set('room_id');
+      Session.set('roomtype');
+    }
+    serverRoomSelectHandler(e);
   }
 });
 
@@ -199,16 +208,14 @@ Template.server_pms.pms = function (id) {
   return return_pms;
 }
 
-Template.chat_users.events({
-  'click .channel-user': function (event) {
+function chatUserClickHandler (event) {
     if ($(event.target).hasClass('caret'))
       return;
     event.stopPropagation();
     $('.channel-user').parent().removeClass('active');
     $('.dropdown.open').removeClass('open');
     $(event.target).parent().addClass('active');
-  }
-});
+}
 
 Template.server_channels.rendered = updateHeight;
 
@@ -308,7 +315,8 @@ Template.chat_users.events = {
     Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
     Session.set('roomtype', 'pm');
     Session.set('room_id', Session.get('server_id') + '-' + nick);
-  }
+  },
+  'click .channel-user': chatUserClickHandler,
 };
 
 Template.chat_input.rendered = function () {
