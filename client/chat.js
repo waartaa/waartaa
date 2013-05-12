@@ -20,6 +20,8 @@ Template.chat.rendered = function () {
 
 function  highlightChannel () {
   var room_id = Session.get('room_id');
+  var server_id = Session.get('server_id');
+  $('#server-' + server_id).find('.dropdown.active').removeClass('active');
   $('.server-room').parent().removeClass('active');
   if (room_id) {
     if (Session.get('roomtype') == 'channel')
@@ -29,7 +31,7 @@ function  highlightChannel () {
     refreshAutocompleteNicksSource();
     $('#chat-input').focus();
   } else {
-    var server_id = Session.get('server_id');
+    $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
   }
 }
 
@@ -168,8 +170,8 @@ function serverRoomSelectHandler (event) {
       return;
     event.stopPropagation();
     $('.dropdown.open').removeClass('open');
-      var prev_room_id = Session.get('room_id');
-      Session.set('scroll_height_' + prev_room_id, $('#chat-logs-container').scrollTop() || null);
+    var prev_room_id = Session.get('room_id');
+    Session.set('scroll_height_' + prev_room_id, $('#chat-logs-container').scrollTop() || null);
     if ($target.data('roomtype') == 'channel') {
       var server_id = $target.parents('.server').data('server-id');
       Session.set('server_id', server_id);
