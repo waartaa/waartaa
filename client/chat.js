@@ -23,16 +23,14 @@ function  highlightChannel () {
   var server_id = Session.get('server_id');
   $('#server-' + server_id).find('.dropdown.active').removeClass('active');
   $('.server-room').parent().removeClass('active');
-  if (room_id) {
-    if (Session.get('roomtype') == 'channel')
-      $('.server-room#channel-id-' + room_id).parent().addClass('active');
-    else if (Session.get('roomtype') == 'pm')
-      $('.server-room#' + room_id).parent().addClass('active');
-    refreshAutocompleteNicksSource();
-    $('#chat-input').focus();
-  } else {
+  if (Session.get('roomtype') == 'channel')
+    $('.server-room#channel-id-' + room_id).parent().addClass('active');
+  else if (Session.get('roomtype') == 'pm')
+    $('.server-room#' + room_id).parent().addClass('active');
+  else if (Session.get('roomtype') == 'server')
     $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
-  }
+  $('#chat-input').focus();
+  refreshAutocompleteNicksSource();
 }
 
 Template.chat_main.chat_logs = function () {
@@ -47,7 +45,11 @@ Template.chat_main.chat_logs = function () {
         {from_user_id: Meteor.user()._id, to: nick}
       ]
     });
+  } else if (Session.get('roomtype') == 'server') {
+    var server_id = Session.get('room_id');
+    return ServerLogs.find({server_id: server_id});
   }
+
 }
 
 Template.chat_main.topic = function () {
@@ -61,30 +63,24 @@ Template.chat_main.topic = function () {
   }
 };
 
-Template.chat_main.server_logs = function () {
-  var server_id = Session.get('server_id');
-  return ServerLogs.find({server_id: server_id});
-};
-
-Template.chat_main.no_room = function () {
-  if (Session.get('room_id'))
-    return false;
-  return true;
-};
-
 Template.chat_main.rendered = updateHeight;
 
 Template.chat_main.events = {
   'scroll #chat-logs-container': function (event) {
     var scroll_top = $(event.target).scrollTop();
+    var room_id = Session.get('room_id');
     if ((event.target.scrollHeight - scroll_top) <= $(this).outerHeight())
       scroll_top = null;
     if (Session.get('roomtype') == 'channel')
-      Session.set('scroll_height_' + Session.get('channel_id'),
+      Session.set('scroll_height_channel-' + room_id,
         scroll_top);
     else if (Session.get('roomtype') == 'pm')
-      Session.set('scroll_height_' + Session.get('pm_id'),
+      Session.set('scroll_height_' + room_id,
         scroll_top);
+    else if (Session.get('roomtype') == 'server')
+      Session.set('scroll_height_server-' + Session.get('server_id'),
+        scroll_top);
+
   }
 };
 
@@ -171,7 +167,11 @@ function serverRoomSelectHandler (event) {
     event.stopPropagation();
     $('.dropdown.open').removeClass('open');
     var prev_room_id = Session.get('room_id');
-    Session.set('scroll_height_' + prev_room_id, $('#chat-logs-container').scrollTop() || null);
+    var prefix = '';
+    var prev_roomtype = Session.get('roomtype');
+    if (prev_roomtype == 'server' || prev_roomtype == 'channel')
+      prefix = prev_roomtype + '-';
+    Session.set('scroll_height_' + prefix + prev_room_id, $('#chat-logs-container').scrollTop() || null);
     if ($target.data('roomtype') == 'channel') {
       var server_id = $target.parents('.server').data('server-id');
       Session.set('server_id', server_id);
@@ -183,21 +183,17 @@ function serverRoomSelectHandler (event) {
       Session.set('server_id', server_id);
       Session.set('roomtype', 'pm');
       Session.set('room_id', $target.attr('id'));
-    } else {
-      Session.set('server_id', $target.parent().data('server-id'));
+    } else if ($target.data('roomtype') == 'server' || $target.parent().data('roomtype') == 'server') {
+      Session.set('room_id', $target.parent().data('server-id') || $target.data('server-id'));
+      Session.set('server_id', Session.get('room_id'));
+      Session.set('roomtype', 'server');
     }
     highlightChannel();
 } 
 
 Template.chat_connections.events({
   'click .server-room': serverRoomSelectHandler,
-  'click .server-link': function (e) {
-    if (!$(e.target).hasClass('dropdown-caret')) {
-      Session.set('room_id');
-      Session.set('roomtype');
-    }
-    serverRoomSelectHandler(e);
-  }
+  'click .server-link': serverRoomSelectHandler
 });
 
 Template.server_pms.pms = function (id) {
@@ -241,14 +237,25 @@ Template.chat_users.rendered = updateHeight;
 Template.chat_main.rendered = function () {
   setTimeout(function () {
     updateHeight();
-    var channel_height = Session.get(
-      'scroll_height_' + Session.get('channel_id'));
-    $('#chat-logs-container').scrollTop(channel_height || $('#chat-logs').height());
+    var roomtype = Session.get('roomtype');
+    var key = '';
+    var room_id = Session.get('room_id');
+    if (roomtype == 'channel')
+      key = 'scroll_height_channel-' + room_id;
+    else if (roomtype == 'pm')
+      key = 'scroll_height_' + room_id;
+    else if (roomtype == 'server')
+      key = 'scroll_height_server-' + room_id;
+    var chat_height = Session.get(key);
+    $('#chat-logs-container').scrollTop(chat_height || $('#chat-logs').height());
   }, 0);
 };
 
 Template.chat_main.destroyed = function () {
-  Session.set('scroll_height_' + Session.get('channel_id'), $('#chat-logs-container').scrollTop());
+  var roomtype = Session.get('roomtype');
+  if (roomtype == 'server' || roomtype == 'channel')
+    prefix = roomtype + '-';
+  Session.set('scroll_height_' + prefix + Session.get('room_id'), $('#chat-logs-container').scrollTop());
 };
 
 Client = {};
@@ -276,9 +283,11 @@ Template.chat_input.events({
     if (!message)
       return;
     $chat_input.val('');
+    var prefix = '';
     if (Session.get('roomtype') == 'channel') {
-      var room_id = Session.get('room_id');
+      var room_id = 'channel-' + Session.get('room_id');
       var channel = Channels.findOne({_id: room_id});
+      prefix = 'channel-';
       ChannelLogs.insert({
         from: myNick || Meteor.user().username,
         user_id: Meteor.user()._id,
@@ -299,8 +308,11 @@ Template.chat_input.events({
         time: new Date(),
       });
       Meteor.call('say', message, room_id, roomtype='pm');
+    } else if (Session.get('roomtype') == 'server') {
+      var room_id = 'server-' + Session.get('server_id');
+      prefix = 'server-';
     }
-    Session.set('scroll_height_' + room_id, null);
+    Session.set('scroll_height_' + prefix + room_id, null);
   }
 });
 

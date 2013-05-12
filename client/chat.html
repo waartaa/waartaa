@@ -14,7 +14,7 @@
         <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
           <ul class="server-link-ul nav nav-list">
             <li class="dropdown">
-              <a id='server-link-{{ _id }}' class='server-link dropdown-toggle' data-server-id='{{ _id }}' href="#" data-toggle="dropdown">
+              <a id='server-link-{{ _id }}' class='server-link dropdown-toggle' data-server-id='{{ _id }}' data-roomtype="server" href="#" data-toggle="dropdown">
                 <span class="server-label">{{ name }}</span>
                 <i class="dropdown-caret icon-chevron-down"></i>
               </a>
@@ -94,22 +94,13 @@
   </div>
   <div id="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
     <table id="chat-logs" class="table">
-    {{# if no_room }}
-      {{#each server_logs}}
-        <tr>
-          <td>{{from}}</td>
-          <td>{{message}}</td>
-        </tr>
-      {{/each}}
-    {{ else }}
       {{#each chat_logs}}
-        <tr>
-          <td>{{from}}</td>
-          <td>{{message}}</td>
-        </tr>
+      <tr>
+        <td>{{from}}</td>
+        <td>{{message}}</td>
+      </tr>
       {{/each}}
     </table>
-    {{/ if }}
   </div>
 </div>
 </template>
