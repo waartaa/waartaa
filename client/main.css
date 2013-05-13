@@ -67,11 +67,11 @@ div.dropdown a {
 
 .server-link-ul {
   position: relative;
-  width: 154px;
-  left: -24px;
+  width: 92%;
+  left: -8%;
 }
 
 .server-label {
-  padding-left: 12px;
-  padding-right: 61px;
+  padding-left: 3%;
+  padding-right: 46%;
 }
