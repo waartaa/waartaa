@@ -80,7 +80,8 @@ initializeClients = function() {
                   Fiber(function (data) {
                     var user = Meteor.users.findOne({_id: data.user._id});
                     console.log(client.chans);
-                    var update_dict = {'profile.connections.client_data.chans': client.chans}
+                    var update_dict = {};
+                    update_dict['profile.connections.' + server_id + '.client_data.chans'] = client.chans;
                     Meteor.users.update({_id: user._id}, {$set: update_dict});
                   }).run({user: user});
                 });

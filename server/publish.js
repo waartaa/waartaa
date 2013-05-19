@@ -31,14 +31,17 @@ Meteor.publish('server_logs', function () {
 
 getUserChannels = function (user) {
   var profile = user.profile;
-  var channel_names = [];
   if (profile && profile.connections) {
     var query = {$or: []};
     var query_or = query.$or;
     for (i in profile.connections) {
+      var channel_names = [];
       var conn = profile.connections[i];
+      for (chan_name in conn.client_data.chans) {
+        channel_names.push(chan_name);
+      }
       query_or.push({
-        server_name: conn.name, name: {$in: conn.channels}
+        server_name: conn.name, name: {$in: channel_names}
       });
     }
     return Channels.find(query);
@@ -74,5 +77,19 @@ Meteor.methods({
     } else return;
     var client = Clients[user.username][server];
     client.say(to, message);
+  },
+  join: function (channel_name, server_id) {
+    var user = Meteor.users.findOne({_id: this.userId});
+    var server = Servers.findOne({_id: server_id});
+    var channel = Channels.findOne({server_id: server_id, name: channel_name});
+    if (!channel) {
+      Channels.insert({name: channel_name, server_id: server_id, server_name: server.name});
+    }
+    console.log(server_id);
+    console.log(Clients);
+    var client = Clients[user.username][server.name];
+    client.join(channel_name, function () {
+      console.log('Joined channel: ' + channel_name);
+    });
   }
 });
