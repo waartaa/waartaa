@@ -74,6 +74,17 @@ initializeClients = function() {
               var update_dict = {};
               update_dict['profile.connections.' + server_id] = conn;
               Meteor.users.update({_id: user._id}, {$set: update_dict});
+              for (i in conn.channels) {
+                var channel_name = conn.channels[i];
+                client.join(channel_name, function() {
+                  Fiber(function (data) {
+                    var user = Meteor.users.findOne({_id: data.user._id});
+                    console.log(client.chans);
+                    var update_dict = {'profile.connections.client_data.chans': client.chans}
+                    Meteor.users.update({_id: user._id}, {$set: update_dict});
+                  }).run({user: user});
+                });
+          }
             }).run({server_id: j, conn: conn, user_id: user._id});
           });
           client.addListener('error', function (err) {

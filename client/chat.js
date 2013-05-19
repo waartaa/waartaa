@@ -285,7 +285,7 @@ Template.chat_input.events({
     $chat_input.val('');
     var prefix = '';
     if (Session.get('roomtype') == 'channel') {
-      var room_id = 'channel-' + Session.get('room_id');
+      var room_id = Session.get('room_id');
       var channel = Channels.findOne({_id: room_id});
       prefix = 'channel-';
       ChannelLogs.insert({
