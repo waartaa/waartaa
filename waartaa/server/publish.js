@@ -1,10 +1,3 @@
-Servers = new Meteor.Collection("servers");
-Channels = new Meteor.Collection("channels");
-ChannelLogs = new Meteor.Collection("channel_logs");
-PMLogs = new Meteor.Collection("pm_logs");
-clients = new Meteor.Collection('clients');
-ServerLogs = new Meteor.Collection("server_logs");
-
 Meteor.publish('servers', function () {
   var user = Meteor.users.findOne({_id: this.userId});
   if (user) {

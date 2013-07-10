@@ -2,17 +2,26 @@
   "meteor": {
     "git": "https://github.com/meteor/meteor.git",
     "branch": "master",
-    "commit": "1e9b9480d171114e0bb4c09f31ccc9afac74a898"
+    "commit": "9bb2b5447e845c4f483df5e9b42a2c1de5ab909b"
   },
   "dependencies": {
     "basePackages": {
-      "jquery-ui-bootstrap": {}
+      "jquery-ui-bootstrap": {},
+      "irc": {
+        "git": "https://github.com/rtnpro/meteor-node-irc",
+        "branch": "patch-1"
+      }
     },
     "packages": {
       "jquery-ui-bootstrap": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui-bootstrap.git",
         "tag": "v0.1.2",
         "commit": "fa742a85639307003e105898e15b631394b63509"
+      },
+      "irc": {
+        "git": "https://github.com/rtnpro/meteor-node-irc",
+        "branch": "patch-1",
+        "commit": "0959fd498261e9852801fba1ab7b4d4389adeccd"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

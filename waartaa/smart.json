@@ -1,5 +1,9 @@
 {
   "packages": {
-    "jquery-ui-bootstrap": {}
+    "jquery-ui-bootstrap": {},
+    "irc": {
+        "git": "https://github.com/rtnpro/meteor-node-irc",
+        "branch": "patch-1"
+    }
   }
 }

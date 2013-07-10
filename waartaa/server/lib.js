@@ -1,2 +1,2 @@
-irc = Npm.require('irc');
+irc = IRC;
 Fiber = Npm.require('fibers');
