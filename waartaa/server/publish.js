@@ -7,14 +7,16 @@ ServerLogs = new Meteor.Collection("server_logs");
 
 Meteor.publish('servers', function () {
   var user = Meteor.users.findOne({_id: this.userId});
-  var profile = user.profile;
-  var server_names = [];
-  if (profile && profile.connections) {
-    for (i in profile.connections) {
-      server_names.push(profile.connections[i].name);
+  if (user) {
+    var profile = user.profile;
+    var server_names = [];
+    if (profile && profile.connections) {
+      for (i in profile.connections) {
+        server_names.push(profile.connections[i].name);
+      }
     }
+    return Servers.find({name: {$in: server_names}});
   }
-  return Servers.find({name: {$in: server_names}});
 });
 
 Meteor.publish('pm_logs', function () {
@@ -50,12 +52,12 @@ getUserChannels = function (user) {
 
 Meteor.publish('channels', function() {
   var user = Meteor.users.findOne({_id: this.userId});
-  return getUserChannels(user);
+  return [];//getUserChannels(user);
 });
 
 Meteor.publish('channel_logs', function () {
   var user = Meteor.users.findOne({_id: this.userId});
-  var channels = getUserChannels(user);
+  var channels = []; //getUserChannels(user);
   var channel_ids = [];
   channels.forEach(function (channel) {
     channel_ids.push(channel._id);
