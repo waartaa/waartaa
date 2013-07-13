@@ -2,29 +2,62 @@
   <title>Waartaa</title>
 </head>
 <body>
-  {{> header}}
-  {{> content}}
-  {{> footer}}
+  {{> body}}
 </body>
 
-<template name="header">
-<div class="navbar navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container-fluid">
-      <a class="brand" href="/">Waartaa</a>
-      <ul class="nav">
-      </ul>
-      <ul class="nav pull-right">
-        {{# if currentUser}}
-        <li>
-          <button id="signout" class="btn btn-success">Sign out</button>
-        </li>
-        {{/if}}
-      </ul>
+<template name="body">
+  {{> header}}
+  <!--{{> content}}-->
+  <div class="content-main container-fluid">
+    <div class="content">
+      <div class="wrapper">
+        <div class="proper-content">
+          {{renderPage}}
+        </div>
+      </div>
     </div>
   </div>
-</div>
+  {{> footer}}
 </template>
+
+<template name="header">
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <button class="btn btn-navbar" data-target=".nav-collapse" data-toggle="collapse" type="button">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="brand" href="/">Waartaa</a>
+        <div class="nav-collapse collapse">
+          {{# if isUserLoggedIn}}
+          <ul class="nav">
+            <li{{# if isCurrentPageHome}} class="active"{{/if}}>
+              <a href="/home/">Home</a>
+            </li>
+            <li>
+              <a href="/chat/">Chat</a>
+            </li>
+            <li>
+              <a href="/settings/">Settings</a>
+          </ul>
+          {{/if}}
+          <ul class="nav pull-right">
+            </li>
+            {{# if currentUser}}
+            <li>
+              <button id="signout" class="btn btn-success">Sign out</button>
+            </li>
+            {{/if}}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="navbar"></template>
 
 <template name="content">
 <div class="content-main container-fluid">
@@ -43,7 +76,7 @@
 </template>
 
 <template name="user_loggedin_content">
-  {{> chat}}
+  {{> user_dashboard}}
 </template>
 
 <template name="account_settings">

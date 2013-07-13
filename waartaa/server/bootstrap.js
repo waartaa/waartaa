@@ -7,7 +7,7 @@ reloadUserProfiles = function (users) {
   }
   for (var i=0; i < users.length; i++) {
     var user = users[i];
-    var user_profile = user_profiles[user.username];
+    var user_profile = user_profiles[user.username] || {};
     var connections = {};
     var profile = user.profile;
     for (i in user_profile.connections) {
@@ -231,7 +231,7 @@ initializeClients = function() {
   }
 }
 
-Meteor.startup(function () {
+/*Meteor.startup(function () {
   if (Servers.find().count() === 0) {
     var connections = [
       {
@@ -258,4 +258,4 @@ Meteor.startup(function () {
     }
   }
   Fiber(initializeClients).run();
-});
+});*/

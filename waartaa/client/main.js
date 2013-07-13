@@ -1,8 +1,8 @@
-Servers = new Meteor.Collection("servers");
-Channels = new Meteor.Collection("channels");
-ChannelLogs = new Meteor.Collection("channel_logs");
-PMLogs = new Meteor.Collection("pm_logs");
-ServerLogs = new Meteor.Collection("server_logs");
+//Servers = new Meteor.Collection("servers");
+//Channels = new Meteor.Collection("channels");
+//ChannelLogs = new Meteor.Collection("channel_logs");
+//PMLogs = new Meteor.Collection("pm_logs");
+//ServerLogs = new Meteor.Collection("server_logs");
 
 subscribe = function () {
   Meteor.subscribe("servers");
@@ -19,7 +19,9 @@ Clients = new Meteor.Collection("clients");
 
 Template.header.events({
   'click #signout': function(){
-    Meteor.logout();
+    Meteor.logout(function (err) {
+      Meteor.Router.to('/');
+    });
   }
 });
 
@@ -52,6 +54,7 @@ Template.signin_form.events({
         Session.set('SigninFormError', err);
       else
         Session.set('SigninFormError');
+      Meteor.Router.to('/home');
     });
   }
 });
@@ -87,3 +90,30 @@ Template.signup_form.SignupError = function(){
 updateHeight();
 
 $(window).resize(updateHeight);
+
+
+Meteor.Router.add({
+  '': function () {
+    if (Meteor.user())
+      setTimeout(Meteor.Router.to('/home'), 1);
+    else {
+      Session.set('currentPage');
+      return 'user_loggedout_content';
+    }
+  },
+  '/home': function () {
+    if (Meteor.userId()) {
+      Session.set('currentPage', 'home');
+      return 'user_dashboard';
+    } else {
+      setTimeout(Meteor.Router.to('/'), 1);
+    }
+  },
+});
+
+Handlebars.registerHelper("isCurrentPageHome", function () {
+  return Session.get('currentPage') === 'home';
+});
+Handlebars.registerHelper("isUserLoggedIn", function () {
+  return Meteor.user();
+});
