@@ -96,26 +96,38 @@ $(window).resize(updateHeight);
 
 Meteor.Router.add({
   '': function () {
-    if (Meteor.user())
-      setTimeout(Meteor.Router.to('/home'), 1);
-    else {
-      Session.set('currentPage');
-      return 'user_loggedout_content';
-    }
+    Session.set('currentPage');
+    return 'user_loggedout_content';
   },
   '/home': function () {
-    if (Meteor.userId()) {
-      Session.set('currentPage', 'home');
-      return 'user_dashboard';
-    } else {
-      setTimeout(Meteor.Router.to('/'), 1);
-    }
+    Session.set('currentPage', 'home');
+    return 'user_dashboard';
   },
+  '/chat': function () {
+    Session.set('currentPage', 'chat');
+    return 'chat';
+  }
 });
+
+Meteor.Router.filters({
+  'login_required': function (page) {
+    if (Meteor.user()) {
+      return page;
+    } else {
+      return 'user_loggedout_content';
+    }
+  }
+});
+
+Meteor.Router.filter('login_required', {only: ['user_dashboard', 'chat']});
 
 Handlebars.registerHelper("isCurrentPageHome", function () {
   return Session.get('currentPage') === 'home';
 });
 Handlebars.registerHelper("isUserLoggedIn", function () {
   return Meteor.user();
+});
+Handlebars.registerHelper("isCurrentPageChat", function () {
+  console.log('hey');
+  return Session.get('currentPage') === 'chat';
 });

@@ -197,6 +197,7 @@ Template.chat_connections.events({
 });
 
 Template.server_pms.pms = function (id) {
+  return;
   var server = Servers.findOne({_id: id});
   var user = Meteor.user();
   var pms = user.profile.connections[id].pms;
