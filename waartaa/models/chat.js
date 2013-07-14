@@ -1,17 +1,35 @@
 /*
 Severs: {
   name: String,
-  type: String (global/private),
   creator: String <username>,
   creator_id: String <user_id>,
   last_updater: String,
   last_updater_id: String,
-  parent: String (server_id),
   created: Date,
-  last_updated: Date
+  last_updated: Date,
+  connections: List of items like {url: 'irc.freenode.net', }
 }
 */
 Servers = new Meteor.Collection("servers");
+
+/*
+UserServers: {
+  name: String,
+  server_id: String,
+  nick: String,
+  password: String,
+  channels: A list of strings,
+  user: String,
+  user_id: String,
+  created: Date,
+  creator: String <username>,
+  creator_id: Sring <user_id>,
+  last_updated: Date,
+  last_updater: String <username>,
+  last_updater_id: String <user_id>
+}
+*/
+UserServers = new Meteor.Collection("user_servers");
 
 /*
 ServerConnections: {

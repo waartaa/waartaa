@@ -3,6 +3,7 @@
 //ChannelLogs = new Meteor.Collection("channel_logs");
 //PMLogs = new Meteor.Collection("pm_logs");
 //ServerLogs = new Meteor.Collection("server_logs");
+//UserServers = new Meteor.Collection("user_servers");
 
 subscribe = function () {
   Meteor.subscribe("servers");
@@ -10,6 +11,7 @@ subscribe = function () {
   Meteor.subscribe("channel_logs");
   Meteor.subscribe("pm_logs");
   Meteor.subscribe("server_logs");
+  Meteor.subscribe("user_servers");
 };
 
 subscribe();

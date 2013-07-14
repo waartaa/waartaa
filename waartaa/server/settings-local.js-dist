@@ -13,3 +13,12 @@ user_profiles = {
   }
   */
 }
+
+Servers = {
+  'Freenode': {
+    connections: [
+      {url: 'irc.freenode.net', port: '6667'},
+      {url: 'irc.freenode.net', port: '8000'}
+    ]
+  }
+}

@@ -65,6 +65,40 @@ function _create_update_user_server(server, data, user) {
 
 }
 
+function _create_user_server(data, user) {
+    var server = Servers.findOne({_id: data.server_id});
+    if (! server)
+        throw new Meteor.Error(400, "Missing server info.");
+    var user_server = UserServers.findOne({name: server.name});
+    if (user_server)
+        throw new Meteor.Error(400, "User server already exists.");
+    else {
+        var channels = [];
+        var now = new Date();
+        var splitted_channels = data.channels.split(',');
+        for (i in splitted_channels) {
+            var channel = splitted_channels[i];
+            channels.push(channel.trim());
+        }
+        console.log(channels);
+        var user_server_id = UserServers.insert({
+            name: server.name,
+            server_id: server._id,
+            channels: channels,
+            nick: data.nick,
+            password: data.password,
+            user: user.username,
+            user_id: user._id,
+            created: now,
+            creator: user.username,
+            creator_id: user._id,
+            last_updated: now,
+            last_updater: user.username,
+            last_updater_id: user._id
+        })
+    }
+}
+
 Meteor.methods({
     // Create/update global servers (by admin users)
     server_create_update : function (data) {
@@ -76,7 +110,8 @@ Meteor.methods({
         _create_update_server(server, data, user);
     },
     // Create/update user servers
-    user_server_create_update: function (data) {
-
+    user_server_create: function (data) {
+        var user = Meteor.users.findOne({_id: this.userId});
+        _create_user_server(data, user);
     }
 })

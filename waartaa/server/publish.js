@@ -1,15 +1,9 @@
 Meteor.publish('servers', function () {
-  var user = Meteor.users.findOne({_id: this.userId});
-  if (user) {
-    var profile = user.profile;
-    var server_names = [];
-    if (profile && profile.connections) {
-      for (i in profile.connections) {
-        server_names.push(profile.connections[i].name);
-      }
-    }
-    return Servers.find({name: {$in: server_names}});
-  }
+  return Servers.find();
+});
+
+Meteor.publish('user_servers', function () {
+  return UserServers.find({user_id: this.userId});
 });
 
 Meteor.publish('pm_logs', function () {
