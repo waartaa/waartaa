@@ -7,7 +7,7 @@ Severs: {
   last_updater_id: String,
   created: Date,
   last_updated: Date,
-  connections: List of items like {url: 'irc.freenode.net', }
+  connections: List of items like {url: 'irc.freenode.net', port: '6667'}
 }
 */
 Servers = new Meteor.Collection("servers");
@@ -26,7 +26,8 @@ UserServers: {
   creator_id: Sring <user_id>,
   last_updated: Date,
   last_updater: String <username>,
-  last_updater_id: String <user_id>
+  last_updater_id: String <user_id>,
+  status: String (online/offline/connecting)
 }
 */
 UserServers = new Meteor.Collection("user_servers");
@@ -47,11 +48,12 @@ ServerConnections: {
 ServerConnections = new Meteor.Collection("server_connections");
 
 /*
-Channels: {
+UserChannels: {
   name: String,
   server_id: String,
   server_name: String,
-  users: Dictionary,
+  nicks: Dictionary,
+  password: String,
   creator: String,
   creator_id: String,
   last_updater: String,
@@ -60,7 +62,7 @@ Channels: {
   last_updated: Date
 }
 */
-Channels = new Meteor.Collection("channels");
+UserChannels = new Meteor.Collection("user_channels");
 
 /*
 ChannelCredentials: {
@@ -84,7 +86,6 @@ ChannelLogs: {
   message: String,
   raw_message: String,
   from: String,
-  from_nick: String,
   from_username: String,
   from_user_id: String,
   created: Date,
@@ -98,6 +99,7 @@ ChannelLogs: {
 }
 */
 ChannelLogs = new Meteor.Collection("channel_logs");
+UserChannelLogs = new Meteor.Collection("user_channel_logs");
 
 /*
 PMLogs: {

@@ -99,6 +99,14 @@ function _create_user_server(data, user) {
     }
 }
 
+function getCurrentUser() {
+    return Meteor.users.findOne({_id: this.userId});
+}
+
+Meteor.startup(function () {
+    CLIENTS = {};
+});
+
 Meteor.methods({
     // Create/update global servers (by admin users)
     server_create_update : function (data) {
@@ -113,5 +121,42 @@ Meteor.methods({
     user_server_create: function (data) {
         var user = Meteor.users.findOne({_id: this.userId});
         _create_user_server(data, user);
+    },
+    join_user_server: function (user_server_name) {
+        var user = Meteor.users.findOne({_id: this.userId});
+        console.log(irc_handler);
+        var user_server = UserServers.findOne({
+            user: user.username, name: user_server_name});
+        if (user_server) {
+            var irc_handler = IRCHandler(user, user_server);
+            if (!CLIENTS[user.username]) {
+                CLIENTS[user.username] = {};
+            }
+            console.log(CLIENTS);
+            CLIENTS[user.username][user_server_name] = irc_handler;
+            console.log('CLIENTS: ' + CLIENTS);
+            irc_handler.joinUserServer();
+        } else
+            throw new Meteor.Error(404, "User server with name: "
+                + user_server_name + " does not exist!");
+    },
+    join_user_channel: function (user_server_name, channel_name) {
+        var user = Meteor.users.findOne({_id: this.userId});
+        var irc_handler = CLIENTS[user.username][user_server_name];
+        irc_handler.joinChannel(channel_name);
+    },
+    send_channel_message: function (user_channel_id, message) {
+        var user_channel = UserChannels.findOne({
+            _id: user_channel_id, user_id: this.userId});
+        var user_server = UserServers.findOne({_id: user_channel.user_server_id});
+        var user = Meteor.users.findOne({_id: this.userId});
+        var irc_handler = CLIENTS[user.username][user_server.name];
+        irc_handler.sendChannelMessage(user_channel.name, message);
+    },
+    change_nick: function (server_name, nick) {
+        var user_server = UserServers.findOne({name: server_name, user_id: this.userId});
+        var user = Meteor.users.findOne({_id: this.userId});
+        var irc_handler = CLIENTS[user.username][user_server.name];
+        irc_handler.changeNick(nick);
     }
 })

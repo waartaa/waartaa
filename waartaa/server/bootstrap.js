@@ -262,6 +262,8 @@ initializeClients = function() {
 
 function initializeServers () {
   var user = Meteor.users.findOne({username: SUPER_USER});
+  if (! user)
+    return;
   for (server_name in GlobalServers) {
     var server = Servers.findOne({name: server_name});
     if (! server) {

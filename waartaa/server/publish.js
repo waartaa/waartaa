@@ -6,6 +6,15 @@ Meteor.publish('user_servers', function () {
   return UserServers.find({user_id: this.userId});
 });
 
+Meteor.publish('user_channels', function () {
+  console.log(UserChannels.findOne());
+  return UserChannels.find({user_id: this.userId});
+});
+
+Meteor.publish("user_channel_logs", function () {
+  return UserChannelLogs.find({user_id: this.userId});
+})
+
 Meteor.publish('pm_logs', function () {
   return PMLogs.find({$or: [
       {from_user_id: this.userId},

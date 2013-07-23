@@ -3,15 +3,15 @@ updateHeight = function () {
   var body_height = $('body').height();
   var final_height = body_height - 90;
   $('#chat, #chat-channel-users, #chat-main, #chat-servers').height(final_height);
-  $('#chat-logs-container').height(final_height - $('#chat-main .topic').height() - 15);
+  $('#chat-logs-container').height(final_height - $('#chat-main .topic').height() - 24);
 }
 
 Template.chat_connections.servers = function () {
-  return Servers.find();
+  return UserServers.find();
 }
 
 Template.server_channels.channels = function (server_id) {
-  return Channels.find({server_id: server_id});
+  return UserChannels.find({user_server_id: server_id});
 }
 
 Template.chat.rendered = function () {
@@ -36,7 +36,7 @@ function  highlightChannel () {
 Template.chat_main.chat_logs = function () {
   var room_id = Session.get('room_id');
   if (Session.get('roomtype') == 'channel') {
-    return ChannelLogs.find({channel_id: room_id});
+    return UserChannelLogs.find({channel_id: room_id});
   } else if (Session.get('roomtype') == 'pm') {
     var nick = room_id.substr(room_id.indexOf('-') + 1);
     return PMLogs.find({
@@ -54,7 +54,7 @@ Template.chat_main.chat_logs = function () {
 
 Template.chat_main.topic = function () {
   try {
-    var channel = Channels.findOne({_id: Session.get('room_id')});
+    var channel = UserChannels.findOne({_id: Session.get('room_id')});
     if (channel) {
       return channel.topic || "";
     }
@@ -154,7 +154,7 @@ function refreshAutocompleteNicksSource () {
 
 function getChannelNicks () {
   var channel_nicks = [];
-  var channel = Channels.findOne({_id: Session.get('room_id')}) || {};
+  var channel = UserChannels.findOne({_id: Session.get('room_id')}) || {};
   for (var nick in channel.nicks || {})
     channel_nicks.push(nick);
   return channel_nicks;
@@ -198,7 +198,7 @@ Template.chat_connections.events({
 
 Template.server_pms.pms = function (id) {
   return;
-  var server = Servers.findOne({_id: id});
+  var server = UserServers.findOne({_id: id});
   var user = Meteor.user();
   var pms = user.profile.connections[id].pms;
   var return_pms = [];
@@ -221,7 +221,7 @@ Template.server_channels.rendered = updateHeight;
 Template.chat_users.channel_users = function () {
   if (Session.get('roomtype') == 'channel') {
     var channel_id = Session.get('room_id');
-    var channel = Channels.findOne({_id: channel_id});
+    var channel = UserChannels.findOne({_id: channel_id});
     var nicks = {};
     if (channel)
       nicks = channel.nicks || {};
@@ -287,9 +287,9 @@ Template.chat_input.events({
     var prefix = '';
     if (Session.get('roomtype') == 'channel') {
       var room_id = Session.get('room_id');
-      var channel = Channels.findOne({_id: room_id});
+      var channel = UserChannels.findOne({_id: room_id});
       prefix = 'channel-';
-      ChannelLogs.insert({
+      UserChannelLogs.insert({
         from: myNick || Meteor.user().username,
         user_id: Meteor.user()._id,
         channel: channel.name,
@@ -297,7 +297,7 @@ Template.chat_input.events({
         message: message,
         time: new Date(),
       });
-      Meteor.call('say', message, room_id, roomtype="channel");
+      Meteor.call('send_channel_message', channel._id, message);
     } else if (Session.get('roomtype') == 'pm') {
       var room_id = Session.get('room_id');
       var nick = room_id.substr(room_id.indexOf('-') + 1);

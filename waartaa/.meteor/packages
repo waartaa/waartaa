@@ -9,5 +9,5 @@ bootstrap
 accounts-password
 jquery-ui-bootstrap
 jquery-ui
-backbone
 router
+irc
