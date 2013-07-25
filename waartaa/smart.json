@@ -5,6 +5,7 @@
       "git": "https://github.com/rtnpro/meteor-node-irc",
       "branch": "patch-1"
     },
-    "router": {}
+    "router": {},
+    "observatory": {}
   }
 }

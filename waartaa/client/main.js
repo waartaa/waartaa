@@ -130,6 +130,5 @@ Handlebars.registerHelper("isUserLoggedIn", function () {
   return Meteor.user();
 });
 Handlebars.registerHelper("isCurrentPageChat", function () {
-  console.log('hey');
   return Session.get('currentPage') === 'chat';
 });
