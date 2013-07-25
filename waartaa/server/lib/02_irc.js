@@ -146,11 +146,26 @@ IRCHandler = function (user, user_server) {
         });
     }
 
+    function _addChannelTopicListener () {
+        client.addListener('topic', function (channel, topic, nick, message) {
+            Fiber(function () {
+                logger.debug('Nick: ' + nick + ' set topic for channel: ' +
+                    channel + ' in server: ' + user_server.name + ' as:' + topic,
+                    '@' + user.username + ':ChannelTopic');
+                UserChannels.update({
+                    name: channel, user_server_id: user_server._id,
+                    user: user.username
+                }, {$set: {topic: topic}});
+            }).run();
+        });
+    }
+
     function _joinServerCallback (message) {
         UserServers.update({_id: user_server._id}, {$set: {
             status: 'connected'}
         });
         _addServerQuitListener();
+        _addChannelTopicListener();
         _.each(user_server.channels, function (channel_name) {
             var channel = getOrCreateUserChannel({name: channel_name});
             _addChannelNamesListener(channel.name);
