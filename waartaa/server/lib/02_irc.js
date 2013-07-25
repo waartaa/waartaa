@@ -5,6 +5,7 @@ IRCHandler = function (user, user_server) {
     /* Event listener callbacks */
     /* Callbacks */
     function getOrCreateUserChannel(channel_data) {
+        console.log(channel_data);
         var channel = UserChannels.findOne({
             user_server_id: user_server._id, name: channel_data.name});
         if (!channel) {
@@ -23,33 +24,17 @@ IRCHandler = function (user, user_server) {
             });
             var channel = UserChannels.findOne({_id: user_channel_id});
         }
+        console.log(channel_data);
         return channel;
     }
-    function _joinChannelCallback (message, channel_name) {
-        console.log("Joined channel: " + channel_name);
-        console.log(client);
-        console.log(user_server);
-        client.addListener('message' + channel_name, function (
-                nick, text, message) {
-            console.log(nick + "->" + channel_name + ': ' + text + '\n' + message);
-        });
+    function _joinChannelCallback (message, channel) {
+        //console.log("Joined channel: " + channel.name);
+        //console.log(client);
+        //console.log(user_server);
         Fiber(function () {
-            var channel = getOrCreateUserChannel({name: channel_name});
-            console.log(channel);
-            client.addListener('names' + channel_name, function (nicks) {
-                console.log(nicks);
-                Fiber(function () {
-                    UserChannels.update({_id: channel._id}, {
-                        $set: {
-                            nicks: nicks
-                        }
-                    });
-                }).run();
-            });
-
-            client.addListener('message' + channel_name,
+            client.addListener('message' + channel.name,
                     function (nick, text, message) {
-                console.log(user_server + "/" + channel.name + ": " + nick + '->' + text);
+                //console.log(user_server + "/" + channel.name + ": " + nick + '->' + text);
                 Fiber(function () {
                     UserChannelLogs.insert({
                         message: text,
@@ -57,7 +42,7 @@ IRCHandler = function (user, user_server) {
                         from: nick,
                         from_user: null,
                         from_user_id: null,
-                        channel_name: channel_name,
+                        channel_name: channel.name,
                         channel_id: channel._id,
                         server_name: user_server.name,
                         server_id: user_server._id,
@@ -71,17 +56,101 @@ IRCHandler = function (user, user_server) {
         }).run();
     }
 
+    function _addChannelNamesListener (channel_name) {
+        client.addListener('names' + channel_name, function (nicks) {
+            Fiber(function () {
+                console.log('Fiber channel_name: ' + channel_name);
+                var channel = UserChannels.findOne({
+                  name: channel_name, user_server_id: user_server._id});
+                if (channel)
+                  UserChannels.update({_id: channel._id}, {
+                      $set: {
+                          nicks: nicks
+                      }
+                  });
+            }).run();
+        });
+    }
+
+    function _addChannelJoinListener (channel_name) {
+        client.addListener('join' + channel_name, function (nick, message) {
+            console.log('NICK JOIN MESSAGE: ' + nick + ', ' + message);
+            console.log(message);
+            Fiber(function () {
+                var channel = UserChannels.findOne({name: channel_name});
+                if (channel) {
+                    var nicks = channel.nicks || {};
+                    nicks[nick] = '';
+                    UserChannels.update({_id: channel._id}, {
+                        $set: {
+                            nicks: nicks
+                        }
+                    });
+                }
+            }).run();
+        });
+    }
+
+    function _addChannelPartListener (channel_name) {
+        client.addListener('part' + channel_name, function (nick, reason, message) {
+            console.log('LEAVING CHANNEL: ' + nick + ', ' + reason + ', ' + message);
+            console.log(message);
+            Fiber(function () {
+                var channel = UserChannels.findOne({name: channel_name});
+                if (channel) {
+                    var nicks = channel.nicks || {};
+                    try {
+                        delete nicks[nick];
+                    } catch (err) {}
+                    UserChannels.update({_id: channel._id}, {
+                        $set: {
+                            nicks: nicks
+                        }
+                    });
+                }
+            }).run();
+        });
+    }
+
+    function _addServerQuitListener () {
+        client.addListener('quit', function (nick, reason, channels, message) {
+            console.log("USER QUITTING SERVER: " + nick + ', ' + reason);
+            console.log(channels);
+            console.log(message);
+            Fiber(function () {
+                _.each(channels, function (channel_name) {
+                    var channel = UserChannels.findOne({
+                        name: channel_name, user_server_id: user_server._id,
+                        user: user.username
+                    });
+                    if (channel) {
+                        var nicks = channel.nicks;
+                        delete nicks[nick];
+                        UserChannels.update({_id: channel._id}, {
+                            $set: {nicks: nicks}
+                        });
+                    }
+                });
+            }).run();
+        });
+    }
+
     function _joinServerCallback (message) {
-        console.log("Joined server: " + message);
-        console.log(user_server);
+        //console.log("Joined server: " + message);
+        //console.log(user_server);
         UserServers.update({_id: user_server._id}, {$set: {
             status: 'connected'}
         });
-        _.each(user_server.channels, function (channel) {
-            client.join(channel, function (message) {
-                Fiber(function () {
+        _addServerQuitListener();
+        _.each(user_server.channels, function (channel_name) {
+            var channel = getOrCreateUserChannel({name: channel_name});
+            _addChannelNamesListener(channel.name);
+            _addChannelJoinListener(channel_name);
+            _addChannelPartListener(channel_name);
+            client.join(channel_name, function (message) {
+                Fiber(function (channel_name) {
                     _joinChannelCallback(message, channel);
-                }).run();
+                }).run(channel_name);
             });
         });
         client.addListener('notice', function (nick, to, text, message) {
@@ -90,13 +159,13 @@ IRCHandler = function (user, user_server) {
             }
         });
         client.addListener('error', function (err) {
-            console.log(err);
+            //console.log(err);
         });
     }
 
     function _partChannelCallback (message, channel, user_server, client) {
-        console.log("Parted channel: " + user_server.name + ":" + channel);
-        console.log("Channel part message: " + message);
+        //console.log("Parted channel: " + user_server.name + ":" + channel);
+        //console.log("Channel part message: " + message);
     }
 
     function _partUserServerCallback (message, user_server, client) {
@@ -136,7 +205,7 @@ IRCHandler = function (user, user_server) {
 
     return {
         joinChannel: function (channel_name) {
-            console.log(client);
+            //console.log(client);
             client.join(channel_name, function (message) {
                 _joinChannelCallback(message, channel_name);
             });
@@ -154,7 +223,7 @@ IRCHandler = function (user, user_server) {
         removeChannel: function (channel) {},
         joinUserServer: function () {
             var server = Servers.findOne({name: user_server.name});
-            console.log(server.connections);
+            //console.log(server.connections);
             var server_url = server.connections[0].url;
             var server_port = server.connections[0].port || '6667';
             var nick = user_server.nick;
