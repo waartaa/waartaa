@@ -10,10 +10,10 @@ subscribe = function () {
   Meteor.subscribe("channels");
   Meteor.subscribe("channel_logs");
   Meteor.subscribe("pm_logs");
-  Meteor.subscribe("server_logs");
   Meteor.subscribe("user_servers");
   Meteor.subscribe("user_channels");
   Meteor.subscribe("user_channel_logs");
+  Meteor.subscribe("user_server_logs");
 };
 
 subscribe();

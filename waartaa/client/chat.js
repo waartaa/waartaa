@@ -47,7 +47,7 @@ Template.chat_main.chat_logs = function () {
     });
   } else if (Session.get('roomtype') == 'server') {
     var server_id = Session.get('room_id');
-    return ServerLogs.find({server_id: server_id});
+    return UserServerLogs.find({server_id: server_id});
   }
 
 }

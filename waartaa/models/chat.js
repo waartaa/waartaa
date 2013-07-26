@@ -142,4 +142,4 @@ ServerLogs: {
   user_id: String
 }
 */
-ServerLogs = new Meteor.Collection("server_logs");
+UserServerLogs = new Meteor.Collection("user_server_logs");

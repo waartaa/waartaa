@@ -166,6 +166,8 @@ IRCHandler = function (user, user_server) {
         });
         _addServerQuitListener();
         _addChannelTopicListener();
+        _addNoticeListener();
+        _addCtcpListener();
         _.each(user_server.channels, function (channel_name) {
             var channel = getOrCreateUserChannel({name: channel_name});
             _addChannelNamesListener(channel.name);
@@ -185,6 +187,75 @@ IRCHandler = function (user, user_server) {
         client.addListener('error', function (err) {
             Fiber(function () {
                 logger.trace(err, '', '02_irc.js');
+            }).run();
+        });
+    }
+
+    function _addNoticeListener () {
+        client.addListener('notice', function (nick, to, text, message) {
+            Fiber(function () {
+                logger.dir(
+                    message,
+                    'nick: ' + nick + ' to: ' + to + ' text: ' + text,
+                    'Notice@' + user.username);
+                if (nick == 'NickServ' || nick == null) {
+                    UserServerLogs.insert({
+                        message: text,
+                        raw_message: message,
+                        from: nick,
+                        from_user: null,
+                        from_user_id: null,
+                        server_name: user_server.name,
+                        server_id: user_server._id,
+                        user: user.username,
+                        user_id: user._id,
+                        created: new Date(),
+                        last_updated: new Date()
+                    });
+                } else if (nick == 'ChanServ') {
+                    try {
+                        var channel_name = text.split(']')[0].substr(1);
+                        var channel = UserChannels.findOne({
+                            name: channel_name,
+                            user_server_id: user_server._id,
+                            user: user.username
+                        });
+                        if (channel)
+                            UserChannelLogs.insert({
+                                message: text,
+                                raw_message: message,
+                                from: nick,
+                                from_user: null,
+                                from_user_id: null,
+                                channel_name: channel.name,
+                                channel_id: channel._id,
+                                server_name: user_server.name,
+                                server_id: user_server._id,
+                                user: user.username,
+                                user_id: user._id,
+                                created: new Date(),
+                                last_updated: new Date(),
+                                type: 'ChannelNotice'
+                            });
+                    } catch (err) {
+                        logger.trace(
+                            err,
+                            "Error during logging ChanServ message",
+                            "NoticeError@" + user.username);
+                    }
+                }
+            }).run();
+        });
+    }
+
+    function _addCtcpListener () {
+        client.addListener('ctcp', function (from, to, text, type) {
+            Fiber(function () {
+                logger.debug(
+                    'from: ' + from + ' to: ' + to + ' text: ' + text +
+                    ' type: ' + type,
+                    'CTCP@rtnpro'
+                );
             }).run();
         });
     }

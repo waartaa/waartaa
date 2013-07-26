@@ -13,6 +13,10 @@ Meteor.publish('user_channels', function () {
 
 Meteor.publish("user_channel_logs", function () {
   return UserChannelLogs.find({user_id: this.userId});
+});
+
+Meteor.publish("user_server_logs", function () {
+  return UserServerLogs.find({user_id: this.userId});
 })
 
 Meteor.publish('pm_logs', function () {
@@ -21,10 +25,6 @@ Meteor.publish('pm_logs', function () {
       {to_user_id: this.userId}
     ]
   });
-});
-
-Meteor.publish('server_logs', function () {
-  return ServerLogs.find({to_user_id: this.userId});
 });
 
 getUserChannels = function (user) {
