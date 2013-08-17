@@ -65,6 +65,20 @@ function _create_update_user_server(server, data, user) {
 
 }
 
+function encrypt(text){
+  var cipher = crypto.createCipher('aes-256-cbc', SECRET_KEY)
+  var crypted = cipher.update(text,'utf8','hex')
+  crypted += cipher.final('hex');
+  return crypted;
+}
+ 
+function decrypt(text){
+  var decipher = crypto.createDecipher('aes-256-cbc', SECRET_KEY)
+  var dec = decipher.update(text,'hex','utf8')
+  dec += decipher.final('utf8');
+  return dec;
+}
+
 function _create_user_server(data, user) {
     var server = Servers.findOne({_id: data.server_id});
     if (! server)
@@ -86,7 +100,7 @@ function _create_user_server(data, user) {
             server_id: server._id,
             channels: channels,
             nick: data.nick,
-            password: data.password,
+            password: encrypt(data.password),
             user: user.username,
             user_id: user._id,
             created: now,
