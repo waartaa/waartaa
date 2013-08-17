@@ -160,6 +160,18 @@ IRCHandler = function (user, user_server) {
         });
     }
 
+    function _addSelfMessageListener (argument) {
+        client.addListener('selfMessageSent', function (target, message) {
+            logger.debug(
+                "MessageSent: " + "target: " + target + " message: " + message,
+                "MessageSent@" + user.username);
+        })
+    }
+
+    function _addWhoisListener (info) {
+        logger.dir(info, 'WHOIS', 'WHOIS@' + username);
+    }
+
     function _joinServerCallback (message) {
         UserServers.update({_id: user_server._id}, {$set: {
             status: 'connected'}
@@ -168,6 +180,7 @@ IRCHandler = function (user, user_server) {
         _addChannelTopicListener();
         _addNoticeListener();
         _addCtcpListener();
+        _addSelfMessageListener();
         _.each(user_server.channels, function (channel_name) {
             var channel = getOrCreateUserChannel({name: channel_name});
             _addChannelNamesListener(channel.name);
