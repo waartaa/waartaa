@@ -11,4 +11,10 @@ jquery-ui-bootstrap
 jquery-ui
 router
 irc
+meteor
 observatory
+standard-app-packages
+HTML5-History-API
+observatory-apollo
+page-js-ie-support
+require
