@@ -6,6 +6,7 @@
       "branch": "patch-1"
     },
     "router": {},
-    "observatory": {}
+    "observatory": {},
+    "require": {}
   }
 }
