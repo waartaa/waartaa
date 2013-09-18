@@ -2,7 +2,7 @@
 #
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
-
+standard-app-packages
 insecure
 preserve-inputs
 bootstrap
@@ -11,10 +11,8 @@ jquery-ui-bootstrap
 jquery-ui
 router
 irc
-meteor
 observatory
 standard-app-packages
 HTML5-History-API
 observatory-apollo
 page-js-ie-support
-require

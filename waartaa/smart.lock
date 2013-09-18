@@ -3,13 +3,10 @@
   "dependencies": {
     "basePackages": {
       "jquery-ui-bootstrap": {},
-      "irc": {
-        "git": "https://github.com/rtnpro/meteor-node-irc",
-        "branch": "patch-1"
-      },
       "router": {},
       "observatory": {},
       "require": {}
+      "irc": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -18,9 +15,9 @@
         "commit": "fa742a85639307003e105898e15b631394b63509"
       },
       "irc": {
-        "git": "https://github.com/rtnpro/meteor-node-irc",
-        "branch": "patch-1",
-        "commit": "0959fd498261e9852801fba1ab7b4d4389adeccd"
+        "git": "https://github.com/Pent/meteor-node-irc.git",
+        "tag": "v1.0.9",
+        "commit": "20dbf2f9c5e51799e96d1619b6006f76ae1bd6f2"
       },
       "router": {
         "git": "https://github.com/tmeasday/meteor-router.git",
@@ -31,11 +28,6 @@
         "git": "https://github.com/jhoxray/observatory.git",
         "tag": "v0.2.7",
         "commit": "b0ea12507b628d4ab9e907615aae2636c1b15dd1"
-      },
-      "require": {
-        "git": "https://github.com/tomconnors/meteor-require.git",
-        "tag": "v0.1.0",
-        "commit": "b9c5a87e9f92019cca882234086b7d32719f67e2"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",
