@@ -94,7 +94,7 @@ function _create_user_server(data, user) {
             var channel = splitted_channels[i];
             channels.push(channel.trim());
         }
-        loggger.info("CHANNELS: " + channels, "_create_user_server");
+        logger.info("CHANNELS: " + channels, "_create_user_server");
         var user_server_id = UserServers.insert({
             name: server.name,
             server_id: server._id,
@@ -137,6 +137,7 @@ function _join_user_server(user, user_server_name) {
 
 Meteor.startup(function () {
     CLIENTS = {};
+    console.log(Meteor.users.find());
     Meteor.users.find().forEach(function (user) {
         UserServers.find({user: user.username}).forEach(
             function (user_server) {
