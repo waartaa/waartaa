@@ -3,7 +3,6 @@
     "jquery-ui-bootstrap": {},
     "router": {},
     "observatory": {},
-    "require": {}
     "irc": {}
   }
 }
