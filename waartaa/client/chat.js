@@ -254,9 +254,10 @@ Template.chat_main.rendered = function () {
 
 Template.chat_main.destroyed = function () {
   var roomtype = Session.get('roomtype');
-  if (roomtype == 'server' || roomtype == 'channel')
+  if (roomtype == 'server' || roomtype == 'channel') {
     prefix = roomtype + '-';
-  Session.set('scroll_height_' + prefix + Session.get('room_id'), $('#chat-logs-container').scrollTop());
+    Session.set('scroll_height_' + prefix + Session.get('room_id'), $('#chat-logs-container').scrollTop());
+  }
 };
 
 Client = {};

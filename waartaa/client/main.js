@@ -98,8 +98,10 @@ $(window).resize(updateHeight);
 
 Meteor.Router.add({
   '': function () {
-    Session.set('currentPage');
-    return 'user_loggedout_content';
+    if (Meteor.userId) {
+      location.href = "/home";
+    } else
+      return 'user_loggedout_content';
   },
   '/home': function () {
     Session.set('currentPage', 'home');
