@@ -3,6 +3,7 @@
     "jquery-ui-bootstrap": {},
     "router": {},
     "observatory": {},
-    "irc": {}
+    "irc": {},
+    "handlebar-helpers": {}
   }
 }
