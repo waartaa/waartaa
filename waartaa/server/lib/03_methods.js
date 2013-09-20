@@ -66,10 +66,13 @@ function _create_update_user_server(server, data, user) {
 }
 
 function encrypt(text){
-  var cipher = crypto.createCipher('aes-256-cbc', SECRET_KEY)
-  var crypted = cipher.update(text,'utf8','hex')
-  crypted += cipher.final('hex');
-  return crypted;
+  if (text.length > 0) {
+      var cipher = crypto.createCipher('aes-256-cbc', SECRET_KEY)
+      var crypted = cipher.update(text,'utf8','hex')
+      crypted += cipher.final('hex');
+      return crypted;
+  }
+  return '';
 }
  
 function decrypt(text){
@@ -80,36 +83,56 @@ function decrypt(text){
 }
 
 function _create_user_server(data, user) {
-    var server = Servers.findOne({_id: data.server_id});
-    if (! server)
-        throw new Meteor.Error(400, "Missing server info.");
-    var user_server = UserServers.findOne({name: server.name});
-    if (user_server)
-        throw new Meteor.Error(400, "User server already exists.");
+    console.log(data);
+    if (data.user_server_id) {
+        var user_server = UserServers.findOne(
+            {_id: data.user_server_id});
+    }
     else {
-        var channels = [];
-        var now = new Date();
-        var splitted_channels = data.channels.split(',');
-        for (i in splitted_channels) {
-            var channel = splitted_channels[i];
-            channels.push(channel.trim());
-        }
-        logger.info("CHANNELS: " + channels, "_create_user_server");
-        var user_server_id = UserServers.insert({
-            name: server.name,
-            server_id: server._id,
-            channels: channels,
-            nick: data.nick,
-            password: encrypt(data.password),
-            user: user.username,
-            user_id: user._id,
-            created: now,
-            creator: user.username,
-            creator_id: user._id,
-            last_updated: now,
-            last_updater: user.username,
-            last_updater_id: user._id
-        })
+        var server = Servers.findOne({_id: data.server_id});
+        if (! server)
+            throw new Meteor.Error(400, "Missing server info.");
+        var user_server = UserServers.findOne({name: server.name, user_id: this.userId});
+    }
+    var channels = [];
+    var now = new Date();
+    var splitted_channels = data.channels.split(',');
+    for (i in splitted_channels) {
+        var channel = splitted_channels[i];
+        channels.push(channel.trim());
+    }
+    logger.info("CHANNELS: " + channels, "_create_user_server");
+    user_server_data = {
+        channels: channels,
+        nick: data.nick,
+        password: encrypt(data.password),
+        user: user.username,
+        user_id: user._id,
+        created: now,
+        creator: user.username,
+        creator_id: user._id,
+        last_updated: now,
+        last_updater: user.username,
+        last_updater_id: user._id
+    };
+    if (user_server) {
+        var password = data.password;
+        if (data.password != user_server.password)
+            password: user_server_data.password;
+        UserServers.update({_id: user_server._id}, {
+            $set: {
+                nick: data.nick,
+                password: password,
+                channels: user_server_data.channels,
+                last_updated: user_server_data.last_updated,
+                last_updater: user_server_data.last_updater,
+                last_updater_id: user_server_data.last_updater_id
+            }
+        });
+    } else {
+        user_server_data["name"] = server.name;
+        user_server_data["server_id"] = server._id;
+        var user_server_id = UserServers.insert(user_server_data);
     }
 }
 
