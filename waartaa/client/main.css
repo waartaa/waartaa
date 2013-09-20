@@ -77,3 +77,8 @@ div.dropdown a {
   padding-left: 3%;
   padding-right: 46%;
 }
+
+.chat-message-datetime {
+  font-size: 12px;
+  color: #9B99A5;
+}
