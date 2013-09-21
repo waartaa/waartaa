@@ -133,6 +133,36 @@ function _create_user_server(data, user) {
         user_server_data["name"] = server.name;
         user_server_data["server_id"] = server._id;
         var user_server_id = UserServers.insert(user_server_data);
+        var user_server = UserServers.findOne({_id: user_server_id});
+    }
+    for (i in user_server.channels) {
+        var channel_name = user_server.channels[i];
+        var channel = UserChannels.findOne(
+            {name: channel_name, user_server_id: user_server._id});
+        if (! channel) {
+            var channel_id = UserChannels.insert({
+                name: channel_name,
+                user_server_id: user_server._id,
+                user_server_name: user_server.name,
+                user_id: this.userId,
+                user: user.username,
+                creator: user.username,
+                creator_id: user._id,
+                created: Date(),
+                last_updater: user.username,
+                last_updater_id: user._id,
+                last_updated: Date(),
+                active: true
+            })
+        }
+    }
+    UserChannels.update(
+        {name: {$nin: user_server.channels}, user: user.username},
+        {$set: {active: false}
+    });
+    for (i in user_server.channels) {
+        var channel_name = user_server.channels[i];
+        Meteor.call('join_user_channel', user_server.name, channel_name);
     }
 }
 
@@ -195,7 +225,22 @@ Meteor.methods({
     join_user_channel: function (user_server_name, channel_name) {
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server_name];
+        UserChannels.update({
+            user: user.username, user_server_name: user_server_name,
+            name: channel_name
+        }, {$set: {active: true, status: 'connecting'}}, {multi: true});
         irc_handler.joinChannel(channel_name);
+    },
+    part_user_channel: function (user_server_name, channel_name) {
+        var user = Meteor.users.findOne({_id: this.userId});
+        var irc_handler = CLIENTS[user.username][user_server_name];
+        UserChannels.update(
+            {
+                user: user.username, name: channel_name,
+                user_server_name: user_server_name
+            }, {$set: {active: false, status: 'disconnecting'}}, {multi: true});
+        irc_handler.partChannel(channel_name);
+
     },
     send_channel_message: function (user_channel_id, message) {
         var user_channel = UserChannels.findOne({
@@ -215,6 +260,7 @@ Meteor.methods({
         irc_handler.changeNick(nick);
     },
     log_clients: function () {
+        console.log(CLIENTS);
         logger.dir(CLIENTS, "Log all clients", "Methods.log_clients");
     }
 })

@@ -11,7 +11,7 @@ Template.chat_connections.servers = function () {
 }
 
 Template.server_channels.channels = function (server_id) {
-  return UserChannels.find({user_server_id: server_id});
+  return UserChannels.find({user_server_id: server_id, active: true});
 }
 
 Template.chat.rendered = function () {

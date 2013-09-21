@@ -30,9 +30,9 @@ IRCHandler = function (user, user_server) {
     function _joinChannelCallback (message, channel) {
         Fiber(function () {
             logger.debug(
-                "User: " + user.username + ' joined channel: ' +
-                channel.name + ' in server: ' + user_server.name + '.',
-                'JoinChannel');
+                "JoinChannelCallback - " + user_server.name + ":" + channel.name
+            );
+            UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
             client.addListener('message' + channel.name,
                     function (nick, text, message) {
                 Fiber(function () {
@@ -274,6 +274,10 @@ IRCHandler = function (user, user_server) {
     }
 
     function _partChannelCallback (message, channel, user_server, client) {
+        Fiber(function() {
+            logger.debug("PartChannelCallback - " + user_server + ":" + channel);
+            UserChannels.update({_id: channel._id}, {$set: {active: false, status: 'disconnected'}});
+        }).run();
     }
 
     function _partUserServerCallback (message, user_server, client) {
