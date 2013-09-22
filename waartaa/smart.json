@@ -4,6 +4,7 @@
     "router": {},
     "observatory": {},
     "irc": {},
-    "handlebar-helpers": {}
+    "handlebar-helpers": {},
+    "require": {}
   }
 }
