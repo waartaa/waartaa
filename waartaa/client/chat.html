@@ -140,14 +140,14 @@
           <i class="icon-user"></i> {{name}}
           <b class="caret pull-right"></b>
         </a>
-        {{> user-menu}}
+        {{> user_menu}}
       </li>
     {{/each}}
   </ul>
 </div>
 </template>
 
-<template name="user-menu">
+<template name="user_menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ name }}" style="min-width: 80px; width: 80px;">
     <li>
       <a class="pm-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-envelope"></i> PM</a>

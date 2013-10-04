@@ -318,7 +318,7 @@ Template.chat_input.events({
   }
 });
 
-Template.chat_users.events = {
+Template.user_menu.events = {
   'click .pm-user': function (event) {
     var $target = $(event.target);
     var nick = $target.data('user-nick');

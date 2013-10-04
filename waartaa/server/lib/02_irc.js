@@ -385,6 +385,8 @@ IRCHandler = function (user, user_server) {
                 create_update_user_channel(user_server, item);
             });
         },
+        markAway: function (message) {},
+        markActve: function () {},
         removeServer: function (server_id, user_id) {},
         updateServer: function (server_id, server_data, user_id) {},
         sendChannelMessage: function (channel_name, message) {

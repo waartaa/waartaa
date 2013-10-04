@@ -188,6 +188,15 @@ function _join_user_server(user, user_server_name) {
             + user_server_name + " does not exist!");
 }
 
+
+function _get_irc_handler (user_server_name, user_id) {
+    var user = Users.findOne({_id: user_id});
+    var user_server = UserServers.findOne({
+        name: user_server_name, user: user.username});
+    return CLIENTS[user.username][user_server.name];
+}
+
+
 Meteor.startup(function () {
     CLIENTS = {};
     console.log(Meteor.users.find());
@@ -262,5 +271,21 @@ Meteor.methods({
     log_clients: function () {
         console.log(CLIENTS);
         logger.dir(CLIENTS, "Log all clients", "Methods.log_clients");
+    },
+    send_pm: function (user_server_name, nick, message) {
+        var user = Meteor.users.findOne({_id: this.userId});
+        var user_server = UserServers.findOne({
+            name: user_server_name, user: user.username});
+        var irc_handler = CLIENTS[user.username][user_server.name];
+        irc_handler.sendPM(message);
+    },
+    mark_away: function (user_server_name, away_message) {
+        var irc_handler = _get_irc_handler(user_server_name, this.userId);
+        irc_handler.markAway(away_message);
+    },
+    mark_active: function (user_server_name) {
+        var irc_handler = _get_irc_handler(user_server_name, this.userId);
+        irc_handler.markActive();
     }
+
 })
