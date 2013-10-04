@@ -197,7 +197,6 @@ Template.chat_connections.events({
 });
 
 Template.server_pms.pms = function (id) {
-  return;
   var server = UserServers.findOne({_id: id});
   var user = Meteor.user();
   var pms = user.profile.connections[id].pms;
@@ -323,8 +322,12 @@ Template.user_menu.events = {
     var $target = $(event.target);
     var nick = $target.data('user-nick');
     var user = Meteor.user();
-    var profile = user.profile;
     var server_id = Session.get('server_id');
+    var profile = user.profile;
+    if (!profile) {
+      profile = {connections: {}};
+      profile.connections[server_id] = {pms: {}};
+    }
     if (!profile.connections[server_id].pms)
       profile.connections[server_id].pms = {};
     profile.connections[server_id].pms[nick] = '';
@@ -337,4 +340,12 @@ Template.user_menu.events = {
 
 Template.chat_input.rendered = function () {
   autocompleteNicksInitiate();
+}
+
+Template.channel_menu.events = {
+  'click .channel-remove': function (e) {
+    var channel_id = $(e.target).data("channel-id");
+    var channel = UserChannels.findOne({_id: channel_id});
+    Meteor.call("part_user_channel", channel.user_server_name, channel.name);
+  }
 }

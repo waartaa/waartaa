@@ -70,16 +70,16 @@
           {{ name }}
           <b class="caret pull-right"></b>
         </a>
-        {{> channel-menu}}
+        {{> channel_menu}}
       </li>
     {{/each}}
   </ul>
 </template>
 
-<template name="channel-menu">
+<template name="channel_menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="channel-id-{{ _id }}" style="min-width: 80px; width: 80px;">
     <li>
-      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-remove"></i> Close</a>
+      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="channel-remove icon-remove"></i> Close</a>
       <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-pencil"></i> Edit</a>
     </li>
   </ul>

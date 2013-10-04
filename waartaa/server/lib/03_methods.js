@@ -129,6 +129,7 @@ function _create_user_server(data, user) {
                 last_updater_id: user_server_data.last_updater_id
             }
         });
+        var user_server = UserServers.findOne({_id: user_server._id});
     } else {
         user_server_data["name"] = server.name;
         user_server_data["server_id"] = server._id;
@@ -157,14 +158,19 @@ function _create_user_server(data, user) {
         }
     }
     UserChannels.update(
+        {
+            name: {$in: user_server.channels}, user: user.username
+        },
+        {$set: {active: true}}, {multi: true}
+    );
+    UserChannels.update(
         {name: {$nin: user_server.channels}, user: user.username},
-        {$set: {active: false}
-    });
+        {$set: {active: false}}, {multi: true}
+    );
     for (i in user_server.channels) {
         var channel_name = user_server.channels[i];
         Meteor.call('join_user_channel', user_server.name, channel_name);
-    }
-}
+    }}
 
 function getCurrentUser() {
     return Meteor.users.findOne({_id: this.userId});
