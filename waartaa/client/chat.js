@@ -275,8 +275,8 @@ Template.chat_input.events({
     var $chat_input = $form.find('#chat-input');
     var message = $chat_input.val();
     try {
-      var myNick = Meteor.user().profile.connections[Session.get(
-        'server_id')].client_data.nick;
+      var myNick = (Meteor.user().profile.connections[Session.get(
+        'server_id')]['client_data'] || {})['nick'] || Meteor.user().username;
     } catch (err) {
       console.log(err);
       var myNick = null;
