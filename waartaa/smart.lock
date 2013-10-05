@@ -26,9 +26,9 @@
         "commit": "3d6b436af0a70b784d0f9ec4709907c77bd4fd63"
       },
       "irc": {
-        "git": "https://github.com/Pent/meteor-node-irc.git",
-        "tag": "v1.0.9",
-        "commit": "20dbf2f9c5e51799e96d1619b6006f76ae1bd6f2"
+        "git": "https://github.com/Pent/meteor-irc.git",
+        "tag": "v0.2.2",
+        "commit": "6de27b99c02ac1ff9bca2356db89fe71deae2781"
       },
       "handlebar-helpers": {
         "git": "https://github.com/raix/Meteor-handlebar-helpers.git",

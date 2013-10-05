@@ -10,7 +10,6 @@ accounts-password
 jquery-ui-bootstrap
 jquery-ui
 router
-irc
 observatory
 standard-app-packages
 HTML5-History-API
@@ -18,3 +17,6 @@ observatory-apollo
 page-js-ie-support
 require
 handlebar-helpers
+
+observatory-galileo
+irc
