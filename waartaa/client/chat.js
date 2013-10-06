@@ -317,6 +317,10 @@ Template.chat_input.events({
   }
 });
 
+Template.chat_users.events = {
+  'click .channel-user': chatUserClickHandler,
+};
+
 Template.user_menu.events = {
   'click .pm-user': function (event) {
     var $target = $(event.target);
@@ -335,7 +339,6 @@ Template.user_menu.events = {
     Session.set('roomtype', 'pm');
     Session.set('room_id', Session.get('server_id') + '-' + nick);
   },
-  'click .channel-user': chatUserClickHandler,
 };
 
 Template.chat_input.rendered = function () {
