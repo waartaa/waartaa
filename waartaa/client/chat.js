@@ -308,7 +308,7 @@ Template.chat_input.events({
         message: message,
         time: new Date(),
       });
-      Meteor.call('say', message, room_id, roomtype='pm');
+      Meteor.call('send_pm', message, room_id)
     } else if (Session.get('roomtype') == 'server') {
       var room_id = 'server-' + Session.get('server_id');
       prefix = 'server-';

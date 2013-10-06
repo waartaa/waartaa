@@ -278,12 +278,14 @@ Meteor.methods({
         console.log(CLIENTS);
         logger.dir(CLIENTS, "Log all clients", "Methods.log_clients");
     },
-    send_pm: function (user_server_name, nick, message) {
+    send_pm: function (message, room_id) {
+        var user_server_id = room_id.split('-')[0];
+        var nick = room_id.split('-')[1];
         var user = Meteor.users.findOne({_id: this.userId});
         var user_server = UserServers.findOne({
-            name: user_server_name, user: user.username});
+            _id: user_server_id, user: user.username});
         var irc_handler = CLIENTS[user.username][user_server.name];
-        irc_handler.sendPM(message);
+        irc_handler.sendPMMessage(nick, message);
     },
     mark_away: function (user_server_name, away_message) {
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
@@ -293,5 +295,4 @@ Meteor.methods({
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
         irc_handler.markActive();
     }
-
 })

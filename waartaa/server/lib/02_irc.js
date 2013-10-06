@@ -172,6 +172,38 @@ IRCHandler = function (user, user_server) {
         logger.dir(info, 'WHOIS', 'WHOIS@' + username);
     }
 
+    function _addPMListener () {
+        client.addListener('message', function (nick, to, text, message) {
+            console.log(nick + ', ' + to + ', ' + text + ', ' + message);
+            Fiber(function () {
+                if (to == client.nick) {
+                    logger.debug(nick + ' ' + JSON.stringify(user.profile.connections[user_server._id].pms));
+                    var profile = user.profile;
+                    profile.connections[user_server._id].pms[nick] = "";
+                    Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
+                    var from_user = Meteor.users.findOne({username: nick}) || {};
+                    var to_user = user;
+                    PMLogs.insert({
+                        message: text,
+                        raw_message: message,
+                        from: nick,
+                        from_user: from_user.username,
+                        from_user_id: from_user._id,
+                        to_nick: to,
+                        to_user: to_user.username,
+                        to_user_id: to_user._id,
+                        server_name: user_server.name,
+                        server_id: user_server._id,
+                        user: user.username,
+                        user_id: user._id,
+                        created: new Date(),
+                        last_updated: new Date()
+                    });
+                }
+            }).run();
+        });
+    }
+
     function _joinServerCallback (message) {
         UserServers.update({_id: user_server._id}, {$set: {
             status: 'connected'}
@@ -181,6 +213,7 @@ IRCHandler = function (user, user_server) {
         _addNoticeListener();
         _addCtcpListener();
         _addSelfMessageListener();
+        _addPMListener();
         _.each(user_server.channels, function (channel_name) {
             var channel = getOrCreateUserChannel({name: channel_name});
             _addChannelNamesListener(channel.name);
@@ -396,7 +429,9 @@ IRCHandler = function (user, user_server) {
             client.send('NICK', nick);
         },
         sendServerMessage: function (server_id, message, user_id) {},
-        sendPMMessage: function (server_id, to, message, user_id) {},
+        sendPMMessage: function (to, message) {
+            client.say(to, message);
+        },
         getServerClient: function (server_id, user_id) {},
         isServerConnected: function (server_id) {},
     }
