@@ -349,3 +349,17 @@ Template.channel_menu.events = {
     Meteor.call("part_user_channel", channel.user_server_name, channel.name);
   }
 }
+
+Template.server_pm_menu.events = {
+  'click .pm-remove': function (e) {
+    var user = Meteor.user();
+    var pm_id = $(e.target).parents('li').find(
+      '.pm.server-room').attr('id');
+    var user_server_id = pm_id.split('-')[0];
+    var nick = pm_id.split('-')[1];
+    var profile = user.profile;
+    var pms = user.profile.connections[user_server_id].pms;
+    delete pms[nick];
+    Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
+  }
+}
