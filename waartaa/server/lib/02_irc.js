@@ -262,7 +262,7 @@ IRCHandler = function (user, user_server) {
                 _addChannelPartListener(channel.name);
                 client.join(channel.name, function (message) {
                     Fiber(function (channel_name) {
-                        _joinChannelCallback(message, channel_name);
+                        _joinChannelCallback(message, channel);
                     }).run(channel.name);
                 });
             });
@@ -396,7 +396,11 @@ IRCHandler = function (user, user_server) {
     return {
         joinChannel: function (channel_name) {
             client.join(channel_name, function (message) {
-                _joinChannelCallback(message, channel_name);
+                var channel = UserChannels.findOne({
+                    name: channel_name, user_server_name: user_server.name,
+                    user: user.username
+                })
+                _joinChannelCallback(message, channel);
             });
         },
         partChannel: function (channel_name) {
