@@ -366,3 +366,13 @@ Template.server_pm_menu.events = {
     Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
   }
 }
+
+Template.channel_menu.events = {
+  'click .channel-remove': function (e) {
+    var $target = $(e.target);
+    var channel_id = $target.data('channel-id');
+    var channel = UserChannels.findOne({_id: channel_id});
+    Meteor.call(
+      'send_command', channel.user_server_name, '/part ' + channel.name);
+  }
+}

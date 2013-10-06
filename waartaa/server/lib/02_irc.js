@@ -144,9 +144,10 @@ IRCHandler = function (user, user_server) {
                     } catch (err) {}
                     UserChannels.update({_id: channel._id}, {
                         $set: {
-                            nicks: nicks
+                            nicks: nicks,
+                            active: false
                         }
-                    });
+                    }, {multi: true});
                 }
             }).run();
         });
@@ -484,6 +485,8 @@ IRCHandler = function (user, user_server) {
         isServerConnected: function (server_id) {},
         sendRawMessage: function (message) {
             var args = message.substr(1).split(' ');
+            console.log('############');
+            console.log(args);
             client.send.apply(client, args);
         }
     }

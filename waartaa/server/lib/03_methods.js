@@ -196,7 +196,7 @@ function _join_user_server(user, user_server_name) {
 
 
 function _get_irc_handler (user_server_name, user_id) {
-    var user = Users.findOne({_id: user_id});
+    var user = Meteor.users.findOne({_id: user_id});
     var user_server = UserServers.findOne({
         name: user_server_name, user: user.username});
     return CLIENTS[user.username][user_server.name];
@@ -308,5 +308,9 @@ Meteor.methods({
     mark_active: function (user_server_name) {
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
         irc_handler.markActive();
+    },
+    send_command: function (user_server_name, command_str) {
+        var irc_handler = _get_irc_handler(user_server_name, this.userId);
+        _send_raw_message(command_str, irc_handler)
     }
 })
