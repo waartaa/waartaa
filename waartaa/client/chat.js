@@ -199,7 +199,10 @@ Template.chat_connections.events({
 Template.server_pms.pms = function (id) {
   var server = UserServers.findOne({_id: id});
   var user = Meteor.user();
-  var pms = user.profile.connections[id].pms;
+  var pms = [];
+  try {
+    var pms = user.profile.connections[id].pms;
+  } catch (err) {}
   var return_pms = [];
   for (nick in pms)
     return_pms.push({name: nick, server_id: server._id});
@@ -279,7 +282,7 @@ Template.chat_input.events({
         'server_id')]['client_data'] || {})['nick'] || Meteor.user().username;
     } catch (err) {
       console.log(err);
-      var myNick = null;
+      var myNick = Meteor.user().username;
     }
     if (!message)
       return;

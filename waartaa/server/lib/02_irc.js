@@ -6,7 +6,9 @@ IRCHandler = function (user, user_server) {
     /* Callbacks */
     function getOrCreateUserChannel(channel_data) {
         var channel = UserChannels.findOne({
-            user_server_id: user_server._id, name: channel_data.name});
+            user_server_id: user_server._id, name: channel_data.name,
+            user: user.username
+        });
         if (!channel) {
             var user_channel_id = UserChannels.insert({
                 name: channel_data.name,
@@ -20,6 +22,7 @@ IRCHandler = function (user, user_server) {
                 last_updater: user.username,
                 last_updater_id: user._id,
                 last_updated: new Date(),
+                active: true
             });
             var channel = UserChannels.findOne({_id: user_channel_id});
         }
@@ -63,7 +66,9 @@ IRCHandler = function (user, user_server) {
                     nicks, 'Nicks in channel: ' + channel_name +
                     ' in server: ' + user_server.name, 'ChannelNames');
                 var channel = UserChannels.findOne({
-                  name: channel_name, user_server_id: user_server._id});
+                  name: channel_name, user_server_id: user_server._id,
+                  user: user.username
+              });
                 if (channel)
                   UserChannels.update({_id: channel._id}, {
                       $set: {
@@ -76,12 +81,12 @@ IRCHandler = function (user, user_server) {
 
     function _addGlobalChannelNamesListener () {
         client.addListener('names', function (channel, nicks) {
-                console.log("++++++++++++++GLOBAL CHANNEL NAMES LISTENER: " + channel);
+                console.log("++++++++++++++GLOBAL CHANNEL NAMES LISTENER: " + channel + ' ' + user.username + ' ' + user_server.name);
                 console.log(nicks);
             Fiber(function () {
                 console.log(nicks);
                 var user_channel = UserChannels.findOne({
-                    name: channel, active: true});
+                    name: channel, active: true, user: user.username});
                 console.log(user_channel.name);
                 if (user_channel) {
                     UserChannels.update(
@@ -101,7 +106,7 @@ IRCHandler = function (user, user_server) {
                     channel_name + ' in server: ' + user_server.name +
                     ' for user: ' + user.username + '.', 'ChannelJoin'
                 );
-                var channel = UserChannels.findOne({name: channel_name});
+                var channel = UserChannels.findOne({name: channel_name, user: user.username});
                 if (channel) {
                     var nicks = channel.nicks || {};
                     nicks[nick] = '';
@@ -121,6 +126,7 @@ IRCHandler = function (user, user_server) {
             Fiber(function () {
                 var user_channel = _create_update_user_channel(
                     user_server, {name: channel});
+                console.log(user_channel);
                 UserChannels.update(
                     {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
             }).run();
@@ -136,7 +142,7 @@ IRCHandler = function (user, user_server) {
                     ' due to reason: ' + reason + ' for user: ' +
                     user.username + '.', 'ChannelPart'
                 );
-                var channel = UserChannels.findOne({name: channel_name});
+                var channel = UserChannels.findOne({name: channel_name, user: user.username});
                 if (channel) {
                     var nicks = channel.nicks || {};
                     try {
@@ -168,7 +174,9 @@ IRCHandler = function (user, user_server) {
                     });
                     if (channel) {
                         var nicks = channel.nicks;
-                        delete nicks[nick];
+                        try {
+                            delete nicks[nick];
+                        } catch (err) {}
                         UserChannels.update({_id: channel._id}, {
                             $set: {nicks: nicks}
                         });
@@ -364,7 +372,7 @@ IRCHandler = function (user, user_server) {
 
     function _create_update_user_channel (user_server, channel_data) {
         var user_channel = UserChannels.findOne({name: channel_data.name,
-            user_server_id: user_server._id});
+            user_server_id: user_server._id, user: user.username});
         if (user_channel) {
             UserChannels.update({_id: user_channel._id},
                 {$set: {
@@ -382,11 +390,13 @@ IRCHandler = function (user, user_server) {
                 password: channel_data.password,
                 user_server_id: user_server._id,
                 user_server_name: user_server.name,
+                user: user.username,
+                user_id: user._id,
                 creator: user.username,
                 creator_id: user._id,
                 created: now,
                 last_updater: user.username,
-                last_updater_id: user_id,
+                last_updater_id: user._id,
                 last_updated: now
             });
         }
@@ -397,11 +407,13 @@ IRCHandler = function (user, user_server) {
     return {
         joinChannel: function (channel_name) {
             client.join(channel_name, function (message) {
-                var channel = UserChannels.findOne({
-                    name: channel_name, user_server_name: user_server.name,
-                    user: user.username
-                })
-                _joinChannelCallback(message, channel);
+                Fiber(function () {
+                    var channel = UserChannels.findOne({
+                        name: channel_name, user_server_name: user_server.name,
+                        user: user.username
+                    })
+                    _joinChannelCallback(message, channel);
+                }).run();
             });
         },
         partChannel: function (channel_name) {

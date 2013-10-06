@@ -7,14 +7,14 @@ Meteor.publish('user_servers', function () {
 });
 
 Meteor.publish('user_channels', function () {
-  console.log(UserChannels.find());
   var user = Meteor.users.findOne({_id: this.userId});
+  if (!user)
+    return;
   var user_channels = UserChannels.find({user: user.username, active: true});
   var u = [];
   user_channels.forEach(function (channel) {
     u.push(channel.name);
   });
-  console.log('********' + u + '**********');
   return user_channels;
 });
 

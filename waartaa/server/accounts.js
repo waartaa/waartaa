@@ -5,7 +5,7 @@ Accounts.validateNewUser(function (user) {
 });
 
 Accounts.validateNewUser(function (user) {
-  if (Meteor.users.findOne({email: user.email}))
+  if (Meteor.users.findOne({'emails.address': user.email}))
     throw new Meteor.Error(403, "Email already exists.");
   return true;
 });

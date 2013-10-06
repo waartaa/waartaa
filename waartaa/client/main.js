@@ -74,7 +74,7 @@ Template.signup_form.events({
     var username = $('#user-signup-username').val();
     var password = $('#user-signup-password').val();
     var email = $('#user-signup-email').val();
-    var options = {username: username, email: email, password: password};
+    var options = {username: username, email: email, password: password, profile: {}};
     Accounts.createUser(options, function(err){
       if (err) {
         Session.set('SignupFormError', err);
