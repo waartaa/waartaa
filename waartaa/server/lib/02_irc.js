@@ -74,6 +74,25 @@ IRCHandler = function (user, user_server) {
         });
     }
 
+    function _addGlobalChannelNamesListener () {
+        client.addListener('names', function (channel, nicks) {
+                console.log("++++++++++++++GLOBAL CHANNEL NAMES LISTENER: " + channel);
+                console.log(nicks);
+            Fiber(function () {
+                console.log(nicks);
+                var user_channel = UserChannels.findOne({
+                    name: channel, active: true});
+                console.log(user_channel.name);
+                if (user_channel) {
+                    UserChannels.update(
+                        {_id: user_channel._id},
+                        {$set: {nicks: nicks}}
+                    );
+                }
+            }).run();
+        });
+    }
+
     function _addChannelJoinListener (channel_name) {
         client.addListener('join' + channel_name, function (nick, message) {
             Fiber(function () {
@@ -92,6 +111,18 @@ IRCHandler = function (user, user_server) {
                         }
                     });
                 }
+            }).run();
+        });
+    }
+
+    function _addGlobalChannelJoinListener () {
+        client.addListener('join', function (channel, nick, message) {
+            console.log('======' + channel + ' ' + nick + ' ' + message);
+            Fiber(function () {
+                var user_channel = _create_update_user_channel(
+                    user_server, {name: channel});
+                UserChannels.update(
+                    {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
             }).run();
         });
     }
@@ -204,6 +235,12 @@ IRCHandler = function (user, user_server) {
         });
     }
 
+    function _addRawMessageListener() {
+        client.addListener('raw', function (message) {
+            console.log(message);
+        });
+    }
+
     function _joinServerCallback (message) {
         UserServers.update({_id: user_server._id}, {$set: {
             status: 'connected'}
@@ -214,9 +251,12 @@ IRCHandler = function (user, user_server) {
         _addCtcpListener();
         _addSelfMessageListener();
         _addPMListener();
+        _addRawMessageListener();
+        _addGlobalChannelJoinListener();
+        _addGlobalChannelNamesListener();
         _.each(user_server.channels, function (channel_name) {
             var channel = getOrCreateUserChannel({name: channel_name});
-            _addChannelNamesListener(channel.name);
+            //_addChannelNamesListener(channel.name);
             _addChannelJoinListener(channel_name);
             _addChannelPartListener(channel_name);
             client.join(channel_name, function (message) {
@@ -317,11 +357,11 @@ IRCHandler = function (user, user_server) {
 
     }
 
-    function _create_update_user_server (user_server, channel_data) {
-        var user_channel = UserChanels.findOne({name: channel_data.name,
+    function _create_update_user_channel (user_server, channel_data) {
+        var user_channel = UserChannels.findOne({name: channel_data.name,
             user_server_id: user_server._id});
         if (user_channel) {
-            UserChannel.update({_id: user_channel._id},
+            UserChannels.update({_id: user_channel._id},
                 {$set: {
                     password: channel_data.password,
                     last_update: new Date(),
@@ -332,7 +372,7 @@ IRCHandler = function (user, user_server) {
             user_channel_id = user_channel._id;
         } else {
             var now = new Date();
-            var user_channel_id = UserChannel.insert({
+            var user_channel_id = UserChannels.insert({
                 name: channel_data.name,
                 password: channel_data.password,
                 user_server_id: user_server._id,
@@ -345,7 +385,7 @@ IRCHandler = function (user, user_server) {
                 last_updated: now
             });
         }
-        var user_channel = UserChannels.get({_id: user_channel_id});
+        var user_channel = UserChannels.findOne({_id: user_channel_id});
         return user_channel;
     }
 
@@ -363,7 +403,7 @@ IRCHandler = function (user, user_server) {
             });
         },
         create_update_user_channel: function (channel_data) {
-            _create_update_user_server(user_server, channel_data);
+            _create_update_user_channel(user_server, channel_data);
         },
         removeChannel: function (channel) {},
         joinUserServer: function () {
@@ -434,5 +474,9 @@ IRCHandler = function (user, user_server) {
         },
         getServerClient: function (server_id, user_id) {},
         isServerConnected: function (server_id) {},
+        sendRawMessage: function (message) {
+            var args = message.substr(1).split(' ');
+            client.send.apply(client, args);
+        }
     }
 };

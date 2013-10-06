@@ -202,6 +202,10 @@ function _get_irc_handler (user_server_name, user_id) {
     return CLIENTS[user.username][user_server.name];
 }
 
+function _send_raw_message(message, irc_handler) {
+    irc_handler.sendRawMessage(message);
+}
+
 
 Meteor.startup(function () {
     CLIENTS = {};
@@ -258,11 +262,17 @@ Meteor.methods({
 
     },
     send_channel_message: function (user_channel_id, message) {
+        console.log(user_channel_id);
+        var user = Meteor.users.findOne({_id: this.userId});
         var user_channel = UserChannels.findOne({
-            _id: user_channel_id, user_id: this.userId});
+            _id: user_channel_id, user: user.username});
         var user_server = UserServers.findOne({_id: user_channel.user_server_id});
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server.name];
+        if (message[0] == '/') {
+            _send_raw_message(message, irc_handler);
+            return;
+        }
         irc_handler.sendChannelMessage(user_channel.name, message);
     },
     change_nick: function (server_name, nick) {
@@ -285,6 +295,10 @@ Meteor.methods({
         var user_server = UserServers.findOne({
             _id: user_server_id, user: user.username});
         var irc_handler = CLIENTS[user.username][user_server.name];
+        if (message[0] == '/') {
+            _send_raw_message(message, irc_handler);
+            return;
+        }
         irc_handler.sendPMMessage(nick, message);
     },
     mark_away: function (user_server_name, away_message) {
