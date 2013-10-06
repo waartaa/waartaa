@@ -254,16 +254,20 @@ IRCHandler = function (user, user_server) {
         _addRawMessageListener();
         _addGlobalChannelJoinListener();
         _addGlobalChannelNamesListener();
-        _.each(user_server.channels, function (channel_name) {
-            var channel = getOrCreateUserChannel({name: channel_name});
-            //_addChannelNamesListener(channel.name);
-            _addChannelJoinListener(channel_name);
-            _addChannelPartListener(channel_name);
-            client.join(channel_name, function (message) {
-                Fiber(function (channel_name) {
-                    _joinChannelCallback(message, channel);
-                }).run(channel_name);
+        UserChannels.find({
+            active: true, user: user.username,
+            user_server_name: user_server.name}).forEach(function (channel) {
+                //_addChannelNamesListener(channel.name);
+                _addChannelJoinListener(channel.name);
+                _addChannelPartListener(channel.name);
+                client.join(channel.name, function (message) {
+                    Fiber(function (channel_name) {
+                        _joinChannelCallback(message, channel_name);
+                    }).run(channel.name);
+                });
             });
+        _.each(user_server.channels, function (channel_name) {
+            
         });
         client.addListener('notice', function (nick, to, text, message) {
             if (nick == null) {
