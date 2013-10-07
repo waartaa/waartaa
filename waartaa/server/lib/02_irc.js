@@ -129,6 +129,9 @@ IRCHandler = function (user, user_server) {
                 console.log(user_channel);
                 UserChannels.update(
                     {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
+                _addChannelJoinListener(channel.name);
+                _addChannelPartListener(channel.name);
+                _joinChannelCallback(message, channel);
             }).run();
         });
     }
