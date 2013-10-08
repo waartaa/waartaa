@@ -82,3 +82,7 @@ div.dropdown a {
   font-size: 12px;
   color: #9B99A5;
 }
+
+.chat-logs-container {
+  overflow: scroll;
+}

@@ -2,8 +2,9 @@ updateHeight = function () {
   highlightChannel();
   var body_height = $('body').height();
   var final_height = body_height - 90;
-  $('#chat, #chat-channel-users, #chat-main, #chat-servers').height(final_height);
-  $('#chat-logs-container').height(final_height - $('#chat-main .topic').height() - 24);
+  $('#chat, #chat-channel-users, #chat-main, #chat-servers, .chatlogs-container').height(final_height);
+  // var topic_height = Session.get('topicHeight') || 0;
+  $('.chat-logs-container').height(final_height - 65);
 }
 
 Template.chat_connections.servers = function () {
@@ -172,31 +173,54 @@ function serverRoomSelectHandler (event) {
     if (prev_roomtype == 'server' || prev_roomtype == 'channel')
       prefix = prev_roomtype + '-';
     Session.set('scroll_height_' + prefix + prev_room_id, $('#chat-logs-container').scrollTop() || null);
+    $('.chatlogs-container').hide();
     if ($target.data('roomtype') == 'channel') {
       var server_id = $target.parents('.server').data('server-id');
       Session.set('server_id', server_id);
       Session.set('roomtype', 'channel');
       Session.set('room_id', $(event.target).data('id'));
       channel_nicks = getChannelNicks();
+      var selector = '#channel-log-container-' + $(event.target).data('id');
+      $(selector).show();
+      Session.set('topicHeight', $(selector + ' .topic').height());
     } else if ($target.data('roomtype') == 'pm') {
       var server_id = $target.parents('.server').data('server-id');
       Session.set('server_id', server_id);
       Session.set('roomtype', 'pm');
       Session.set('room_id', $target.attr('id'));
+      var selector = '#pm-log-container-' + Session.get('room_id');
+      $(selector).show();
+      Session.set('topicHeight', $(selector + ' .topic').height());
     } else if ($target.data('roomtype') == 'server' || $target.parent().data('roomtype') == 'server') {
       Session.set('room_id', $target.parent().data('server-id') || $target.data('server-id'));
       Session.set('server_id', Session.get('room_id'));
       Session.set('roomtype', 'server');
+      var selector = '#server-log-container-' + Session.get('room_id');
+      $(selector).show();
+      Session.set('topicHeight', $(selector + ' .topic').height());
     }
     highlightChannel();
 } 
+
+Handlebars.registerHelper("isCurrentRoom", function (room_id, room_type, server_id) {
+  if (room_id == "ohB9cwuTsTnHMxT7T")
+    return true;
+  return false;
+  /*
+  var session_roomtype = Session.get('roomtype');
+  var session_room_id = Session.get('room_id');
+  var session_server_id = Session.get('server_id');
+  if (session_roomtype = room_type && session_room_id == room_id && session_server_id == server_id)
+    return true;
+  return false;*/
+});
 
 Template.chat_connections.events({
   'click .server-room': serverRoomSelectHandler,
   'click .server-link': serverRoomSelectHandler
 });
 
-Template.server_pms.pms = function (id) {
+Handlebars.registerHelper('pms', function (id) {
   var server = UserServers.findOne({_id: id});
   var user = Meteor.user();
   var pms = [];
@@ -205,9 +229,9 @@ Template.server_pms.pms = function (id) {
   } catch (err) {}
   var return_pms = [];
   for (nick in pms)
-    return_pms.push({name: nick, server_id: server._id});
+    return_pms.push({name: nick, server_id: server._id, room_id: server._id + '-' + nick});
   return return_pms;
-}
+});
 
 function chatUserClickHandler (event) {
     if ($(event.target).hasClass('caret'))
@@ -250,7 +274,7 @@ Template.chat_main.rendered = function () {
     else if (roomtype == 'server')
       key = 'scroll_height_server-' + room_id;
     var chat_height = Session.get(key);
-    $('#chat-logs-container').scrollTop(chat_height || $('#chat-logs').height());
+    //$('#chat-logs-container').scrollTop(chat_height || $('#chat-logs').height());
   }, 0);
 };
 
@@ -379,3 +403,26 @@ Template.channel_menu.events = {
       'send_command', channel.user_server_name, '/part ' + channel.name);
   }
 }
+
+Handlebars.registerHelper("activeChannels", function () {
+  return UserChannels.find({active: true});
+});
+
+Handlebars.registerHelper("activeServers", function () {
+  return UserServers.find();
+});
+
+Handlebars.registerHelper("channelChatLogs", function (channel_id) {
+  return UserChannelLogs.find({channel_id: channel_id});
+});
+
+Handlebars.registerHelper("serverChatLogs", function (server_id) {
+  return UserServerLogs.find({server_id: server_id});
+});
+
+Handlebars.registerHelper("pmChatLogs", function (server_id, nick) {
+  console.log(server_id);
+  console.log(nick);
+  return PMLogs.find({
+    $or: [{from: nick}, {to_nick: nick}], server_id: server_id});
+});

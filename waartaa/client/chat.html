@@ -87,14 +87,23 @@
 
 <template name="chat_main">
 <div id="chat-main" class="span8">
+  {{> channel_logs}}
+  {{> server_logs}}
+  {{> pm_logs}}
+</div>
+</template>
+
+<template name="channel_logs">
+{{#each activeChannels }}
+<div id="channel-log-container-{{ _id }}" class="chatlogs-container" style="display: none;">
   <div class="topic">
     <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
       <li><p>{{topic}}<p></li>
     </ul>
   </div>
-  <div id="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
-    <table id="chat-logs" class="table">
-      {{#each chat_logs}}
+  <div class="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
+    <table id="channel-chat-logs-{{ _id }}" class="table chatlogs-table">
+      {{#each channelChatLogs _id}}
       <tr>
         <td class="span2"><strong>{{from}}</strong></td>
         <td>
@@ -110,6 +119,67 @@
     </table>
   </div>
 </div>
+{{/each}}
+</template>
+
+<template name="server_logs">
+{{#each activeServers }}
+<div id="server-log-container-{{ _id }}" class="chatlogs-container" style="display: none;">
+  <div class="topic">
+    <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+      <li><p>{{topic}}<p></li>
+    </ul>
+  </div>
+  <div class="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
+    <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table">
+      {{#each serverChatLogs _id}}
+      <tr>
+        <td class="span2"><strong>{{from}}</strong></td>
+        <td>
+          <div class="row">
+            {{message}}
+          </div>
+          <div class="row">
+            <em class="pull-right chat-message-datetime">{{last_updated}}</em>
+          </div>
+        </td>
+      </tr>
+      {{/each}}
+    </table>
+  </div>
+</div>
+{{/each}}
+</template>
+
+<template name="pm_logs">
+{{#each activeServers }}
+  {{# each pms _id}}
+    <div id="pm-log-container-{{ room_id }}" class="chatlogs-container" style="display: none;">
+      <div class="topic">
+        <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+          <li><p>{{topic}}<p></li>
+        </ul>
+      </div>
+      <div class="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
+        <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table">
+          {{#each pmChatLogs server_id name }}
+          <tr>
+            <td class="span2"><strong>{{from}}</strong></td>
+            <td>
+              <div class="row">
+                {{message}}
+              </div>
+              <div class="row">
+                <em class="pull-right chat-message-datetime">{{last_updated}}</em>
+              </div>
+            </td>
+          </tr>
+          {{/each}}
+        </table>
+      </div>
+    </div>
+  {{/each}}
+{{/each}}
 </template>
 
 <template name="chat_input">
