@@ -202,7 +202,7 @@
     {{#each channel_users}}
       <li class="dropdown">
         <a id="{{ name }}" class="channel-user dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="icon-user"></i> {{name}}
+          <i class="icon-user whois-tooltip" title="{{whois_tooltip name}}"></i> {{name}}
           <b class="caret pull-right"></b>
         </a>
         {{> user_menu}}

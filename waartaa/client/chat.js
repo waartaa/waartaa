@@ -468,3 +468,18 @@ Handlebars.registerHelper("unread_logs_count", function (room_type, room_id) {
     return '';
   }
 });
+
+$('.whois-tooltip').tipsy({live: true, gravity: 'e', html: true});
+
+Handlebars.registerHelper('whois_tooltip', function (nick) {
+  var user_server_id = Session.get('server_id');
+  var whois_data = UserServerUsers.findOne({
+    nick: nick, user_server_id: user_server_id});
+  var tooltip = "";
+  if (whois_data)
+    tooltip = "Username: " + whois_data.user + "<br/>" +
+      "Real name: " + whois_data.realname + "<br/>" +
+      "Server: " + whois_data.server + "<br/>";
+  console.log(tooltip);
+  return new Handlebars.SafeString(tooltip);
+});
