@@ -65,15 +65,26 @@
 <template name="server_channels">
   <ul class="nav nav-list">
     {{#each channels _id}}
-      <li class="dropdown">
-        <a id="channel-id-{{ _id }}" role="button" class="server-room channel dropdown-toggle" href="#" data-id="{{ _id }}" data-roomtype="channel" data-toggle="dropdown">
-          {{ name }}
-          <b class="caret pull-right"></b>
-        </a>
-        {{> channel_menu}}
-      </li>
+      {{> server_channel_item}}
     {{/each}}
   </ul>
+</template>
+
+<template name="server_channel_item">
+  <li class="dropdown">
+    <a id="channel-id-{{ _id }}" role="button" class="server-room channel dropdown-toggle" href="#" data-id="{{ _id }}" data-roomtype="channel" data-toggle="dropdown">
+      {{ name }}
+      <span class="pull-right">
+        {{> unread_messages_count}}
+        <b class="caret"></b>
+      </span>
+    </a>
+    {{> channel_menu}}
+  </li>
+</template>
+
+<template name="unread_messages_count">
+  <span class="badge">{{ unread_logs_count "channel" _id }}</span>
 </template>
 
 <template name="channel_menu">
@@ -104,17 +115,7 @@
   <div class="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
     <table id="channel-chat-logs-{{ _id }}" class="table chatlogs-table">
       {{#each channelChatLogs _id}}
-      <tr>
-        <td class="span2"><strong>{{from}}</strong></td>
-        <td>
-          <div class="row">
-            {{message}}
-          </div>
-          <div class="row">
-            <em class="pull-right chat-message-datetime">{{last_updated}}</em>
-          </div>
-        </td>
-      </tr>
+        {{> chat_row}}
       {{/each}}
     </table>
   </div>
@@ -133,17 +134,7 @@
   <div class="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
     <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table">
       {{#each serverChatLogs _id}}
-      <tr>
-        <td class="span2"><strong>{{from}}</strong></td>
-        <td>
-          <div class="row">
-            {{message}}
-          </div>
-          <div class="row">
-            <em class="pull-right chat-message-datetime">{{last_updated}}</em>
-          </div>
-        </td>
-      </tr>
+        {{> chat_row}}
       {{/each}}
     </table>
   </div>
@@ -163,23 +154,27 @@
       <div class="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
         <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table">
           {{#each pmChatLogs server_id name }}
-          <tr>
-            <td class="span2"><strong>{{from}}</strong></td>
-            <td>
-              <div class="row">
-                {{message}}
-              </div>
-              <div class="row">
-                <em class="pull-right chat-message-datetime">{{last_updated}}</em>
-              </div>
-            </td>
-          </tr>
+            {{> chat_row}}
           {{/each}}
         </table>
       </div>
     </div>
   {{/each}}
 {{/each}}
+</template>
+
+<template name="chat_row">
+  <tr>
+    <td class="span2"><strong>{{from}}</strong></td>
+    <td>
+      <div class="row">
+        {{message}}
+      </div>
+      <div class="row">
+        <em class="pull-right chat-message-datetime">{{last_updated}}</em>
+      </div>
+    </td>
+  </tr>
 </template>
 
 <template name="chat_input">

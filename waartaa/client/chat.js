@@ -161,7 +161,7 @@ function getChannelNicks () {
   return channel_nicks;
 }
 
-function serverRoomSelectHandler (event) {
+function serverRoomSelectHandler (event) { 
     var $target = $(event.target);
     if ($target.hasClass('caret') || $target.hasClass('dropdown-caret'))
       return;
@@ -183,6 +183,8 @@ function serverRoomSelectHandler (event) {
       var selector = '#channel-log-container-' + $(event.target).data('id');
       $(selector).show();
       Session.set('topicHeight', $(selector + ' .topic').height());
+      Session.set('last_accessed-channel_' + Session.get('room_id'), new Date());
+      Session.set('unread_logs_count-channel_' + Session.get('room_id'), 0);
     } else if ($target.data('roomtype') == 'pm') {
       var server_id = $target.parents('.server').data('server-id');
       Session.set('server_id', server_id);
@@ -242,7 +244,11 @@ function chatUserClickHandler (event) {
     $(event.target).parent().addClass('active');
 }
 
-Template.server_channels.rendered = updateHeight;
+function serverChannelsRenderedCallback () {
+  updateHeight();
+}
+
+Template.server_channels.rendered = serverChannelsRenderedCallback;
 
 Template.chat_users.channel_users = function () {
   if (Session.get('roomtype') == 'channel') {
@@ -260,6 +266,10 @@ Template.chat_users.channel_users = function () {
 };
 
 Template.chat_users.rendered = updateHeight;
+
+Template.server_channel_item.rendered = function () {
+  Session.set("last_accessed-channel_" + this.data._id, new Date());
+};
 
 Template.chat_main.rendered = function () {
   setTimeout(function () {
@@ -322,7 +332,8 @@ Template.chat_input.events({
         channel: channel.name,
         channel_id: room_id,
         message: message,
-        time: new Date(),
+        created: new Date(),
+        last_updated: new Date()
       });
       Meteor.call('send_channel_message', channel._id, message);
     } else if (Session.get('roomtype') == 'pm') {
@@ -404,6 +415,10 @@ Template.channel_menu.events = {
   }
 }
 
+Template.channel_logs.rendered = function () {
+  console.log("CREATED channel_logs");
+};
+
 Handlebars.registerHelper("activeChannels", function () {
   return UserChannels.find({active: true});
 });
@@ -412,8 +427,24 @@ Handlebars.registerHelper("activeServers", function () {
   return UserServers.find();
 });
 
+cursors_observed = {};
+
 Handlebars.registerHelper("channelChatLogs", function (channel_id) {
-  return UserChannelLogs.find({channel_id: channel_id});
+  var cursor = UserChannelLogs.find({channel_id: channel_id});
+  var session_key = 'unread_logs_count-channel_' + channel_id;
+  cursor.observeChanges({
+    added: function (id, fields) {
+      Deps.nonreactive(function () {
+        var last_accessed = Session.get('last_accessed-channel_' + fields.channel_id);
+        if (fields.last_updated > last_accessed) {
+          var unread_logs_count = Session.get(session_key);
+          unread_logs_count += 1;
+          Session.set(session_key, unread_logs_count);
+        }
+      });
+    }
+  });
+  return cursor;
 });
 
 Handlebars.registerHelper("serverChatLogs", function (server_id) {
@@ -425,4 +456,15 @@ Handlebars.registerHelper("pmChatLogs", function (server_id, nick) {
   console.log(nick);
   return PMLogs.find({
     $or: [{from: nick}, {to_nick: nick}], server_id: server_id});
+});
+
+Handlebars.registerHelper("unread_logs_count", function (room_type, room_id) {
+  var key = "unread_logs_count-" + room_type + "_" + room_id;
+  var count = Session.get(key);
+  if (count > 0 && Session.get('room_id') != room_id)
+    return count;
+  else {
+    Session.set(key, 0);
+    return '';
+  }
 });
