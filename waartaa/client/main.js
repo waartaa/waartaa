@@ -14,6 +14,7 @@ subscribe = function () {
   Meteor.subscribe("user_channels");
   Meteor.subscribe("user_channel_logs");
   Meteor.subscribe("user_server_logs");
+  Meteor.subscribe("user_server_users");
 };
 
 subscribe();

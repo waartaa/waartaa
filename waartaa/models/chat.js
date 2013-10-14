@@ -143,3 +143,17 @@ ServerLogs: {
 }
 */
 UserServerLogs = new Meteor.Collection("user_server_logs");
+
+/*
+UserServerUsers: {
+  nick: 'rtnpro_wc',
+  user: '7bc98086',
+  host: 'gateway/web/freenode/ip.123.201.128.134',
+  realname: '123.201.128.134 - http://webchat.freenode.net',
+  channels: [ '#bcrec', '#bcreclug' ],
+  server: 'herbert.freenode.net',
+  serverinfo: 'DE',
+  away: '"foo"' 
+}
+*/
+UserServerUsers = new Meteor.Collection("user_server_users");

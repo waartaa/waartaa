@@ -407,6 +407,24 @@ IRCHandler = function (user, user_server) {
         return user_channel;
     }
 
+    function _create_update_server_user (info) {
+        Fiber(function () {
+            var server_user = UserServerUsers.findOne({nick: info.nick});
+            info['user_server_id'] = user_server._id;
+            info['user_server_name'] = user_server.name;
+            info['last_updated'] = new Date();
+            if (server_user) {
+                UserServerUsers.update({_id: server_user._id}, info);
+            } else {
+                UserServerUsers.insert(info);
+            }
+        }).run();
+    }
+
+    function _whois_callback (info) {
+        _create_update_server_user(info);
+    }
+
     return {
         joinChannel: function (channel_name) {
             client.join(channel_name, function (message) {
@@ -502,6 +520,13 @@ IRCHandler = function (user, user_server) {
             var args = message.substr(1).split(' ');
             console.log('############');
             console.log(args);
+            if (args[0] == 'whois' || args[0] == 'WHOIS') {
+                client.whois(args[1], function (info) {
+                    console.log('+++++++WHOIS CALLBACK++++++++');
+                    console.log(info);
+                    _whois_callback(info);
+                });
+            } else 
             client.send.apply(client, args);
         }
     }

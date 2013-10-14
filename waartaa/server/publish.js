@@ -68,6 +68,16 @@ Meteor.publish('channel_logs', function () {
   return ChannelLogs.find({channel_id: {$in: channel_ids}});
 })
 
+Meteor.publish('user_server_users', function () {
+  var user = Meteor.users.findOne({_id: this.userId});
+  var user_server_ids = [];
+  UserServers.find({user: user.username}, {_id: 1}).forEach(function (value) {
+    user_server_ids.push(value._id);
+  });
+  return UserServerUsers.find({user_server_id: {
+    $in: user_server_ids}});
+});
+
 Meteor.methods({
   say: function(message, id, roomtype) {
     var user = Meteor.users.findOne({_id: this.userId});
