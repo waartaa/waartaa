@@ -14,7 +14,7 @@ user_profiles = {
   */
 }
 
-Servers = {
+GlobalServers = {
   'Freenode': {
     connections: [
       {url: 'irc.freenode.net', port: '6667'},
@@ -22,5 +22,7 @@ Servers = {
     ]
   }
 }
+
+SUPER_USER = 'foo'
 
 SECRET_KEY = 'blah'
