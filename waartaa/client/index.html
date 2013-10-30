@@ -1,5 +1,7 @@
 <head>
   <title>Waartaa</title>
+  <link href='http://fonts.googleapis.com/css?family=Oleo+Script:700' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Bitter:400,700,400italic' rel='stylesheet' type='text/css'>
 </head>
 <body>
   {{> body}}
@@ -34,13 +36,13 @@
           {{# if isUserLoggedIn}}
           <ul class="nav">
             <li{{# if isCurrentPageHome}} class="active"{{/if}}>
-              <a href="/home/">Home</a>
+              <a href="/home/" class="bitter font-white">Home</a>
             </li>
             <li{{# if isCurrentPageChat}} class="active"{{/if}}>
-              <a href="/chat/">Chat</a>
+              <a href="/chat/" class="bitter">Chat</a>
             </li>
             <li>
-              <a href="/settings/">Settings</a>
+              <a href="/settings/" class="bitter">Settings</a>
           </ul>
           {{/if}}
           <ul class="nav pull-right">

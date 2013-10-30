@@ -86,3 +86,30 @@ div.dropdown a {
 .chat-logs-container {
   overflow: scroll;
 }
+
+/* Bootstrap CSS */
+.navbar-inner {
+    background-color: #330709 !important;
+    background-image: none !important;
+}
+
+.brand {
+    font-family: 'Oleo Script', cursive;
+    font-size: 27px !important;
+    color: black !important;
+    text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff !important;
+}
+
+.bitter {
+    font-family: 'Bitter', serif;
+    font-weight: bold !important;
+    text-shadow: none !important;
+}
+
+.navbar .nav > li > a:hover {
+    color: #A7A7A7;
+}
+
+body {
+    background-color: #F8F8F8 !important;
+}
