@@ -89,7 +89,8 @@ div.dropdown a {
 
 /* Bootstrap CSS */
 .navbar-inner {
-    background-color: #330709 !important;
+    /*background-color: #330709 !important;*/
+    background-color: #eaeaea !important;
     background-image: none !important;
 }
 
