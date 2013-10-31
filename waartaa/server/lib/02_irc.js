@@ -98,9 +98,37 @@ IRCHandler = function (user, user_server) {
         });
     }
 
+    function whoToWhoisInfo (nick, who_info) {
+      var whoisInfo = {
+        nick: nick,
+        user: who_info.user,
+        server: who_info.server,
+        realname: who_info.gecos,
+        host: who_info.host,
+      }
+      if (who_info.nick_status.search('G') >= 0)
+        whoisInfo['away'] = true;
+      return whoisInfo;
+    }
+
+    function _addWhoListener () {
+      console.log('log WHO data');
+      client.addListener('who', function (message) {
+        console.log(message);
+        Fiber(function () {
+          for (nick in message.nicks) {
+            var who_info = message.nicks[nick];
+            var whoisInfo = whoToWhoisInfo(nick, who_info);
+            _create_update_server_user(whoisInfo);
+          }
+        }).run();
+      });
+    }
+
     function _addChannelJoinListener (channel_name) {
         client.addListener('join' + channel_name, function (nick, message) {
             Fiber(function () {
+                client.send('who', channel_name);
                 logger.dir(
                     message, 'Nick: ' + nick + ' joined channel: ' +
                     channel_name + ' in server: ' + user_server.name +
@@ -257,6 +285,7 @@ IRCHandler = function (user, user_server) {
         UserServers.update({_id: user_server._id}, {$set: {
             status: 'connected'}
         });
+        _addWhoListener();
         _addServerQuitListener();
         _addChannelTopicListener();
         _addNoticeListener();
