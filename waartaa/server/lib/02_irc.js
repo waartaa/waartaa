@@ -30,6 +30,7 @@ IRCHandler = function (user, user_server) {
             user_server.name, 'getOrCreateUserChannel');
         return channel;
     }
+
     function _joinChannelCallback (message, channel) {
         Fiber(function () {
             logger.debug(
@@ -125,10 +126,14 @@ IRCHandler = function (user, user_server) {
       });
     }
 
+    function _getChannelWHOData (channel_name) {
+        client.send('who', channel_name);
+    }
+
     function _addChannelJoinListener (channel_name) {
         client.addListener('join' + channel_name, function (nick, message) {
             Fiber(function () {
-                client.send('who', channel_name);
+                setInterval(_getChannelWHOData, CONFIG.channel_who_poll_interval, channel_name);
                 logger.dir(
                     message, 'Nick: ' + nick + ' joined channel: ' +
                     channel_name + ' in server: ' + user_server.name +

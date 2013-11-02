@@ -23,6 +23,11 @@ GlobalServers = {
   }
 }
 
+CONFIG = {
+  'channel_who_poll_interval': 20 * 1000,
+}
+
+
 SUPER_USER = 'foo'
 
 SECRET_KEY = 'blah'
