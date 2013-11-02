@@ -471,15 +471,28 @@ Handlebars.registerHelper("unread_logs_count", function (room_type, room_id) {
 
 $('.whois-tooltip').tipsy({live: true, gravity: 'e', html: true});
 
-Handlebars.registerHelper('whois_tooltip', function (nick) {
+function _get_nick_whois_data (nick) {
   var user_server_id = Session.get('server_id');
-  var whois_data = UserServerUsers.findOne({
+  return UserServerUsers.findOne({
     nick: nick, user_server_id: user_server_id});
+
+
+}
+
+Handlebars.registerHelper('whois_tooltip', function (nick) {
   var tooltip = "";
+  var whois_data = _get_nick_whois_data(nick);
   if (whois_data)
     tooltip = "Username: " + whois_data.user + "<br/>" +
       "Real name: " + whois_data.realname + "<br/>" +
       "Server: " + whois_data.server + "<br/>";
   console.log(tooltip);
   return new Handlebars.SafeString(tooltip);
+});
+
+Handlebars.registerHelper('is_user_away', function (nick) {
+  var whois_data = _get_nick_whois_data(nick);
+  if (whois_data && whois_data.away)
+    return true;
+  return false;
 });

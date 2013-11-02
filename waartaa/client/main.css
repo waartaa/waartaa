@@ -111,6 +111,18 @@ div.dropdown a {
     color: #A7A7A7;
 }
 
+.user-away .dropdown-toggle {
+  color: #B7BABB;
+}
+
+.nav-list > .user-away.active > a {
+  background-color: #ACBAC2 !important;
+}
+
+.user-away .icon-user {
+  background-color: #ACBAC2;
+}
+
 body {
     background-color: #F8F8F8 !important;
 }

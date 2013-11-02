@@ -200,16 +200,24 @@
 <div id="chat-channel-users" class="span2" style="overflow: auto;">
   <ul class="nav nav-list">
     {{#each channel_users}}
-      <li class="dropdown">
-        <a id="{{ name }}" class="channel-user dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="icon-user whois-tooltip" title="{{whois_tooltip name}}"></i> {{name}}
-          <b class="caret pull-right"></b>
-        </a>
-        {{> user_menu}}
-      </li>
+      {{>chat_user}}
     {{/each}}
   </ul>
 </div>
+</template>
+
+<template name="chat_user">
+  <li class="dropdown{{#if is_user_away name}} user-away{{/if}}">
+    <a id="{{ name }}" class="channel-user dropdown-toggle" data-toggle="dropdown" href="#">
+      {{>channel_user_icon}} {{name}}
+      <b class="caret pull-right"></b>
+    </a>
+    {{> user_menu}}
+  </li>
+</template>
+
+<template name="channel_user_icon">
+  <i class="icon-user whois-tooltip{{#if is_user_away name}} icon-white{{/if}}" title="{{whois_tooltip name}}"></i>
 </template>
 
 <template name="user_menu">
