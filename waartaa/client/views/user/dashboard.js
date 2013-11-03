@@ -1,5 +1,11 @@
 Template.servers_list_for_user.serversForUser = function () {
-  return Servers.find();
+  var user_servers = UserServers.find();
+  var server_names = [];
+  user_servers.forEach(function(user_server) {
+    server_names.push(user_server.name);
+  });
+
+  return Servers.find({'name':{ $nin: server_names}});
 };
 
 Template.accordion_user_servers.events({
