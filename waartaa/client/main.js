@@ -11,13 +11,23 @@ subscribe = function () {
   Meteor.subscribe("channel_logs");
   Meteor.subscribe("pm_logs");
   Meteor.subscribe("user_servers");
-  Meteor.subscribe("user_channels");
+  Meteor.subscribe("user_channels", function () {
+    subscribe_user_channel_logs();
+  });
   Meteor.subscribe("user_channel_logs");
   Meteor.subscribe("user_server_logs");
   Meteor.subscribe("user_server_users");
 };
 
 subscribe();
+
+subscribe_user_channel_logs = function () {
+  UserChannels.find().forEach(function (channel) {
+    Meteor.subscribe("user_channel_logs_" + channel._id, function () {
+      console.log(UserChannelLogs.find().count());
+    });
+  });
+}
 
 Clients = new Meteor.Collection("clients");
 //Meteor.subscribe("clients");

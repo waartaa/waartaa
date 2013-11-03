@@ -88,8 +88,8 @@ IRCHandler = function (user, user_server) {
                 console.log(nicks);
                 var user_channel = UserChannels.findOne({
                     name: channel, active: true, user: user.username});
-                console.log(user_channel.name);
                 if (user_channel) {
+                    console.log(user_channel.name);
                     UserChannels.update(
                         {_id: user_channel._id},
                         {$set: {nicks: nicks}}
@@ -116,13 +116,15 @@ IRCHandler = function (user, user_server) {
       console.log('log WHO data');
       client.addListener('who', function (message) {
         console.log(message);
-        Fiber(function () {
-          for (nick in message.nicks) {
-            var who_info = message.nicks[nick];
-            var whoisInfo = whoToWhoisInfo(nick, who_info);
-            _create_update_server_user(whoisInfo);
-          }
-        }).run();
+        if (message) {
+            Fiber(function () {
+              for (nick in message.nicks) {
+                var who_info = message.nicks[nick];
+                var whoisInfo = whoToWhoisInfo(nick, who_info);
+                _create_update_server_user(whoisInfo);
+              }
+            }).run();
+        }
       });
     }
 

@@ -430,7 +430,7 @@ Handlebars.registerHelper("activeServers", function () {
 cursors_observed = {};
 
 Handlebars.registerHelper("channelChatLogs", function (channel_id) {
-  var cursor = UserChannelLogs.find({channel_id: channel_id});
+  var cursor = UserChannelLogs.find({channel_id: channel_id}, {sort: {created: 1}});
   var session_key = 'unread_logs_count-channel_' + channel_id;
   cursor.observeChanges({
     added: function (id, fields) {
