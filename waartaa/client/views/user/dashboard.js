@@ -2,6 +2,20 @@ Template.servers_list_for_user.serversForUser = function () {
   return Servers.find();
 };
 
+Template.accordion_user_servers.events({
+  'click .icon-trash': function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      var userservers = UserServers.find();
+      userservers.forEach(function(us) {
+          $this = $(e.currentTarget);
+          var server_id = $this.parents('a.accordion-toggle').data('user-server-id');
+          UserServers.remove(server_id);
+      });
+  }
+});
+
 Template.accordion_join_server.events({
   'submit form': function (e) {
     e.preventDefault();
