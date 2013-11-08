@@ -26,8 +26,8 @@ function publish_user_channel_logs (user) {
     var user_channels = UserChannels.find({user: user.username, active: true});
     user_channels.forEach(function (channel) {
       //if (typeof(logs_published_for_channels[channel._id]) == "undefined") {
-        Meteor.publish("user_channel_logs_" + channel._id, function () {
-          var N = CONFIG.show_last_n_logs;
+        Meteor.publish("user_channel_logs_" + channel._id, function (n) {
+          var N = n || CONFIG.show_last_n_logs;
           var cursor = UserChannelLogs.find({channel_id: channel._id},
             {
               sort: {created: -1}, limit: N

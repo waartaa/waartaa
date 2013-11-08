@@ -12,6 +12,9 @@ subscribe = function () {
   Meteor.subscribe("pm_logs");
   Meteor.subscribe("user_servers");
   Meteor.subscribe("user_channels", function () {
+    UserChannels.find({}).forEach(function (channel) {
+      Session.set("user_channel_log_count_" + channel._id, 2);
+    });
     subscribe_user_channel_logs();
   });
   Meteor.subscribe("user_channel_logs");
@@ -22,12 +25,18 @@ subscribe = function () {
 subscribe();
 
 subscribe_user_channel_logs = function () {
-  UserChannels.find().forEach(function (channel) {
-    Meteor.subscribe("user_channel_logs_" + channel._id, function () {
-      console.log(UserChannelLogs.find().count());
-    });
+  UserChannels.find({}).forEach(function (channel) {
+    Meteor.subscribe(
+      "user_channel_logs_" + channel._id,
+      Session.get('user_channel_log_count_' + channel._id),
+      function () {
+        console.log(UserChannelLogs.find().count());
+      }
+    );
   });
 }
+
+Deps.autorun(subscribe_user_channel_logs);
 
 Clients = new Meteor.Collection("clients");
 //Meteor.subscribe("clients");
