@@ -66,13 +66,35 @@ Template.chat_main.topic = function () {
 
 Template.chat_main.rendered = updateHeight;
 
-Template.chat_main.events = {
-  'scroll #chat-logs-container': function (event) {
+Template.channel_chat_logs_table.rendered = function () {
+  var $table = $(this.find('.chatlogs-table'));
+  var $container = $table.parent();
+  var id = $table.attr('id');
+  var old_table_height = Session.get('height-' + id, 0);
+  var new_table_height = $table.height();
+  if ($container.scrollTop() == 0) {
+    console.log(old_table_height);
+    console.log(new_table_height);
+    $container.scrollTop(new_table_height - old_table_height);
+  }
+  Session.set('height-' + id, new_table_height);
+};
+
+Template.chat_row.rendered = function () {};
+
+Template.channel_logs.events = {
+  'scroll .chat-logs-container': function (event) {
     var scroll_top = $(event.target).scrollTop();
-    if (scroll_top == 0)
+    var $target = $(event.target);
+    if (scroll_top == 0) {
       console.log("Reached top of page.");
+      var key = "user_channel_log_count_" + $(event.target).data('channel-id');
+      var current_count = Session.get(key, 0);
+      Session.set('height-' + $target.find('table').attr('id'), $target.find('table').height());
+      Session.set(key, current_count + DEFAULT_LOGS_COUNT);
+    }
     var room_id = Session.get('room_id');
-    if ((event.target.scrollHeight - scroll_top) <= $(this).outerHeight())
+    if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
       scroll_top = null;
     if (Session.get('roomtype') == 'channel')
       Session.set('scroll_height_channel-' + room_id,
@@ -498,3 +520,4 @@ Handlebars.registerHelper('is_user_away', function (nick) {
     return true;
   return false;
 });
+

@@ -112,15 +112,19 @@
       <li><p>{{topic}}<p></li>
     </ul>
   </div>
-  <div class="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
-    <table id="channel-chat-logs-{{ _id }}" class="table chatlogs-table">
-      {{#each channelChatLogs _id}}
-        {{> chat_row}}
-      {{/each}}
-    </table>
+  <div class="chat-logs-container" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+    {{> channel_chat_logs_table}}
   </div>
 </div>
 {{/each}}
+</template>
+
+<template name="channel_chat_logs_table">
+<table id="channel-chat-logs-{{ _id }}" class="table chatlogs-table">
+  {{#each channelChatLogs _id}}
+    {{> chat_row}}
+  {{/each}}
+</table>
 </template>
 
 <template name="server_logs">

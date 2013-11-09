@@ -5,6 +5,9 @@
 //ServerLogs = new Meteor.Collection("server_logs");
 //UserServers = new Meteor.Collection("user_servers");
 
+
+DEFAULT_LOGS_COUNT = 10;
+
 subscribe = function () {
   Meteor.subscribe("servers");
   Meteor.subscribe("channels");
@@ -13,7 +16,7 @@ subscribe = function () {
   Meteor.subscribe("user_servers");
   Meteor.subscribe("user_channels", function () {
     UserChannels.find({}).forEach(function (channel) {
-      Session.set("user_channel_log_count_" + channel._id, 2);
+      Session.set("user_channel_log_count_" + channel._id, DEFAULT_LOGS_COUNT);
     });
     subscribe_user_channel_logs();
   });
