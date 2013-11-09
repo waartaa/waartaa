@@ -112,6 +112,24 @@ IRCHandler = function (user, user_server) {
       return whoisInfo;
     }
 
+    function _update_channel_nicks_from_who_data (message) {
+      var channel = UserChannels.findOne({
+        name: message.channel, user: user.username,
+        user_server_id: user_server._id});
+      if (channel) {
+        var nicks = channel.nicks;
+        var update = false;
+        for (nick in message.nicks) {
+          if (!nicks[nick]) {
+            nicks[nick] = '';
+            update = true;
+          }
+        }
+        if (update)
+          UserChannels.update({_id: channel._id}, {$set: {nicks: nicks}});
+      }
+    }
+
     function _addWhoListener () {
       console.log('log WHO data');
       client.addListener('who', function (message) {
@@ -445,14 +463,15 @@ IRCHandler = function (user, user_server) {
 
     function _create_update_server_user (info) {
         Fiber(function () {
-            var server_user = UserServerUsers.findOne({nick: info.nick});
             info['user_server_id'] = user_server._id;
             info['user_server_name'] = user_server.name;
             info['last_updated'] = new Date();
+            var server_user = UserServerUsers.findOne({nick: info.nick, user_server_id: user_server._id});
             if (server_user) {
-                UserServerUsers.update({_id: server_user._id}, info);
+              UserServerUsers.update(
+                {_id: server_user._id}, {$set: info});
             } else {
-                UserServerUsers.insert(info);
+              UserServerUsers.insert(info);
             }
         }).run();
     }

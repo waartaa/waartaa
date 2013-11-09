@@ -69,6 +69,8 @@ Template.chat_main.rendered = updateHeight;
 Template.chat_main.events = {
   'scroll #chat-logs-container': function (event) {
     var scroll_top = $(event.target).scrollTop();
+    if (scroll_top == 0)
+      console.log("Reached top of page.");
     var room_id = Session.get('room_id');
     if ((event.target.scrollHeight - scroll_top) <= $(this).outerHeight())
       scroll_top = null;
