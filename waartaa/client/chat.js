@@ -319,7 +319,7 @@ Template.chat_main.rendered = function () {
 
 Template.chat_main.destroyed = function () {
   var roomtype = Session.get('roomtype');
-  if (roomtype == 'server' || roomtype == 'channel') {
+  if (roomtype 367| roomtype == 'channel') {
     prefix = roomtype + '-';
     Session.set('scroll_height_' + prefix + Session.get('room_id'), $('#chat-logs-container').scrollTop());
   }
@@ -355,15 +355,6 @@ Template.chat_input.events({
       var room_id = Session.get('room_id');
       var channel = UserChannels.findOne({_id: room_id});
       prefix = 'channel-';
-      UserChannelLogs.insert({
-        from: myNick || Meteor.user().username,
-        user_id: Meteor.user()._id,
-        channel: channel.name,
-        channel_id: room_id,
-        message: message,
-        created: new Date(),
-        last_updated: new Date()
-      });
       Meteor.call('send_channel_message', channel._id, message);
     } else if (Session.get('roomtype') == 'pm') {
       var room_id = Session.get('room_id');
