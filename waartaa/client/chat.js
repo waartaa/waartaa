@@ -66,6 +66,7 @@ Template.chat_main.topic = function () {
 
 Template.chat_main.rendered = updateHeight;
 
+
 Template.channel_chat_logs_table.rendered = function () {
   var $table = $(this.find('.chatlogs-table'));
   var $container = $table.parent();
@@ -206,6 +207,10 @@ function serverRoomSelectHandler (event) {
       channel_nicks = getChannelNicks();
       var selector = '#channel-log-container-' + $(event.target).data('id');
       $(selector).show();
+      if (!$(selector).data('rendered')) {
+        $(selector + ' .chat-logs-container').scrollTop($(selector + ' table').height());
+        $(selector).data('rendered', true);
+      }
       Session.set('topicHeight', $(selector + ' .topic').height());
       Session.set('last_accessed-channel_' + Session.get('room_id'), new Date());
       Session.set('unread_logs_count-channel_' + Session.get('room_id'), 0);
