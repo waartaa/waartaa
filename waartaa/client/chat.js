@@ -65,8 +65,7 @@ Template.chat_main.topic = function () {
 
 Template.chat_main.rendered = updateHeight;
 
-
-Template.channel_chat_logs_table.rendered = function () {
+function observeChatlogTableScroll () {
   var $table = $(this.find('.chatlogs-table'));
   var $container = $table.parent();
   var id = $table.attr('id');
@@ -78,19 +77,29 @@ Template.channel_chat_logs_table.rendered = function () {
     $container.scrollTop(new_table_height - old_table_height);
   }
   Session.set('height-' + id, new_table_height);
-};
+}
+
+Template.channel_chat_logs_table.rendered = observeChatlogTableScroll;
+Template.server_chat_logs_table.rendered = observeChatlogTableScroll;
+Template.pm_chat_logs_table.rendered = observeChatlogTableScroll;
 
 Template.chat_row.rendered = function () {};
 
-Template.channel_logs.events = {
-  'scroll .chat-logs-container': function (event) {
+function chatLogsContainerScrollCallback (event) {
     var scroll_top = $(event.target).scrollTop();
     var $target = $(event.target);
+    var $table = $target.find('.chatlogs-table');
     if (scroll_top == 0) {
       console.log("Reached top of page.");
-      var key = "user_channel_log_count_" + $(event.target).data('channel-id');
+      var key = '';
+      if ($table.hasClass('channel'))
+        key = "user_channel_log_count_" + $target.data('channel-id');
+      else if ($table.hasClass('server'))
+        key = "user_server_log_count_" + $target.data('server-id');
+      else if ($table.hasClass('pm'))
+        key = "pmLogCount-" + $target.data('server-id') + '_' + $target.data('nick');
       var current_count = Session.get(key, 0);
-      Session.set('height-' + $target.find('table').attr('id'), $target.find('table').height());
+      Session.set('height-' + $table.attr('id'), $table.height());
       Session.set(key, current_count + DEFAULT_LOGS_COUNT);
     }
     var room_id = Session.get('room_id');
@@ -105,8 +114,18 @@ Template.channel_logs.events = {
     else if (Session.get('roomtype') == 'server')
       Session.set('scroll_height_server-' + Session.get('server_id'),
         scroll_top);
-
   }
+
+Template.channel_logs.events = {
+  'scroll .chat-logs-container': chatLogsContainerScrollCallback
+};
+
+Template.server_logs.events = {
+  'scroll .chat-logs-container': chatLogsContainerScrollCallback
+};
+
+Template.pm_logs.events = {
+  'scroll .chat-logs-container': chatLogsContainerScrollCallback
 };
 
 function autocompleteNicksInitiate () {

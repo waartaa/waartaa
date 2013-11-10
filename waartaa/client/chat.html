@@ -126,7 +126,7 @@
       <li><p>{{topic}}<p></li>
     </ul>
   </div>
-  <div class="chat-logs-container channel-chat-logs-container" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+  <div class="chat-logs-container channel" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
     {{> channel_chat_logs_table}}
   </div>
 </div>
@@ -134,7 +134,7 @@
 </template>
 
 <template name="channel_chat_logs_table">
-<table id="channel-chat-logs-{{ _id }}" class="table chatlogs-table">
+<table id="channel-chat-logs-{{ _id }}" class="table chatlogs-table channel">
   {{#each channelChatLogs _id}}
     {{> chat_row}}
   {{/each}}
@@ -149,15 +149,19 @@
       <li><p>{{topic}}<p></li>
     </ul>
   </div>
-  <div class="chat-logs-container server-chat-logs-container" data-server-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
-    <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table">
-      {{#each serverChatLogs _id}}
-        {{> chat_row}}
-      {{/each}}
-    </table>
+  <div class="chat-logs-container server" data-server-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+    {{> server_chat_logs_table}}
   </div>
 </div>
 {{/each}}
+</template>
+
+<template name="server_chat_logs_table">
+  <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table server">
+    {{#each serverChatLogs _id}}
+      {{> chat_row}}
+    {{/each}}
+  </table>
 </template>
 
 <template name="pm_logs">
@@ -169,16 +173,20 @@
           <li><p>{{topic}}<p></li>
         </ul>
       </div>
-      <div class="chat-logs-container pm-chat-logs-container" data-server-id="{{ server_id }}" data-nick="{{ name }}" style="overflow-y: auto; overflow-x: hidden;">
-        <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table">
-          {{#each pmChatLogs server_id name }}
-            {{> chat_row}}
-          {{/each}}
-        </table>
+      <div class="chat-logs-container pm" data-server-id="{{ server_id }}" data-nick="{{ name }}" style="overflow-y: auto; overflow-x: hidden;">
+        {{> pm_chat_logs_table}}
       </div>
     </div>
   {{/each}}
 {{/each}}
+</template>
+
+<template name="pm_chat_logs_table">
+  <table id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table chatlogs-table pm">
+    {{#each pmChatLogs server_id name }}
+      {{> chat_row}}
+    {{/each}}
+  </table>
 </template>
 
 <template name="chat_row">
