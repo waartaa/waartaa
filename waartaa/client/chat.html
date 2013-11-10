@@ -11,22 +11,30 @@
   <div id="chat-servers" class="span2" style="overflow: auto;">
     <ul class="nav nav-list">
       {{#each servers}}
-        <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
-          <ul class="server-link-ul nav nav-list">
-            <li class="dropdown">
-              <a id='server-link-{{ _id }}' class='server-link dropdown-toggle' data-server-id='{{ _id }}' data-roomtype="server" href="#" data-toggle="dropdown">
-                <span class="server-label">{{ name }}</span>
-                <span class="dropdown-caret caret"></span>
-              </a>
-              {{> server_menu}}
-            </li>
-          </ul>
-          {{> server_channels}}
-          {{> server_pms}}
-        </li>
+        {{> chat_connection_server}}
       {{/each}}
     </ul>
   </div>
+</template>
+
+<template name="chat_connection_server">
+  <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
+    <ul class="server-link-ul nav nav-list">
+      <li class="dropdown">
+        <a id='serverLink-{{ _id }}' class='server-link dropdown-toggle' data-server-id='{{ _id }}' data-roomtype="server" href="#" data-toggle="dropdown">
+          <span class="server-label">{{ name }}</span>
+          <span class="pull-right">
+            <span class="badge">{{ unread_logs_count "server" _id }}</span>
+            <!--<b class="caret"></b>-->
+            <span class="dropdown-caret caret"></span>
+          </span>
+        </a>
+        {{> server_menu}}
+      </li>
+    </ul>
+    {{> server_channels}}
+    {{> server_pms}}
+  </li>
 </template>
 
 <template name="server_menu">
@@ -42,22 +50,29 @@
 <template name="server_pms">
   <ul class="nav nav-list">
     {{#each pms _id}}
-      <li class="dropdown">
-        <a id="{{ server_id }}-{{ name }}" role="button" class="server-room pm dropdown-toggle" href="#" data-toggle="dropdown" data-roomtype="pm" data-nick="{{ name }}" data-serverid="{{ _id }}">
-          <i class="icon-user"></i>
-          {{ name }}
-          <b class="caret pull-right"></b>
-        </a>
-        {{> server_pm_menu}}
-      </li>
+      {{> server_pm_item}}
     {{/each}}
   </ul>
+</template>
+
+<template name="server_pm_item">
+  <li class="dropdown">
+    <a id="pmLink-{{ server_id }}_{{ name }}" role="button" class="server-room pm dropdown-toggle" href="#" data-toggle="dropdown" data-roomtype="pm" data-roomid="{{ server_id}}_{{ name }}" data-nick="{{ name }}" data-server-id="{{ server_id }}">
+      <i class="icon-user"></i>
+      {{ name }}
+      <span class="pull-right">        
+        <span class="badge">{{ unread_logs_count "pm" server_id name }}</span>
+        <b class="caret"></b>
+      </span>
+    </a>
+    {{> server_pm_menu}}
+  </li>
 </template>
 
 <template name="server_pm_menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ name }}" style="min-width: 80px; width: 80px;">
     <li>
-      <a class="pm-remove" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-remove"></i> Close</a>
+      <a class="pm-remove" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}" data-server-id="{{ server_id }}"><i class="icon-remove"></i> Close</a>
     </li>
   </ul>
 </template>
@@ -72,10 +87,10 @@
 
 <template name="server_channel_item">
   <li class="dropdown">
-    <a id="channel-id-{{ _id }}" role="button" class="server-room channel dropdown-toggle" href="#" data-id="{{ _id }}" data-roomtype="channel" data-toggle="dropdown">
+    <a id="channelLink-{{ _id }}" role="button" class="server-room channel dropdown-toggle" href="#" data-id="{{ _id }}" data-roomtype="channel" data-toggle="dropdown">
       {{ name }}
       <span class="pull-right">
-        {{> unread_messages_count}}
+        <span class="badge">{{ unread_logs_count "channel" _id }}</span>
         <b class="caret"></b>
       </span>
     </a>
@@ -84,7 +99,6 @@
 </template>
 
 <template name="unread_messages_count">
-  <span class="badge">{{ unread_logs_count "channel" _id }}</span>
 </template>
 
 <template name="channel_menu">
@@ -106,13 +120,13 @@
 
 <template name="channel_logs">
 {{#each activeChannels }}
-<div id="channel-log-container-{{ _id }}" class="chatlogs-container" style="display: none;">
+<div id="channel-chatroom-{{ _id }}" class="chatroom channel" style="display: none;">
   <div class="topic">
     <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
       <li><p>{{topic}}<p></li>
     </ul>
   </div>
-  <div class="chat-logs-container" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+  <div class="chat-logs-container channel-chat-logs-container" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
     {{> channel_chat_logs_table}}
   </div>
 </div>
@@ -129,13 +143,13 @@
 
 <template name="server_logs">
 {{#each activeServers }}
-<div id="server-log-container-{{ _id }}" class="chatlogs-container" style="display: none;">
+<div id="server-chatroom-{{ _id }}" class="chatroom server" style="display: none;">
   <div class="topic">
     <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
       <li><p>{{topic}}<p></li>
     </ul>
   </div>
-  <div class="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
+  <div class="chat-logs-container server-chat-logs-container" data-server-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
     <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table">
       {{#each serverChatLogs _id}}
         {{> chat_row}}
@@ -149,13 +163,13 @@
 <template name="pm_logs">
 {{#each activeServers }}
   {{# each pms _id}}
-    <div id="pm-log-container-{{ room_id }}" class="chatlogs-container" style="display: none;">
+    <div id="pmChatroom-{{ room_id }}" class="chatroom pm" style="display: none;">
       <div class="topic">
         <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
           <li><p>{{topic}}<p></li>
         </ul>
       </div>
-      <div class="chat-logs-container" style="overflow-y: auto; overflow-x: hidden;">
+      <div class="chat-logs-container pm-chat-logs-container" data-server-id="{{ server_id }}" data-nick="{{ name }}" style="overflow-y: auto; overflow-x: hidden;">
         <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table">
           {{#each pmChatLogs server_id name }}
             {{> chat_row}}

@@ -586,6 +586,22 @@ IRCHandler = function (user, user_server) {
         },
         sendServerMessage: function (server_id, message, user_id) {},
         sendPMMessage: function (to, message) {
+            PMLogs.insert({
+              message: message,
+              raw_message: {},
+              from: client.nick,
+              from_user: user.username,
+              from_user_id: user._id,
+              to_nick: to,
+              to_user: '',
+              to_user_id: '',
+              server_name: user_server.name,
+              server_id: user_server._id,
+              user: user.username,
+              user_id: user._id,
+              created: new Date(),
+              last_updated: new Date()
+            });
             client.say(to, message);
         },
         getServerClient: function (server_id, user_id) {},

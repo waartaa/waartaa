@@ -2,7 +2,7 @@ updateHeight = function () {
   highlightChannel();
   var body_height = $('body').height();
   var final_height = body_height - 90;
-  $('#chat, #chat-channel-users, #chat-main, #chat-servers, .chatlogs-container').height(final_height);
+  $('#chat, #chat-channel-users, #chat-main, #chat-servers, .chatroom').height(final_height);
   // var topic_height = Session.get('topicHeight') || 0;
   $('.chat-logs-container').height(final_height - 65);
 }
@@ -25,9 +25,9 @@ function  highlightChannel () {
   $('#server-' + server_id).find('.dropdown.active').removeClass('active');
   $('.server-room').parent().removeClass('active');
   if (Session.get('roomtype') == 'channel')
-    $('.server-room#channel-id-' + room_id).parent().addClass('active');
+    $('.server-room#channelLink-' + room_id).parent().addClass('active');
   else if (Session.get('roomtype') == 'pm')
-    $('.server-room#' + room_id).parent().addClass('active');
+    $('.server-room#pmLink-' + room_id).parent().addClass('active');
   else if (Session.get('roomtype') == 'server')
     $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
   $('#chat-input').focus();
@@ -50,7 +50,6 @@ Template.chat_main.chat_logs = function () {
     var server_id = Session.get('room_id');
     return UserServerLogs.find({server_id: server_id});
   }
-
 }
 
 Template.chat_main.topic = function () {
@@ -198,38 +197,45 @@ function serverRoomSelectHandler (event) {
     if (prev_roomtype == 'server' || prev_roomtype == 'channel')
       prefix = prev_roomtype + '-';
     Session.set('scroll_height_' + prefix + prev_room_id, $('#chat-logs-container').scrollTop() || null);
-    $('.chatlogs-container').hide();
+    $('.chatroom').hide();
     if ($target.data('roomtype') == 'channel') {
       var server_id = $target.parents('.server').data('server-id');
       Session.set('server_id', server_id);
       Session.set('roomtype', 'channel');
       Session.set('room_id', $(event.target).data('id'));
       channel_nicks = getChannelNicks();
-      var selector = '#channel-log-container-' + $(event.target).data('id');
+      var selector = '#channel-chatroom-' + $(event.target).data('id');
       $(selector).show();
-      if (!$(selector).data('rendered')) {
-        $(selector + ' .chat-logs-container').scrollTop($(selector + ' table').height());
-        $(selector).data('rendered', true);
-      }
       Session.set('topicHeight', $(selector + ' .topic').height());
-      Session.set('last_accessed-channel_' + Session.get('room_id'), new Date());
-      Session.set('unread_logs_count-channel_' + Session.get('room_id'), 0);
+      Session.set('lastAccessedChannel-' + Session.get('room_id'), new Date());
+      Session.set('unreadLogsCountChannel-' + Session.get('room_id'), 0);
     } else if ($target.data('roomtype') == 'pm') {
       var server_id = $target.parents('.server').data('server-id');
       Session.set('server_id', server_id);
       Session.set('roomtype', 'pm');
-      Session.set('room_id', $target.attr('id'));
-      var selector = '#pm-log-container-' + Session.get('room_id');
+      Session.set('room_id', $target.data('roomid'));
+      var selector = '#pmChatroom-' + Session.get('room_id');
       $(selector).show();
       Session.set('topicHeight', $(selector + ' .topic').height());
+      Session.set('lastAccessedPm-' + Session.get('room_id'), new Date());
+      Session.set('unreadLogsCountPm-' + Session.get('room_id'), 0);
+
     } else if ($target.data('roomtype') == 'server' || $target.parent().data('roomtype') == 'server') {
       Session.set('room_id', $target.parent().data('server-id') || $target.data('server-id'));
       Session.set('server_id', Session.get('room_id'));
       Session.set('roomtype', 'server');
-      var selector = '#server-log-container-' + Session.get('room_id');
+      var selector = '#server-chatroom-' + Session.get('room_id');
       $(selector).show();
       Session.set('topicHeight', $(selector + ' .topic').height());
+      Session.set('lastAccessedServer-' + Session.get('room_id'), new Date());
+      Session.set('unreadLogsCountServer-' + Session.get('room_id'), 0);
+
     }
+    if (!$(selector).data('rendered')) {
+      $(selector + ' .chat-logs-container').scrollTop($(selector + ' table').height());
+      $(selector).data('rendered', true);
+    }
+
     highlightChannel();
 } 
 
@@ -246,7 +252,7 @@ Handlebars.registerHelper("isCurrentRoom", function (room_id, room_type, server_
   return false;*/
 });
 
-Template.chat_connections.events({
+Template.chat_connection_server.events({
   'click .server-room': serverRoomSelectHandler,
   'click .server-link': serverRoomSelectHandler
 });
@@ -260,7 +266,7 @@ Handlebars.registerHelper('pms', function (id) {
   } catch (err) {}
   var return_pms = [];
   for (nick in pms)
-    return_pms.push({name: nick, server_id: server._id, room_id: server._id + '-' + nick});
+    return_pms.push({name: nick, server_id: server._id, room_id: server._id + '_' + nick});
   return return_pms;
 });
 
@@ -297,7 +303,15 @@ Template.chat_users.channel_users = function () {
 Template.chat_users.rendered = updateHeight;
 
 Template.server_channel_item.rendered = function () {
-  Session.set("last_accessed-channel_" + this.data._id, new Date());
+  Session.set("lastAccessedChannel-" + this.data._id, new Date());
+};
+
+Template.chat_connection_server.rendered = function () {
+  Session.set("lastAccessedServer-" + this.data._id, new Date());
+};
+
+Template.server_pm_item.rendered = function () {
+  Session.set("lastAccessedPm-" + this.data.server_id + '_' + this.data.from);
 };
 
 Template.chat_main.rendered = function () {
@@ -319,7 +333,7 @@ Template.chat_main.rendered = function () {
 
 Template.chat_main.destroyed = function () {
   var roomtype = Session.get('roomtype');
-  if (roomtype 367| roomtype == 'channel') {
+  if (roomtype == 'channel') {
     prefix = roomtype + '-';
     Session.set('scroll_height_' + prefix + Session.get('room_id'), $('#chat-logs-container').scrollTop());
   }
@@ -358,14 +372,7 @@ Template.chat_input.events({
       Meteor.call('send_channel_message', channel._id, message);
     } else if (Session.get('roomtype') == 'pm') {
       var room_id = Session.get('room_id');
-      var nick = room_id.substr(room_id.indexOf('-') + 1);
-      PMLogs.insert({
-        from: myNick || Meteor.user().username,
-        from_user_id: Meteor.user()._id,
-        to: nick,
-        message: message,
-        time: new Date(),
-      });
+      var nick = room_id.substr(room_id.indexOf('_') + 1);
       Meteor.call('send_pm', message, room_id)
     } else if (Session.get('roomtype') == 'server') {
       var room_id = 'server-' + Session.get('server_id');
@@ -414,10 +421,11 @@ Template.channel_menu.events = {
 Template.server_pm_menu.events = {
   'click .pm-remove': function (e) {
     var user = Meteor.user();
+    var $target = $(e.target);
     var pm_id = $(e.target).parents('li').find(
       '.pm.server-room').attr('id');
-    var user_server_id = pm_id.split('-')[0];
-    var nick = pm_id.split('-')[1];
+    var user_server_id = $target.data('server-id');
+    var nick = $target.data('user-nick');
     var profile = user.profile;
     var pms = user.profile.connections[user_server_id].pms;
     delete pms[nick];
@@ -449,18 +457,25 @@ Handlebars.registerHelper("activeServers", function () {
 
 cursors_observed = {};
 
+function updateUnreadLogsCount (
+    unread_logs_count_key, last_accessed_key, last_updated) {
+  var last_accessed = Session.get(last_accessed_key);
+  if (last_updated > last_accessed) {
+    var unread_logs_count = Session.get(unread_logs_count_key) || 0;
+    unread_logs_count += 1;
+    Session.set(unread_logs_count_key, unread_logs_count);
+  }
+}
+
 Handlebars.registerHelper("channelChatLogs", function (channel_id) {
   var cursor = UserChannelLogs.find({channel_id: channel_id}, {sort: {created: 1}});
-  var session_key = 'unread_logs_count-channel_' + channel_id;
+  var session_key = 'unreadLogsCountChannel-' + channel_id;
   cursor.observeChanges({
     added: function (id, fields) {
       Deps.nonreactive(function () {
-        var last_accessed = Session.get('last_accessed-channel_' + fields.channel_id);
-        if (fields.last_updated > last_accessed) {
-          var unread_logs_count = Session.get(session_key);
-          unread_logs_count += 1;
-          Session.set(session_key, unread_logs_count);
-        }
+        updateUnreadLogsCount(
+          session_key, 'lastAccessedChannel-' + fields.channel_id,
+          fields.last_updated)
       });
     }
   });
@@ -468,18 +483,42 @@ Handlebars.registerHelper("channelChatLogs", function (channel_id) {
 });
 
 Handlebars.registerHelper("serverChatLogs", function (server_id) {
-  return UserServerLogs.find({server_id: server_id});
+  var cursor = UserServerLogs.find({server_id: server_id});
+  var session_key = 'unreadLogsCountServer_' + server_id;
+  cursor.observeChanges({
+    added: function (id, fields) {
+      Deps.nonreactive(function () {
+        updateUnreadLogsCount(
+          session_key, 'lastAccessedServer-' + fields.server_id,
+          fields.last_updated)
+      });
+    }
+  });
+  return cursor;
 });
 
 Handlebars.registerHelper("pmChatLogs", function (server_id, nick) {
-  console.log(server_id);
-  console.log(nick);
-  return PMLogs.find({
+  var cursor = PMLogs.find({
     $or: [{from: nick}, {to_nick: nick}], server_id: server_id});
+  var session_key = "unreadLogsCountPm-" + server_id + '_' + nick;
+  cursor.observeChanges({
+    added: function (id, fields) {
+      Deps.nonreactive(function () {
+        updateUnreadLogsCount(
+          session_key, 'lastAccessedPm-' + fields.server_id + '_' + nick,
+          fields.last_updated);
+      });
+    }
+  });
+  return cursor;
 });
 
-Handlebars.registerHelper("unread_logs_count", function (room_type, room_id) {
-  var key = "unread_logs_count-" + room_type + "_" + room_id;
+Handlebars.registerHelper("unread_logs_count", function (
+    room_type, room_id, nick) {
+  if (room_type == "pm")
+    room_id = room_id + '_' + nick;
+  var room_type = room_type[0].toUpperCase() + room_type.substr(1);
+  var key = "unreadLogsCount" + room_type + "-" + room_id;
   var count = Session.get(key);
   if (count > 0 && Session.get('room_id') != room_id)
     return count;

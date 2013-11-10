@@ -289,8 +289,8 @@ Meteor.methods({
         logger.dir(CLIENTS, "Log all clients", "Methods.log_clients");
     },
     send_pm: function (message, room_id) {
-        var user_server_id = room_id.split('-')[0];
-        var nick = room_id.split('-')[1];
+        var user_server_id = room_id.split('_')[0];
+        var nick = room_id.split('_')[1];
         var user = Meteor.users.findOne({_id: this.userId});
         var user_server = UserServers.findOne({
             _id: user_server_id, user: user.username});
