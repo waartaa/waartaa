@@ -13,7 +13,20 @@ subscribe = function () {
   Meteor.subscribe("channels");
   Meteor.subscribe("channel_logs");
   Meteor.subscribe("pm_logs");
-  Meteor.subscribe("user_servers");
+  Meteor.subscribe("user_servers", function () {
+    UserServers.find().forEach(function (user_server) {
+      Session.set(
+        "user_server_log_count_" + user_server._id, DEFAULT_LOGS_COUNT);
+      var user = Meteor.user();
+      var pm_nicks = user.profile.connections[user_server._id].pms;
+      for (nick in pm_nicks) {
+        var room_id = user_server._id + '_' + nick;
+        Session.set('pmLogCount-' + room_id, DEFAULT_LOGS_COUNT);
+      }
+    });
+    subscribe_user_server_logs();
+    subscribe_pm_logs();
+  });
   Meteor.subscribe("user_channels", function () {
     UserChannels.find({}).forEach(function (channel) {
       Session.set("user_channel_log_count_" + channel._id, DEFAULT_LOGS_COUNT);
@@ -26,6 +39,25 @@ subscribe = function () {
 };
 
 subscribe();
+
+subscribe_pm_logs = function () {
+  var user = Meteor.user();
+  UserServers.find().forEach(function (user_server) {
+    var nicks = user.profile.connections[user_server._id].pms;
+    for (nick in nicks) {
+      var room_id = user_server._id + '_' + nick;
+      Meteor.subscribe(
+        'pm_logs_' + room_id,
+        Session.get('pmLogCount-' + room_id),
+        function () {
+          console.log('PM logs count ' + PMLogs.find().count());
+        }
+      );
+    }
+  });
+}
+
+Deps.autorun(subscribe_pm_logs);
 
 subscribe_user_channel_logs = function () {
   UserChannels.find({}).forEach(function (channel) {
@@ -40,6 +72,20 @@ subscribe_user_channel_logs = function () {
 }
 
 Deps.autorun(subscribe_user_channel_logs);
+
+subscribe_user_server_logs = function () {
+  UserServers.find().forEach(function (user_server) {
+    Meteor.subscribe(
+      "user_server_logs_" + user_server._id,
+      Session.get('user_server_log_count_' + user_server._id),
+      function () {
+        console.log(UserServerLogs.find().count());
+      }
+    );
+  });
+}
+
+Deps.autorun(subscribe_user_server_logs);
 
 Clients = new Meteor.Collection("clients");
 //Meteor.subscribe("clients");

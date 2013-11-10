@@ -3,8 +3,33 @@ Meteor.publish('servers', function () {
 });
 
 Meteor.publish('user_servers', function () {
-  return UserServers.find({user_id: this.userId});
+  var user_servers = UserServers.find({user_id: this.userId});
+  var user = Meteor.users.findOne({_id: this.userId});
+  setTimeout(publish_user_server_logs, 1000, user);
+  setTimeout(publish_pm_logs, 1000, user);
+  return user_servers;
 });
+
+logs_published_for_servers = {}
+
+function publish_user_server_logs (user) {
+  Fiber(function () {
+    UserServers.find({user: user.username}).forEach(function (user_server) {
+      if (typeof(logs_published_for_servers[user_server._id]) == "undefined") {
+        Meteor.publish('user_server_logs_' + user_server._id, function (n) {
+          var N = n || CONFIG.show_last_n_logs;
+          var cursor = UserServerLogs.find({server_id: user_server._id},
+            {
+              sort: {created: -1}, limit: N
+            }
+          );
+          return cursor;
+        });
+        logs_published_for_servers[user_server._id] = "";
+      }
+    });
+  }).run();
+}
 
 Meteor.publish('user_channels', function () {
   var user = Meteor.users.findOne({_id: this.userId});
@@ -25,7 +50,7 @@ function publish_user_channel_logs (user) {
   Fiber(function () {
     var user_channels = UserChannels.find({user: user.username, active: true});
     user_channels.forEach(function (channel) {
-      //if (typeof(logs_published_for_channels[channel._id]) == "undefined") {
+      if (typeof(logs_published_for_channels[channel._id]) == "undefined") {
         Meteor.publish("user_channel_logs_" + channel._id, function (n) {
           var N = n || CONFIG.show_last_n_logs;
           var cursor = UserChannelLogs.find({channel_id: channel._id},
@@ -36,7 +61,34 @@ function publish_user_channel_logs (user) {
           return cursor;
         });
         logs_published_for_channels[channel._id] = "";
-      //}
+      }
+    });
+  }).run();
+}
+
+logs_published_for_pms = {};
+
+function publish_pm_logs (user) {
+  Fiber(function () {
+    UserServers.find({user: user.username}).forEach(function (user_server) {
+      var nicks = user.profile.connections[user_server._id].pms;
+      for (nick in nicks) {
+        var room_id = user_server._id + '_' + nick;
+        if (typeof(logs_published_for_pms[room_id]) == "undefined") {
+          Meteor.publish(
+            'pm_logs_' + room_id, function (n) {
+              var N = n || CONFIG.show_last_n_logs;
+              var cursor = PMLogs.find({
+                $or: [
+                  {from: nick},
+                  {to_nick: nick}
+                ], user: user.username
+              }, {sort: {created: -1}, limit: N});
+              return cursor;
+          });
+          logs_published_for_pms[room_id] = "";
+        }
+      }
     });
   }).run();
 }
@@ -66,6 +118,7 @@ Meteor.publish("user_channel_logs", function () {
 });
 */
 
+/*
 Meteor.publish("user_server_logs", function () {
   return UserServerLogs.find({user_id: this.userId});
 })
@@ -77,6 +130,7 @@ Meteor.publish('pm_logs', function () {
     ]
   });
 });
+*/
 
 getUserChannels = function (user) {
   var profile = user.profile;
