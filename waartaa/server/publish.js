@@ -174,6 +174,8 @@ Meteor.publish('channel_logs', function () {
 
 Meteor.publish('user_server_users', function () {
   var user = Meteor.users.findOne({_id: this.userId});
+  if (!user)
+    return;
   var user_server_ids = [];
   UserServers.find({user: user.username}, {_id: 1}).forEach(function (value) {
     user_server_ids.push(value._id);
