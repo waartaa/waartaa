@@ -13,6 +13,8 @@ Meteor.publish('user_servers', function () {
 logs_published_for_servers = {}
 
 function publish_user_server_logs (user) {
+  if (!user)
+    return;
   Fiber(function () {
     UserServers.find({user: user.username}).forEach(function (user_server) {
       if (typeof(logs_published_for_servers[user_server._id]) == "undefined") {
@@ -69,6 +71,8 @@ function publish_user_channel_logs (user) {
 logs_published_for_pms = {};
 
 function publish_pm_logs (user) {
+  if (!user)
+    return;
   Fiber(function () {
     UserServers.find({user: user.username}).forEach(function (user_server) {
       var nicks = user.profile.connections[user_server._id].pms;
@@ -133,6 +137,8 @@ Meteor.publish('pm_logs', function () {
 */
 
 getUserChannels = function (user) {
+  if (!user)
+    return;
   var profile = user.profile;
   if (profile && profile.connections) {
     var query = {$or: []};
