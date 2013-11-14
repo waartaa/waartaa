@@ -5,6 +5,7 @@
     "observatory": {},
     "irc": {},
     "handlebar-helpers": {},
-    "require": {}
+    "require": {},
+    "presence": {}
   }
 }

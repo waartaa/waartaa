@@ -7,7 +7,8 @@
       "observatory": {},
       "irc": {},
       "handlebar-helpers": {},
-      "require": {}
+      "require": {},
+      "presence": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -39,6 +40,11 @@
         "git": "https://github.com/tomconnors/meteor-require.git",
         "tag": "v0.1.0",
         "commit": "b9c5a87e9f92019cca882234086b7d32719f67e2"
+      },
+      "presence": {
+        "git": "https://github.com/tmeasday/meteor-presence.git",
+        "tag": "v0.3.0",
+        "commit": "bc619727e46ee46573ec319f73f95f8be0d3247c"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",
