@@ -1,6 +1,7 @@
 IRCHandler = function (user, user_server) {
     var client_data = {};
     var client = null;
+    var user_status = "";
 
     /* Event listener callbacks */
     /* Callbacks */
@@ -306,6 +307,28 @@ IRCHandler = function (user, user_server) {
         });
     }
 
+    function set_user_away (message) {
+        client.send('AWAY', message);
+    }
+
+    function set_user_active () {
+        client.send('AWAY', '');
+    }
+
+    function _pollUserStatus (interval) {
+        Meteor.setInterval(function () {
+            var presence = Meteor.presences.findOne({userId: user._id});
+            if (presence && user_status != "active") {
+                set_user_active();
+                user_status = "active";
+            }
+            else if (_.isUndefined(presence) && user_status != "away") {
+                set_user_away("I am not around!");
+                user_status = "away";
+            }
+        }, interval);
+    }
+
     function _joinServerCallback (message) {
         UserServers.update({_id: user_server._id}, {$set: {
             status: 'connected'}
@@ -320,6 +343,7 @@ IRCHandler = function (user, user_server) {
         _addRawMessageListener();
         _addGlobalChannelJoinListener();
         _addGlobalChannelNamesListener();
+        _pollUserStatus(60 * 1000);
         UserChannels.find({
             active: true, user: user.username,
             user_server_name: user_server.name}).forEach(function (channel) {
