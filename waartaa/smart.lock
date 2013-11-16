@@ -8,7 +8,8 @@
       "irc": {},
       "handlebar-helpers": {},
       "require": {},
-      "presence": {}
+      "presence": {},
+      "bootstrap-3": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -45,6 +46,11 @@
         "git": "https://github.com/tmeasday/meteor-presence.git",
         "tag": "v0.3.0",
         "commit": "bc619727e46ee46573ec319f73f95f8be0d3247c"
+      },
+      "bootstrap-3": {
+        "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
+        "tag": "v0.3.6",
+        "commit": "711dbcabe333c8714298b2fd1de97fdcdae6efa7"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

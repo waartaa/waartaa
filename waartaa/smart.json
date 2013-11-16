@@ -6,6 +6,7 @@
     "irc": {},
     "handlebar-helpers": {},
     "require": {},
-    "presence": {}
+    "presence": {},
+    "bootstrap-3": {}
   }
 }
