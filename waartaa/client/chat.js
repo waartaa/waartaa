@@ -2,12 +2,13 @@ updateHeight = function () {
   highlightChannel();
   var body_height = $('body').height();
   var final_height = body_height - 90;
-  $('#chat, #chat-channel-users, #chat-main, #chat-servers, .chatroom').height(final_height);
+  $('#chat, #chat-main, .chatroom').height(final_height - 23);
+  $('#chat-channel-users .panel-body, #chat-servers .panel-body').height(final_height - 75);
   //var topic_height = Session.get('topicHeight') || 0;
   $('.chat-logs-container')//.height(final_height - 69);
   .each(function (index, elem) {
     var $topic = $(elem).prev('.topic');
-    $(elem).height((final_height - $topic.height() || 0) - 20);
+    $(elem).height((final_height - $topic.height() || 0) - 25);
   });
 }
 
@@ -553,7 +554,7 @@ Handlebars.registerHelper("unread_logs_count", function (
 });
 
 $('.whois-tooltip').tipsy({live: true, gravity: 'e', html: true});
-
+$('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 function _get_nick_whois_data (nick) {
   var user_server_id = Session.get('server_id');
   return UserServerUsers.findOne({

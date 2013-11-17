@@ -8,12 +8,24 @@
 </template>
 
 <template name="chat_connections">
-  <div id="chat-servers" class=" bs-sidebar col-md-2 hidden-xs hidden-sm col-sm-1" style="overflow: auto;">
-    <ul class="nav bs-sidenav">
-      {{#each servers}}
-        {{> chat_connection_server}}
-      {{/each}}
-    </ul>
+  <div id="chat-servers" class="bs-sidebar col-md-2 hidden-xs hidden-sm col-sm-1" style="overflow: auto;">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <strong>Servers</strong>
+        <span class="pull-right">
+          <button id="server-add-btn" class="btn btn-primary compact-icon-btn enable-tipsy" title="Add new server">
+            <icon class="glypicon glyphicon-plus"></icon>
+          </button>
+        </span>
+      </div>
+      <div class="panel-body">
+        <ul class="nav bs-sidenav">
+          {{#each servers}}
+            {{> chat_connection_server}}
+          {{/each}}
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -227,12 +239,18 @@
 </template>
 
 <template name="chat_users">
-<div id="chat-channel-users" class="col-md-2 col-sm-2 hidden-xs" style="overflow: auto;">
-  <ul class="nav nav-list">
-    {{#each channel_users}}
-      {{>chat_user}}
-    {{/each}}
-  </ul>
+<div id="chat-channel-users" class="col-md-2 col-sm-2 hidden-xs">
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <strong>Users</strong>
+    </div>
+    <div class="panel-body">
+      <ul class="nav nav-list">
+        {{#each channel_users}}
+          {{>chat_user}}
+        {{/each}}
+      </ul>
+    </div>
 </div>
 </template>
 
