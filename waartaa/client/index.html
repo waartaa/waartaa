@@ -1,5 +1,6 @@
 <head>
   <title>Waartaa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link href='http://fonts.googleapis.com/css?family=Oleo+Script:700' rel='stylesheet' type='text/css'>
   <link href='http://fonts.googleapis.com/css?family=Bitter:400,700,400italic' rel='stylesheet' type='text/css'>
 </head>
@@ -10,7 +11,7 @@
 
 <template name="body">
   {{> header}}
-  <div class="content-main container-fluid">
+  <div class="container">
     <div class="content">
       <div class="wrapper">
         <div class="proper-content">
@@ -23,40 +24,39 @@
 </template>
 
 <template name="header">
-  <div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container">
-        <button class="btn btn-navbar" data-target=".nav-collapse" data-toggle="collapse" type="button">
+  <nav class="navbar navbar-inverse navbar-fixed-top global-navbar" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle" data-target="#nav-collapse-1" data-toggle="collapse" type="button">
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="brand" href="/">Waartaa</a>
-        <div class="nav-collapse collapse">
-          {{# if isUserLoggedIn}}
-          <ul class="nav">
-            <li{{# if isCurrentPageHome}} class="active"{{/if}}>
-              <a href="/home/" class="bitter font-white">Home</a>
-            </li>
-            <li{{# if isCurrentPageChat}} class="active"{{/if}}>
-              <a href="/chat/" class="bitter">Chat</a>
-            </li>
-            <li>
-              <a href="/settings/" class="bitter">Settings</a>
-          </ul>
+        <a class="navbar-brand" href="/">Waartaa</a>
+      </div>
+      <div class="collapse navbar-collapse" id="nav-collapse-1">
+        {{# if isUserLoggedIn}}
+        <ul class="nav navbar-nav">
+          <li{{# if isCurrentPageHome}} class="active"{{/if}}>
+            <a href="/home/" class="bitter font-white">Home</a>
+          </li>
+          <li{{# if isCurrentPageChat}} class="active"{{/if}}>
+            <a href="/chat/" class="bitter">Chat</a>
+          </li>
+          <li>
+            <a href="/settings/" class="bitter">Settings</a>
+        </ul>
+        {{/if}}
+        <ul class="nav navbar-nav navbar-right">
+          {{# if currentUser}}
+          <li>
+            <button id="signout" class="btn btn-success">Sign out</button>
+          </li>
           {{/if}}
-          <ul class="nav pull-right">
-            </li>
-            {{# if currentUser}}
-            <li>
-              <button id="signout" class="btn btn-success">Sign out</button>
-            </li>
-            {{/if}}
-          </ul>
-        </div>
+        </ul>
       </div>
     </div>
-  </div>
+  </nav>
 </template>
 
 <template name="navbar"></template>

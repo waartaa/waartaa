@@ -3,8 +3,12 @@ updateHeight = function () {
   var body_height = $('body').height();
   var final_height = body_height - 90;
   $('#chat, #chat-channel-users, #chat-main, #chat-servers, .chatroom').height(final_height);
-  // var topic_height = Session.get('topicHeight') || 0;
-  $('.chat-logs-container').height(final_height - 65);
+  //var topic_height = Session.get('topicHeight') || 0;
+  $('.chat-logs-container')//.height(final_height - 69);
+  .each(function (index, elem) {
+    var $topic = $(elem).prev('.topic');
+    $(elem).height(final_height - $topic.height() || 0);
+  });
 }
 
 Template.chat_connections.servers = function () {
@@ -22,14 +26,15 @@ Template.chat.rendered = function () {
 function  highlightChannel () {
   var room_id = Session.get('room_id');
   var server_id = Session.get('server_id');
-  $('#server-' + server_id).find('.dropdown.active').removeClass('active');
+  $('li.server').removeClass('active');
   $('.server-room').parent().removeClass('active');
   if (Session.get('roomtype') == 'channel')
     $('.server-room#channelLink-' + room_id).parent().addClass('active');
   else if (Session.get('roomtype') == 'pm')
     $('.server-room#pmLink-' + room_id).parent().addClass('active');
-  else if (Session.get('roomtype') == 'server')
-    $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
+  //else if (Session.get('roomtype') == 'server')
+  //  $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
+  $('li#server-' + server_id).addClass('active');
   $('#chat-input').focus();
   refreshAutocompleteNicksSource();
 }
@@ -204,12 +209,12 @@ function getChannelNicks () {
   return channel_nicks;
 }
 
-function serverRoomSelectHandler (event) { 
+function serverRoomSelectHandler (event) {
     var $target = $(event.target);
-    if ($target.hasClass('caret') || $target.hasClass('dropdown-caret'))
+    if ($target.hasClass('server-room-menu-btn') || $target.parent().hasClass('server-room-menu-btn'))
       return;
     event.stopPropagation();
-    $('.dropdown.open').removeClass('open');
+    $('.dropdown.open, .btn-group.open').removeClass('open');
     var prev_room_id = Session.get('room_id');
     var prefix = '';
     var prev_roomtype = Session.get('roomtype');
@@ -290,11 +295,11 @@ Handlebars.registerHelper('pms', function (id) {
 });
 
 function chatUserClickHandler (event) {
-    if ($(event.target).hasClass('caret'))
+    if ($(event.target).hasClass('btn-group') || $(event.target).parent().hasClass('btn-group'))
       return;
     event.stopPropagation();
     $('.channel-user').parent().removeClass('active');
-    $('.dropdown.open').removeClass('open');
+    $('.dropdown.open, .btn-group.open').removeClass('open');
     $(event.target).parent().addClass('active');
 }
 

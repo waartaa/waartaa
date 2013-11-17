@@ -31,16 +31,20 @@ html, body, .container, .content {
 }
 @media (min-width: 1200px) {
   #chat-main {
-    width: 70.94017094017096% !important;
+    /*width: 70.94017094017096% !important;*/
     margin-left: 0px !important;
     border-left: 1px solid #eee;
     border-right: 1px solid #eee;
+    box-shadow: 1px 0px #ddd;
   }
   #chat-channel-users {
     margin-left: 0px !important;
   }
 }
 
+#chat {
+  margin-top: 10px;
+}
 #chat-input-form .typeahead.dropdown-menu {
     bottom: 40px !important;
     top: -70px !important;
@@ -94,18 +98,20 @@ div.dropdown a {
     background-image: none !important;
 }
 
-.brand {
+/*.brand {
     font-family: 'Oleo Script', cursive;
     font-size: 27px !important;
     color: black !important;
     text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff !important;
 }
+*/
 
-.bitter {
+/*.bitter {
     font-family: 'Bitter', serif;
     font-weight: bold !important;
     text-shadow: none !important;
 }
+*/
 
 .navbar .nav > li > a:hover {
     color: #A7A7A7;
@@ -125,4 +131,44 @@ div.dropdown a {
 
 body {
     background-color: #F8F8F8 !important;
+}
+
+.global-navbar {
+  background-color: #2F4279;
+}
+
+.container {
+  width: 100%;
+}
+
+.global-navbar .navbar-brand {
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.global-navbar.navbar-inverse .navbar-nav > .active > a {
+  background-color: #39326B;
+}
+
+#signout {
+  margin-top: 5px;
+}
+
+.container {
+  width: 100%;
+}
+
+.bs-sidebar .nav > .active > a, .bs-sidebar .nav > .active:hover > a, .bs-sidebar .nav > .active:focus > a {
+  font-weight: bold;
+  color: #563d7c;
+  background-color: transparent;
+  border-right: 1px solid #563d7c;
+}
+
+.nav .nav {
+  padding-left: 10px;
+}
+
+.server-room-menu-btn, .channel-user-menu-btn {
+  padding: 0px 6px;
 }

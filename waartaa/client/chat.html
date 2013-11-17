@@ -1,5 +1,5 @@
 <template name="chat">
-<div id="chat" class="row-fluid" style="min-height: 0px;">
+<div id="chat" class="row" style="min-height: 0px;">
   {{> chat_connections}}
   {{> chat_main}}
   {{> chat_users}}
@@ -8,8 +8,8 @@
 </template>
 
 <template name="chat_connections">
-  <div id="chat-servers" class="span2" style="overflow: auto;">
-    <ul class="nav nav-list">
+  <div id="chat-servers" class=" bs-sidebar col-md-2 hidden-xs hidden-sm col-sm-1" style="overflow: auto;">
+    <ul class="nav bs-sidenav">
       {{#each servers}}
         {{> chat_connection_server}}
       {{/each}}
@@ -19,36 +19,34 @@
 
 <template name="chat_connection_server">
   <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
-    <ul class="server-link-ul nav nav-list">
-      <li class="dropdown">
-        <a id='serverLink-{{ _id }}' class='server-link dropdown-toggle' data-server-id='{{ _id }}' data-roomtype="server" href="#" data-toggle="dropdown">
-          <span class="server-label">{{ name }}</span>
-          <span class="pull-right">
-            <span class="badge">{{ unread_logs_count "server" _id }}</span>
-            <!--<b class="caret"></b>-->
-            <span class="dropdown-caret caret"></span>
-          </span>
-        </a>
-        {{> server_menu}}
-      </li>
-    </ul>
+    <a id='serverLink-{{ _id }}' class='server-link' data-server-id='{{ _id }}' data-roomtype="server" href="#">
+      {{name}}
+      <span class="pull-right">
+        <div class="btn-group">
+          <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          {{> server_menu}}
+        </div>
+      </span>
+    </a>
     {{> server_channels}}
     {{> server_pms}}
   </li>
 </template>
 
 <template name="server_menu">
-  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="channel-id-{{ _id }}" style="min-width: 85px; width: 85px;">
+  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="server-menu-{{ _id }}" style="min-width: 85px; width: 85px;">
     <li>
-      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-plus"></i> Channel</a>
-      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-pencil"></i> Edit</a>
-      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-remove"></i> Close</a>
+      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="icon-plus"></i> Channel</a>
+      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="icon-pencil"></i> Edit</a>
+      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="icon-remove"></i> Close</a>
     </li>
   </ul>
 </template>
 
 <template name="server_pms">
-  <ul class="nav nav-list">
+  <ul class="nav bs-siderbar">
     {{#each pms _id}}
       {{> server_pm_item}}
     {{/each}}
@@ -57,15 +55,19 @@
 
 <template name="server_pm_item">
   <li class="dropdown">
-    <a id="pmLink-{{ server_id }}_{{ name }}" role="button" class="server-room pm dropdown-toggle" href="#" data-toggle="dropdown" data-roomtype="pm" data-roomid="{{ server_id}}_{{ name }}" data-nick="{{ name }}" data-server-id="{{ server_id }}">
+    <a id="pmLink-{{ server_id }}_{{ name }}" role="button" class="server-room pm" href="#" data-roomtype="pm" data-roomid="{{ server_id}}_{{ name }}" data-nick="{{ name }}" data-server-id="{{ server_id }}">
       <i class="icon-user"></i>
       {{ name }}
       <span class="pull-right">        
         <span class="badge">{{ unread_logs_count "pm" server_id name }}</span>
-        <b class="caret"></b>
+        <div class="btn-group">
+          <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          {{> server_pm_menu}}
+        </div>
       </span>
     </a>
-    {{> server_pm_menu}}
   </li>
 </template>
 
@@ -78,7 +80,7 @@
 </template>
 
 <template name="server_channels">
-  <ul class="nav nav-list">
+  <ul class="nav bs-sidebar">
     {{#each channels _id}}
       {{> server_channel_item}}
     {{/each}}
@@ -86,15 +88,19 @@
 </template>
 
 <template name="server_channel_item">
-  <li class="dropdown">
-    <a id="channelLink-{{ _id }}" role="button" class="server-room channel dropdown-toggle" href="#" data-id="{{ _id }}" data-roomtype="channel" data-toggle="dropdown">
+  <li class="">
+    <a id="channelLink-{{ _id }}" role="button" class="server-room channel" href="#" data-id="{{ _id }}" data-roomtype="channel">
       {{ name }}
       <span class="pull-right">
         <span class="badge">{{ unread_logs_count "channel" _id }}</span>
-        <b class="caret"></b>
+        <div class="btn-group">
+          <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          {{> channel_menu}}
+        </div>
       </span>
     </a>
-    {{> channel_menu}}
   </li>
 </template>
 
@@ -102,7 +108,7 @@
 </template>
 
 <template name="channel_menu">
-  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="channel-id-{{ _id }}" style="min-width: 80px; width: 80px;">
+  <ul class="dropdown-menu pull-right" role="menu" style="min-width: 80px; width: 80px;">
     <li>
       <a href="#" class="channel-remove" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-remove"></i> Close</a>
       <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-pencil"></i> Edit</a>
@@ -111,7 +117,7 @@
 </template>
 
 <template name="chat_main">
-<div id="chat-main" class="span8">
+<div id="chat-main" class="col-md-8 col-sm-9 col-xs-12">
   {{> channel_logs}}
   {{> server_logs}}
   {{> pm_logs}}
@@ -204,18 +210,18 @@
 </template>
 
 <template name="chat_input">
-<div class="navbar-fixed-bottom" style="height: 40px;">
+<div class="navbar navbar-default navbar-fixed-bottom" role="navigation" style="height: 40px;">
   <div class="navbar-inner">
-    <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="span2">&nbsp;</div>
-        <div class="span8">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">&nbsp;</div>
+        <div class="col-md-8">
           <form id="chat-input-form">
             <input id="chat-input" name="chat_input" type="text"
-              class="span12" style="margin-top: 5px;" autocomplete="off" placeholder="@">
+              class="col-md-12" style="margin-top: 5px;" autocomplete="off" placeholder="@">
           </form>
         </div>
-        <div class="span2">&nbsp;</div>
+        <div class="col-md-2">&nbsp;</div>
       </div>
     </div>
   </div>
@@ -223,7 +229,7 @@
 </template>
 
 <template name="chat_users">
-<div id="chat-channel-users" class="span2" style="overflow: auto;">
+<div id="chat-channel-users" class="col-md-2 col-sm-2 hidden-xs" style="overflow: auto;">
   <ul class="nav nav-list">
     {{#each channel_users}}
       {{>chat_user}}
@@ -234,11 +240,17 @@
 
 <template name="chat_user">
   <li class="dropdown{{#if is_user_away name}} user-away{{/if}}">
-    <a id="{{ name }}" class="channel-user dropdown-toggle" data-toggle="dropdown" href="#">
+    <a id="{{ name }}" class="channel-user" href="#">
       {{>channel_user_icon}} {{name}}
-      <b class="caret pull-right"></b>
+      <span class="pull-right">
+        <div class="btn-group">
+          <button type="button" class="channel-user-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          {{> user_menu}}
+        </div>
+      </span>
     </a>
-    {{> user_menu}}
   </li>
 </template>
 
