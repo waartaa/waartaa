@@ -38,9 +38,9 @@
 <template name="server_menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="server-menu-{{ _id }}" style="min-width: 85px; width: 85px;">
     <li>
-      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="icon-plus"></i> Channel</a>
-      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="icon-pencil"></i> Edit</a>
-      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="icon-remove"></i> Close</a>
+      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-plus"></i> Channel</a>
+      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-remove"></i> Close</a>
     </li>
   </ul>
 </template>
@@ -74,7 +74,7 @@
 <template name="server_pm_menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ name }}" style="min-width: 80px; width: 80px;">
     <li>
-      <a class="pm-remove" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}" data-server-id="{{ server_id }}"><i class="icon-remove"></i> Close</a>
+      <a class="pm-remove" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}" data-server-id="{{ server_id }}"><i class="glyphicon glyphicon-remove"></i> Close</a>
     </li>
   </ul>
 </template>
@@ -110,8 +110,8 @@
 <template name="channel_menu">
   <ul class="dropdown-menu pull-right" role="menu" style="min-width: 80px; width: 80px;">
     <li>
-      <a href="#" class="channel-remove" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-remove"></i> Close</a>
-      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="icon-pencil"></i> Edit</a>
+      <a href="#" class="channel-remove" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="glyphicon glyphicon-remove"></i> Close</a>
+      <a href="#" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
     </li>
   </ul>
 </template>
@@ -211,18 +211,16 @@
 
 <template name="chat_input">
 <div class="navbar navbar-default navbar-fixed-bottom" role="navigation" style="height: 40px;">
-  <div class="navbar-inner">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-2">&nbsp;</div>
-        <div class="col-md-8">
-          <form id="chat-input-form">
-            <input id="chat-input" name="chat_input" type="text"
-              class="col-md-12" style="margin-top: 5px;" autocomplete="off" placeholder="@">
-          </form>
-        </div>
-        <div class="col-md-2">&nbsp;</div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">&nbsp;</div>
+      <div class="col-md-8">
+        <form id="chat-input-form">
+          <input id="chat-input" class="form-control" name="chat_input" type="text"
+            style="margin-top: 5px;" autocomplete="off" placeholder="@">
+        </form>
       </div>
+      <div class="col-md-2">&nbsp;</div>
     </div>
   </div>
 </div>
@@ -255,14 +253,14 @@
 </template>
 
 <template name="channel_user_icon">
-  <i class="icon-user whois-tooltip{{#if is_user_away name}} icon-white{{/if}}" title="{{whois_tooltip name}}"></i>
+  <i class="glyphicon glyphicon-user whois-tooltip{{#if is_user_away name}} icon-white{{/if}}" title="{{whois_tooltip name}}"></i>
 </template>
 
 <template name="user_menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ name }}" style="min-width: 80px; width: 80px;">
     <li>
-      <a class="pm-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-envelope"></i> PM</a>
-      <a class="whois-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="icon-info-sign"></i> WHOIS</a>
+      <a class="pm-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="glyphicon glyphicon-envelope"></i> PM</a>
+      <a class="whois-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}"><i class="glyphicon glyphicon-info-sign"></i> WHOIS</a>
     </li>
   </ul>
 </template>

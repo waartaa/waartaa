@@ -45,10 +45,23 @@ html, body, .container, .content {
 #chat {
   margin-top: 10px;
 }
+
+#chat-main {
+    padding: 0 1px 0 1px;
+}
+
 #chat-input-form .typeahead.dropdown-menu {
     bottom: 40px !important;
     top: -70px !important;
     overflow-y: auto; 
+}
+
+#chat-input {
+  color: #555;
+}
+
+#chat-input-form {
+  padding: 6px 0 8px 0;
 }
 
 .ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br {
@@ -171,4 +184,8 @@ body {
 
 .server-room-menu-btn, .channel-user-menu-btn {
   padding: 0px 6px;
+}
+
+.user-away a {
+  color: #9E9EC2;
 }

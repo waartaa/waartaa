@@ -7,7 +7,7 @@ updateHeight = function () {
   $('.chat-logs-container')//.height(final_height - 69);
   .each(function (index, elem) {
     var $topic = $(elem).prev('.topic');
-    $(elem).height(final_height - $topic.height() || 0);
+    $(elem).height((final_height - $topic.height() || 0) - 20);
   });
 }
 
@@ -298,9 +298,9 @@ function chatUserClickHandler (event) {
     if ($(event.target).hasClass('btn-group') || $(event.target).parent().hasClass('btn-group'))
       return;
     event.stopPropagation();
-    $('.channel-user').parent().removeClass('active');
+    //$('.channel-user').parent().removeClass('active');
     $('.dropdown.open, .btn-group.open').removeClass('open');
-    $(event.target).parent().addClass('active');
+    //$(event.target).parent().addClass('active');
 }
 
 function serverChannelsRenderedCallback () {
