@@ -104,6 +104,7 @@ function _create_user_server(data, user) {
     user_server_data = {
         channels: channels,
         nick: data.nick,
+        real_name: data.real_name,
         password: encrypt(data.password),
         user: user.username,
         user_id: user._id,
@@ -122,6 +123,7 @@ function _create_user_server(data, user) {
             $set: {
                 nick: data.nick,
                 password: password,
+                real_name: data.real_name,
                 channels: user_server_data.channels,
                 last_updated: user_server_data.last_updated,
                 last_updater: user_server_data.last_updater,

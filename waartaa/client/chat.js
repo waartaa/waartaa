@@ -475,6 +475,25 @@ Template.channel_logs.rendered = function () {
   //console.log("CREATED channel_logs");
 };
 
+
+Template.add_server_modal.events({
+  'submit form': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var data = {
+      server_id: $('#server-join-server-list').val(),
+      nick: $('#server-join-nick').val(),
+      real_name: $('#server-join-name').val(),
+      password: $('#server-join-password').val(),
+      channels: $('#server-join-channels').val()
+    };
+    console.log(data);
+    Meteor.call('user_server_create', data, function (err) {
+      console.log(err);
+    });
+  },
+});
+
 Handlebars.registerHelper("activeChannels", function () {
   return UserChannels.find({active: true});
 });
