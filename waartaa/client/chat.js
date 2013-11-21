@@ -36,7 +36,7 @@ function  highlightChannel () {
   //else if (Session.get('roomtype') == 'server')
   //  $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
   $('li#server-' + server_id).addClass('active');
-  $('#chat-input').focus();
+  //$('#chat-input').focus();
   refreshAutocompleteNicksSource();
 }
 
@@ -492,6 +492,34 @@ Template.add_server_modal.events({
       console.log(err);
     });
   },
+});
+
+Template.edit_server_modal.events({
+  'submit form': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $form = $(e.target);
+    var server_id = $form.parents('.modal').data('server-id');
+    var data = {};
+    $.each($form.serializeArray(), function (index, value) {
+      data[value.name] = value.value;
+    })
+    console.log(data);
+    Meteor.call('user_server_create', data, function (err) {
+      console.log(err);
+      $('#editServerModal-' + server_id).modal('hide');
+    })
+  }
+});
+
+Template.server_menu.events({
+  'click .serverEditLink': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $this = $(e.target);
+    var server_id = $this.data('server-id');
+    $('#editServerModal-' + server_id).modal();
+  }
 });
 
 Handlebars.registerHelper("activeChannels", function () {
