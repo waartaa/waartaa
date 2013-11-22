@@ -512,6 +512,22 @@ Template.edit_server_modal.events({
   }
 });
 
+Template.add_server_channel.events({
+  'submit form': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $form = $(e.target);
+    var data = {};
+    var server_id = $form.parents('.modal').data('server-id');
+    $.each($form.serializeArray(), function (index, value) {
+      data[value.name] = value.value;
+    });
+    var server = UserServers.findOne({_id: server_id});
+    Meteor.call('join_user_channel', server.name, data.name, data.password);
+    $('#addServerChannel-' + server_id).modal('hide');
+  }
+});
+
 Template.server_menu.events({
   'click .serverEditLink': function (e) {
     e.preventDefault();
@@ -519,6 +535,13 @@ Template.server_menu.events({
     var $this = $(e.target);
     var server_id = $this.data('server-id');
     $('#editServerModal-' + server_id).modal();
+  },
+  'click .addChannelLink': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $this = $(e.target);
+    var server_id = $this.data('server-id');
+    $('#addServerChannel-' + server_id).modal();
   }
 });
 

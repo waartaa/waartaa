@@ -235,14 +235,14 @@ Meteor.methods({
         var user = Meteor.users.findOne({_id: this.userId});
         _join_user_server(user, user_server_name);
     },
-    join_user_channel: function (user_server_name, channel_name) {
+    join_user_channel: function (user_server_name, channel_name, password) {
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server_name];
         UserChannels.update({
             user: user.username, user_server_name: user_server_name,
             name: channel_name
         }, {$set: {active: true, status: 'connecting'}}, {multi: true});
-        irc_handler.joinChannel(channel_name);
+        irc_handler.joinChannel(channel_name, password);
     },
     part_user_channel: function (user_server_name, channel_name) {
         var user = Meteor.users.findOne({_id: this.userId});

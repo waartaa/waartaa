@@ -462,16 +462,20 @@ IRCHandler = function (user, user_server) {
     }
 
     return {
-        joinChannel: function (channel_name) {
-            client.join(channel_name, function (message) {
-                Fiber(function () {
-                    var channel = UserChannels.findOne({
-                        name: channel_name, user_server_name: user_server.name,
-                        user: user.username
-                    })
-                    _joinChannelCallback(message, channel);
-                }).run();
-            });
+        joinChannel: function (channel_name, password) {
+            if (password) {
+                client.send('JOIN', channel_name, password);
+            } else {
+                client.join(channel_name, function (message) {
+                    Fiber(function () {
+                        var channel = UserChannels.findOne({
+                            name: channel_name, user_server_name: user_server.name,
+                            user: user.username
+                        })
+                        _joinChannelCallback(message, channel);
+                    }).run();
+                });
+            }
         },
         partChannel: function (channel_name) {
             var client = client_data[user_server.name];
