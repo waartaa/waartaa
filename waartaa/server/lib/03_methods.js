@@ -273,6 +273,7 @@ Meteor.methods({
         var user_server = UserServers.findOne({name: server_name, user_id: this.userId});
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server.name];
+        irc_handler.changeNick(nick);
     },
     log_clients: function () {
         //console.log(CLIENTS);

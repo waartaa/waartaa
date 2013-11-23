@@ -626,6 +626,13 @@ Handlebars.registerHelper("unread_logs_count", function (
   }
 });
 
+Handlebars.registerHelper("server_current_nick", function () {
+  var user_server = UserServers.findOne({_id: Session.get('server_id')});
+  if (user_server) {
+    return user_server.current_nick;
+  }
+})
+
 $('.whois-tooltip').tipsy({live: true, gravity: 'e', html: true});
 $('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 
@@ -654,3 +661,66 @@ Handlebars.registerHelper('is_user_away', function (nick) {
   return false;
 });
 
+Handlebars.registerHelper('current_server_id', function () {
+  return Session.get('server_id');
+});
+
+
+Handlebars.registerHelper('current_server_away_msg', function () {
+  var user_server =  UserServers.findOne({_id: Session.get('server_id')});
+  if (user_server)
+    return user_server.away_msg || "I'm not around.";
+  return '';
+});
+
+function _submit_nick_away_data ($form) {
+  var away_message = $form.find(
+    '#nickAwayMessageInput').val() || "I'm not around.";
+  var user_server = UserServers.findOne({_id: Session.get('server_id')});
+  if (user_server)
+    Meteor.call('mark_away', user_server.name, away_message, function (err) {
+      console.log(err);
+    });
+}
+
+Template.user_nick_options_menu.events = {
+  'click .userNickOptions': function (e) {
+    e.stopPropagation();
+  },
+  'submit .updateNickForm': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $form = $(e.target);
+    var nick = $form.find('#updateNickInput').val();
+    var server_id = $form.data('server-id');
+    var server = UserServers.findOne({_id: server_id});
+    if (server) {
+      Meteor.call('change_nick', server.name, nick, function (err) {
+        console.log(err);
+        if (!err)
+          $('.userNickOptions').parents('.dropup').removeClass('open');
+      });
+    }
+  },
+  'submit .nickAwayForm': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $form = $(e.target);
+    _submit_nick_away_data($form);
+  },
+  'click #updateNickAwayCheckbox': function (e) {
+    var $this = $(e.target);
+    var $form = $this.parents('form.nickAwayForm');
+    if ($this.attr('checked')) {
+      _submit_nick_away_data($form);
+    }
+    else {
+      var user_server = UserServers.findOne({_id: $form.data('server-id')});
+      if (user_server) {
+        Meteor.call('mark_active', user_server.name, function (err) {
+          console.log(err);
+        });
+      }
+    }
+  }
+};

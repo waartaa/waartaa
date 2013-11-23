@@ -502,6 +502,14 @@ IRCHandler = function (user, user_server) {
             UserServers.update({_id: user_server._id}, {$set: {
                 status: 'connecting'}
             });
+            client.addListener('nickSet', function (nick) {
+                Fiber(function () {
+                    if (user_server.current_nick != nick) {
+                        UserServers.update({_id: user_server._id}, {$set: {current_nick: nick}});
+                        user_server = UserServers.findOne({_id: user_server._id});
+                    }
+                }).run();
+            });
             client.connect(function (message) {
                 Fiber(function () {
                     _joinServerCallback(message);
@@ -539,8 +547,15 @@ IRCHandler = function (user, user_server) {
                 create_update_user_channel(user_server, item);
             });
         },
-        markAway: function (message) {},
-        markActve: function () {},
+        markAway: function (message) {
+            Fiber(function () {
+                UserServers.update({_id: user_server._id}, {$set: {away_msg: message}});
+                client.send('AWAY', message);
+            }).run();
+        },
+        markActive: function () {
+            client.send('AWAY', '');
+        },
         removeServer: function (server_id, user_id) {},
         updateServer: function (server_id, server_data, user_id) {},
         sendChannelMessage: function (channel_name, message) {
