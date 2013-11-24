@@ -116,8 +116,8 @@ Meteor.publish("user_channel_logs", function () {
         })
     );
   });
-  console.log(cursors);
-  console.log('$$$$$$$$$$$$$$$');
+  //console.log(cursors);
+  //console.log('$$$$$$$$$$$$$$$');
   return cursors;
 });
 */
@@ -206,11 +206,11 @@ Meteor.methods({
     if (!channel) {
       Channels.insert({name: channel_name, server_id: server_id, server_name: server.name});
     }
-    console.log(server_id);
-    console.log(Clients);
+    //console.log(server_id);
+    //console.log(Clients);
     var client = Clients[user.username][server.name];
     client.join(channel_name, function () {
-      console.log('Joined channel: ' + channel_name);
+      //console.log('Joined channel: ' + channel_name);
     });
   }
 });

@@ -50,7 +50,7 @@ subscribe_pm_logs = function () {
         'pm_logs_' + room_id,
         Session.get('pmLogCount-' + room_id),
         function () {
-          console.log('PM logs count ' + PMLogs.find().count());
+          //console.log('PM logs count ' + PMLogs.find().count());
         }
       );
     }
@@ -65,7 +65,7 @@ subscribe_user_channel_logs = function () {
       "user_channel_logs_" + channel._id,
       Session.get('user_channel_log_count_' + channel._id),
       function () {
-        console.log(UserChannelLogs.find().count());
+        //console.log(UserChannelLogs.find().count());
       }
     );
   });
@@ -79,7 +79,7 @@ subscribe_user_server_logs = function () {
       "user_server_logs_" + user_server._id,
       Session.get('user_server_log_count_' + user_server._id),
       function () {
-        console.log(UserServerLogs.find().count());
+        //console.log(UserServerLogs.find().count());
       }
     );
   });

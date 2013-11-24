@@ -83,14 +83,14 @@ IRCHandler = function (user, user_server) {
 
     function _addGlobalChannelNamesListener () {
         client.addListener('names', function (channel, nicks) {
-                console.log("++++++++++++++GLOBAL CHANNEL NAMES LISTENER: " + channel + ' ' + user.username + ' ' + user_server.name);
-                console.log(nicks);
+                //console.log("++++++++++++++GLOBAL CHANNEL NAMES LISTENER: " + channel + ' ' + user.username + ' ' + user_server.name);
+                //console.log(nicks);
             Fiber(function () {
-                console.log(nicks);
+                //console.log(nicks);
                 var user_channel = UserChannels.findOne({
                     name: channel, active: true, user: user.username});
                 if (user_channel) {
-                    console.log(user_channel.name);
+                    //console.log(user_channel.name);
                     UserChannels.update(
                         {_id: user_channel._id},
                         {$set: {nicks: nicks}}
@@ -132,9 +132,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addWhoListener () {
-      console.log('log WHO data');
+      //console.log('log WHO data');
       client.addListener('who', function (message) {
-        console.log(message);
+        //console.log(message);
         if (message) {
             Fiber(function () {
               for (nick in message.nicks) {
@@ -176,11 +176,11 @@ IRCHandler = function (user, user_server) {
 
     function _addGlobalChannelJoinListener () {
         client.addListener('join', function (channel, nick, message) {
-            console.log('======' + channel + ' ' + nick + ' ' + message);
+            //console.log('======' + channel + ' ' + nick + ' ' + message);
             Fiber(function () {
                 var user_channel = _create_update_user_channel(
                     user_server, {name: channel});
-                console.log(user_channel);
+                //console.log(user_channel);
                 UserChannels.update(
                     {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
                 _addChannelJoinListener(channel.name);
@@ -271,7 +271,7 @@ IRCHandler = function (user, user_server) {
 
     function _addPMListener () {
         client.addListener('message', function (nick, to, text, message) {
-            console.log(nick + ', ' + to + ', ' + text + ', ' + message);
+            //console.log(nick + ', ' + to + ', ' + text + ', ' + message);
             Fiber(function () {
                 if (to == client.nick) {
                     logger.debug(nick + ' ' + JSON.stringify(user.profile.connections[user_server._id].pms));
@@ -303,7 +303,7 @@ IRCHandler = function (user, user_server) {
 
     function _addRawMessageListener() {
         client.addListener('raw', function (message) {
-            console.log(message);
+            //console.log(message);
         });
     }
 
@@ -632,12 +632,12 @@ IRCHandler = function (user, user_server) {
         isServerConnected: function (server_id) {},
         sendRawMessage: function (message) {
             var args = message.substr(1).split(' ');
-            console.log('############');
-            console.log(args);
+            //console.log('############');
+            //console.log(args);
             if (args[0] == 'whois' || args[0] == 'WHOIS') {
                 client.whois(args[1], function (info) {
-                    console.log('+++++++WHOIS CALLBACK++++++++');
-                    console.log(info);
+                    //console.log('+++++++WHOIS CALLBACK++++++++');
+                    //console.log(info);
                     _whois_callback(info);
                 });
             } else 

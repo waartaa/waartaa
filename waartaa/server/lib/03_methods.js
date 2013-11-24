@@ -83,7 +83,7 @@ function decrypt(text){
 }
 
 function _create_user_server(data, user) {
-    console.log(data);
+    //console.log(data);
     if (data.user_server_id) {
         var user_server = UserServers.findOne(
             {_id: data.user_server_id});
@@ -209,7 +209,7 @@ function _send_raw_message(message, irc_handler) {
 
 Meteor.startup(function () {
     CLIENTS = {};
-    console.log(Meteor.users.find());
+    //console.log(Meteor.users.find());
     Meteor.users.find().forEach(function (user) {
         UserServers.find({user: user.username}).forEach(
             function (user_server) {
@@ -262,7 +262,7 @@ Meteor.methods({
 
     },
     send_channel_message: function (user_channel_id, message) {
-        console.log(user_channel_id);
+        //console.log(user_channel_id);
         var user = Meteor.users.findOne({_id: this.userId});
         var user_channel = UserChannels.findOne({
             _id: user_channel_id, user: user.username});
@@ -285,7 +285,7 @@ Meteor.methods({
         irc_handler.changeNick(nick);
     },
     log_clients: function () {
-        console.log(CLIENTS);
+        //console.log(CLIENTS);
         logger.dir(CLIENTS, "Log all clients", "Methods.log_clients");
     },
     send_pm: function (message, room_id) {

@@ -79,7 +79,7 @@ initializeClients = function() {
                 client.join(channel_name, function() {
                   Fiber(function (data) {
                     var user = Meteor.users.findOne({_id: data.user._id});
-                    console.log(client.chans);
+                    //console.log(client.chans);
                     var update_dict = {};
                     update_dict['profile.connections.' + server_id + '.client_data.chans'] = client.chans;
                     Meteor.users.update({_id: user._id}, {$set: update_dict});
@@ -89,7 +89,7 @@ initializeClients = function() {
             }).run({server_id: j, conn: conn, user_id: user._id});
           });
           client.addListener('error', function (err) {
-            console.log(err);
+            //console.log(err);
           });
           client.addListener('message#', function(nick, to, text, message) {
             Fiber(function(){
@@ -177,7 +177,7 @@ initializeClients = function() {
               try {
                 var myNick = user.profile.connections[server_id].client_data.nick;
               } catch (err) {
-                console.log(err);
+                //console.log(err);
                 var myNick = user.username;
               }
               var pm_log_id = PMLogs.insert({from: nick, from_user_id: null,
@@ -195,8 +195,8 @@ initializeClients = function() {
             });
           });
           client.addListener('notice', function (nick, to, text, message) {
-            console.log(nick + '->' + to  + ': ' + text);
-            console.log(message);
+            //console.log(nick + '->' + to  + ': ' + text);
+            //console.log(message);
             Fiber(function (data) {
               if (! data.nick)
                 return;
@@ -220,7 +220,7 @@ initializeClients = function() {
             }
           }).run({
             channel: channel, topic: topic, nick: nick, message: message});
-          console.log(channel, topic, nick, message);
+          //console.log(channel, topic, nick, message);
         });
           client_server_dict[conn.name] = client;
       }
@@ -279,7 +279,7 @@ function initializeServers () {
         last_updater: user.username,
         last_updater_id: user._id,
       });
-      console.log("Server: " + server_id + " created");
+      //console.log("Server: " + server_id + " created");
     }
   }
 }
