@@ -172,7 +172,7 @@ Meteor.publish('channel_logs', function () {
   return ChannelLogs.find({channel_id: {$in: channel_ids}});
 })
 
-Meteor.publish('user_server_users', function () {
+Meteor.publish('server_nicks', function () {
   var user = Meteor.users.findOne({_id: this.userId});
   if (!user)
     return;
@@ -180,7 +180,7 @@ Meteor.publish('user_server_users', function () {
   UserServers.find({user: user.username}, {_id: 1}).forEach(function (value) {
     user_server_ids.push(value._id);
   });
-  return UserServerUsers.find({user_server_id: {
+  return ServerNicks.find({user_server_id: {
     $in: user_server_ids}});
 });
 

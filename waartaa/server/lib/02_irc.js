@@ -61,22 +61,36 @@ IRCHandler = function (user, user_server) {
         }).run();
     }
 
+    function _updateChannelNicks (channel_name, nicks) {
+        ChannelNicks.find(
+            {channel_name: channel_name,
+             server_name: user_server.name},
+            {nick: 1}
+        ).forEach(function (channel_nick) {
+            if (!nicks[channel_nick.nick]) {
+                ChannelNicks.remove(
+                    {
+                        channel_name: channel_name,
+                        server_name: user_server.name,
+                        nick: channel_nick.nick
+                    });
+            } else {
+                delete nicks[channel_nick.nick];
+            }
+        });
+        for (nick in nicks) {
+            ChannelNicks.insert({
+                channel_name: channel_name,
+                server_name: user_server.name,
+                nick: nick
+            });
+        }
+    }
+
     function _addChannelNamesListener (channel_name) {
         client.addListener('names' + channel_name, function (nicks) {
             Fiber(function () {
-                logger.dir(
-                    nicks, 'Nicks in channel: ' + channel_name +
-                    ' in server: ' + user_server.name, 'ChannelNames');
-                var channel = UserChannels.findOne({
-                  name: channel_name, user_server_id: user_server._id,
-                  user: user.username
-              });
-                if (channel)
-                  UserChannels.update({_id: channel._id}, {
-                      $set: {
-                          nicks: nicks
-                      }
-                  });
+                _updateChannelNicks(channel_name, nicks);
             }).run();
         });
     }
@@ -90,11 +104,7 @@ IRCHandler = function (user, user_server) {
                 var user_channel = UserChannels.findOne({
                     name: channel, active: true, user: user.username});
                 if (user_channel) {
-                    //console.log(user_channel.name);
-                    UserChannels.update(
-                        {_id: user_channel._id},
-                        {$set: {nicks: nicks}}
-                    );
+                    _updateChannelNicks(user_channel.name, nicks);
                 }
             }).run();
         });
@@ -114,21 +124,7 @@ IRCHandler = function (user, user_server) {
     }
 
     function _update_channel_nicks_from_who_data (message) {
-      var channel = UserChannels.findOne({
-        name: message.channel, user: user.username,
-        user_server_id: user_server._id});
-      if (channel) {
-        var nicks = channel.nicks;
-        var update = false;
-        for (nick in message.nicks) {
-          if (!nicks[nick]) {
-            nicks[nick] = '';
-            update = true;
-          }
-        }
-        if (update)
-          UserChannels.update({_id: channel._id}, {$set: {nicks: nicks}});
-      }
+      _updateChannelNicks(message.channel, message.nicks);
     }
 
     function _addWhoListener () {
@@ -140,7 +136,7 @@ IRCHandler = function (user, user_server) {
               for (nick in message.nicks) {
                 var who_info = message.nicks[nick];
                 var whoisInfo = whoToWhoisInfo(nick, who_info);
-                _create_update_server_user(whoisInfo);
+                _create_update_server_nick(whoisInfo);
               }
             }).run();
         }
@@ -193,25 +189,19 @@ IRCHandler = function (user, user_server) {
     function _addChannelPartListener (channel_name) {
         client.addListener('part' + channel_name, function (nick, reason, message) {
             Fiber(function () {
-                logger.dir(
-                    message, 'Nick: ' + nick + ' left channel: ' +
-                    channel_name + ' in server: ' + user_server.name +
-                    ' due to reason: ' + reason + ' for user: ' +
-                    user.username + '.', 'ChannelPart'
+                channel_active = (nick == client.nick)? false: true;
+                UserChannels.update(
+                  {
+                    user_server_id: user_server._id, name: channel_name
+                  },
+                  {$set: {active: channel_active}}, {multi: true}
                 );
-                var channel = UserChannels.findOne({name: channel_name, user: user.username});
-                if (channel) {
-                    var nicks = channel.nicks || {};
-                    try {
-                        delete nicks[nick];
-                    } catch (err) {}
-                    UserChannels.update({_id: channel._id}, {
-                        $set: {
-                            nicks: nicks,
-                            active: false
-                        }
-                    }, {multi: true});
-                }
+                ChannelNicks.remove(
+                  {
+                    channel_name: channel_name, server_name: user_server.name,
+                    nick: nick
+                  }
+                );
             }).run();
         });
     }
@@ -485,23 +475,21 @@ IRCHandler = function (user, user_server) {
         return user_channel;
     }
 
-    function _create_update_server_user (info) {
+    function _create_update_server_nick (info) {
         Fiber(function () {
             info['user_server_id'] = user_server._id;
             info['user_server_name'] = user_server.name;
             info['last_updated'] = new Date();
-            var server_user = UserServerUsers.findOne({nick: info.nick, user_server_id: user_server._id});
-            if (server_user) {
-              UserServerUsers.update(
-                {_id: server_user._id}, {$set: info});
-            } else {
-              UserServerUsers.insert(info);
-            }
+            info['server_name'] = user_server.name;
+            ServerNicks.upsert({
+              server_name: user_server.name, nick: info.nick},
+              {$set: info}
+            );
         }).run();
     }
 
     function _whois_callback (info) {
-        _create_update_server_user(info);
+        _create_update_server_nick(info);
     }
 
     return {

@@ -35,7 +35,7 @@ subscribe = function () {
   });
   Meteor.subscribe("user_channel_logs");
   Meteor.subscribe("user_server_logs");
-  Meteor.subscribe("user_server_users");
+  Meteor.subscribe("server_nicks");
 };
 
 subscribe();

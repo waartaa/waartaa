@@ -52,7 +52,7 @@ UserChannels: {
   name: String,
   server_id: String,
   server_name: String,
-  nicks: Dictionary,
+  //nicks: Dictionary,
   password: String,
   creator: String,
   creator_id: String,
@@ -145,7 +145,7 @@ ServerLogs: {
 UserServerLogs = new Meteor.Collection("user_server_logs");
 
 /*
-UserServerUsers: {
+ServerNicks: {
   nick: 'rtnpro_wc',
   user: '7bc98086',
   host: 'gateway/web/freenode/ip.123.201.128.134',
@@ -153,7 +153,17 @@ UserServerUsers: {
   channels: [ '#bcrec', '#bcreclug' ],
   server: 'herbert.freenode.net',
   serverinfo: 'DE',
-  away: '"foo"' 
+  away: '"foo"' ,
+  server_name: String
 }
 */
-UserServerUsers = new Meteor.Collection("user_server_users");
+ServerNicks = new Meteor.Collection("server_nicks");
+
+/*
+ChannelNicks: {
+  'channel_name': String,
+  'server_name': String,
+  'nick': String
+}
+*/
+ChannelNicks = new Meteor.Collection("channel_nicks");

@@ -557,7 +557,7 @@ $('.whois-tooltip').tipsy({live: true, gravity: 'e', html: true});
 $('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 function _get_nick_whois_data (nick) {
   var user_server_id = Session.get('server_id');
-  return UserServerUsers.findOne({
+  return ServerNicks.findOne({
     nick: nick, user_server_id: user_server_id});
 
 
