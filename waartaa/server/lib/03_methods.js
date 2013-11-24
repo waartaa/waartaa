@@ -343,5 +343,10 @@ Meteor.methods({
             }
         }
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
+        _send_raw_message(command_str, irc_handler);
+    },
+    edit_user_channel: function (user_channel_id, data) {
+        UserChannels.update({_id: user_channel_id}, {
+            $set: {password: data.password || ''}});
     }
 })
