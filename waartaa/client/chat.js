@@ -204,9 +204,12 @@ function refreshAutocompleteNicksSource () {
 
 function getChannelNicks () {
   var channel_nicks = [];
-  var channel = UserChannels.findOne({_id: Session.get('room_id')}) || {};
-  for (var nick in channel.nicks || {})
-    channel_nicks.push(nick);
+  var channel = UserChannels.findOne({_id: Session.get('room_id')}, {name: 1, user_server_name: 1}) || {};
+  ChannelNicks.find({
+    server_name: channel.user_server_name, channel_name: channel.name
+  }).forEach(function (channel_nick) {
+    channel_nicks.push(channel_nick.nick);
+  });
   return channel_nicks;
 }
 
@@ -555,12 +558,12 @@ Handlebars.registerHelper("unread_logs_count", function (
 
 $('.whois-tooltip').tipsy({live: true, gravity: 'e', html: true});
 $('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
+
 function _get_nick_whois_data (nick) {
   var user_server_id = Session.get('server_id');
+  var user_server = UserServers.findOne({_id: user_server_id});
   return ServerNicks.findOne({
-    nick: nick, user_server_id: user_server_id});
-
-
+    nick: nick, server_id: user_server.server_id});
 }
 
 Handlebars.registerHelper('whois_tooltip', function (nick) {

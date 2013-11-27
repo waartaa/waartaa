@@ -172,13 +172,35 @@ Meteor.publish('server_nicks', function () {
   var user = Meteor.users.findOne({_id: this.userId});
   if (!user)
     return;
-  var user_server_ids = [];
+  var server_ids = [];
   UserServers.find({user: user.username}, {_id: 1}).forEach(function (value) {
-    user_server_ids.push(value._id);
+    server_ids.push(value.server_id);
   });
   console.log('publishing server nicks');
-  return ServerNicks.find({user_server_id: {
-    $in: user_server_ids}});
+  return ServerNicks.find({server_id: {
+    $in: server_ids}});
+});
+
+Meteor.publish('channel_nicks', function () {
+  var user = Meteor.users.findOne({_id: this.userId});
+  if (!user)
+    return;
+  var query_or = [];
+  UserServers.find({user_id: user._id}).forEach(function (user_server) {
+    var channel_names = [];
+    var query_dict = {
+      server_name: user_server.name, channel_name: {$in: channel_names}};
+    UserChannels.find({
+        user_server_id: user_server._id, active: true
+      }).forEach(function (user_channel) {
+        channel_names.push(user_channel.name);
+      });
+    query_or.push(query_dict);
+    console.log(query_dict.channel_name);
+  });
+  console.log('publishing channel nicks');
+  console.log(query_or);
+  return ChannelNicks.find({$or: query_or});
 });
 
 Meteor.methods({
