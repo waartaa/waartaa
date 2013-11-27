@@ -83,7 +83,7 @@ function decrypt(text){
 }
 
 function _create_user_server(data, user) {
-    console.log(data);
+    //console.log(data);
     if (data.user_server_id) {
         var user_server = UserServers.findOne(
             {_id: data.user_server_id});
@@ -101,7 +101,6 @@ function _create_user_server(data, user) {
         var channel = splitted_channels[i];
         channels.push(channel.trim());
     }
-    logger.info("CHANNELS: " + channels, "_create_user_server");
     user_server_data = {
         channels: channels,
         nick: data.nick,
@@ -177,9 +176,6 @@ function getCurrentUser() {
 }
 
 function _join_user_server(user, user_server_name) {
-    logger.debug(
-        'User: ' + user.username + ' is joining server: ' +
-        user_server_name, 'server.methods._join_user_server');
     var user_server = UserServers.findOne({
         user: user.username, name: user_server_name});
     if (user_server) {
@@ -209,7 +205,7 @@ function _send_raw_message(message, irc_handler) {
 
 Meteor.startup(function () {
     CLIENTS = {};
-    console.log(Meteor.users.find());
+    //console.log(Meteor.users.find());
     Meteor.users.find().forEach(function (user) {
         UserServers.find({user: user.username}).forEach(
             function (user_server) {
@@ -236,10 +232,6 @@ Meteor.methods({
     join_user_server: function (user_server_name) {
         var user = Meteor.users.findOne({_id: this.userId});
         _join_user_server(user, user_server_name);
-        logger.dir(irc_handler,
-            'Created IRCHandler instance for server: ' +
-            user_server_name + ' user: ' + user.username,
-            'server.methods.join_user_server');
     },
     join_user_channel: function (user_server_name, channel_name) {
         var user = Meteor.users.findOne({_id: this.userId});
@@ -262,7 +254,7 @@ Meteor.methods({
 
     },
     send_channel_message: function (user_channel_id, message) {
-        console.log(user_channel_id);
+        //console.log(user_channel_id);
         var user = Meteor.users.findOne({_id: this.userId});
         var user_channel = UserChannels.findOne({
             _id: user_channel_id, user: user.username});
@@ -279,14 +271,9 @@ Meteor.methods({
         var user_server = UserServers.findOne({name: server_name, user_id: this.userId});
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server.name];
-        logger.debug(
-            "Changing nick from '" + irc_handler.client.nick + "' to '" +
-                nick + "'.", "Methods.change_nick");
-        irc_handler.changeNick(nick);
     },
     log_clients: function () {
-        console.log(CLIENTS);
-        logger.dir(CLIENTS, "Log all clients", "Methods.log_clients");
+        //console.log(CLIENTS);
     },
     send_pm: function (message, room_id) {
         var user_server_id = room_id.split('_')[0];

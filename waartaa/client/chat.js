@@ -78,8 +78,8 @@ function observeChatlogTableScroll () {
   var old_table_height = Session.get('height-' + id, 0);
   var new_table_height = $table.height();
   if ($container.scrollTop() == 0) {
-    console.log(old_table_height);
-    console.log(new_table_height);
+    //console.log(old_table_height);
+    //console.log(new_table_height);
     $container.scrollTop(new_table_height - old_table_height);
   }
   Session.set('height-' + id, new_table_height);
@@ -96,7 +96,7 @@ function chatLogsContainerScrollCallback (event) {
     var $target = $(event.target);
     var $table = $target.find('.chatlogs-table');
     if (scroll_top == 0) {
-      console.log("Reached top of page.");
+      //console.log("Reached top of page.");
       var key = '';
       if ($table.hasClass('channel'))
         key = "user_channel_log_count_" + $target.data('channel-id');
@@ -204,9 +204,12 @@ function refreshAutocompleteNicksSource () {
 
 function getChannelNicks () {
   var channel_nicks = [];
-  var channel = UserChannels.findOne({_id: Session.get('room_id')}) || {};
-  for (var nick in channel.nicks || {})
-    channel_nicks.push(nick);
+  var channel = UserChannels.findOne({_id: Session.get('room_id')}, {name: 1, user_server_name: 1}) || {};
+  ChannelNicks.find({
+    server_name: channel.user_server_name, channel_name: channel.name
+  }).forEach(function (channel_nick) {
+    channel_nicks.push(channel_nick.nick);
+  });
   return channel_nicks;
 }
 
@@ -383,7 +386,7 @@ Template.chat_input.events({
       var myNick = (Meteor.user().profile.connections[Session.get(
         'server_id')]['client_data'] || {})['nick'] || Meteor.user().username;
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       var myNick = Meteor.user().username;
     }
     if (!message)
@@ -469,7 +472,7 @@ Template.channel_menu.events = {
 }
 
 Template.channel_logs.rendered = function () {
-  console.log("CREATED channel_logs");
+  //console.log("CREATED channel_logs");
 };
 
 Handlebars.registerHelper("activeChannels", function () {
@@ -555,12 +558,12 @@ Handlebars.registerHelper("unread_logs_count", function (
 
 $('.whois-tooltip').tipsy({live: true, gravity: 'e', html: true});
 $('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
+
 function _get_nick_whois_data (nick) {
   var user_server_id = Session.get('server_id');
-  return UserServerUsers.findOne({
-    nick: nick, user_server_id: user_server_id});
-
-
+  var user_server = UserServers.findOne({_id: user_server_id});
+  return ServerNicks.findOne({
+    nick: nick, server_id: user_server.server_id});
 }
 
 Handlebars.registerHelper('whois_tooltip', function (nick) {
@@ -570,7 +573,7 @@ Handlebars.registerHelper('whois_tooltip', function (nick) {
     tooltip = "Username: " + whois_data.user + "<br/>" +
       "Real name: " + whois_data.realname + "<br/>" +
       "Server: " + whois_data.server + "<br/>";
-  console.log(tooltip);
+  //console.log(tooltip);
   return new Handlebars.SafeString(tooltip);
 });
 

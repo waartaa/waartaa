@@ -10,7 +10,7 @@ Severs: {
   connections: List of items like {url: 'irc.freenode.net', port: '6667'}
 }
 */
-Servers = new Meteor.Collection("servers");
+Servers = new Meteor.SmartCollection("servers");
 
 /*
 UserServers: {
@@ -30,7 +30,7 @@ UserServers: {
   status: String (online/offline/connecting)
 }
 */
-UserServers = new Meteor.Collection("user_servers");
+UserServers = new Meteor.SmartCollection("user_servers");
 
 /*
 ServerConnections: {
@@ -45,14 +45,14 @@ ServerConnections: {
   last_updated: Date
 }
 */
-ServerConnections = new Meteor.Collection("server_connections");
+ServerConnections = new Meteor.SmartCollection("server_connections");
 
 /*
 UserChannels: {
   name: String,
   server_id: String,
   server_name: String,
-  nicks: Dictionary,
+  //nicks: Dictionary,
   password: String,
   creator: String,
   creator_id: String,
@@ -62,7 +62,7 @@ UserChannels: {
   last_updated: Date
 }
 */
-UserChannels = new Meteor.Collection("user_channels");
+UserChannels = new Meteor.SmartCollection("user_channels");
 
 /*
 ChannelCredentials: {
@@ -75,7 +75,7 @@ ChannelCredentials: {
   last_updated: Date
 }
 */
-ChannelCredentials = new Meteor.Collection("channel_credentials");
+ChannelCredentials = new Meteor.SmartCollection("channel_credentials");
 
 /*
 ChannelLogs: {
@@ -98,8 +98,8 @@ ChannelLogs: {
   user_id: String
 }
 */
-ChannelLogs = new Meteor.Collection("channel_logs");
-UserChannelLogs = new Meteor.Collection("user_channel_logs");
+ChannelLogs = new Meteor.SmartCollection("channel_logs");
+UserChannelLogs = new Meteor.SmartCollection("user_channel_logs");
 
 /*
 PMLogs: {
@@ -121,7 +121,7 @@ PMLogs: {
   user_id: String
 }
 */
-PMLogs = new Meteor.Collection("pm_logs");
+PMLogs = new Meteor.SmartCollection("pm_logs");
 
 /*
 ServerLogs: {
@@ -142,10 +142,10 @@ ServerLogs: {
   user_id: String
 }
 */
-UserServerLogs = new Meteor.Collection("user_server_logs");
+UserServerLogs = new Meteor.SmartCollection("user_server_logs");
 
 /*
-UserServerUsers: {
+ServerNicks: {
   nick: 'rtnpro_wc',
   user: '7bc98086',
   host: 'gateway/web/freenode/ip.123.201.128.134',
@@ -153,7 +153,28 @@ UserServerUsers: {
   channels: [ '#bcrec', '#bcreclug' ],
   server: 'herbert.freenode.net',
   serverinfo: 'DE',
-  away: '"foo"' 
+  away: '"foo"' ,
+  server_name: String
 }
 */
-UserServerUsers = new Meteor.Collection("user_server_users");
+ServerNicks = new Meteor.SmartCollection("server_nicks");
+
+/*
+ChannelNicks: {
+  'channel_name': String,
+  'server_name': String,
+  'nick': String
+}
+*/
+ChannelNicks = new Meteor.SmartCollection("channel_nicks");
+
+/*
+Create indices:
+> db.user_servers.ensureIndex({_id: 1, name: 1, user_id: 1})
+> db.user_server_logs.ensureIndex({server_id: 1})
+> db.user_server_logs.ensureIndex({server_id: 1, created: 1})
+> db.user_channels.ensureIndex({user: 1, active: 1})
+> db.user_channel_logs.ensureIndex({channel_id: 1})
+> db.pm_logs.ensureIndex({user: 1, from: 1, to_nick: 1})
+> db.server_nicks.ensureIndex({user_server_id: 1})
+*/

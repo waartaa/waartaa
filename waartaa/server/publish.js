@@ -42,6 +42,7 @@ Meteor.publish('user_channels', function () {
   user_channels.forEach(function (channel) {
     u.push(channel.name);
   });
+  console.log('Publishing channels for user: ' + user.username);
   setTimeout(publish_user_channel_logs, 1000, user);
   return user_channels;
 });
@@ -54,6 +55,7 @@ function publish_user_channel_logs (user) {
     user_channels.forEach(function (channel) {
       if (typeof(logs_published_for_channels[channel._id]) == "undefined") {
         Meteor.publish("user_channel_logs_" + channel._id, function (n) {
+          console.log('Publishing logs for channel: ' + channel.name + ', ' + user.username);
           var N = n || CONFIG.show_last_n_logs;
           var cursor = UserChannelLogs.find({channel_id: channel._id},
             {
@@ -81,6 +83,7 @@ function publish_pm_logs (user) {
         if (typeof(logs_published_for_pms[room_id]) == "undefined") {
           Meteor.publish(
             'pm_logs_' + room_id, function (n) {
+              console.log('publishing PMLogs');
               var N = n || CONFIG.show_last_n_logs;
               var cursor = PMLogs.find({
                 $or: [
@@ -116,8 +119,8 @@ Meteor.publish("user_channel_logs", function () {
         })
     );
   });
-  console.log(cursors);
-  console.log('$$$$$$$$$$$$$$$');
+  //console.log(cursors);
+  //console.log('$$$$$$$$$$$$$$$');
   return cursors;
 });
 */
@@ -136,6 +139,7 @@ Meteor.publish('pm_logs', function () {
 });
 */
 
+/*
 getUserChannels = function (user) {
   if (!user)
     return;
@@ -162,26 +166,41 @@ Meteor.publish('channels', function() {
   return [];//getUserChannels(user);
 });
 
-Meteor.publish('channel_logs', function () {
-  var user = Meteor.users.findOne({_id: this.userId});
-  var channels = []; //getUserChannels(user);
-  var channel_ids = [];
-  channels.forEach(function (channel) {
-    channel_ids.push(channel._id);
-  });
-  return ChannelLogs.find({channel_id: {$in: channel_ids}});
-})
+*/
 
-Meteor.publish('user_server_users', function () {
+Meteor.publish('server_nicks', function () {
   var user = Meteor.users.findOne({_id: this.userId});
   if (!user)
     return;
-  var user_server_ids = [];
+  var server_ids = [];
   UserServers.find({user: user.username}, {_id: 1}).forEach(function (value) {
-    user_server_ids.push(value._id);
+    server_ids.push(value.server_id);
   });
-  return UserServerUsers.find({user_server_id: {
-    $in: user_server_ids}});
+  console.log('publishing server nicks');
+  return ServerNicks.find({server_id: {
+    $in: server_ids}});
+});
+
+Meteor.publish('channel_nicks', function () {
+  var user = Meteor.users.findOne({_id: this.userId});
+  if (!user)
+    return;
+  var query_or = [];
+  UserServers.find({user_id: user._id}).forEach(function (user_server) {
+    var channel_names = [];
+    var query_dict = {
+      server_name: user_server.name, channel_name: {$in: channel_names}};
+    UserChannels.find({
+        user_server_id: user_server._id, active: true
+      }).forEach(function (user_channel) {
+        channel_names.push(user_channel.name);
+      });
+    query_or.push(query_dict);
+    console.log(query_dict.channel_name);
+  });
+  console.log('publishing channel nicks');
+  console.log(query_or);
+  return ChannelNicks.find({$or: query_or});
 });
 
 Meteor.methods({
@@ -206,11 +225,11 @@ Meteor.methods({
     if (!channel) {
       Channels.insert({name: channel_name, server_id: server_id, server_name: server.name});
     }
-    console.log(server_id);
-    console.log(Clients);
+    //console.log(server_id);
+    //console.log(Clients);
     var client = Clients[user.username][server.name];
     client.join(channel_name, function () {
-      console.log('Joined channel: ' + channel_name);
+      //console.log('Joined channel: ' + channel_name);
     });
   }
 });

@@ -1,12 +1,11 @@
-waartaa
-=======
+# waartaa
 
 A web IRC client written in Meteor JS. It is aimed towards being an intuitive, collaborative IRC client across
 multiple devices of the user along with centralized logging.
 
 
-Setup
-=====
+## Setup
+
 1. Install Meteor: ``$ curl https://install.meteor.com | sh``
 1. Clone repo: ``$ git clone https://github.com/rtnpro/waartaa.git``
 1. Change dir to waartaa: ``$ cd waartaa``
@@ -18,3 +17,25 @@ Setup
 1. Install ``meteorite``: ``$ npm install meteorite``
 1. Add meteor-irc: ``$ mrt add irc``
 1. Run waartaa development server: ``$ meteor``
+
+
+## Running with SmartCollections
+
+1. ``mongod [--dbpath <path_to_db>] --replSet meteor``
+1. Open mongo shell by typing ``mongo`` in your shell and then enter the
+   following:
+
+   ```
+   var config = {_id: "meteor", members: [{_id: 0, host: "127.0.0.1:27017"}]}
+   rs.initiate(config)
+   ```
+
+1. Then export the following variables:
+
+   ```
+   export MONGO_URL=mongodb://localhost:27017/meteor
+   export OPLOG_URL=mongodb://localhost:27017/local
+   ```
+
+1. Run meteor as usual: ``meteor`` or ``mrt``
+
