@@ -438,14 +438,22 @@ IRCHandler = function (user, user_server) {
 
     function _create_update_server_nick (info) {
         Fiber(function () {
-            info['user_server_id'] = user_server._id;
-            info['user_server_name'] = user_server.name;
             info['last_updated'] = new Date();
             info['server_name'] = user_server.name;
-            ServerNicks.upsert({
-              server_name: user_server.name, nick: info.nick},
-              {$set: info}
-            );
+            info['server_id'] = user_server.server_id;
+            // SmartCollections does not support 'upsert'
+            //ServerNicks.upsert({
+            //  server_name: user_server.name, nick: info.nick},
+            //  {$set: info}
+            //);
+            var server_nick = ServerNicks.findOne({
+              server_name: user_server.name, nick: info.nick});
+            if (!server_nick) {
+              info['created'] = info['last_updated'];
+              ServerNicks.insert(info);
+            } else
+              ServerNicks.update({_id: server_nick._id},
+                  {$set: info});
         }).run();
     }
 
