@@ -22,7 +22,7 @@ Setup
 
 Running with SmartCollections
 =============================
-1. mongod [--dbpath <path_to_db>] --replSet meteor
+1. ``mongod [--dbpath <path_to_db>] --replSet meteor``
 1. Open mongo shell by typing ``mongo`` in your shell and then enter the
    following:
 
