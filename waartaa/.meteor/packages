@@ -9,15 +9,14 @@ accounts-password
 jquery-ui-bootstrap
 jquery-ui
 router
-observatory
 standard-app-packages
 HTML5-History-API
-observatory-apollo
+#observatory-apollo
 page-js-ie-support
 require
 handlebar-helpers
 
-observatory-galileo
+#observatory-galileo
 irc
 presence
 bootstrap-3
