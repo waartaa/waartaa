@@ -21,3 +21,6 @@ irc
 presence
 bootstrap-3
 smart-collections
+accounts-github
+
+accounts-ui-bootstrap-3

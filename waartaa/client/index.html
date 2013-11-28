@@ -47,12 +47,17 @@
         </ul>
         {{/if}}
         <ul class="nav navbar-nav navbar-right">
+          {{ loginButtons }}
+        </ul>
+        <!--
+        <ul class="nav navbar-nav navbar-right">
           {{# if currentUser}}
           <li>
             <button id="signout" class="btn btn-success">Sign out</button>
           </li>
           {{/if}}
         </ul>
+        -->
       </div>
     </div>
   </nav>
@@ -68,7 +73,8 @@
         {{#if currentUser}}
           {{> user_loggedin_content}}
         {{else}}
-          {{> user_loggedout_content}}
+          <h1>Hello</h1>
+          {{loginButtons}}
         {{/if}}
       </div>
     </div>
@@ -85,11 +91,6 @@
 </template>
 
 <template name="user_loggedout_content">
-  {{# if show_signup_form}}
-    {{> signup_form}}
-  {{else}}
-    {{> signin_form}}
-  {{/if}}
 </template>
 
 <template name="signin_form">

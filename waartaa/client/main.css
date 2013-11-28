@@ -157,7 +157,9 @@ body {
   color: #ffffff;
 }
 
-.global-navbar.navbar-inverse .navbar-nav > .active > a {
+.global-navbar.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover {
   background-color: #39326B;
 }
 
