@@ -2,6 +2,7 @@ IRCHandler = function (user, user_server) {
     var client_data = {};
     var client = null;
     var user_status = "";
+    var channels_listening_to = {};
 
     /* Event listener callbacks */
     /* Callbacks */
@@ -33,9 +34,15 @@ IRCHandler = function (user, user_server) {
     function _joinChannelCallback (message, channel) {
         Fiber(function () {
             UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
+            if (channels_listening_to[channel.name])
+                return;
             client.addListener('message' + channel.name,
                     function (nick, text, message) {
                 Fiber(function () {
+                    if (user.username == 'rtnpro') {
+                        console.log('Adding channel message listener:');
+                        console.log(channel.name);
+                    }
                     UserChannelLogs.insert({
                         message: text,
                         raw_message: message,
@@ -191,6 +198,8 @@ IRCHandler = function (user, user_server) {
                     nick: nick
                   }
                 );
+                if (channels_listening_to[channel_name])
+                    delete channels_listening_to[channel_name];
             }).run();
         });
     }
@@ -213,6 +222,7 @@ IRCHandler = function (user, user_server) {
                         });
                     }
                 });
+                channels_listening_to = {};
             }).run();
         });
     }
