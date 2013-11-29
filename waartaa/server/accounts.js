@@ -11,6 +11,35 @@ Accounts.validateNewUser(function (user) {
 });
 
 Accounts.onCreateUser(function (options, user) {
-  user.profile = user_profiles && user_profiles[user.username] || null;
+  var result, profile;
+  if (user.services.github) {
+    var accessToken = user.services.github.accessToken;
+    result = Meteor.http.get("https://api.github.com/user", {
+    headers: {
+        "User-Agent": "Meteor/1.0"
+    },
+    params: {
+        access_token: accessToken
+    }
+    });
+    if (result.error)
+    throw result.error;
+    console.log(result);
+    profile = _.pick(result.data,
+    "login",
+    "name",
+    "avatar_url",
+    "url",
+    "company",
+    "blog",
+    "email",
+    "bio",
+    "html_url");
+    user.profile = profile;
+    if (Meteor.users.findOne({username: profile.login}))
+        user.username = profile.login + '@' + 'github';
+    else
+        user.username = profile.login;
+  }
   return user;
 });

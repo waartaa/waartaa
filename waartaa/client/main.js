@@ -204,3 +204,10 @@ Handlebars.registerHelper("isUserLoggedIn", function () {
 Handlebars.registerHelper("isCurrentPageChat", function () {
   return Session.get('currentPage') === 'chat';
 });
+
+Accounts.ui.config({
+  requestPermissions: {
+    github: ['user', 'repo']
+  },
+  passwordSignupFields: 'USERNAME_AND_EMAIL'
+});
