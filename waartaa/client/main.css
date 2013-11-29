@@ -211,3 +211,12 @@ body {
 .updateNickInput {
   border-radius: 5px !important;
 }
+
+.right-panel-user-info {
+  padding: 0 5px 0 5px;
+}
+
+.right-panel-user-info dl {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}

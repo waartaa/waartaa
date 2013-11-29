@@ -380,13 +380,44 @@
 <div id="chat-channel-users" class="col-md-2 col-sm-2 hidden-xs">
   <div class="panel panel-info">
     <div class="panel-heading">
-      <strong>Users</strong>
+        <strong>
+          {{# if isCurrentRoomtype "pm" }}
+            User info
+          {{ else }}
+            {{# if isCurrentRoomtype "server" }}
+              Server info
+            {{ else }}
+              Users
+            {{/if}}
+          {{/if}}
+        </strong>
     </div>
     <div class="panel-body">
       <ul class="nav nav-list">
-        {{#each channel_users}}
-          {{>chat_user}}
-        {{/each}}
+        {{# if isCurrentRoomtype "channel" }}
+          {{#each channel_users}}
+            {{>chat_user}}
+          {{/each}}
+        {{ else }}
+            {{# if isCurrentRoomtype "pm"}}
+              {{# with getCurrentPMNickInfo}}
+                <div class="right-panel-user-info">
+                  <dl>
+                    <dt>Username</dt>
+                    <dd>{{ user }}</dd>
+                  </dl>
+                  <dl>
+                    <dt>Real name</dt>
+                    <dd>{{ realname }}</dd>
+                  </dl>
+                  <dl>
+                    <dt>Server</dt>
+                    <dd>{{ server }}</dd>
+                  </dl>
+                </div>
+              {{/with}}
+            {{/if}}
+        {{/if}}
       </ul>
     </div>
 </div>

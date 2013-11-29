@@ -639,6 +639,8 @@ $('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 function _get_nick_whois_data (nick) {
   var user_server_id = Session.get('server_id');
   var user_server = UserServers.findOne({_id: user_server_id});
+  if (!user_server)
+    return;
   return ServerNicks.findOne({
     nick: nick, server_id: user_server.server_id});
 }
@@ -653,6 +655,11 @@ Handlebars.registerHelper('whois_tooltip', function (nick) {
   //console.log(tooltip);
   return new Handlebars.SafeString(tooltip);
 });
+
+Handlebars.registerHelper('getCurrentPMNickInfo', function () {
+  var nick = Session.get('room_id').split('_')[1];
+  return _get_nick_whois_data(nick);
+})
 
 Handlebars.registerHelper('is_user_away', function (nick) {
   var whois_data = _get_nick_whois_data(nick);
@@ -724,3 +731,9 @@ Template.user_nick_options_menu.events = {
     }
   }
 };
+
+Handlebars.registerHelper('isCurrentRoomtype', function (roomtype) {
+  if (Session.get('roomtype') == roomtype)
+    return true;
+  return false;
+})
