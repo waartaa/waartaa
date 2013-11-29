@@ -31,33 +31,12 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/">Waartaa</a>
+        <a class="navbar-brand" href="{{# if currentUser }}/chat{{else}}/{{/if}}">Waartaa</a>
       </div>
       <div class="collapse navbar-collapse" id="nav-collapse-1">
-        {{# if isUserLoggedIn}}
-        <ul class="nav navbar-nav">
-          <li{{# if isCurrentPageHome}} class="active"{{/if}}>
-            <a href="/home/" class="bitter font-white">Home</a>
-          </li>
-          <li{{# if isCurrentPageChat}} class="active"{{/if}}>
-            <a href="/chat/" class="bitter">Chat</a>
-          </li>
-          <li>
-            <a href="/settings/" class="bitter">Settings</a>
-        </ul>
-        {{/if}}
         <ul class="nav navbar-nav navbar-right">
           {{ loginButtons }}
         </ul>
-        <!--
-        <ul class="nav navbar-nav navbar-right">
-          {{# if currentUser}}
-          <li>
-            <button id="signout" class="btn btn-success">Sign out</button>
-          </li>
-          {{/if}}
-        </ul>
-        -->
       </div>
     </div>
   </nav>

@@ -168,18 +168,17 @@ $(window).resize(updateHeight);
 
 Meteor.Router.add({
   '': function () {
-    if (Meteor.userId) {
-      location.href = "/home";
+    if (Meteor.userId()) {
+      location.href = "/chat";
     } else
       return 'user_loggedout_content';
   },
-  '/home': function () {
-    Session.set('currentPage', 'home');
-    return 'user_dashboard';
-  },
   '/chat': function () {
-    Session.set('currentPage', 'chat');
-    return 'chat';
+    if (Meteor.userId()) {
+      Session.set('currentPage', 'chat');
+      return 'chat';
+    } else
+      location.href = '/';
   }
 });
 
