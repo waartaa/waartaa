@@ -13,7 +13,7 @@
       <div class="panel-heading">
         <strong>Servers</strong>
         <span class="pull-right">
-          <button id="server-add-btn" class="btn btn-primary compact-icon-btn enable-tipsy" title="Add new server">
+          <button id="server-add-btn" class="btn btn-primary compact-icon-btn enable-tipsy" title="Add new server" data-toggle="modal" data-target="#addServerModal">
             <icon class="glypicon glyphicon-plus"></icon>
           </button>
         </span>
@@ -27,6 +27,45 @@
       </div>
     </div>
   </div>
+  {{> add_server_modal}}
+</template>
+
+<template name="add_server_modal">
+<div class="modal fade" id="addServerModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="form" role="form">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">Add a server</h4>
+        </div>
+        <div class="modal-body">
+          <fieldset>
+            <div class="form-group">
+              {{> servers_list_for_user}}
+            </div>
+            <div class="form-group">
+              <input id="server-join-nick" type="text" class="form-control" name="nick" required="true" placeholder="Nick">
+            </div>
+            <div class="form-group">
+              <input id="server-join-name" type="text" class="form-control" name="name" placeholder="Name">
+            </div>
+            <div class="form-group">
+              <input id="server-join-password" type="password" class="form-control" name="password" placeholder="Password">
+            </div>
+            <div class="form-group">
+              <input id="server-join-channels" type="text" class="form-control" name="channels" placeholder="Channels...">
+            <div>
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-primary" value="Submit">
+        </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 </template>
 
 <template name="chat_connection_server">
@@ -47,14 +86,83 @@
   </li>
 </template>
 
+<template name="edit_server_modal">
+<div class="modal fade" id="editServerModal-{{ _id }}" data-server-id="{{ _id }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="form" role="form">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">Edit <strong>{{name}}</strong> server</h4>
+        </div>
+        <div class="modal-body">
+          <fieldset>
+            <input type="hidden" name="user_server_id" value="{{_id}}">
+            <div class="form-group">
+              <input type="text" class="form-control" name="nick" required="true" placeholder="Nick" value="{{ nick }}">
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" name="real_name" placeholder="Name" value="{{ real_name }}">
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" name="password" placeholder="Password" value="{{ password }}">
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" name="channels" placeholder="Channels..." value="{{ channels }}">
+            <div>
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-primary" value="Save changes">
+        </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</template>
+
 <template name="server_menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="server-menu-{{ _id }}" style="min-width: 85px; width: 85px;">
     <li>
-      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-plus"></i> Channel</a>
-      <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+      <a class="addChannelLink" data-toggle="modal" data-target="#addServerChannel-{{ _id }}" href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-plus"></i> Channel</a>
+      <a class="serverEditLink" href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}" data-toggle="modal" data-target="#editServerModal-{{ _id }}"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
       <a href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-remove"></i> Close</a>
     </li>
   </ul>
+  {{> edit_server_modal}}
+  {{> add_server_channel}}
+</template>
+
+<template name="add_server_channel">
+<div class="modal fade" id="addServerChannel-{{ _id }}" data-server-id="{{ _id }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="form" role="form">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">Join new channel</h4>
+        </div>
+        <div class="modal-body">
+          <fieldset>
+            <input type="hidden" name="user_server_id" value="{{_id}}">
+            <div class="form-group">
+              <input type="text" class="form-control" name="name" required="true" placeholder="#ChannelName">
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" name="password" placeholder="Password" value="{{ password }}">
+            </div>
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-primary" value="Join">
+        </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 </template>
 
 <template name="server_pms">
@@ -228,14 +336,44 @@
       <div class="col-md-2">&nbsp;</div>
       <div class="col-md-8">
         <form id="chat-input-form">
-          <input id="chat-input" class="form-control" name="chat_input" type="text"
-            style="margin-top: 5px;" autocomplete="off" placeholder="@">
+          <div class="input-group">
+              <div class="input-group-btn dropup">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">{{ server_current_nick }} <span class="caret"></button>
+                {{> user_nick_options_menu}}
+              </div>
+              <input id="chat-input" class="form-control" name="chat_input" type="text"
+               autocomplete="off" placeholder="@">
+          </div>
         </form>
       </div>
       <div class="col-md-2">&nbsp;</div>
     </div>
   </div>
 </div>
+</template>
+
+<template name="user_nick_options_menu">
+  <ul class="dropdown-menu userNickOptions" role="menu">
+    <li>
+      <form class="form nickAwayForm" data-server-id="{{ current_user_server }}">
+        <label for="updateNickAwayCheckbox">
+          <input id="updateNickAwayCheckbox" data-server-id="{{ current_user_server }}" type="checkbox" name="away">
+          <small>Away</small>
+        </label>
+        <br/>
+        <input type="text" id="nickAwayMessageInput" name="awayMessage" placeholder="Away message..." value="{{ current_server_away_msg }}" required="true">
+      </form>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <form class="form updateNickForm" data-server-id="{{ current_server_id }}">
+        <div class="form-group">
+          <label for="updateNickInput"><small>Change nick</small></label><br/>
+          <input id="updateNickInput" class="form-control updateNickInput" type="text" name="nick" value="{{ server_current_nick }}">
+        </div>
+      </form>
+    </li>
+  </ul>
 </template>
 
 <template name="chat_users">

@@ -2,6 +2,7 @@ IRCHandler = function (user, user_server) {
     var client_data = {};
     var client = null;
     var user_status = "";
+    var channels_listening_to = {};
 
     /* Event listener callbacks */
     /* Callbacks */
@@ -33,9 +34,15 @@ IRCHandler = function (user, user_server) {
     function _joinChannelCallback (message, channel) {
         Fiber(function () {
             UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
+            if (channels_listening_to[channel.name])
+                return;
             client.addListener('message' + channel.name,
                     function (nick, text, message) {
                 Fiber(function () {
+                    if (user.username == 'rtnpro') {
+                        console.log('Adding channel message listener:');
+                        console.log(channel.name);
+                    }
                     UserChannelLogs.insert({
                         message: text,
                         raw_message: message,
@@ -191,6 +198,8 @@ IRCHandler = function (user, user_server) {
                     nick: nick
                   }
                 );
+                if (channels_listening_to[channel_name])
+                    delete channels_listening_to[channel_name];
             }).run();
         });
     }
@@ -213,6 +222,7 @@ IRCHandler = function (user, user_server) {
                         });
                     }
                 });
+                channels_listening_to = {};
             }).run();
         });
     }
@@ -462,16 +472,20 @@ IRCHandler = function (user, user_server) {
     }
 
     return {
-        joinChannel: function (channel_name) {
-            client.join(channel_name, function (message) {
-                Fiber(function () {
-                    var channel = UserChannels.findOne({
-                        name: channel_name, user_server_name: user_server.name,
-                        user: user.username
-                    })
-                    _joinChannelCallback(message, channel);
-                }).run();
-            });
+        joinChannel: function (channel_name, password) {
+            if (password) {
+                client.send('JOIN', channel_name, password);
+            } else {
+                client.join(channel_name, function (message) {
+                    Fiber(function () {
+                        var channel = UserChannels.findOne({
+                            name: channel_name, user_server_name: user_server.name,
+                            user: user.username
+                        })
+                        _joinChannelCallback(message, channel);
+                    }).run();
+                });
+            }
         },
         partChannel: function (channel_name) {
             var client = client_data[user_server.name];
@@ -497,6 +511,14 @@ IRCHandler = function (user, user_server) {
             client_data[server.name] = client;
             UserServers.update({_id: user_server._id}, {$set: {
                 status: 'connecting'}
+            });
+            client.addListener('nickSet', function (nick) {
+                Fiber(function () {
+                    if (user_server.current_nick != nick) {
+                        UserServers.update({_id: user_server._id}, {$set: {current_nick: nick}});
+                        user_server = UserServers.findOne({_id: user_server._id});
+                    }
+                }).run();
             });
             client.connect(function (message) {
                 Fiber(function () {
@@ -535,8 +557,15 @@ IRCHandler = function (user, user_server) {
                 create_update_user_channel(user_server, item);
             });
         },
-        markAway: function (message) {},
-        markActve: function () {},
+        markAway: function (message) {
+            Fiber(function () {
+                UserServers.update({_id: user_server._id}, {$set: {away_msg: message}});
+                client.send('AWAY', message);
+            }).run();
+        },
+        markActive: function () {
+            client.send('AWAY', '');
+        },
         removeServer: function (server_id, user_id) {},
         updateServer: function (server_id, server_data, user_id) {},
         sendChannelMessage: function (channel_name, message) {

@@ -157,7 +157,9 @@ body {
   color: #ffffff;
 }
 
-.global-navbar.navbar-inverse .navbar-nav > .active > a {
+.global-navbar.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover {
   background-color: #39326B;
 }
 
@@ -200,4 +202,12 @@ body {
 
 #chat-servers .panel-info > .panel-heading, #chat-channel-users .panel-info > .panel-heading {
   text-transform: uppercase;
+}
+
+.userNickOptions li {
+  padding: 0 3px 0 3px;
+}
+
+.updateNickInput {
+  border-radius: 5px !important;
 }

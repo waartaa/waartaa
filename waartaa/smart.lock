@@ -9,7 +9,8 @@
       "handlebar-helpers": {},
       "require": {},
       "presence": {},
-      "bootstrap-3": {}
+      "bootstrap-3": {},
+      "accounts-ui-bootstrap-3": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -51,6 +52,11 @@
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
         "tag": "v0.3.6",
         "commit": "711dbcabe333c8714298b2fd1de97fdcdae6efa7"
+      },
+      "accounts-ui-bootstrap-3": {
+        "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
+        "tag": "v0.2.4",
+        "commit": "cdbd20eb065310c0cc302bbd5f22e5b2121c769a"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

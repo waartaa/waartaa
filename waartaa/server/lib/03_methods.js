@@ -104,6 +104,7 @@ function _create_user_server(data, user) {
     user_server_data = {
         channels: channels,
         nick: data.nick,
+        real_name: data.real_name,
         password: encrypt(data.password),
         user: user.username,
         user_id: user._id,
@@ -122,6 +123,7 @@ function _create_user_server(data, user) {
             $set: {
                 nick: data.nick,
                 password: password,
+                real_name: data.real_name,
                 channels: user_server_data.channels,
                 last_updated: user_server_data.last_updated,
                 last_updater: user_server_data.last_updater,
@@ -233,14 +235,14 @@ Meteor.methods({
         var user = Meteor.users.findOne({_id: this.userId});
         _join_user_server(user, user_server_name);
     },
-    join_user_channel: function (user_server_name, channel_name) {
+    join_user_channel: function (user_server_name, channel_name, password) {
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server_name];
         UserChannels.update({
             user: user.username, user_server_name: user_server_name,
             name: channel_name
         }, {$set: {active: true, status: 'connecting'}}, {multi: true});
-        irc_handler.joinChannel(channel_name);
+        irc_handler.joinChannel(channel_name, password);
     },
     part_user_channel: function (user_server_name, channel_name) {
         var user = Meteor.users.findOne({_id: this.userId});
@@ -271,6 +273,7 @@ Meteor.methods({
         var user_server = UserServers.findOne({name: server_name, user_id: this.userId});
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server.name];
+        irc_handler.changeNick(nick);
     },
     log_clients: function () {
         //console.log(CLIENTS);
