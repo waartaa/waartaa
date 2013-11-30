@@ -9,7 +9,7 @@ if (Meteor.isServer) {
             key: privateKey, cert: certificate});
         delete privatekey;
         delete certificate;
-    catch (err) {
+    } catch (err) {
         ssl_credentials = false;
     }
 }
