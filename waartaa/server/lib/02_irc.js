@@ -260,6 +260,7 @@ IRCHandler = function (user, user_server) {
                         message: text,
                         raw_message: message,
                         from: nick,
+                        display_from: nick,
                         from_user: from_user.username,
                         from_user_id: from_user._id,
                         to_nick: to,
@@ -467,8 +468,160 @@ IRCHandler = function (user, user_server) {
         }).run();
     }
 
-    function _whois_callback (info) {
+    function _getLogsFromWhoisInfo(info) {
+        if (!info)
+            return;
+        var logs = [];
+        logs.push(
+            info.nick + ' has userhost ' + info.user + '@' + info.host
+            + ' and realname ' + info.realname);
+        if (info.channels)
+            logs.push(info.nick + ' is on ' + info.channels.join(', '));
+        if (info.serverInfo)
+            logs.push(
+                info.nick + ' is connected on ' + info.server + ' (' +
+                info.serverInfo + ')');
+        if (info.account)
+            logs.push(info.nick + ' ' + info.accountInfo + ' ' + info.account);
+        return logs;
+    }
+
+    function _saveWhoisResponseAsChatLog(info, log_options) {
+        Fiber(function () {
+            if (!log_options)
+                return;
+            var whoisLogs = _getLogsFromWhoisInfo(info);
+            if (log_options.roomtype == 'channel') {
+                var channel = UserChannels.findOne({
+                    _id: log_options.room_id, user_server_id: user_server._id});
+                if (!channel)
+                    return;
+                _.each(whoisLogs, function (text) {
+                    UserChannelLogs.insert({
+                        message: text,
+                        raw_message: info,
+                        from: "WHOIS",
+                        from_user: null,
+                        from_user_id: null,
+                        channel_name: channel.name,
+                        channel_id: channel._id,
+                        server_name: user_server.name,
+                        server_id: user_server._id,
+                        user: user.username,
+                        user_id: user._id,
+                        created: new Date(),
+                        last_updated: new Date(),
+                        type: 'CMDRESP'
+                    });
+                });
+            } else if (log_options.roomtype == 'pm') {
+                var to = log_options.room_id.substr(
+                    log_options.room_id.indexOf('_') + 1);
+                _.each(whoisLogs, function (text) {
+                    PMLogs.insert({
+                      message: text,
+                      raw_message: {},
+                      from: to,
+                      display_from: 'WHOIS',
+                      from_user: null,
+                      from_user_id: null,
+                      to_nick: client.nick,
+                      to_user: user.username,
+                      to_user_id: user._id,
+                      server_name: user_server.name,
+                      server_id: user_server._id,
+                      user: user.username,
+                      user_id: user._id,
+                      created: new Date(),
+                      last_updated: new Date()
+                    });
+                });
+            } else if (log_options.roomtype == 'server') {
+                _.each(whoisLogs, function (text) {
+                    UserServerLogs.insert({
+                        message: text,
+                        raw_message: {},
+                        from: 'WHOIS',
+                        from_user: null,
+                        from_user_id: null,
+                        server_name: user_server.name,
+                        server_id: user_server._id,
+                        user: user.username,
+                        user_id: user._id,
+                        created: new Date(),
+                        last_updated: new Date()
+                    });
+                });
+            }
+        }).run();
+    }
+
+    function _whois_callback (info, log_options) {
         _create_update_server_nick(info);
+        _saveWhoisResponseAsChatLog(info, log_options);
+    }
+
+    function _logIncomingMessage (message, log_options) {
+        Fiber(function () {
+            if (log_options.roomtype == 'channel') {
+                var channel = UserChannels.findOne(
+                    {
+                        _id: log_options.room_id,
+                        user_server_id: user_server._id
+                    }, {_id: 1, name: 1});
+                if (!channel)
+                    return;
+                UserChannelLogs.insert({
+                    message: message,
+                    raw_message: {},
+                    from: client.nick,
+                    from_user: user.username,
+                    from_user_id: user._id,
+                    channel_name: channel.name,
+                    channel_id: channel._id,
+                    server_name: user_server.name,
+                    server_id: user_server._id,
+                    user: user.username,
+                    user_id: user._id,
+                    created: new Date(),
+                    last_updated: new Date()
+                });
+            } else if (log_options.roomtype == 'pm') {
+                var to = log_options.room_id.substr(
+                    log_options.room_id.indexOf('_') + 1);
+                PMLogs.insert({
+                  message: message,
+                  raw_message: {},
+                  from: client.nick,
+                  display_from: client.nick,
+                  from_user: user.username,
+                  from_user_id: user._id,
+                  to_nick: to,
+                  to_user: '',
+                  to_user_id: '',
+                  server_name: user_server.name,
+                  server_id: user_server._id,
+                  user: user.username,
+                  user_id: user._id,
+                  created: new Date(),
+                  last_updated: new Date()
+                });
+            } else if (log_options.roomtype == 'server') {
+                UserServerLogs.insert({
+                    message: message,
+                    raw_message: {},
+                    from: client.nick,
+                    from_user: null,
+                    from_user_id: null,
+                    server_name: user_server.name,
+                    server_id: user_server._id,
+                    user: user.username,
+                    user_id: user._id,
+                    created: new Date(),
+                    last_updated: new Date()
+                });
+            }
+        }).run();
     }
 
     return {
@@ -599,12 +752,27 @@ IRCHandler = function (user, user_server) {
         changeNick: function (nick) {
             client.send('NICK', nick);
         },
-        sendServerMessage: function (server_id, message, user_id) {},
+        sendServerMessage: function (message) {
+            UserServerLogs.insert({
+                message: message,
+                raw_message: message,
+                from: client.nick,
+                from_user: user.username,
+                from_user_id: user.user_id,
+                server_name: user_server.name,
+                server_id: user_server._id,
+                user: user.username,
+                user_id: user._id,
+                created: new Date(),
+                last_updated: new Date()
+            });
+        },
         sendPMMessage: function (to, message) {
             PMLogs.insert({
               message: message,
               raw_message: {},
               from: client.nick,
+              display_from: client.nick,
               from_user: user.username,
               from_user_id: user._id,
               to_nick: to,
@@ -621,7 +789,7 @@ IRCHandler = function (user, user_server) {
         },
         getServerClient: function (server_id, user_id) {},
         isServerConnected: function (server_id) {},
-        sendRawMessage: function (message) {
+        sendRawMessage: function (message, log_options) {
             var args = message.substr(1).split(' ');
             //console.log('############');
             //console.log(args);
@@ -629,7 +797,10 @@ IRCHandler = function (user, user_server) {
                 client.whois(args[1], function (info) {
                     //console.log('+++++++WHOIS CALLBACK++++++++');
                     //console.log(info);
-                    _whois_callback(info);
+                    if (log_options.logInput) {
+                        _logIncomingMessage(message, log_options);
+                    }
+                    _whois_callback(info, log_options);
                 });
             } else 
             client.send.apply(client, args);

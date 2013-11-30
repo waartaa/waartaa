@@ -192,7 +192,6 @@ function _join_user_server(user, user_server_name) {
             + user_server_name + " does not exist!");
 }
 
-
 function _get_irc_handler (user_server_name, user_id) {
     var user = Meteor.users.findOne({_id: user_id});
     var user_server = UserServers.findOne({
@@ -200,8 +199,8 @@ function _get_irc_handler (user_server_name, user_id) {
     return CLIENTS[user.username][user_server.name];
 }
 
-function _send_raw_message(message, irc_handler) {
-    irc_handler.sendRawMessage(message);
+function _send_raw_message(message, irc_handler, log_options) {
+    irc_handler.sendRawMessage(message, log_options);
 }
 
 
@@ -255,7 +254,7 @@ Meteor.methods({
         irc_handler.partChannel(channel_name);
 
     },
-    send_channel_message: function (user_channel_id, message) {
+    send_channel_message: function (user_channel_id, message, log_options) {
         //console.log(user_channel_id);
         var user = Meteor.users.findOne({_id: this.userId});
         var user_channel = UserChannels.findOne({
@@ -264,10 +263,20 @@ Meteor.methods({
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server.name];
         if (message[0] == '/') {
-            _send_raw_message(message, irc_handler);
+            _send_raw_message(message, irc_handler, log_options);
             return;
         }
         irc_handler.sendChannelMessage(user_channel.name, message);
+    },
+    send_server_message: function (user_server_id, message, log_options) {
+        var user_server = UserServers.findOne(
+            {_id: user_server_id, user_id: this.userId}, {name: 1});
+        var irc_handler = _get_irc_handler(user_server.name, this.userId);
+        if (message[0] == '/') {
+            _send_raw_message(message, irc_handler, log_options);
+            return;
+        }
+        irc_handler.sendServerMessage(message);
     },
     change_nick: function (server_name, nick) {
         var user_server = UserServers.findOne({name: server_name, user_id: this.userId});
@@ -278,7 +287,7 @@ Meteor.methods({
     log_clients: function () {
         //console.log(CLIENTS);
     },
-    send_pm: function (message, room_id) {
+    send_pm: function (message, room_id, log_options) {
         var user_server_id = room_id.split('_')[0];
         var nick = room_id.split('_')[1];
         var user = Meteor.users.findOne({_id: this.userId});
@@ -286,7 +295,7 @@ Meteor.methods({
             _id: user_server_id, user: user.username});
         var irc_handler = CLIENTS[user.username][user_server.name];
         if (message[0] == '/') {
-            _send_raw_message(message, irc_handler);
+            _send_raw_message(message, irc_handler, log_options);
             return;
         }
         irc_handler.sendPMMessage(nick, message);
@@ -299,8 +308,40 @@ Meteor.methods({
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
         irc_handler.markActive();
     },
-    send_command: function (user_server_name, command_str) {
+    send_command: function (user_server_name, command_str, log_options) {
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
-        _send_raw_message(command_str, irc_handler)
+        _send_raw_message(command_str, irc_handler, log_options);
+    },
+    whois: function (user_server_name, nick, log_options) {
+        if (log_options) {
+            var roomtype = log_options.roomtype;
+            var room_id = log_options.room_id;
+            if (roomtype == "channel") {
+
+                UserChannelLogs.insert({
+                    message: text,
+                    raw_message: message,
+                    from: nick,
+                    from_user: null,
+                    from_user_id: null,
+                    channel_name: channel.name,
+                    channel_id: channel._id,
+                    server_name: user_server.name,
+                    server_id: user_server._id,
+                    user: user.username,
+                    user_id: user._id,
+                    created: new Date(),
+                    last_updated: new Date(),
+                    type: 'cmd'
+                });
+
+
+            } else if (roomtype == "pm") {
+
+            } else if (roomtype == "server") {
+
+            }
+        }
+        var irc_handler = _get_irc_handler(user_server_name, this.userId);
     }
 })

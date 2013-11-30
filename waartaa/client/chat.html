@@ -310,7 +310,7 @@
 <template name="pm_chat_logs_table">
   <table id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table chatlogs-table pm">
     {{#each pmChatLogs server_id name }}
-      {{> chat_row}}
+      {{> pm_chat_row}}
     {{/each}}
   </table>
 </template>
@@ -318,6 +318,20 @@
 <template name="chat_row">
   <tr>
     <td class="span2"><strong>{{from}}</strong></td>
+    <td>
+      <div class="row">
+        {{message}}
+      </div>
+      <div class="row">
+        <em class="pull-right chat-message-datetime">{{last_updated}}</em>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<template name="pm_chat_row">
+  <tr>
+    <td class="span2"><strong>{{display_from}}</strong></td>
     <td>
       <div class="row">
         {{message}}
