@@ -505,7 +505,13 @@ IRCHandler = function (user, user_server) {
             var nick = user_server.nick;
             var client_options = {
                 autoConnect: false,
-                port: server_port
+                port: '6697',
+                userName: nick,
+                realName: user_server.real_name || '~',
+                secure: ssl_credentials,
+                selfSigned: true,
+                certExpired: true,
+                debug: true
             }
             client = new irc.Client(server_url, nick, client_options);
             client_data[server.name] = client;
