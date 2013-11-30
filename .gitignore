@@ -1,3 +1,5 @@
 *local.js
 *.swp
 00_monitor.js
+*.pem
+*.csr
