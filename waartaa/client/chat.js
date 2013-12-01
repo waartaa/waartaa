@@ -810,7 +810,7 @@ Handlebars.registerHelper('showStatusIcon', function (status) {
   else if (status == 'disconnected')
     iconClass = 'glyphicon-ban-circle';
   else if (status == 'connecting')
-    iconClass = 'glyphicon-refresh';
+    iconClass = 'spin glyphicon-refresh';
   if (iconClass) {
     statusIconHtml = '<icon class="tipsy-enable glyphicon ' + iconClass + '" tooltip="'
       + status + '"></icon>';
