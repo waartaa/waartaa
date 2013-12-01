@@ -168,10 +168,12 @@ function _create_user_server(data, user) {
         {name: {$nin: user_server.channels}, user: user.username},
         {$set: {active: false}}, {multi: true}
     );
-    for (i in user_server.channels) {
+    /*for (i in user_server.channels) {
         var channel_name = user_server.channels[i];
         Meteor.call('join_user_channel', user_server.name, channel_name);
-    }}
+    }*/
+    Meteor.call('join_user_server', user_server.name);
+}
 
 function getCurrentUser() {
     return Meteor.users.findOne({_id: this.userId});

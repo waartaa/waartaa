@@ -77,7 +77,11 @@ function publish_pm_logs (user) {
     return;
   Fiber(function () {
     UserServers.find({user: user.username}).forEach(function (user_server) {
-      var nicks = user.profile.connections[user_server._id].pms;
+      if (!user.profile.connections[user_server._id])
+        user.profile.connections[user_server._id] = {
+          pms: []
+        };
+      var nicks = user.profile.connections[user_server._id].pms || [];
       for (nick in nicks) {
         var room_id = user_server._id + '_' + nick;
         if (typeof(logs_published_for_pms[room_id]) == "undefined") {

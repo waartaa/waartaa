@@ -554,6 +554,8 @@ Template.add_server_modal.events({
     console.log(data);
     Meteor.call('user_server_create', data, function (err) {
       console.log(err);
+      if (!err)
+        $('#addServerModal').modal('hide');
     });
   },
 });

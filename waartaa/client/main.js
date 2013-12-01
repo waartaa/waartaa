@@ -18,7 +18,8 @@ subscribe = function () {
       Session.set(
         "user_server_log_count_" + user_server._id, DEFAULT_LOGS_COUNT);
       var user = Meteor.user();
-      var pm_nicks = user.profile.connections[user_server._id].pms;
+      var pm_nicks = (
+        user.profile.connections[user_server._id] || {}).pms || [];
       for (nick in pm_nicks) {
         var room_id = user_server._id + '_' + nick;
         Session.set('pmLogCount-' + room_id, DEFAULT_LOGS_COUNT);
@@ -44,7 +45,7 @@ subscribe();
 subscribe_pm_logs = function () {
   var user = Meteor.user();
   UserServers.find().forEach(function (user_server) {
-    var nicks = user.profile.connections[user_server._id].pms;
+    var nicks = (user.profile.connections[user_server._id] || {}).pms || [];
     for (nick in nicks) {
       var room_id = user_server._id + '_' + nick;
       Meteor.subscribe(
