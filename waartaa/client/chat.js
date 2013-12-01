@@ -697,7 +697,7 @@ Handlebars.registerHelper("server_current_nick", function () {
   }
 })
 
-$('.whois-tooltip').tipsy({live: true, gravity: 'e', html: true});
+$('.whois-tooltip, .tipsy-enable').tipsy({live: true, gravity: 'e', html: true});
 $('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 
 function _get_nick_whois_data (nick) {
@@ -801,3 +801,19 @@ Handlebars.registerHelper('isCurrentRoomtype', function (roomtype) {
     return true;
   return false;
 })
+
+Handlebars.registerHelper('showStatusIcon', function (status) {
+  var iconClass = "";
+  var statusIconHtml = '';
+  if (status == 'connected')
+    iconClass = 'glyphicon-ok-circle';
+  else if (status == 'disconnected')
+    iconClass = 'glyphicon-ban-circle';
+  else if (status == 'connecting')
+    iconClass = 'glyphicon-refresh';
+  if (iconClass) {
+    statusIconHtml = '<icon class="tipsy-enable glyphicon ' + iconClass + '" tooltip="'
+      + status + '"></icon>';
+  }
+  return new Handlebars.SafeString(statusIconHtml);
+});

@@ -73,6 +73,7 @@
     <a id='serverLink-{{ _id }}' class='server-link' data-server-id='{{ _id }}' data-roomtype="server" href="#">
       {{name}}
       <span class="pull-right">
+        {{ showStatusIcon status }}
         <div class="btn-group">
           <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
@@ -213,6 +214,7 @@
       {{ name }}
       <span class="pull-right">
         <span class="badge">{{ unread_logs_count "channel" _id }}</span>
+        {{ showStatusIcon status }}
         <div class="btn-group">
           <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
