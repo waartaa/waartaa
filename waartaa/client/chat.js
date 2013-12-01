@@ -460,19 +460,13 @@ Template.chat_input.rendered = function () {
   autocompleteNicksInitiate();
 }
 
-
-$('.editServerChannelLink').click(function (e) {
-    debugger;
-    e.preventDefault();
-    e.stopPropagation();
-    var $this = $(e.target);
-    var channel_id = $this.data('channel-id');
-    var user_channel = UserChannels.findOne({_id: channel_id});
-    debugger;
-    $('#editServerChannel-' + user_channel._id).modal();
-  });
-
-function _handleServerChannelEditLinkClick (e) {
+Template.channel_menu.events = {
+  'click .channel-remove': function (e) {
+    var channel_id = $(e.target).data("channel-id");
+    var channel = UserChannels.findOne({_id: channel_id});
+    Meteor.call("part_user_channel", channel.user_server_name, channel.name);
+  },
+  'click .editServerChannelLink': function (e) {
     e.preventDefault();
     e.stopPropagation();
     var $this = $(e.target);
@@ -481,15 +475,7 @@ function _handleServerChannelEditLinkClick (e) {
     Meteor.setTimeout(function () {
       $('#editServerChannel-' + channel_id).modal();
     }, 4);
-}
-
-Template.channel_menu.events = {
-  'click .channel-remove': function (e) {
-    var channel_id = $(e.target).data("channel-id");
-    var channel = UserChannels.findOne({_id: channel_id});
-    Meteor.call("part_user_channel", channel.user_server_name, channel.name);
-  },
-  'click .editServerChannelLink': _handleServerChannelEditLinkClick
+  }
 }
 
 //$('.editServerChannelLink').live('click', _handleServerChannelEditLinkClick);
