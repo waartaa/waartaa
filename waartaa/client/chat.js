@@ -464,7 +464,8 @@ Template.channel_menu.events = {
   'click .channel-remove': function (e) {
     var channel_id = $(e.target).data("channel-id");
     var channel = UserChannels.findOne({_id: channel_id});
-    Meteor.call("part_user_channel", channel.user_server_name, channel.name);
+    Meteor.call(
+      "part_user_channel", channel.user_server_name, channel.name, true);
   },
   'click .editServerChannelLink': function (e) {
     e.preventDefault();
@@ -475,6 +476,19 @@ Template.channel_menu.events = {
     Meteor.setTimeout(function () {
       $('#editServerChannel-' + channel_id).modal();
     }, 4);
+  },
+  'click .toggleJoinChannel': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $this = $(e.target);
+    var channel_id = $this.data('channel-id');
+    var channel = UserChannels.findOne({_id: channel_id});
+    var status = $this.data('status');
+    if (status == 'connected')
+      Meteor.call(
+        "part_user_channel", channel.user_server_name, channel.name, false);
+    else
+      Meteor.call('join_user_channel', channel.user_server_name, channel.name);
   }
 }
 
@@ -795,11 +809,18 @@ Handlebars.registerHelper('showStatusIcon', function (status) {
     iconClass = 'glyphicon-ok-circle';
   else if (status == 'disconnected')
     iconClass = 'glyphicon-ban-circle';
-  else if (status == 'connecting')
+  else if (status == 'connecting' || status == 'disconnecting')
     iconClass = 'spin glyphicon-refresh';
   if (iconClass) {
     statusIconHtml = '<icon class="tipsy-enable glyphicon ' + iconClass + '" tooltip="'
       + status + '"></icon>';
   }
   return new Handlebars.SafeString(statusIconHtml);
+});
+
+Handlebars.registerHelper('isConnected', function (status) {
+  if (status == 'connected')
+    return true;
+  else
+    return false;
 });

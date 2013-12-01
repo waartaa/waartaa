@@ -232,6 +232,12 @@
 <template name="channel_menu">
   <ul class="dropdown-menu pull-right" role="menu" style="min-width: 80px; width: 80px;">
     <li>
+      <a href="#" class="toggleJoinChannel" style="padding: 3px 5px;" data-channel-id="{{ _id }}"
+          data-status="{{ status }}">
+        <i class="glyphicon {{# if isConnected status}}glyphicon-log-out{{ else }}glyphicon-log-in{{/if}}"></i>
+        {{# if isConnected status}}Part{{ else }}Join{{/if}}</a>
+    </li>
+    <li>
       <a href="#" class="editServerChannelLink" style="padding: 3px 5px;" data-channel-id="{{ _id }}"  data-toggle="modal" data-target="#editServerChannel-{{ _id }}"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
     </li>
     <li>

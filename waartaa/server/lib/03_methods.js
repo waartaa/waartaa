@@ -243,14 +243,16 @@ Meteor.methods({
         }, {$set: {active: true, status: 'connecting'}}, {multi: true});
         irc_handler.joinChannel(channel_name, password);
     },
-    part_user_channel: function (user_server_name, channel_name) {
+    part_user_channel: function (user_server_name, channel_name, close) {
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server_name];
+        var active = close? false: true;
+        console.log('CHANNEL STATUS: ' + active);
         UserChannels.update(
             {
                 user: user.username, name: channel_name,
                 user_server_name: user_server_name
-            }, {$set: {active: false, status: 'disconnecting'}}, {multi: true});
+            }, {$set: {active: active, status: 'disconnecting'}}, {multi: true});
         irc_handler.partChannel(channel_name);
 
     },

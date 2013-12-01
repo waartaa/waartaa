@@ -185,13 +185,6 @@ IRCHandler = function (user, user_server) {
     function _addChannelPartListener (channel_name) {
         client.addListener('part' + channel_name, function (nick, reason, message) {
             Fiber(function () {
-                channel_active = (nick == client.nick)? false: true;
-                UserChannels.update(
-                  {
-                    user_server_id: user_server._id, name: channel_name
-                  },
-                  {$set: {active: channel_active}}, {multi: true}
-                );
                 ChannelNicks.remove(
                   {
                     channel_name: channel_name, server_name: user_server.name,
@@ -403,9 +396,11 @@ IRCHandler = function (user, user_server) {
         });
     }
 
-    function _partChannelCallback (message, channel, user_server, client) {
+    function _partChannelCallback (message, channel_name) {
         Fiber(function() {
-            UserChannels.update({_id: channel._id}, {$set: {active: false, status: 'disconnected'}});
+            UserChannels.update(
+                {name: channel_name, user_server_id: user_server._id},
+                {$set: {status: 'disconnected'}});
         }).run();
     }
 
@@ -644,7 +639,7 @@ IRCHandler = function (user, user_server) {
             var client = client_data[user_server.name];
             client.part(channel_name, function (message) {
                 _partChannelCallback(
-                    message, channel_name, user_server, client);
+                    message, channel_name);
             });
         },
         create_update_user_channel: function (channel_data) {
