@@ -460,11 +460,63 @@ Template.chat_input.rendered = function () {
   autocompleteNicksInitiate();
 }
 
+
+$('.editServerChannelLink').click(function (e) {
+    debugger;
+    e.preventDefault();
+    e.stopPropagation();
+    var $this = $(e.target);
+    var channel_id = $this.data('channel-id');
+    var user_channel = UserChannels.findOne({_id: channel_id});
+    debugger;
+    $('#editServerChannel-' + user_channel._id).modal();
+  });
+
+function _handleServerChannelEditLinkClick (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $this = $(e.target);
+    var channel_id = $this.data('channel-id');
+    Session.set('channel_id_to_edit', channel_id);
+    Meteor.setTimeout(function () {
+      $('#editServerChannel-' + channel_id).modal();
+    }, 4);
+}
+
 Template.channel_menu.events = {
   'click .channel-remove': function (e) {
     var channel_id = $(e.target).data("channel-id");
     var channel = UserChannels.findOne({_id: channel_id});
     Meteor.call("part_user_channel", channel.user_server_name, channel.name);
+  },
+  'click .editServerChannelLink': _handleServerChannelEditLinkClick
+}
+
+//$('.editServerChannelLink').live('click', _handleServerChannelEditLinkClick);
+
+Template.channel_menu.rendered = function (e) {
+  //Template.channel_menu.events[
+  //  'click .editServerChannelLink'] =  _handleServerChannelEditLinkClick;
+}
+
+Handlebars.registerHelper('channel_to_edit', function (e) {
+  var channel = UserChannels.findOne({_id: Session.get('channel_id_to_edit')});
+  if (channel) {
+    channel.password = channel.password || '';
+    return channel;
+  }
+})
+
+Template.edit_server_channel.events = {
+  'submit .editServerChannel': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $form = $(e.target);
+    var data = {'password': $form.find('[name="password"]').val() || ''};
+    Meteor.call('edit_user_channel', $form.data('channel-id'), data, function (err) {
+      console.log(err);
+      $form.parents('.modal').modal('hide');
+    })
   }
 }
 
@@ -480,16 +532,6 @@ Template.server_pm_menu.events = {
     var pms = user.profile.connections[user_server_id].pms;
     delete pms[nick];
     Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
-  }
-}
-
-Template.channel_menu.events = {
-  'click .channel-remove': function (e) {
-    var $target = $(e.target);
-    var channel_id = $target.data('channel-id');
-    var channel = UserChannels.findOne({_id: channel_id});
-    Meteor.call(
-      'send_command', channel.user_server_name, '/part ' + channel.name);
   }
 }
 
