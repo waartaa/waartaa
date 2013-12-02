@@ -71,9 +71,9 @@
 <template name="chat_connection_server">
   <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
     <a id='serverLink-{{ _id }}' class='server-link' data-server-id='{{ _id }}' data-roomtype="server" href="#">
+      {{ showStatusIcon status }}
       {{name}}
       <span class="pull-right">
-        {{ showStatusIcon status }}
         <div class="btn-group">
           <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
@@ -211,10 +211,10 @@
 <template name="server_channel_item">
   <li class="">
     <a id="channelLink-{{ _id }}" role="button" class="server-room channel" href="#" data-id="{{ _id }}" data-roomtype="channel">
+      {{ showStatusIcon status }}
       {{ name }}
       <span class="pull-right">
         <span class="badge">{{ unread_logs_count "channel" _id }}</span>
-        {{ showStatusIcon status }}
         <div class="btn-group">
           <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
