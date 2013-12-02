@@ -34,10 +34,8 @@ IRCHandler = function (user, user_server) {
     function _joinChannelCallback (message, channel) {
         Fiber(function () {
             UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
-            if (channels_listening_to[channel.name])
-                return;
-            client.addListener('message' + channel.name,
-                    function (nick, text, message) {
+            client.addListener('message' + channel.name, function (
+                    nick, text, message) {
                 Fiber(function () {
                     if (user.username == 'rtnpro') {
                         console.log('Adding channel message listener:');
@@ -398,6 +396,10 @@ IRCHandler = function (user, user_server) {
 
     function _partChannelCallback (message, channel_name) {
         Fiber(function() {
+            var listeners = client.listeners('message' + channel_name);
+            _.each(listeners, function (listener) {
+                client.removeListener('message' + channel_name, listener);
+            })
             UserChannels.update(
                 {name: channel_name, user_server_id: user_server._id},
                 {$set: {status: 'disconnected'}});
