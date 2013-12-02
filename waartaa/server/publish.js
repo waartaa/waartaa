@@ -102,7 +102,8 @@ Meteor.publish('channel_nicks', function () {
   });
   console.log('publishing channel nicks');
   console.log(query_or);
-  return ChannelNicks.find({$or: query_or});
+  if (query_or.length > 0)
+    return ChannelNicks.find({$or: query_or});
 });
 
 Meteor.methods({
