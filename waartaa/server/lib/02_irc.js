@@ -666,6 +666,9 @@ IRCHandler = function (user, user_server) {
             UserServers.update({_id: user_server._id}, {$set: {
                 status: 'connecting'}
             });
+            UserChannels.update(
+                {user_server_id: user_server._id},
+                {$set: {status: 'connecting'}}, {multi: true});
             client.addListener('nickSet', function (nick) {
                 Fiber(function () {
                     if (user_server.current_nick != nick) {
