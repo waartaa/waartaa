@@ -49,7 +49,7 @@ subscribe_pm_logs = function () {
     for (nick in nicks) {
       var room_id = user_server._id + '_' + nick;
       Meteor.subscribe(
-        'pm_logs_' + room_id,
+        'pm_logs', room_id,
         Session.get('pmLogCount-' + room_id),
         function () {
           //console.log('PM logs count ' + PMLogs.find().count());
@@ -64,10 +64,10 @@ Deps.autorun(subscribe_pm_logs);
 subscribe_user_channel_logs = function () {
   UserChannels.find({}).forEach(function (channel) {
     Meteor.subscribe(
-      "user_channel_logs_" + channel._id,
+      "user_channel_logs", channel._id,
       Session.get('user_channel_log_count_' + channel._id),
       function () {
-        //console.log(UserChannelLogs.find().count());
+        console.log(UserChannelLogs.find().count());
       }
     );
   });
@@ -78,10 +78,10 @@ Deps.autorun(subscribe_user_channel_logs);
 subscribe_user_server_logs = function () {
   UserServers.find().forEach(function (user_server) {
     Meteor.subscribe(
-      "user_server_logs_" + user_server._id,
+      "user_server_logs", user_server._id,
       Session.get('user_server_log_count_' + user_server._id),
       function () {
-        //console.log(UserServerLogs.find().count());
+        console.log(UserServerLogs.find().count());
       }
     );
   });
