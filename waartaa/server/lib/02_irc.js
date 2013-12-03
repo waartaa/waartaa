@@ -33,14 +33,12 @@ IRCHandler = function (user, user_server) {
 
     function _joinChannelCallback (message, channel) {
         Fiber(function () {
+            if (channel.status == 'connected')
+                return;
             UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
             client.addListener('message' + channel.name, function (
                     nick, text, message) {
                 Fiber(function () {
-                    if (user.username == 'rtnpro') {
-                        console.log('Adding channel message listener:');
-                        console.log(channel.name);
-                    }
                     UserChannelLogs.insert({
                         message: text,
                         raw_message: message,
