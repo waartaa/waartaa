@@ -59,7 +59,7 @@ Meteor.publish(
       return;
     var user = Meteor.users.findOne({_id: this.userId});
     console.log('publishing PMLogs');
-    var nick = room_id.split('_')[1];
+    var nick = room_id.slice(room_id.search('_') + 1);
     var N = n || CONFIG.show_last_n_logs;
     var cursor = PMLogs.find({
       $or: [

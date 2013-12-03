@@ -293,7 +293,7 @@ Meteor.methods({
     },
     send_pm: function (message, room_id, log_options) {
         var user_server_id = room_id.split('_')[0];
-        var nick = room_id.split('_')[1];
+        var nick = room_id.slice(room_id.search('_') + 1);
         var user = Meteor.users.findOne({_id: this.userId});
         var user_server = UserServers.findOne({
             _id: user_server_id, user: user.username});

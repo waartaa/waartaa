@@ -408,6 +408,7 @@ Template.chat_input.events({
       Meteor.call('send_channel_message', channel._id, message, log_options);
     } else if (Session.get('roomtype') == 'pm') {
       var room_id = Session.get('room_id');
+      console.log(room_id);
       var nick = room_id.substr(room_id.indexOf('_') + 1);
       Meteor.call('send_pm', message, room_id, log_options)
     } else if (Session.get('roomtype') == 'server') {
