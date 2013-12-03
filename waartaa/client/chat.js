@@ -317,12 +317,14 @@ Template.chat_users.channel_users = function () {
   if (Session.get('roomtype') == 'channel') {
     var channel_id = Session.get('room_id');
     var channel = UserChannels.findOne({_id: channel_id});
-    var nicks = {};
-    if (channel)
-      nicks = channel.nicks || {};
+    if (!channel)
+      return [];
     var nicks_list = [];
-    for (var key in nicks)
-      nicks_list.push({name: key, status: nicks.key})
+    ChannelNicks.find(
+      {channel_name: channel.name, server_name: channel.user_server_name},
+      {nick: 1}).forEach(function (channel_nick) {
+        nicks_list.push({name: channel_nick.nick});
+      });
     return nicks_list;
   } else
     return [];

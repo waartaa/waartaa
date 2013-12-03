@@ -120,6 +120,8 @@ IRCHandler = function (user, user_server) {
       }
       if (who_info.nick_status.search('G') >= 0)
         whoisInfo['away'] = true;
+      else
+        whoisInfo['away'] = false;
       return whoisInfo;
     }
 
