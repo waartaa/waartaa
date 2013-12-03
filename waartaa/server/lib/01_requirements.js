@@ -1,6 +1,14 @@
 if (Meteor.isServer) {
-	irc = Npm.require('irc');
-	Fiber = Npm.require('fibers');
+    try {
+	   irc = Npm.require('irc');
+    } catch (err) {
+        irc = require('irc');
+    }
+    try {
+	   Fiber = Npm.require('fibers');
+    } catch (err) {
+        Fiber = require('fibers');
+    }
 	crypto = Npm.require('crypto');
     try {
         var privateKey = Assets.getText('certs/privatekey.pem');

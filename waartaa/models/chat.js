@@ -10,7 +10,7 @@ Severs: {
   connections: List of items like {url: 'irc.freenode.net', port: '6667'}
 }
 */
-Servers = new Meteor.SmartCollection("servers");
+Servers = new Meteor.Collection("servers");
 
 /*
 UserServers: {
@@ -30,7 +30,7 @@ UserServers: {
   status: String (online/offline/connecting)
 }
 */
-UserServers = new Meteor.SmartCollection("user_servers");
+UserServers = new Meteor.Collection("user_servers");
 
 /*
 ServerConnections: {
@@ -45,7 +45,7 @@ ServerConnections: {
   last_updated: Date
 }
 */
-ServerConnections = new Meteor.SmartCollection("server_connections");
+ServerConnections = new Meteor.Collection("server_connections");
 
 /*
 UserChannels: {
@@ -62,7 +62,7 @@ UserChannels: {
   last_updated: Date
 }
 */
-UserChannels = new Meteor.SmartCollection("user_channels");
+UserChannels = new Meteor.Collection("user_channels");
 
 /*
 ChannelCredentials: {
@@ -75,7 +75,7 @@ ChannelCredentials: {
   last_updated: Date
 }
 */
-ChannelCredentials = new Meteor.SmartCollection("channel_credentials");
+ChannelCredentials = new Meteor.Collection("channel_credentials");
 
 /*
 ChannelLogs: {
@@ -98,8 +98,8 @@ ChannelLogs: {
   user_id: String
 }
 */
-ChannelLogs = new Meteor.SmartCollection("channel_logs");
-UserChannelLogs = new Meteor.SmartCollection("user_channel_logs");
+ChannelLogs = new Meteor.Collection("channel_logs");
+UserChannelLogs = new Meteor.Collection("user_channel_logs");
 
 /*
 PMLogs: {
@@ -121,7 +121,7 @@ PMLogs: {
   user_id: String
 }
 */
-PMLogs = new Meteor.SmartCollection("pm_logs");
+PMLogs = new Meteor.Collection("pm_logs");
 
 /*
 ServerLogs: {
@@ -142,7 +142,7 @@ ServerLogs: {
   user_id: String
 }
 */
-UserServerLogs = new Meteor.SmartCollection("user_server_logs");
+UserServerLogs = new Meteor.Collection("user_server_logs");
 
 /*
 ServerNicks: {
@@ -157,7 +157,7 @@ ServerNicks: {
   server_name: String
 }
 */
-ServerNicks = new Meteor.SmartCollection("server_nicks");
+ServerNicks = new Meteor.Collection("server_nicks");
 
 /*
 ChannelNicks: {
@@ -166,7 +166,7 @@ ChannelNicks: {
   'nick': String
 }
 */
-ChannelNicks = new Meteor.SmartCollection("channel_nicks");
+ChannelNicks = new Meteor.Collection("channel_nicks");
 
 /*
 Create indices:
