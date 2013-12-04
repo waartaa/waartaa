@@ -77,11 +77,17 @@ IRCHandler = function (user, user_server) {
             }
         });
         for (nick in nicks) {
-            ChannelNicks.insert({
-                channel_name: channel_name,
-                server_name: user_server.name,
-                nick: nick
-            });
+            var channel_nick = ChannelNicks.findOne(
+                {
+                    channel_name: channel_name, server_name: user_server.name,
+                    nick: nick
+                }, {_id: 1});
+            if (!channel_nick)
+                ChannelNicks.insert({
+                    channel_name: channel_name,
+                    server_name: user_server.name,
+                    nick: nick
+                });
         }
     }
 
