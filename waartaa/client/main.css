@@ -257,3 +257,11 @@ body {
     transform: rotate(360deg);
   }
 }
+
+#nprogress > .bar, #nprogress > .spinner {
+  z-index: 10000;
+}
+
+#nprogress > .bar {
+  height: 3px;
+}

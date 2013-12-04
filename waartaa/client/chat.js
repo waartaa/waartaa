@@ -24,6 +24,14 @@ Template.chat.rendered = function () {
   $('.content-main').addClass('no-padding');
 }
 
+Template._loginButtonsLoggedInDropdown.created = function () {
+  NProgress.start();
+}
+
+Template.add_server_modal.created = function () {
+  NProgress.done();
+}
+
 function  highlightChannel () {
   var room_id = Session.get('room_id');
   var server_id = Session.get('server_id');
