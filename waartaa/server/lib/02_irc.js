@@ -149,18 +149,7 @@ IRCHandler = function (user, user_server) {
 
     function _addChannelJoinListener (channel_name) {
         client.addListener('join' + channel_name, function (nick, message) {
-            Fiber(function () {
-                setInterval(_getChannelWHOData, CONFIG.channel_who_poll_interval, channel_name);                var channel = UserChannels.findOne({name: channel_name, user: user.username});
-                if (channel) {
-                    var nicks = channel.nicks || {};
-                    nicks[nick] = '';
-                    UserChannels.update({_id: channel._id}, {
-                        $set: {
-                            nicks: nicks
-                        }
-                    });
-                }
-            }).run();
+            setInterval(_getChannelWHOData, CONFIG.channel_who_poll_interval, channel_name);
         });
     }
 
@@ -170,12 +159,12 @@ IRCHandler = function (user, user_server) {
             Fiber(function () {
                 var user_channel = _create_update_user_channel(
                     user_server, {name: channel});
-                //console.log(user_channel);
+                console.log(user_channel);
                 UserChannels.update(
                     {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
-                _addChannelJoinListener(channel.name);
-                _addChannelPartListener(channel.name);
-                _joinChannelCallback(message, channel);
+                _addChannelJoinListener(user_channel.name);
+                _addChannelPartListener(user_channel.name);
+                _joinChannelCallback(message, user_channel);
             }).run();
         });
     }
@@ -628,10 +617,9 @@ IRCHandler = function (user, user_server) {
             } else {
                 client.join(channel_name, function (message) {
                     Fiber(function () {
-                        var channel = UserChannels.findOne({
-                            name: channel_name, user_server_name: user_server.name,
-                            user: user.username
-                        })
+                        var channel = _create_update_user_channel(
+                            user_server, {
+                                name: channel_name, password: password});
                         _joinChannelCallback(message, channel);
                     }).run();
                 });
