@@ -1,3 +1,7 @@
+Meteor.startup(function () {
+    WHO_DATA_POLL_LOCK = {};
+});
+
 IRCHandler = function (user, user_server) {
     var client_data = {};
     var client = null;
@@ -134,9 +138,10 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addWhoListener () {
-      //console.log('log WHO data');
       client.addListener('who', function (message) {
-        //console.log(message);
+        var key = user_server.name + '-' + message.channel;
+        if (WHO_DATA_POLL_LOCK[key] == user.username)
+            WHO_DATA_POLL_LOCK[key] = "";
         if (message) {
             Fiber(function () {
               for (nick in message.nicks) {
@@ -150,7 +155,11 @@ IRCHandler = function (user, user_server) {
     }
 
     function _getChannelWHOData (channel_name) {
-        client.send('who', channel_name);
+        var key = user_server.name + '-' + channel_name;
+        if (!WHO_DATA_POLL_LOCK[key]) {
+            WHO_DATA_POLL_LOCK[key] = user.username;
+            client.send('who', channel_name);
+        }
     }
 
     function _addChannelJoinListener (channel_name) {

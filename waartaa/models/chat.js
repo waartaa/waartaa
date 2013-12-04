@@ -169,6 +169,17 @@ ChannelNicks: {
 ChannelNicks = new Meteor.Collection("channel_nicks");
 
 /*
+WhoDataPollLock: {
+  server_name: String,
+  channel_name: String,
+  lock_owner: String,
+  created: Datetime,
+  last_updated: Datetime
+}
+*/
+WhoDataPollLock = new Meteor.Collection("who_data_poll_lock");
+
+/*
 Create indices:
 > db.user_servers.ensureIndex({_id: 1, name: 1, user_id: 1})
 > db.user_server_logs.ensureIndex({server_id: 1})
