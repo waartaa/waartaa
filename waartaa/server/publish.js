@@ -3,8 +3,9 @@ Meteor.publish('servers', function () {
 });
 
 Meteor.publish('user_servers', function () {
-  var user_servers = UserServers.find({user_id: this.userId});
-  var user = Meteor.users.findOne({_id: this.userId});
+  var user_servers = UserServers.find(
+    {user_id: this.userId},
+    {created: 0, last_updated: 0});
   return user_servers;
 });
 
@@ -26,7 +27,9 @@ Meteor.publish('user_channels', function () {
   if (!this.userId)
     return;
   var user = Meteor.users.findOne({_id: this.userId});
-  var user_channels = UserChannels.find({user: user.username, active: true});
+  var user_channels = UserChannels.find(
+    {user: user.username, active: true},
+    {last_updated: 0, created: 0});
   var u = [];
   user_channels.forEach(function (channel) {
     u.push(channel.name);
@@ -80,7 +83,7 @@ Meteor.publish('server_nicks', function () {
   });
   console.log('publishing server nicks');
   return ServerNicks.find({server_id: {
-    $in: server_ids}});
+    $in: server_ids}}, {last_updated: 0, created: 0});
 });
 
 Meteor.publish('channel_nicks', function () {
