@@ -6,6 +6,9 @@
 //UserServers = new Meteor.Collection("user_servers");
 
 
+Meteor.AppCache.config({firefox: true});
+
+
 DEFAULT_LOGS_COUNT = 10;
 
 subscribe = function () {
