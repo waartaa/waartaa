@@ -32,3 +32,6 @@ CONFIG = {
 SUPER_USER = 'foo'
 
 SECRET_KEY = 'blah'
+
+
+Meteor.AppCache.config({firefox: true});
