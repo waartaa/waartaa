@@ -7,6 +7,10 @@ IRCHandler = function (user, user_server) {
     var client = null;
     var user_status = "";
     var channels_listening_to = {};
+    var LISTENERS = {
+        server: {},
+        channel: {}
+    };
 
     /* Event listener callbacks */
     /* Callbacks */
@@ -40,6 +44,9 @@ IRCHandler = function (user, user_server) {
             if (channel.status == 'connected')
                 return;
             UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
+            if (LISTENERS.channel['message' + channel.name] != undefined)
+                return;
+            LISTENERS.channel['message', channel.name] = '';
             client.addListener('message' + channel.name, function (
                     nick, text, message) {
                 Fiber(function () {
@@ -94,6 +101,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addChannelNamesListener (channel_name) {
+        if (LISTENERS.channel['names' + channel_name] != undefined)
+            return;
+        LISTENERS.channel['names' + channel_name] = '';
         client.addListener('names' + channel_name, function (nicks) {
             Fiber(function () {
                 _updateChannelNicks(channel_name, nicks);
@@ -102,8 +112,11 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addGlobalChannelNamesListener () {
+        if (LISTENERS.server['names'] != undefined)
+            return;
+        LISTENERS.server['names'] = '';
         client.addListener('names', function (channel, nicks) {
-                //console.log("++++++++++++++GLOBAL CHANNEL NAMES LISTENER: " + channel + ' ' + user.username + ' ' + user_server.name);
+                //console.log("++++++++++++++GLOBAL CHANNEL NAMES LISTENERS: " + channel + ' ' + user.username + ' ' + user_server.name);
                 //console.log(nicks);
             Fiber(function () {
                 //console.log(nicks);
@@ -136,7 +149,12 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addWhoListener () {
+      if (LISTENERS.server['who'] != undefined)
+        return;
+      LISTENERS.server['who'] = '';
       client.addListener('who', function (message) {
+        if (!message)
+            return;
         var key = user_server.name + '-' + message.channel;
         if (WHO_DATA_POLL_LOCK[key] == user.username)
             WHO_DATA_POLL_LOCK[key] = "";
@@ -165,6 +183,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addGlobalChannelJoinListener () {
+        if (LISTENERS.server['join'] != undefined)
+            return;
+        LISTENERS.server['join'] = '';
         client.addListener('join', function (channel, nick, message) {
             //console.log('======' + channel + ' ' + nick + ' ' + message);
             if (nick == client.nick)
@@ -185,6 +206,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addChannelPartListener (channel_name) {
+        if (LISTENERS.channel['part' + channel_name] != undefined)
+            return;
+        LISTENERS.channel['part' + channel_name] = '';
         client.addListener('part' + channel_name, function (nick, reason, message) {
             Fiber(function () {
                 ChannelNicks.remove(
@@ -200,6 +224,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addServerQuitListener () {
+        if (LISTENERS.server['quit'] != undefined)
+            return;
+        LISTENERS.server['quit'] = '';
         client.addListener('quit', function (nick, reason, channels, message) {
             Fiber(function () {
                 _.each(channels, function (channel_name) {
@@ -223,6 +250,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addChannelTopicListener () {
+        if (LISTENERS.server['topic'] != undefined)
+            return;
+        LISTENERS.server['topic'] = '';
         client.addListener('topic', function (channel, topic, nick, message) {
             Fiber(function () {
                 UserChannels.update({
@@ -242,6 +272,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addPMListener () {
+        if (LISTENERS.server['message'] != undefined)
+            return;
+        LISTENERS.server['message'] = '';
         client.addListener('message', function (nick, to, text, message) {
             //console.log(nick + ', ' + to + ', ' + text + ', ' + message);
             Fiber(function () {
@@ -343,6 +376,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addNoticeListener () {
+        if (LISTENERS.server['notice'] != undefined)
+            return;
+        LISTENERS.server['notice'] = '';
         client.addListener('notice', function (nick, to, text, message) {
             Fiber(function () {
                 if (nick == 'NickServ' || nick == null) {
@@ -392,6 +428,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addCtcpListener () {
+        if (LISTENERS.server['ctcp'] != 'undefined')
+            return;
+        LISTENERS.server['ctcp'] = '';
         client.addListener('ctcp', function (from, to, text, type) {
             Fiber(function () {
             }).run();
@@ -674,6 +713,9 @@ IRCHandler = function (user, user_server) {
             UserChannels.update(
                 {user_server_id: user_server._id},
                 {$set: {status: 'connecting'}}, {multi: true});
+            if (LISTENERS.server['nickSet'] != undefined)
+                return;
+            LISTENERS.server['nickSet'] = '';
             client.addListener('nickSet', function (nick) {
                 Fiber(function () {
                     if (user_server.current_nick != nick) {
