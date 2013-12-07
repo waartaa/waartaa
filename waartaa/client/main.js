@@ -86,6 +86,18 @@ UserChannels.find().observeChanges({
   }
 });
 
+UserServers.find().observeChanges({
+  added: function (id, user_server) {
+    console.log('Added new server');
+    console.log(user_server);
+    Meteor.subscribe('server_nicks', function () {
+      console.log('subscribed to server nicks');
+      console.log(ServerNicks.find().count());
+    });
+  }
+});
+
+
 Deps.autorun(subscribe_user_channel_logs);
 
 subscribe_user_server_logs = function () {
