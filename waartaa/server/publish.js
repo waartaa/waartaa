@@ -93,7 +93,8 @@ Meteor.publish('channel_nicks', function (server_name, channel_name) {
   var query_or = [];
   if (server_name && channel_name) {
     return ChannelNicks.find(
-      {server_name: server_name, channel_name: channel_name});
+      {server_name: server_name, channel_name: channel_name},
+      {fields: {created: 0, last_updated: 0}});
   } else {
     UserServers.find({user_id: user._id}).forEach(function (user_server) {
       var channel_names = [];
@@ -110,7 +111,8 @@ Meteor.publish('channel_nicks', function (server_name, channel_name) {
     console.log('publishing channel nicks');
     console.log(query_or);
     if (query_or.length > 0)
-      return ChannelNicks.find({$or: query_or});
+      return ChannelNicks.find({$or: query_or},
+        {fields: {created: 0, last_updated: 0}});
   }
 });
 

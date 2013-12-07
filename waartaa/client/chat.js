@@ -327,16 +327,11 @@ Template.chat_users.channel_users = function () {
     var channel_id = Session.get('room_id');
     var channel = UserChannels.findOne({_id: channel_id});
     if (!channel)
-      return [];
-    var nicks_list = [];
-    ChannelNicks.find(
+      return;
+    return ChannelNicks.find(
       {channel_name: channel.name, server_name: channel.user_server_name},
-      {fields: {nick: 1}, sort: {nick: 1}}).forEach(function (channel_nick) {
-        nicks_list.push({name: channel_nick.nick});
-      });
-    return nicks_list;
-  } else
-    return [];
+      {fields: {nick: 1}, sort: {nick: 1}});
+  }
 };
 
 Template.chat_users.rendered = updateHeight;
