@@ -41,6 +41,8 @@ Accounts.onCreateUser(function (options, user) {
     else
         user.username = profile.login;
   }
+  if (!user.profile)
+    user.profile = {};
   user.profile.connections = {};
   return user;
 });
