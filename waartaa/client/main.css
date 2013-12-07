@@ -265,3 +265,7 @@ body {
 #nprogress > .bar {
   height: 3px;
 }
+
+.chatlogs-table td > .row {
+  margin-right: 5px;
+}

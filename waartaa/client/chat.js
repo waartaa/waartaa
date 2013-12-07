@@ -837,3 +837,11 @@ Handlebars.registerHelper('isConnected', function (status) {
   else
     return false;
 });
+
+Handlebars.registerHelper('showDatetime', function (datetime_obj) {
+  var today_str = moment(new Date()).format('MM/DD/YYYY');
+  if (today_str == moment(datetime_obj).format('MM/DD/YYYY'))
+    return moment(datetime_obj).format('hh:mm A');
+  else
+    return moment(datetime_obj).format('hh:mm A, DD MMM\'YY');
+});

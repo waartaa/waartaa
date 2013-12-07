@@ -356,13 +356,13 @@
 
 <template name="chat_row">
   <tr>
-    <td class="span2"><strong>{{from}}</strong></td>
-    <td>
+    <td class="col-md-2"><strong>{{from}}</strong></td>
+    <td class="col-md-10">
       <div class="row">
         {{message}}
       </div>
       <div class="row">
-        <em class="pull-right chat-message-datetime">{{last_updated}}</em>
+        <em class="pull-right chat-message-datetime">{{ showDatetime last_updated }}</em>
       </div>
     </td>
   </tr>
@@ -370,13 +370,13 @@
 
 <template name="pm_chat_row">
   <tr>
-    <td class="span2"><strong>{{display_from}}</strong></td>
-    <td>
+    <td class="col-md-2"><strong>{{display_from}}</strong></td>
+    <td class="col-md-10">
       <div class="row">
         {{message}}
       </div>
       <div class="row">
-        <em class="pull-right chat-message-datetime">{{last_updated}}</em>
+        <em class="pull-right chat-message-datetime">{{ showDatetime last_updated }}</em>
       </div>
     </td>
   </tr>
