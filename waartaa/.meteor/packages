@@ -29,3 +29,5 @@ nodetime
 force-ssl
 appcache
 nprogress
+
+moment

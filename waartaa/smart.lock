@@ -11,7 +11,8 @@
       "presence": {},
       "bootstrap-3": {},
       "accounts-ui-bootstrap-3": {},
-      "nodetime": {}
+      "nodetime": {},
+      "moment": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -51,8 +52,8 @@
       },
       "bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
-        "tag": "v0.3.6",
-        "commit": "711dbcabe333c8714298b2fd1de97fdcdae6efa7"
+        "tag": "v0.3.7",
+        "commit": "5dd0d142c870647b910be80bc777b96f0dd45e5e"
       },
       "accounts-ui-bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
@@ -63,6 +64,11 @@
         "git": "https://github.com/subhog/meteor-nodetime.git",
         "tag": "v0.2.0",
         "commit": "3611684e29563e58ccbd6275c5885a31a60196d7"
+      },
+      "moment": {
+        "git": "https://github.com/acreeger/meteor-moment.git",
+        "tag": "v2.2.1",
+        "commit": "9ee12e714afe56b189f53076447b7b54f3012065"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",
