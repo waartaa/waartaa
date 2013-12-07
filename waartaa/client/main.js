@@ -73,6 +73,19 @@ subscribe_user_channel_logs = function () {
   });
 }
 
+UserChannels.find().observeChanges({
+  added: function (id, channel) {
+    console.log('Added new channel');
+    console.log(channel);
+    Meteor.subscribe(
+      'channel_nicks', channel.user_server_name, channel.name, function () {
+        console.log('subscribed to channel nicks');
+        console.log(ChannelNicks.find().count());
+      }
+    );
+  }
+});
+
 Deps.autorun(subscribe_user_channel_logs);
 
 subscribe_user_server_logs = function () {

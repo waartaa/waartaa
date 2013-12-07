@@ -86,27 +86,32 @@ Meteor.publish('server_nicks', function () {
     $in: server_ids}}, {last_updated: 0, created: 0});
 });
 
-Meteor.publish('channel_nicks', function () {
+Meteor.publish('channel_nicks', function (server_name, channel_name) {
   var user = Meteor.users.findOne({_id: this.userId});
   if (!user)
     return;
   var query_or = [];
-  UserServers.find({user_id: user._id}).forEach(function (user_server) {
-    var channel_names = [];
-    var query_dict = {
-      server_name: user_server.name, channel_name: {$in: channel_names}};
-    UserChannels.find({
-        user_server_id: user_server._id, active: true
-      }).forEach(function (user_channel) {
-        channel_names.push(user_channel.name);
-      });
-    query_or.push(query_dict);
-    console.log(query_dict.channel_name);
-  });
-  console.log('publishing channel nicks');
-  console.log(query_or);
-  if (query_or.length > 0)
-    return ChannelNicks.find({$or: query_or});
+  if (server_name && channel_name) {
+    return ChannelNicks.find(
+      {server_name: server_name, channel_name: channel_name});
+  } else {
+    UserServers.find({user_id: user._id}).forEach(function (user_server) {
+      var channel_names = [];
+      var query_dict = {
+        server_name: user_server.name, channel_name: {$in: channel_names}};
+      UserChannels.find({
+          user_server_id: user_server._id, active: true
+        }).forEach(function (user_channel) {
+          channel_names.push(user_channel.name);
+        });
+      query_or.push(query_dict);
+      console.log(query_dict.channel_name);
+    });
+    console.log('publishing channel nicks');
+    console.log(query_or);
+    if (query_or.length > 0)
+      return ChannelNicks.find({$or: query_or});
+  }
 });
 
 Meteor.methods({

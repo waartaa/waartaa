@@ -161,14 +161,16 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addChannelJoinListener (channel_name) {
-        client.addListener('join' + channel_name, function (nick, message) {
-            setInterval(_getChannelWHOData, CONFIG.channel_who_poll_interval, channel_name);
-        });
+
     }
 
     function _addGlobalChannelJoinListener () {
         client.addListener('join', function (channel, nick, message) {
             //console.log('======' + channel + ' ' + nick + ' ' + message);
+            if (nick == client.nick)
+                setInterval(
+                    _getChannelWHOData, CONFIG.channel_who_poll_interval,
+                    channel);
             Fiber(function () {
                 var user_channel = _create_update_user_channel(
                     user_server, {name: channel});
