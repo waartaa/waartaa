@@ -17,7 +17,8 @@ Template.chat_connections.servers = function () {
 }
 
 Template.server_channels.channels = function (server_id) {
-  return UserChannels.find({user_server_id: server_id, active: true});
+  return UserChannels.find(
+    {user_server_id: server_id, active: true}, {sort: {name: 1}});
 }
 
 Template.chat.rendered = function () {
@@ -330,7 +331,7 @@ Template.chat_users.channel_users = function () {
     var nicks_list = [];
     ChannelNicks.find(
       {channel_name: channel.name, server_name: channel.user_server_name},
-      {nick: 1}).forEach(function (channel_nick) {
+      {fields: {nick: 1}, sort: {nick: 1}}).forEach(function (channel_nick) {
         nicks_list.push({name: channel_nick.nick});
       });
     return nicks_list;
