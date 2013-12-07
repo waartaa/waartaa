@@ -299,7 +299,7 @@
 </template>
 
 <template name="channel_chat_logs_table">
-<table id="channel-chat-logs-{{ _id }}" class="table chatlogs-table channel">
+<table id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel">
   {{#each channelChatLogs _id}}
     {{> chat_row}}
   {{/each}}
@@ -322,7 +322,7 @@
 </template>
 
 <template name="server_chat_logs_table">
-  <table id="server-chat-logs-{{ _id }}" class="table chatlogs-table server">
+  <table id="server-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table server">
     {{#each serverChatLogs _id}}
       {{> chat_row}}
     {{/each}}
@@ -347,7 +347,7 @@
 </template>
 
 <template name="pm_chat_logs_table">
-  <table id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table chatlogs-table pm">
+  <table id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table table-condensed chatlogs-table pm">
     {{#each pmChatLogs server_id name }}
       {{> pm_chat_row}}
     {{/each}}
@@ -356,7 +356,7 @@
 
 <template name="chat_row">
   <tr>
-    <td class="col-md-2"><strong>{{from}}</strong></td>
+    <td class="col-md-2">{{# if from}}<strong>{{from}}</strong>{{/if}}</td>
     <td class="col-md-10">
       <div class="row">
         {{message}}
