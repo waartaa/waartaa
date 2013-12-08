@@ -160,12 +160,16 @@ function _create_user_server(data, user) {
     }
     UserChannels.update(
         {
-            name: {$in: user_server.channels}, user: user.username
+            name: {$in: user_server.channels}, user: user.username,
+            user_server_name: user_server.name
         },
         {$set: {active: true}}, {multi: true}
     );
     UserChannels.update(
-        {name: {$nin: user_server.channels}, user: user.username},
+        {
+            name: {$nin: user_server.channels}, user: user.username,
+            user_server_name: user_server.name
+        },
         {$set: {active: false}}, {multi: true}
     );
     /*for (i in user_server.channels) {
