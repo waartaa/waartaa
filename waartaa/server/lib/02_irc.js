@@ -71,33 +71,26 @@ IRCHandler = function (user, user_server) {
     }
 
     function _updateChannelNicks (channel_name, nicks) {
-        ChannelNicks.find(
-            {channel_name: channel_name,
-             server_name: user_server.name},
-            {nick: 1}
-        ).forEach(function (channel_nick) {
-            if (!nicks[channel_nick.nick]) {
-                ChannelNicks.remove(
-                    {
-                        channel_name: channel_name,
-                        server_name: user_server.name,
-                        nick: channel_nick.nick
-                    });
-            } else {
-                delete nicks[channel_nick.nick];
-            }
-        });
+        var nicks_list = [];
         for (nick in nicks) {
-            ChannelNicks.upsert(
-                {
-                    channel_name: channel_name, server_name: user_server.name,
-                    nick: nick
-                },
-                {
-                    channel_name: channel_name, server_name: user_server.name,
-                    nick: nick
-                }
-            );        }
+            nicks_list.push(nick);
+        }
+        ChannelNicks.remove(
+            {
+                channel_name: channel_name, server_name: user_server.name,
+                nick: {$nin: nicks_list}
+            }
+        );
+        ChannelNicks.upsert(
+            {
+                channel_name: channel_name, server_name: user_server.name,
+                nick: nick
+            },
+            {
+                channel_name: channel_name, server_name: user_server.name,
+                nick: nick, last_updated: new Date()
+            }
+        );
     }
 
     function _addChannelNamesListener (channel_name) {
