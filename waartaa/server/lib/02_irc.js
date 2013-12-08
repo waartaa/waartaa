@@ -280,22 +280,9 @@ IRCHandler = function (user, user_server) {
         LISTENERS.server['quit'] = '';
         client.addListener('quit', function (nick, reason, channels, message) {
             Fiber(function () {
-                _.each(channels, function (channel_name) {
-                    var channel = UserChannels.findOne({
-                        name: channel_name, user_server_id: user_server._id,
-                        user: user.username
-                    });
-                    if (channel) {
-                        var nicks = channel.nicks;
-                        try {
-                            delete nicks[nick];
-                        } catch (err) {}
-                        UserChannels.update({_id: channel._id}, {
-                            $set: {nicks: nicks}
-                        });
-                    }
-                });
-                channels_listening_to = {};
+                ChannelNicks.remove(
+                    {nick: nick, channel_name: {$in: channels},
+                    server_name: user_server.name});
             }).run();
         });
     }
