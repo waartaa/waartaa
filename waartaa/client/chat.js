@@ -615,6 +615,27 @@ Template.server_menu.events({
     var $this = $(e.target);
     var server_id = $this.data('server-id');
     $('#addServerChannel-' + server_id).modal();
+  },
+  'click .server-remove': function (e) {
+    var server_id = $(e.target).data("server-id");
+    var server = UserServers.findOne({_id: server_id});
+    Meteor.call(
+      "quit_user_server", server.name, true);
+  },
+  'click .toggleJoinServer': function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $this = $(e.target);
+    var server_id = $this.data('server-id');
+    var server = UserServers.findOne({_id: server_id});
+    if (!server)
+      return;
+    var status = $this.data('status');
+    if (status == 'connected')
+      Meteor.call(
+        "quit_user_server", server.name, false);
+    else
+      Meteor.call('join_user_server', server.name);
   }
 });
 

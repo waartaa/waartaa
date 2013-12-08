@@ -83,16 +83,16 @@ function decrypt(text){
 }
 
 function _create_user_server(data, user) {
-    //console.log(data);
+    var server = Servers.findOne({_id: data.server_id});
+    if (! server)
+        throw new Meteor.Error(400, "Missing server info.");
     if (data.user_server_id) {
         var user_server = UserServers.findOne(
             {_id: data.user_server_id});
     }
     else {
-        var server = Servers.findOne({_id: data.server_id});
-        if (! server)
-            throw new Meteor.Error(400, "Missing server info.");
-        var user_server = UserServers.findOne({name: server.name, user_id: this.userId});
+        var user_server = UserServers.findOne(
+            {name: server.name, user: user.username});
     }
     var channels = [];
     var now = new Date();
@@ -235,6 +235,17 @@ Meteor.methods({
     join_user_server: function (user_server_name) {
         var user = Meteor.users.findOne({_id: this.userId});
         _join_user_server(user, user_server_name);
+    },
+    quit_user_server: function (user_server_name, close) {
+        var irc_handler = _get_irc_handler(user_server_name, this.userId);
+        var user = Meteor.users.findOne({_id: this.userId});
+        var active = close? false: true;
+        console.log('SERVER STATUS: ' + active);
+        UserServers.update(
+            {
+                user: user.username, name: user_server_name,
+            }, {$set: {active: active, status: 'disconnecting'}}, {multi: true});
+        irc_handler.partUserServer();       
     },
     join_user_channel: function (user_server_name, channel_name, password) {
         var user = Meteor.users.findOne({_id: this.userId});

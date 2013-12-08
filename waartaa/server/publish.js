@@ -3,10 +3,9 @@ Meteor.publish('servers', function () {
 });
 
 Meteor.publish('user_servers', function () {
-  var user_servers = UserServers.find(
-    {user_id: this.userId},
+  return user_servers = UserServers.find(
+    {user_id: this.userId, active: true},
     {created: 0, last_updated: 0});
-  return user_servers;
 });
 
 Meteor.publish('user_server_logs', function (user_server_id, n) {

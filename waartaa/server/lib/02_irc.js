@@ -11,6 +11,7 @@ IRCHandler = function (user, user_server) {
         server: {},
         channel: {}
     };
+    var JOBS = {}
 
     /* Event listener callbacks */
     /* Callbacks */
@@ -165,7 +166,7 @@ IRCHandler = function (user, user_server) {
 
     function _getChannelWHOData (channel_name) {
         var key = user_server.name + '-' + channel_name;
-        if (!WHO_DATA_POLL_LOCK[key]) {
+        if (!WHO_DATA_POLL_LOCK[key] || WHO_DATA_POLL_LOCK[key] == user.username) {
             WHO_DATA_POLL_LOCK[key] = user.username;
             client.send('who', channel_name);
         }
@@ -192,7 +193,10 @@ IRCHandler = function (user, user_server) {
                     {upsert: true}
                 );
                 if (nick == client.nick) {
-                    setInterval(
+                    var job_key = 'WHO-' + channel;
+                    if (JOBS[job_key])
+                        clearInterval(JOBS[job_key]);
+                    JOBS[job_key] = setInterval(
                         _getChannelWHOData, CONFIG.channel_who_poll_interval,
                         channel);
                     console.log(user_channel);
@@ -368,7 +372,10 @@ IRCHandler = function (user, user_server) {
     }
 
     function _pollUserStatus (interval) {
-        Meteor.setInterval(function () {
+        var job_key = 'POLL_USER_STATUS';
+        if (JOBS[job_key])
+            Meteor.clearInterval(JOBS[job_key]);
+        JOBS[job_key] = Meteor.setInterval(function () {
             var presence = Meteor.presences.findOne({userId: user._id});
             if (presence && user_status != "active") {
                 set_user_active();
@@ -493,11 +500,34 @@ IRCHandler = function (user, user_server) {
             UserChannels.update(
                 {name: channel_name, user_server_id: user_server._id},
                 {$set: {status: 'disconnected'}});
+            for (job in JOBS) {
+                if (job.search(channel_name) >= 0)
+                    Meteor.clearInterval(JOBS[job]);
+            }
         }).run();
     }
 
     function _partUserServerCallback (message, user_server, client) {
-
+        Fiber(function () {
+            UserServers.update(
+                {_id: user_server._id},
+                {$set: {status: 'disconnected'}}
+            );
+            UserChannels.update(
+                {user_server_id: user_server._id},
+                {$set: {status: 'disconnected'}}
+            );
+            UserChannels.find(
+                {user_server_id: user_server._id}).forEach(function (channel) {
+                    var key = user_server.name + '-' + channel.name;
+                    if (WHO_DATA_POLL_LOCK[key] == user.username)
+                        WHO_DATA_POLL_LOCK[key] = '';
+                });
+            for (job in JOBS) {
+                Meteor.clearInterval(JOBS[job]);
+                JOBS[job] = '';
+            }
+        }).run();
     }
 
     function _create_update_user_channel (user_server, channel_data) {
@@ -755,7 +785,7 @@ IRCHandler = function (user, user_server) {
             client = new irc.Client(server_url, nick, client_options);
             client_data[server.name] = client;
             UserServers.update({_id: user_server._id}, {$set: {
-                status: 'connecting'}
+                status: 'connecting', active: true}
             });
             UserChannels.update(
                 {user_server_id: user_server._id},
