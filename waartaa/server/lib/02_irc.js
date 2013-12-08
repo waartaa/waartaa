@@ -187,20 +187,47 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['join'] = '';
         client.addListener('join', function (channel, nick, message) {
-            //console.log('======' + channel + ' ' + nick + ' ' + message);
-            if (nick == client.nick)
-                setInterval(
-                    _getChannelWHOData, CONFIG.channel_who_poll_interval,
-                    channel);
             Fiber(function () {
                 var user_channel = _create_update_user_channel(
                     user_server, {name: channel});
-                console.log(user_channel);
-                UserChannels.update(
-                    {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
-                _addChannelJoinListener(user_channel.name);
-                _addChannelPartListener(user_channel.name);
-                _joinChannelCallback(message, user_channel);
+                ChannelNicks.update(
+                    {
+                        nick: nick, channel_name: channel,
+                        server_name: user_server.name
+                    },
+                    {$set: {last_updated: new Date()}},
+                    {upsert: true}
+                );
+                if (nick == client.nick) {
+                    setInterval(
+                        _getChannelWHOData, CONFIG.channel_who_poll_interval,
+                        channel);
+                    console.log(user_channel);
+                    UserChannels.update(
+                        {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
+                    _addChannelJoinListener(user_channel.name);
+                    _addChannelPartListener(user_channel.name);
+                    _joinChannelCallback(message, user_channel);
+                }
+                var channel_join_message = nick + ' has joined the channel.';
+                if (nick == client.nick)
+                    channel_join_message = 'You have joined the channel.';
+                UserChannelLogs.insert({
+                    message: channel_join_message,
+                    raw_message: message,
+                    from: null,
+                    from_user: null,
+                    from_user_id: null,
+                    channel_name: user_channel.name,
+                    channel_id: user_channel._id,
+                    server_name: user_server.name,
+                    server_id: user_server._id,
+                    user: user.username,
+                    user_id: user._id,
+                    created: new Date(),
+                    last_updated: new Date(),
+                    type: 'ChannelJoin'
+                });
             }).run();
         });
     }
@@ -217,6 +244,33 @@ IRCHandler = function (user, user_server) {
                     nick: nick
                   }
                 );
+                var channel = UserChannels.findOne(
+                    {user_server_id: user_server._id, name: channel_name});
+                if (!channel)
+                    return;
+                var part_message = "";
+                if (nick == client.nick)
+                    part_message = 'You have left';
+                else
+                    part_message = nick + ' has left';
+                if (reason)
+                    part_message += ' (' + reason + ')';
+                UserChannelLogs.insert({
+                    message: part_message,
+                    raw_message: message,
+                    from: null,
+                    from_user: null,
+                    from_user_id: null,
+                    channel_name: channel.name,
+                    channel_id: channel._id,
+                    server_name: user_server.name,
+                    server_id: user_server._id,
+                    user: user.username,
+                    user_id: user._id,
+                    created: new Date(),
+                    last_updated: new Date(),
+                    type: 'ChannelPart'
+                });
                 if (channels_listening_to[channel_name])
                     delete channels_listening_to[channel_name];
             }).run();
