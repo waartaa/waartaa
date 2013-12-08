@@ -269,3 +269,23 @@ body {
 .chatlogs-table td > .row {
   margin-right: 5px;
 }
+
+.chatlog-row {
+  border-bottom: 1px dashed #F4F2F7;
+}
+
+.chatlog-from {
+}
+
+.chatlog-time {
+  margin-right: 5px;
+}
+
+.chatlog-notice {
+  font-size: 13px;
+  font-style: italic;
+}
+
+.chatlog-notice .chatlog-message {
+  color: #9C9393;
+}

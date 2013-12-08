@@ -862,3 +862,9 @@ Handlebars.registerHelper('showDatetime', function (datetime_obj) {
   else
     return moment(datetime_obj).format('hh:mm A, DD MMM\'YY');
 });
+
+Handlebars.registerHelper('isToday', function (date_obj) {
+  if (moment(new Date()).format('MM/DD/YYYY') == moment(date_obj).format('MM/DD/YYYY'))
+    return true;
+  return false;
+});

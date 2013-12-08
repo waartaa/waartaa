@@ -309,11 +309,11 @@
 </template>
 
 <template name="channel_chat_logs_table">
-<table id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel">
+<div id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel">
   {{#each channelChatLogs _id}}
     {{> chat_row}}
   {{/each}}
-</table>
+</div>
 </template>
 
 <template name="server_logs">
@@ -357,39 +357,65 @@
 </template>
 
 <template name="pm_chat_logs_table">
-  <table id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table table-condensed chatlogs-table pm">
+  <div id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table table-condensed chatlogs-table pm">
     {{#each pmChatLogs server_id name }}
       {{> pm_chat_row}}
     {{/each}}
-  </table>
+  </div>
 </template>
 
 <template name="chat_row">
-  <tr>
-    <td class="col-md-2">{{# if from}}<strong>{{from}}</strong>{{/if}}</td>
-    <td class="col-md-10">
-      <div class="row">
-        {{message}}
+  <div class="row chatlog-row{{# unless from}} chatlog-notice{{/unless}}">
+    <div class="col-md-12">
+      <div class="pull-left chatlog-from">
+        {{# if from}}
+          <span class="label label-info">
+            <icon class="glyphicon glyphicon-user"></icon>
+            <strong>{{from}}</strong>
+          </span>
+        {{/if}}
       </div>
-      <div class="row">
-        <em class="pull-right chat-message-datetime">{{ showDatetime last_updated }}</em>
+      <div class="{{# if isToday last_updated}}col-md-10{{else}}col-md-9{{/if}} chatlog-message">
+          {{# unless from}}
+            <icon class="glyphicon glyphicon-info-sign"></icon>
+          {{/unless}}
+          {{message}}
       </div>
-    </td>
-  </tr>
+      <div class="pull-right chatlog-time">
+        <em class="pull-right chat-message-datetime">
+          <icon class="glyphicon glyphicon-time"></icon>
+          {{ showDatetime last_updated }}
+        </em>
+      </div>
+    </div>
+  </div>
 </template>
 
 <template name="pm_chat_row">
-  <tr>
-    <td class="col-md-2"><strong>{{display_from}}</strong></td>
-    <td class="col-md-10">
-      <div class="row">
-        {{message}}
+  <div class="row chatlog-row{{# unless display_from}} chatlog-notice{{/unless}}">
+    <div class="col-md-12">
+      <div class="pull-left chatlog-from">
+        {{# if display_from}}
+          <span class="label label-info">
+            <icon class="glyphicon glyphicon-user"></icon>
+            <strong>{{display_from}}</strong>
+          </span>
+        {{/if}}
       </div>
-      <div class="row">
-        <em class="pull-right chat-message-datetime">{{ showDatetime last_updated }}</em>
+      <div class="{{# if isToday last_updated}}col-md-10{{else}}col-md-9{{/if}} chatlog-message">
+          {{# unless from}}
+            <icon class="glyphicon glyphicon-info-sign"></icon>
+          {{/unless}}
+          {{message}}
       </div>
-    </td>
-  </tr>
+      <div class="pull-right chatlog-time">
+        <em class="pull-right chat-message-datetime">
+          <icon class="glyphicon glyphicon-time"></icon>
+          {{ showDatetime last_updated }}
+        </em>
+      </div>
+    </div>
+  </div>
 </template>
 
 <template name="chat_input">
