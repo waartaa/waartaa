@@ -41,6 +41,8 @@ Meteor.publish('user_channel_logs', function (channel_id, n) {
   if (!this.userId)
     return;
   var user = Meteor.users.findOne({_id: this.userId});
+  if (!user)
+    return;
   var channel = UserChannels.findOne({_id: channel_id, user: user.username});
   if (!channel)
     return;
@@ -60,6 +62,8 @@ Meteor.publish(
     if (!room_id)
       return;
     var user = Meteor.users.findOne({_id: this.userId});
+    if (!user)
+      return;
     console.log('publishing PMLogs');
     var nick = room_id.slice(room_id.search('_') + 1);
     var N = n || CONFIG.show_last_n_logs;
