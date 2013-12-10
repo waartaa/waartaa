@@ -313,6 +313,34 @@ IRCHandler = function (user, user_server) {
                 ChannelNicks.remove(
                     {nick: nick, channel_name: {$in: channels},
                     server_name: user_server.name});
+                    UserChannels.find({
+                        user_server_name: user_server.name,
+                        user: user.username, name: {$in: channels}
+                    }).forEach(function (channel) {
+                        var part_message = "";
+                        if (nick == client.nick)
+                            part_message = 'You have left IRC';
+                        else
+                            part_message = nick + ' has left IRC';
+                        if (reason)
+                            part_message += ' (' + reason + ')';
+                        UserChannelLogs.insert({
+                            message: part_message,
+                            raw_message: message,
+                            from: null,
+                            from_user: null,
+                            from_user_id: null,
+                            channel_name: channel.name,
+                            channel_id: channel._id,
+                            server_name: user_server.name,
+                            server_id: user_server._id,
+                            user: user.username,
+                            user_id: user._id,
+                            created: new Date(),
+                            last_updated: new Date(),
+                            type: 'QUITIRC'
+                        });
+                    });
             }).run();
         });
     }
