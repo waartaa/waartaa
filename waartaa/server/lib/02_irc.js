@@ -82,16 +82,38 @@ IRCHandler = function (user, user_server) {
                 nick: {$nin: nicks_list}
             }
         );
-        ChannelNicks.upsert(
-            {
-                channel_name: channel_name, server_name: user_server.name,
-                nick: nick
-            },
-            {
-                channel_name: channel_name, server_name: user_server.name,
-                nick: nick, last_updated: new Date()
-            }
-        );
+        _.each(nicks_list, function (nick) {
+            ChannelNicks.update(
+                {channel_name: channel_name, server_name: user_server.name,
+                 nick: nick},
+                {$set: {last_updated: new Date()}},
+                {upsert: true}
+            )
+        });
+        try {
+            var db_nicks_count = ChannelNicks.find(
+                {channel_name: channel_name, server_name: user_server.name}
+            ).count();
+            var irc_nicks_count = nicks_list.length;
+            assert(db_nicks_count == irc_nicks_count);
+        } catch (err) {
+            console.log(err);
+            if (err)
+                logger.error(
+                    'ChannelNicksUpdateError for ' + user_server.name +
+                        channel_name,
+                    {
+                        'nicks_list': nicks_list,
+                        'irc_nicks_count': irc_nicks_count,
+                        'db_nicks_count': db_nicks_count,
+                        'nicks_nin': ChannelNicks.find({
+                            channel_name: channel_name, server_name: user_server.name,
+                            nick: { $nin: nicks_list }
+                        }, {'nick': 1}).fetch(),
+                        'error': err
+                    }
+                );
+        }
     }
 
     function _addChannelNamesListener (channel_name) {
@@ -147,19 +169,24 @@ IRCHandler = function (user, user_server) {
         return;
       LISTENERS.server['who'] = '';
       client.addListener('who', function (message) {
-        if (!message)
-            return;
-        var key = user_server.name + '-' + message.channel;
-        if (WHO_DATA_POLL_LOCK[key] == user.username)
-            WHO_DATA_POLL_LOCK[key] = "";
-        if (message) {
-            Fiber(function () {
-              for (nick in message.nicks) {
-                var who_info = message.nicks[nick];
-                var whoisInfo = whoToWhoisInfo(nick, who_info);
-                _create_update_server_nick(whoisInfo);
-              }
-            }).run();
+        try {
+            if (!message)
+                return;
+            var key = user_server.name + '-' + message.channel;
+            if (WHO_DATA_POLL_LOCK[key] == user.username)
+                WHO_DATA_POLL_LOCK[key] = "";
+            if (message) {
+                Fiber(function () {
+                  for (nick in message.nicks) {
+                    var who_info = message.nicks[nick];
+                    var whoisInfo = whoToWhoisInfo(nick, who_info);
+                    _create_update_server_nick(whoisInfo);
+                  }
+                  _updateChannelNicks(message.channel, message.nicks);
+                }).run();
+            }
+        } catch (err) {
+            logger.error(err);
         }
       });
     }
@@ -393,7 +420,7 @@ IRCHandler = function (user, user_server) {
         UserChannels.find({
             active: true, user: user.username,
             user_server_name: user_server.name}).forEach(function (channel) {
-                //_addChannelNamesListener(channel.name);
+                _addChannelNamesListener(channel.name);
                 _addChannelJoinListener(channel.name);
                 _addChannelPartListener(channel.name);
                 client.join(channel.name, function (message) {
@@ -730,6 +757,9 @@ IRCHandler = function (user, user_server) {
 
     return {
         joinChannel: function (channel_name, password) {
+            _addChannelNamesListener(channel_name);
+            _addChannelJoinListener(channel_name);
+            _addChannelPartListener(channel_name);
             if (password) {
                 client.send('JOIN', channel_name, password);
             } else {
