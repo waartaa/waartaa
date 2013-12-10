@@ -743,10 +743,9 @@ Handlebars.registerHelper('whois_tooltip', function (nick) {
   var tooltip = "";
   var whois_data = _get_nick_whois_data(nick);
   if (whois_data)
-    tooltip = "Username: " + whois_data.user + "<br/>" +
-      "Real name: " + whois_data.realname + "<br/>" +
-      "Server: " + whois_data.server + "<br/>";
-  //console.log(tooltip);
+    tooltip = "Username: " + _.escape(whois_data.user) + "<br/>" +
+      "Real name: " + _.escape(whois_data.realname) + "<br/>" +
+      "Server: " + _.escape(whois_data.server) + "<br/>";
   return new Handlebars.SafeString(tooltip);
 });
 
