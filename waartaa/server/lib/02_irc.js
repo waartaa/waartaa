@@ -2,6 +2,9 @@ Meteor.startup(function () {
     WHO_DATA_POLL_LOCK = {};
 });
 
+if (typeof(logger) == 'undefined')
+    logger = Winston;
+
 IRCHandler = function (user, user_server) {
     var client_data = {};
     var client = null;
