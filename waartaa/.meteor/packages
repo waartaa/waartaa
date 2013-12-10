@@ -31,3 +31,6 @@ appcache
 nprogress
 
 moment
+winston-loggly
+winston
+assert

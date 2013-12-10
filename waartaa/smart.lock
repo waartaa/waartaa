@@ -12,7 +12,10 @@
       "bootstrap-3": {},
       "accounts-ui-bootstrap-3": {},
       "nodetime": {},
-      "moment": {}
+      "moment": {},
+      "winston-loggly": {},
+      "winston": {},
+      "assert": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -69,6 +72,21 @@
         "git": "https://github.com/acreeger/meteor-moment.git",
         "tag": "v2.2.1",
         "commit": "9ee12e714afe56b189f53076447b7b54f3012065"
+      },
+      "winston-loggly": {
+        "git": "https://github.com/tomrogers3/meteor-winston-loggly.git",
+        "tag": "v0.0.3",
+        "commit": "87ac23ce1134d778d53a3b99350921f9eb15358c"
+      },
+      "winston": {
+        "git": "https://github.com/tomrogers3/meteor-winston.git",
+        "tag": "v0.0.3",
+        "commit": "60dc02303ca003ef05254f94fbb9bfd40915d5d3"
+      },
+      "assert": {
+        "git": "https://github.com/peerlibrary/meteor-assert.git",
+        "tag": "v0.2.2",
+        "commit": "5f87f665ccd6c74322febaf78fe5a24dbfb7949c"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

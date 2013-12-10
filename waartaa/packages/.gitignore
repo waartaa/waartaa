@@ -30,3 +30,6 @@
 /nodetime
 /bootstrap-3
 /moment
+/winston-loggly
+/winston
+/assert
