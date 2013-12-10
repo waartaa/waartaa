@@ -436,10 +436,10 @@ Template.user_menu.events = {
     var user = Meteor.user();
     var server_id = Session.get('server_id');
     var profile = user.profile;
-    if (!profile) {
+    if (!profile)
       profile = {connections: {}};
+    if (!profile.connections[server_id])
       profile.connections[server_id] = {pms: {}};
-    }
     if (!profile.connections[server_id].pms)
       profile.connections[server_id].pms = {};
     profile.connections[server_id].pms[nick] = '';
