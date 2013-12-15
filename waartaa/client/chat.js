@@ -33,7 +33,7 @@ Template.add_server_modal.created = function () {
   NProgress.done();
 }
 
-function  highlightChannel () {
+function highlightChannel () {
   var room_id = Session.get('room_id');
   var server_id = Session.get('server_id');
   $('li.server').removeClass('active');
@@ -46,6 +46,7 @@ function  highlightChannel () {
   //  $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
   $('li#server-' + server_id).addClass('active');
   //$('#chat-input').focus();
+  $('#chat-input').focus();
   refreshAutocompleteNicksSource();
 }
 
@@ -279,13 +280,12 @@ function serverRoomSelectHandler (event) {
       Session.set('topicHeight', $(selector + ' .topic').height());
       Session.set('lastAccessedServer-' + Session.get('room_id'), new Date());
       Session.set('unreadLogsCountServer-' + Session.get('room_id'), 0);
-
+      $('.info-panel-item.active').removeClass('active');
     }
     if (!$(selector).data('rendered')) {
       $(selector + ' .chat-logs-container').scrollTop($(selector + ' table').height());
       $(selector).data('rendered', true);
     }
-
     highlightChannel();
 } 
 
@@ -491,8 +491,16 @@ Template.channel_menu.events = {
     var $this = $(e.target);
     var channel_id = $this.data('channel-id');
     Session.set('channel_id_to_edit', channel_id);
+    var $modal_content = $('#editServerChannel-' + channel_id);
     Meteor.setTimeout(function () {
-      $('#editServerChannel-' + channel_id).modal();
+      $modal_content.modal().on(
+        'shown.bs.modal', function (e) {
+          $modal_content.find('[name="password"]').focus();
+        })
+        .on('hidden.bs.modal', function (e) {
+          $('#chat-input').focus();
+        })
+      ;
     }, 4);
   },
   'click .toggleJoinChannel': function (e) {
@@ -578,6 +586,10 @@ Template.add_server_modal.events({
   },
 });
 
+$('#addServerModal').on('shown.bs.modal', function (e) {
+  $('#addServerModal').find('[name="nick"]').focus();
+});
+
 Template.edit_server_modal.events({
   'submit form': function (e) {
     e.preventDefault();
@@ -608,7 +620,8 @@ Template.add_server_channel.events({
     });
     var server = UserServers.findOne({_id: server_id});
     Meteor.call('join_user_channel', server.name, data.name, data.password);
-    $('#addServerChannel-' + server_id).modal('hide');
+    var $modal_content = $('#addServerChannel-' + server_id);
+    $modal_content.modal('hide');
   }
 });
 
@@ -618,14 +631,26 @@ Template.server_menu.events({
     e.stopPropagation();
     var $this = $(e.target);
     var server_id = $this.data('server-id');
-    $('#editServerModal-' + server_id).modal();
+    var $modal_content = $('#editServerModal-' + server_id);
+    $modal_content.modal().on('shown.bs.modal', function (e) {
+      $modal_content.find('[name="nick"]').focus();
+    })
+    .on('hidden.bs.modal', function (e) {
+      $('#chat-input').focus();
+    });
   },
   'click .addChannelLink': function (e) {
     e.preventDefault();
     e.stopPropagation();
     var $this = $(e.target);
     var server_id = $this.data('server-id');
-    $('#addServerChannel-' + server_id).modal();
+    var $modal_content = $('#addServerChannel-' + server_id);
+    $modal_content.modal().on('shown.bs.modal', function (e) {
+      $modal_content.find('input[name="name"]').focus();
+    })
+    .on('hidden.bs.modal', function (e) {
+      $('#chat-input').focus();
+    });
   },
   'click .server-remove': function (e) {
     var server_id = $(e.target).data("server-id");
