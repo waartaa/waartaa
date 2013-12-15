@@ -213,7 +213,9 @@ function _send_raw_message(message, irc_handler, log_options) {
 Meteor.startup(function () {
     CLIENTS = {};
     //console.log(Meteor.users.find());
-    Meteor.users.find().forEach(function (user) {
+    Meteor.users.find(
+        {active: true, status: {$ne: 'disconnected'}}
+    ).forEach(function (user) {
         UserServers.find({user: user.username}).forEach(
             function (user_server) {
                 _join_user_server(user, user_server.name);

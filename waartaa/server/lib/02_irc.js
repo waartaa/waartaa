@@ -448,20 +448,20 @@ IRCHandler = function (user, user_server) {
         _addGlobalChannelJoinListener();
         _addGlobalChannelNamesListener();
         _pollUserStatus(60 * 1000);
-        UserChannels.find({
+        UserChannels.find(
+        {
             active: true, user: user.username,
-            user_server_name: user_server.name}).forEach(function (channel) {
-                _addChannelNamesListener(channel.name);
-                _addChannelJoinListener(channel.name);
-                _addChannelPartListener(channel.name);
-                client.join(channel.name, function (message) {
-                    Fiber(function (channel_name) {
-                        _joinChannelCallback(message, channel);
-                    }).run(channel.name);
-                });
+            status: {$ne: 'disconnected'},
+            user_server_name: user_server.name
+        }).forEach(function (channel) {
+            _addChannelNamesListener(channel.name);
+            _addChannelJoinListener(channel.name);
+            _addChannelPartListener(channel.name);
+            client.join(channel.name, function (message) {
+                Fiber(function (channel_name) {
+                    _joinChannelCallback(message, channel);
+                }).run(channel.name);
             });
-        _.each(user_server.channels, function (channel_name) {
-            
         });
         client.addListener('notice', function (nick, to, text, message) {
             if (nick == null) {
@@ -832,12 +832,13 @@ IRCHandler = function (user, user_server) {
             }
             client = new irc.Client(server_url, nick, client_options);
             client_data[server.name] = client;
-            UserServers.update({_id: user_server._id}, {$set: {
-                status: 'connecting', active: true}
-            });
-            UserChannels.update(
-                {user_server_id: user_server._id},
-                {$set: {status: 'connecting'}}, {multi: true});
+            UserServers.update(
+                {_id: user_server._id, status: {$ne: 'disconnected'}},
+                {
+                    $set: {status: 'connecting', active: true}
+                },
+                {multi: true}
+            );
             if (LISTENERS.server['nickSet'] != undefined)
                 return;
             LISTENERS.server['nickSet'] = '';
