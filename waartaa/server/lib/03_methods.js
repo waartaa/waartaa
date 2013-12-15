@@ -213,13 +213,15 @@ function _send_raw_message(message, irc_handler, log_options) {
 Meteor.startup(function () {
     CLIENTS = {};
     //console.log(Meteor.users.find());
-    Meteor.users.find(
-        {active: true, status: {$ne: 'disconnected'}}
-    ).forEach(function (user) {
-        UserServers.find({user: user.username}).forEach(
-            function (user_server) {
-                _join_user_server(user, user_server.name);
-            });
+    Meteor.users.find({}).forEach(function (user) {
+        UserServers.find(
+            {
+                user: user.username, active: true,
+                status: {$ne: 'disconnected'}
+            }
+        ).forEach(function (user_server) {
+            _join_user_server(user, user_server.name);
+        });
     });
 });
 
@@ -251,7 +253,8 @@ Meteor.methods({
             {
                 user: user.username, name: user_server_name,
             }, {$set: {active: active, status: 'disconnecting'}}, {multi: true});
-        irc_handler.partUserServer();       
+        if (irc_handler)
+            irc_handler.partUserServer();       
     },
     join_user_channel: function (user_server_name, channel_name, password) {
         var user = Meteor.users.findOne({_id: this.userId});
@@ -260,7 +263,8 @@ Meteor.methods({
             user: user.username, user_server_name: user_server_name,
             name: channel_name
         }, {$set: {active: true, status: 'connecting'}}, {multi: true});
-        irc_handler.joinChannel(channel_name, password);
+        if (irc_handler)
+            irc_handler.joinChannel(channel_name, password);
     },
     part_user_channel: function (user_server_name, channel_name, close) {
         var user = Meteor.users.findOne({_id: this.userId});
@@ -272,7 +276,8 @@ Meteor.methods({
                 user: user.username, name: channel_name,
                 user_server_name: user_server_name
             }, {$set: {active: active, status: 'disconnecting'}}, {multi: true});
-        irc_handler.partChannel(channel_name);
+        if (irc_handler)
+            irc_handler.partChannel(channel_name);
 
     },
     send_channel_message: function (user_channel_id, message, log_options) {
@@ -287,7 +292,8 @@ Meteor.methods({
             _send_raw_message(message, irc_handler, log_options);
             return;
         }
-        irc_handler.sendChannelMessage(user_channel.name, message);
+        if (irc_handler)
+            irc_handler.sendChannelMessage(user_channel.name, message);
     },
     send_server_message: function (user_server_id, message, log_options) {
         var user_server = UserServers.findOne(
@@ -297,16 +303,18 @@ Meteor.methods({
             _send_raw_message(message, irc_handler, log_options);
             return;
         }
-        irc_handler.sendServerMessage(message);
+        if (irc_handler)
+            irc_handler.sendServerMessage(message);
     },
     change_nick: function (server_name, nick) {
         var user_server = UserServers.findOne({name: server_name, user_id: this.userId});
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server.name];
-        irc_handler.changeNick(nick);
+        if (irc_handler)
+            irc_handler.changeNick(nick);
     },
     log_clients: function () {
-        //console.log(CLIENTS);
+        console.log(CLIENTS);
     },
     send_pm: function (message, room_id, log_options) {
         var user_server_id = room_id.split('_')[0];
@@ -314,7 +322,9 @@ Meteor.methods({
         var user = Meteor.users.findOne({_id: this.userId});
         var user_server = UserServers.findOne({
             _id: user_server_id, user: user.username});
-        var irc_handler = CLIENTS[user.username][user_server.name];
+        var irc_handler = (CLIENTS[user.username] || {})[user_server.name];
+        if (!irc_handler)
+            return;
         if (message[0] == '/') {
             _send_raw_message(message, irc_handler, log_options);
             return;
@@ -323,15 +333,18 @@ Meteor.methods({
     },
     mark_away: function (user_server_name, away_message) {
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
-        irc_handler.markAway(away_message);
+        if (irc_handler)
+            irc_handler.markAway(away_message);
     },
     mark_active: function (user_server_name) {
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
-        irc_handler.markActive();
+        if (irc_handler)
+            irc_handler.markActive();
     },
     send_command: function (user_server_name, command_str, log_options) {
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
-        _send_raw_message(command_str, irc_handler, log_options);
+        if (irc_handler)
+            _send_raw_message(command_str, irc_handler, log_options);
     },
     whois: function (user_server_name, nick, log_options) {
         if (log_options) {
@@ -364,7 +377,8 @@ Meteor.methods({
             }
         }
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
-        _send_raw_message(command_str, irc_handler);
+        if (irc_handler)
+            _send_raw_message(command_str, irc_handler);
     },
     edit_user_channel: function (user_channel_id, data) {
         UserChannels.update({_id: user_channel_id}, {

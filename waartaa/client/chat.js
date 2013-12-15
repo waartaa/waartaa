@@ -38,17 +38,26 @@ function highlightChannel () {
   var server_id = Session.get('server_id');
   $('li.server').removeClass('active');
   $('.server-room').parent().removeClass('active');
-  if (Session.get('roomtype') == 'channel')
+  var selector = '';
+  if (Session.get('roomtype') == 'channel') {
     $('.server-room#channelLink-' + room_id).parent().addClass('active');
-  else if (Session.get('roomtype') == 'pm')
+    selector = '#channel-chatroom-' + room_id;
+  } else if (Session.get('roomtype') == 'pm') {
     $('#pmLink-' + room_id + '.server-room').parent().addClass('active');
-  //else if (Session.get('roomtype') == 'server')
+    selector = '#pmChatroom-' + room_id;
+  } else if (Session.get('roomtype') == 'server') {
+    selector = '#server-chatroom-' + server_id;
+  }
+  $('.chatroom').hide();
+  $(selector).show();
   //  $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
   $('li#server-' + server_id).addClass('active');
   //$('#chat-input').focus();
   $('#chat-input').focus();
   refreshAutocompleteNicksSource();
 }
+
+Deps.autorun(highlightChannel);
 
 Template.chat_main.chat_logs = function () {
   var room_id = Session.get('room_id');
@@ -286,7 +295,6 @@ function serverRoomSelectHandler (event) {
       $(selector + ' .chat-logs-container').scrollTop($(selector + ' table').height());
       $(selector).data('rendered', true);
     }
-    highlightChannel();
 } 
 
 Handlebars.registerHelper("isCurrentRoom", function (room_id, room_type, server_id) {
@@ -454,9 +462,11 @@ Template.user_menu.events = {
     if (!profile.connections[server_id].pms)
       profile.connections[server_id].pms = {};
     profile.connections[server_id].pms[nick] = '';
+    console.log(profile);
     Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
+    $('.info-panel-item.active').removeClass('active');
     Session.set('roomtype', 'pm');
-    Session.set('room_id', server_id + '-' + nick);
+    Session.set('room_id', server_id + '_' + nick);
   },
   'click .whois-user': function (event) {
     var $target = $(event.target);
