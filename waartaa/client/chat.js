@@ -3,7 +3,7 @@ updateHeight = function () {
   var body_height = $('body').height();
   var final_height = body_height - 90;
   $('#chat, #chat-main, .chatroom').height(final_height - 23);
-  $('#chat-channel-users .panel-body, #chat-servers .panel-body').height(final_height - 75);
+  $('#info-panel .panel-body, #chat-servers .panel-body').height(final_height - 75);
   //var topic_height = Session.get('topicHeight') || 0;
   $('.chat-logs-container')//.height(final_height - 69);
   .each(function (index, elem) {
@@ -41,7 +41,7 @@ function  highlightChannel () {
   if (Session.get('roomtype') == 'channel')
     $('.server-room#channelLink-' + room_id).parent().addClass('active');
   else if (Session.get('roomtype') == 'pm')
-    $('.server-room#pmLink-' + room_id).parent().addClass('active');
+    $('#pmLink-' + room_id + '.server-room').parent().addClass('active');
   //else if (Session.get('roomtype') == 'server')
   //  $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
   $('li#server-' + server_id).addClass('active');
@@ -143,6 +143,18 @@ Template.pm_logs.events = {
   'scroll .chat-logs-container': chatLogsContainerScrollCallback
 };
 
+function _getMatchingNicks (term) {
+  var nicks = [];
+  console.log(term);
+  ChannelNicks.find(
+      {nick: {$regex: '^' + term.substr(1) + '.*'}},
+      {nick: 1}).forEach(function (nick) {
+    nicks.push(nick.nick);
+  });
+  console.log(nicks);
+  return nicks;
+}
+
 function autocompleteNicksInitiate () {
   function split (val) {
     return val.split(/(^|[\ ]+)@/ );
@@ -165,9 +177,10 @@ function autocompleteNicksInitiate () {
       source: function( request, response ) {
         // delegate back to autocomplete, but extract the last term
         response( $.ui.autocomplete.filter(
-          getChannelNicks(), extractLast( request.term ) ) );
+          _getMatchingNicks(request.term), extractLast( request.term ) ) );
       },
       search: function (event, ui) {
+        console.log(event);
         var $input = $('#chat-input');
         var val = $input.val() || "";
         if (val.split(' ').length == 1 && val.length >= 1 && val[0] != '@')
@@ -208,7 +221,7 @@ function autocompleteNicksInitiate () {
 }
 
 function refreshAutocompleteNicksSource () {
-  $('chat-input').autocomplete('option', 'source', getChannelNicks());
+  $('chat-input').autocomplete('option', 'source', []);
 }
 
 function getChannelNicks () {
@@ -237,12 +250,14 @@ function serverRoomSelectHandler (event) {
     $('.chatroom').hide();
     if ($target.data('roomtype') == 'channel') {
       var server_id = $target.parents('.server').data('server-id');
+      var channel_id = $(event.target).data('id');
+      var selector = '#channel-chatroom-' + channel_id;
+      $(selector).show();
+      $('.info-panel-item.active').removeClass('active');
+      $('#channel-users-' + channel_id).addClass('active');
       Session.set('server_id', server_id);
       Session.set('roomtype', 'channel');
-      Session.set('room_id', $(event.target).data('id'));
-      channel_nicks = getChannelNicks();
-      var selector = '#channel-chatroom-' + $(event.target).data('id');
-      $(selector).show();
+      Session.set('room_id', channel_id);
       Session.set('topicHeight', $(selector + ' .topic').height());
       Session.set('lastAccessedChannel-' + Session.get('room_id'), new Date());
       Session.set('unreadLogsCountChannel-' + Session.get('room_id'), 0);
@@ -251,12 +266,10 @@ function serverRoomSelectHandler (event) {
       Session.set('server_id', server_id);
       Session.set('roomtype', 'pm');
       Session.set('room_id', $target.data('roomid'));
-      var selector = '#pmChatroom-' + Session.get('room_id');
-      $(selector).show();
       Session.set('topicHeight', $(selector + ' .topic').height());
       Session.set('lastAccessedPm-' + Session.get('room_id'), new Date());
       Session.set('unreadLogsCountPm-' + Session.get('room_id'), 0);
-
+      $('.info-panel-item.active').removeClass('active');
     } else if ($target.data('roomtype') == 'server' || $target.parent().data('roomtype') == 'server') {
       Session.set('room_id', $target.parent().data('server-id') || $target.data('server-id'));
       Session.set('server_id', Session.get('room_id'));
@@ -322,17 +335,15 @@ function serverChannelsRenderedCallback () {
 
 Template.server_channels.rendered = serverChannelsRenderedCallback;
 
-Template.chat_users.channel_users = function () {
-  if (Session.get('roomtype') == 'channel') {
-    var channel_id = Session.get('room_id');
-    var channel = UserChannels.findOne({_id: channel_id});
-    if (!channel)
-      return;
-    return ChannelNicks.find(
-      {channel_name: channel.name, server_name: channel.user_server_name},
-      {fields: {nick: 1}, sort: {nick: 1}});
-  }
-};
+Handlebars.registerHelper('channel_users', function (id) {
+  var channel_id = id;
+  var channel = UserChannels.findOne({_id: channel_id});
+  if (!channel)
+    return;
+  return ChannelNicks.find(
+    {channel_name: channel.name, server_name: channel.user_server_name},
+    {fields: {nick: 1}, sort: {nick: 1}});
+});
 
 Template.chat_users.rendered = updateHeight;
 
@@ -434,7 +445,7 @@ Template.user_menu.events = {
     var $target = $(event.target);
     var nick = $target.data('user-nick');
     var user = Meteor.user();
-    var server_id = Session.get('server_id');
+    var server_id = $target.parents('.info-panel-item').data('server-id');
     var profile = user.profile;
     if (!profile)
       profile = {connections: {}};
@@ -445,13 +456,13 @@ Template.user_menu.events = {
     profile.connections[server_id].pms[nick] = '';
     Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
     Session.set('roomtype', 'pm');
-    Session.set('room_id', Session.get('server_id') + '-' + nick);
+    Session.set('room_id', server_id + '-' + nick);
   },
   'click .whois-user': function (event) {
     var $target = $(event.target);
     var nick = $target.data('user-nick');
     var user = Meteor.user();
-    var server_id = Session.get('server_id');
+    var server_id = $target.parents('.info-panel-item').data('server-id');
     var server = UserServers.findOne({_id: server_id});
     var roomtype = Session.get('roomtype');
     var room_id = Session.get('room_id');
@@ -730,8 +741,7 @@ Handlebars.registerHelper("server_current_nick", function () {
 $('.whois-tooltip, .tipsy-enable').tipsy({live: true, gravity: 'e', html: true});
 $('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 
-function _get_nick_whois_data (nick) {
-  var user_server_id = Session.get('server_id');
+function _get_nick_whois_data (nick, user_server_id) {
   var user_server = UserServers.findOne({_id: user_server_id});
   if (!user_server)
     return;
@@ -739,9 +749,10 @@ function _get_nick_whois_data (nick) {
     nick: nick, server_id: user_server.server_id});
 }
 
-Handlebars.registerHelper('whois_tooltip', function (nick) {
+Handlebars.registerHelper('whois_tooltip', function (nick, server_name) {
   var tooltip = "";
-  var whois_data = _get_nick_whois_data(nick);
+  var server_id = (UserServers.findOne({name: server_name}, {_id: 1}) || {})._id;
+  var whois_data = _get_nick_whois_data(nick, server_id);
   if (whois_data)
     tooltip = "Username: " + _.escape(whois_data.user) + "<br/>" +
       "Real name: " + _.escape(whois_data.realname) + "<br/>" +
@@ -750,12 +761,17 @@ Handlebars.registerHelper('whois_tooltip', function (nick) {
 });
 
 Handlebars.registerHelper('getCurrentPMNickInfo', function () {
-  var nick = Session.get('room_id').split('_')[1];
-  return _get_nick_whois_data(nick);
+  var room_id = Session.get('room_id');
+  if (!room_id)
+    return;
+  var server_id = room_id.split('_')[0];
+  var nick = room_id.split('_')[1];
+  return _get_nick_whois_data(nick, server_id);
 })
 
-Handlebars.registerHelper('is_user_away', function (nick) {
-  var whois_data = _get_nick_whois_data(nick);
+Handlebars.registerHelper('is_user_away', function (nick, server_name) {
+  var server_id = (UserServers.findOne({name: server_name}, {_id: 1}) || {})._id || "";
+  var whois_data = _get_nick_whois_data(nick, server_id);
   if (whois_data && whois_data.away)
     return true;
   return false;

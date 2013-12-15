@@ -200,7 +200,7 @@ body {
   padding-left: 5px;
 }
 
-#chat-servers .panel-info > .panel-heading, #chat-channel-users .panel-info > .panel-heading {
+#chat-servers .panel-info > .panel-heading, #info-panel .panel-info > .panel-heading {
   text-transform: uppercase;
 }
 
@@ -212,11 +212,11 @@ body {
   border-radius: 5px !important;
 }
 
-.right-panel-user-info {
+#info-panel {
   padding: 0 5px 0 5px;
 }
 
-.right-panel-user-info dl {
+#info-panel dl {
   margin-top: 5px;
   margin-bottom: 5px;
 }
@@ -288,4 +288,24 @@ body {
 
 .chatlog-notice .chatlog-message {
   color: #9C9393;
+}
+
+.info-panel-item {
+  display: none;
+}
+
+.info-panel-item.active {
+  display: block;
+}
+
+.panel-info .panel-body {
+  padding: 0px !important;
+}
+
+.info-panel-item.pm {
+  padding-left: 5px;
+}
+
+#info-panel .panel-body {
+  overflow-y: auto;
 }

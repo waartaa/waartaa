@@ -466,54 +466,68 @@
 </template>
 
 <template name="chat_users">
-<div id="chat-channel-users" class="col-md-2 col-sm-2 hidden-xs">
+<div id="info-panel" class="col-md-2 col-sm-2 hidden-xs">
   <div class="panel panel-info">
-    <div class="panel-heading">
-        <strong>
-          {{# if isCurrentRoomtype "pm" }}
-            User info
-          {{ else }}
-            {{# if isCurrentRoomtype "server" }}
-              Server info
-            {{ else }}
-              Users
-            {{/if}}
-          {{/if}}
-        </strong>
-    </div>
-    <div class="panel-body">
-      <ul class="nav nav-list">
-        {{# if isCurrentRoomtype "channel" }}
-          {{#each channel_users}}
-            {{>chat_user}}
-          {{/each}}
-        {{ else }}
-            {{# if isCurrentRoomtype "pm"}}
-              {{# with getCurrentPMNickInfo}}
-                <div class="right-panel-user-info">
-                  <dl>
-                    <dt>Username</dt>
-                    <dd>{{ user }}</dd>
-                  </dl>
-                  <dl>
-                    <dt>Real name</dt>
-                    <dd>{{ realname }}</dd>
-                  </dl>
-                  <dl>
-                    <dt>Server</dt>
-                    <dd>{{ server }}</dd>
-                  </dl>
-                </div>
-              {{/with}}
-            {{/if}}
-        {{/if}}
-      </ul>
-    </div>
+    {{> info_panel_header}}
+    {{> info_panel_body}}
+  </div>
 </div>
 </template>
 
+<template name="info_panel_header">
+  <div class="panel-heading">
+      <strong>
+        {{# if isCurrentRoomtype "pm" }}
+          User info
+        {{ else }}
+          {{# if isCurrentRoomtype "server" }}
+            Server info
+          {{ else }}
+            Users
+          {{/if}}
+        {{/if}}
+      </strong>
+  </div>
+</template>
+
+<template name="info_panel_body">
+  <div class="panel-body">
+    {{> channel_nicks_info}}
+      {{> pm_nick_info}}
+  </div>
+</template>
+
+<template name="channel_nicks_info">
+  {{# each activeChannels}}
+    <ul id="channel-users-{{ _id }}" class="nav nav-list info-panel-item channel" data-server-id="{{ user_server_id }}">
+      {{#each channel_users _id}}
+        {{>chat_user}}
+      {{/each}}
+    </ul>
+  {{/each}}
+</template>
+
+<template name="pm_nick_info">
+  <ul class="info-panel-item pm{{# if isCurrentRoomtype "pm"}} active{{/if}}">
+    {{# with getCurrentPMNickInfo}}
+      <dl>
+        <dt>Username</dt>
+        <dd>{{ user }}</dd>
+      </dl>
+      <dl>
+        <dt>Real name</dt>
+        <dd>{{ realname }}</dd>
+      </dl>
+      <dl>
+        <dt>Server</dt>
+        <dd>{{ server }}</dd>
+      </dl>
+    {{/with}}
+  </ul>
+</template>
+
 <template name="chat_user">
-  <li class="dropdown{{#if is_user_away nick}} user-away{{/if}}">
+  <li class="dropdown{{#if is_user_away nick server_name}} user-away{{/if}}">
     <a id="{{ nick }}" class="channel-user" href="#">
       {{>channel_user_icon}} {{nick}}
       <span class="pull-right">
@@ -529,7 +543,7 @@
 </template>
 
 <template name="channel_user_icon">
-  <i class="glyphicon glyphicon-user whois-tooltip{{#if is_user_away nick}} icon-white{{/if}}" title="{{whois_tooltip nick}}"></i>
+  <i class="glyphicon glyphicon-user whois-tooltip{{#if is_user_away nick}} icon-white{{/if}}" title="{{whois_tooltip nick server_name}}"></i>
 </template>
 
 <template name="user_menu">
