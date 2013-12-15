@@ -156,9 +156,20 @@ Template.pm_logs.events = {
 function _getMatchingNicks (term) {
   var nicks = [];
   console.log(term);
+  var channel = null;
+  if (Session.get('roomtype') == 'channel') {
+    channel = UserChannels.findOne({_id: Session.get('room_id')});
+  }
+  if (!channel)
+    return;
   ChannelNicks.find(
-      {nick: {$regex: '^' + term.substr(1) + '.*'}},
-      {nick: 1}).forEach(function (nick) {
+    {
+      nick: {$regex: '^' + term + '.+'},
+      channel_name: channel.name,
+      server_name: channel.user_server_name
+    },
+    {nick: 1}
+  ).forEach(function (nick) {
     nicks.push(nick.nick);
   });
   console.log(nicks);
@@ -167,19 +178,25 @@ function _getMatchingNicks (term) {
 
 function autocompleteNicksInitiate () {
   function split (val) {
-    return val.split(/(^|[\ ]+)@/ );
+    return val.split(/(^|[\ ]+)/ );
   }
 
   function extractLast ( term ) {
     return split(term).pop();
   }
 
+  var auto_suggest = false;
+
   $('#chat-input')
     .bind('keydown', function (event) {
-      if ( event.keyCode === $.ui.keyCode.TAB &&
-            $( this ).data( "ui-autocomplete" ).menu.active ) {
-          event.preventDefault();
-      }
+      if (event.keyCode === $.ui.keyCode.TAB) {
+        event.preventDefault();
+        if ($( this ).data( "ui-autocomplete" ).menu.active)
+          return;
+        auto_suggest = true;
+        $('#chat-input').autocomplete('search', extractLast($(event.target).val()));
+      } else if (event.keyCode === $.ui.keyCode.SPACE)
+        auto_suggest = false;
     })
     .autocomplete({
       autoFocus: true,
@@ -193,8 +210,8 @@ function autocompleteNicksInitiate () {
         console.log(event);
         var $input = $('#chat-input');
         var val = $input.val() || "";
-        if (val.split(' ').length == 1 && val.length >= 1 && val[0] != '@')
-          return false;
+        console.log(auto_suggest);
+        return auto_suggest;
       },
       focus: function() {
         // prevent value inserted on focus
