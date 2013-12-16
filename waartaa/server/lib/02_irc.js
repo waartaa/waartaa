@@ -839,6 +839,15 @@ IRCHandler = function (user, user_server) {
                 },
                 {multi: true}
             );
+            UserChannels.update(
+                {
+                    user_server_name: user_server.name,
+                    user: user.username,
+                    status: {$ne: 'disconnected'}
+                },
+                {$set: {status: 'connecting'}},
+                {multi: true}
+            )
             if (LISTENERS.server['nickSet'] != undefined)
                 return;
             LISTENERS.server['nickSet'] = '';
