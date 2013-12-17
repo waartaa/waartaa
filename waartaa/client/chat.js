@@ -189,6 +189,8 @@ function autocompleteNicksInitiate () {
 
   $('#chat-input')
     .bind('keydown', function (event) {
+      if (Session.get('roomtype') != 'channel')
+        return;
       if (event.keyCode === $.ui.keyCode.TAB) {
         event.preventDefault();
         if ($( this ).data( "ui-autocomplete" ).menu.active)
@@ -715,11 +717,24 @@ cursors_observed = {};
 function updateUnreadLogsCount (
     unread_logs_count_key, last_accessed_key, last_updated) {
   var last_accessed = Session.get(last_accessed_key);
+  var count = 0;
   if (last_updated > last_accessed) {
     var unread_logs_count = Session.get(unread_logs_count_key) || 0;
     unread_logs_count += 1;
+    count += 1;
     Session.set(unread_logs_count_key, unread_logs_count);
   }
+  return count;
+}
+
+var focussed = true;
+
+window.onfocus = function () {
+  focussed = true;
+};
+
+window.onblur = function () {
+  focussed = false;
 }
 
 Handlebars.registerHelper("channelChatLogs", function (channel_id) {
@@ -728,9 +743,29 @@ Handlebars.registerHelper("channelChatLogs", function (channel_id) {
   cursor.observeChanges({
     added: function (id, fields) {
       Deps.nonreactive(function () {
-        updateUnreadLogsCount(
+        var new_logs = updateUnreadLogsCount(
           session_key, 'lastAccessedChannel-' + fields.channel_id,
-          fields.last_updated)
+          fields.last_updated);
+        var user_server = UserServers.findOne({_id: fields.server_id});
+        if (!user_server)
+          return;
+        if (
+          new_logs > 0 &&
+          fields.message.search(user_server.current_nick) >= 0 &&
+          (
+            (Session.get('roomtype') == 'channel' &&
+              Session.get('room_id') != fields.channel_id) ||
+            Session.get('roomtype') != 'channel')
+          ) {
+            var alert_message = fields.server_name + fields.channel_name + ': ' + fields.message;
+            $.titleAlert(alert_message, {
+              requireBlur:true,
+              stopOnFocus:true,
+              duration:10000,
+              interval:500
+            });
+          $('#audio-notification')[0].play();
+        }
       });
     }
   });
@@ -759,9 +794,21 @@ Handlebars.registerHelper("pmChatLogs", function (server_id, nick) {
   cursor.observeChanges({
     added: function (id, fields) {
       Deps.nonreactive(function () {
-        updateUnreadLogsCount(
+        new_logs = updateUnreadLogsCount(
           session_key, 'lastAccessedPm-' + fields.server_id + '_' + nick,
           fields.last_updated);
+        if (
+            new_logs > 0 &&
+            Session.get('room_id') != fields.server_id + '_' + nick) {
+          var alert_message = nick + ' messaged you: ' + fields.message;
+          $.titleAlert(alert_message, {
+            requireBlur:true,
+            stopOnFocus:true,
+            duration:10000,
+            interval:500
+          });
+          $('#audio-notification')[0].play();
+        }
       });
     }
   });
