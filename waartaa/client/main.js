@@ -6,7 +6,7 @@
 //UserServers = new Meteor.Collection("user_servers");
 
 
-DEFAULT_LOGS_COUNT = 10;
+DEFAULT_LOGS_COUNT = 40;
 
 subscribe = function () {
   Meteor.subscribe("servers");

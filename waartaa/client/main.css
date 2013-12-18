@@ -309,3 +309,47 @@ body {
 #info-panel .panel-body {
   overflow-y: auto;
 }
+
+.nano:hover > .pane, .pane.active, .pane.flashed {
+  visibility: visible\9;
+  opacity: 0.99;
+}
+
+.nano > .pane > .slider {
+  background: #444;
+  background: rgba(0,0,0,.5);
+  position: relative;
+  margin: 0 1px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.nano > .pane {
+  background: rgba(0,0,0,.25);
+  position: absolute;
+  width: 10px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  visibility: hidden\9;
+  opacity: .01;
+  -webkit-transition: .2s;
+  -moz-transition: .2s;
+  -o-transition: .2s;
+  transition: .2s;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.nano .pane {
+  background: #777;
+  width: 6px;
+  right: 1px;
+  margin: 2px;
+}
+
+.nano .slider {
+  background: #111;
+}

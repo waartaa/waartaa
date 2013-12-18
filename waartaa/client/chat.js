@@ -55,6 +55,7 @@ function highlightChannel () {
   //$('#chat-input').focus();
   $('#chat-input').focus();
   refreshAutocompleteNicksSource();
+  $(selector).find('.nano').nanoScroller();
 }
 
 Deps.autorun(highlightChannel);
@@ -358,6 +359,7 @@ function chatUserClickHandler (event) {
 
 function serverChannelsRenderedCallback () {
   updateHeight();
+  $('#chat-servers .nano').nanoScroller();
 }
 
 Template.server_channels.rendered = serverChannelsRenderedCallback;
@@ -373,6 +375,10 @@ Handlebars.registerHelper('channel_users', function (id) {
 });
 
 Template.chat_users.rendered = updateHeight;
+
+Template.info_panel_body.rendered = function () {
+  $('#info-panel .nano').nanoScroller();
+}
 
 Template.server_channel_item.rendered = function () {
   Session.set("lastAccessedChannel-" + this.data._id, new Date());

@@ -21,8 +21,8 @@
           </button>
         </span>
       </div>
-      <div class="panel-body">
-        <ul class="nav bs-sidenav">
+      <div class="panel-body nano">
+        <ul class="nav bs-sidenav content">
           {{#each servers}}
             {{> chat_connection_server}}
           {{/each}}
@@ -304,7 +304,7 @@
       <li><p>{{topic}}<p></li>
     </ul>
   </div>
-  <div class="chat-logs-container channel" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+  <div class="chat-logs-container nano channel" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
     {{> channel_chat_logs_table}}
   </div>
 </div>
@@ -312,7 +312,7 @@
 </template>
 
 <template name="channel_chat_logs_table">
-<div id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel">
+<div id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel content">
   {{#each channelChatLogs _id}}
     {{> chat_row}}
   {{/each}}
@@ -327,7 +327,7 @@
       <li><p>{{topic}}<p></li>
     </ul>
   </div>
-  <div class="chat-logs-container server" data-server-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+  <div class="chat-logs-container server nano" data-server-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
     {{> server_chat_logs_table}}
   </div>
 </div>
@@ -335,7 +335,7 @@
 </template>
 
 <template name="server_chat_logs_table">
-  <table id="server-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table server">
+  <table id="server-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table server content">
     {{#each serverChatLogs _id}}
       {{> chat_row}}
     {{/each}}
@@ -351,7 +351,7 @@
           <li><p>{{topic}}<p></li>
         </ul>
       </div>
-      <div class="chat-logs-container pm" data-server-id="{{ server_id }}" data-nick="{{ name }}" style="overflow-y: auto; overflow-x: hidden;">
+      <div class="chat-logs-container pm nano" data-server-id="{{ server_id }}" data-nick="{{ name }}" style="overflow-y: auto; overflow-x: hidden;">
         {{> pm_chat_logs_table}}
       </div>
     </div>
@@ -360,7 +360,7 @@
 </template>
 
 <template name="pm_chat_logs_table">
-  <div id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table table-condensed chatlogs-table pm">
+  <div id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table table-condensed chatlogs-table pm content">
     {{#each pmChatLogs server_id name }}
       {{> pm_chat_row}}
     {{/each}}
@@ -494,9 +494,11 @@
 </template>
 
 <template name="info_panel_body">
-  <div class="panel-body">
-    {{> channel_nicks_info}}
+  <div class="panel-body nano">
+    <div class="content">
+      {{> channel_nicks_info}}
       {{> pm_nick_info}}
+    </div>
   </div>
 </template>
 
