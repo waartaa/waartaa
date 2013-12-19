@@ -56,6 +56,8 @@ function highlightChannel () {
   $('#chat-input').focus();
   refreshAutocompleteNicksSource();
   $(selector).find('.nano').nanoScroller();
+  $(selector).off('scrolltop').on('scrolltop', chatLogsContainerScrollCallback);
+
 }
 
 Deps.autorun(highlightChannel);
@@ -96,11 +98,9 @@ function observeChatlogTableScroll () {
   var $container = $table.parent();
   var id = $table.attr('id');
   var old_table_height = Session.get('height-' + id, 0);
-  var new_table_height = $table.height();
-  if ($container.scrollTop() == 0) {
-    //console.log(old_table_height);
-    //console.log(new_table_height);
-    $container.scrollTop(new_table_height - old_table_height);
+  var new_table_height = $table.find('.chatlogrows').height();
+  if ($container.scrollTop() == 0 && new_table_height > old_table_height) {
+    $container.nanoScroller({scrollTop: (new_table_height - old_table_height)});
   }
   Session.set('height-' + id, new_table_height);
 }
@@ -115,19 +115,18 @@ function chatLogsContainerScrollCallback (event) {
     var scroll_top = $(event.target).scrollTop();
     var $target = $(event.target);
     var $table = $target.find('.chatlogs-table');
-    if (scroll_top == 0) {
-      //console.log("Reached top of page.");
-      var key = '';
-      if ($table.hasClass('channel'))
-        key = "user_channel_log_count_" + $target.data('channel-id');
-      else if ($table.hasClass('server'))
-        key = "user_server_log_count_" + $target.data('server-id');
-      else if ($table.hasClass('pm'))
-        key = "pmLogCount-" + $target.data('server-id') + '_' + $target.data('nick');
-      var current_count = Session.get(key, 0);
-      Session.set('height-' + $table.attr('id'), $table.height());
-      Session.set(key, current_count + DEFAULT_LOGS_COUNT);
-    }
+    $table.off('scrolltop');
+    console.log("Reached top of page.");
+    var key = '';
+    if ($table.hasClass('channel'))
+      key = "user_channel_log_count_" + $target.data('channel-id');
+    else if ($table.hasClass('server'))
+      key = "user_server_log_count_" + $target.data('server-id');
+    else if ($table.hasClass('pm'))
+      key = "pmLogCount-" + $target.data('server-id') + '_' + $target.data('nick');
+    var current_count = Session.get(key, 0);
+    Session.set('height-' + $table.attr('id'), $table.find('.chatlogrows').height());
+    console.log('current table height: ' + Session.get('height-' + $table.attr('id')));
     var room_id = Session.get('room_id');
     if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
       scroll_top = null;
@@ -140,10 +139,14 @@ function chatLogsContainerScrollCallback (event) {
     else if (Session.get('roomtype') == 'server')
       Session.set('scroll_height_server-' + Session.get('server_id'),
         scroll_top);
+    Session.set(key, current_count + DEFAULT_LOGS_COUNT);
+    Meteor.setTimeout(function () {
+      $table.on('scrolltop', chatLogsContainerScrollCallback);
+    }, 500)
   }
 
 Template.channel_logs.events = {
-  'scroll .chat-logs-container': chatLogsContainerScrollCallback
+  'scrolltop .chat-logs-container': chatLogsContainerScrollCallback
 };
 
 Template.server_logs.events = {

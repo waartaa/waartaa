@@ -313,9 +313,11 @@
 
 <template name="channel_chat_logs_table">
 <div id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel content">
-  {{#each channelChatLogs _id}}
-    {{> chat_row}}
-  {{/each}}
+  <div class="chatlogrows">
+    {{#each channelChatLogs _id}}
+      {{> chat_row}}
+    {{/each}}
+  </div>
 </div>
 </template>
 
@@ -336,9 +338,11 @@
 
 <template name="server_chat_logs_table">
   <table id="server-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table server content">
-    {{#each serverChatLogs _id}}
-      {{> chat_row}}
-    {{/each}}
+    <div class="chatlogrows">
+      {{#each serverChatLogs _id}}
+        {{> chat_row}}
+      {{/each}}
+    </div>
   </table>
 </template>
 
@@ -361,9 +365,11 @@
 
 <template name="pm_chat_logs_table">
   <div id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table table-condensed chatlogs-table pm content">
-    {{#each pmChatLogs server_id name }}
-      {{> pm_chat_row}}
-    {{/each}}
+    <div class="chatlogrows">
+      {{#each pmChatLogs server_id name }}
+        {{> pm_chat_row}}
+      {{/each}}
+    </div>
   </div>
 </template>
 
