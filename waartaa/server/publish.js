@@ -76,6 +76,7 @@ Meteor.publish(
     return cursor;
 });
 
+/*
 Meteor.publish('server_nicks', function () {
   var user = Meteor.users.findOne({_id: this.userId});
   if (!user)
@@ -88,16 +89,21 @@ Meteor.publish('server_nicks', function () {
   return ServerNicks.find({server_id: {
     $in: server_ids}}, {last_updated: 0, created: 0});
 });
+*/
 
-Meteor.publish('channel_nicks', function (server_name, channel_name) {
+Meteor.publish('channel_nicks', function (server_name, channel_name, from) {
   var user = Meteor.users.findOne({_id: this.userId});
   if (!user)
     return;
   var query_or = [];
   if (server_name && channel_name) {
+    var query = {server_name: server_name, channel_name: channel_name};
+    if (from) {
+      query['nick'] = {$gt: from}
+    }
     return ChannelNicks.find(
-      {server_name: server_name, channel_name: channel_name},
-      {fields: {created: 0, last_updated: 0}});
+      query,
+      {fields: {created: 0, last_updated: 0}, limit: 40, sort: {nick: 1}});
   } else {
     UserServers.find({user_id: user._id}).forEach(function (user_server) {
       var channel_names = [];

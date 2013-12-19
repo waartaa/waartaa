@@ -991,3 +991,34 @@ Handlebars.registerHelper('isToday', function (date_obj) {
     return true;
   return false;
 });
+
+$(document).on('scrollend', '#info-panel .nano', function (e) {
+  var $target = $(e.target);
+  if (Session.get('roomtype') == 'channel') {
+    var channel = UserChannels.findOne({_id: Session.get('room_id')});
+    if (!channel)
+      return;
+    Meteor.subscribe(
+      'channel_nicks', channel.user_server_name,
+      channel.name, Session.get(
+      'lastNick-' + channel.user_server_name + '_' +
+      channel.name), function () {
+        console.log('subscribed to channel nicks');
+        console.log(ChannelNicks.find().count());
+        var last_nick = ChannelNicks.findOne(
+            {
+              channel_name: channel.name,
+              server_name: channel.user_server_name,
+            },
+            {
+              sort: {nick: -1}
+            }
+          );
+        console.log('LAST channel nick: ' + (last_nick || {}).nick);
+        Session.set(
+          'lastNick-' + channel.user_server_name + '_' + channel.name,
+          (last_nick || {}).nick);
+      }
+    );
+  }
+});

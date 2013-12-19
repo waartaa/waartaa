@@ -37,7 +37,7 @@ subscribe = function () {
   Meteor.subscribe("user_channel_logs");
   Meteor.subscribe("user_server_logs");
   Meteor.subscribe("server_nicks");
-  Meteor.subscribe('channel_nicks');
+  //Meteor.subscribe('channel_nicks');
 };
 
 subscribe();
@@ -81,6 +81,19 @@ UserChannels.find().observeChanges({
       'channel_nicks', channel.user_server_name, channel.name, function () {
         console.log('subscribed to channel nicks');
         console.log(ChannelNicks.find().count());
+        var last_nick = ChannelNicks.findOne(
+            {
+              channel_name: channel.name,
+              server_name: channel.user_server_name,
+            },
+            {
+              sort: {nick: -1}
+            }
+          );
+        console.log('LAST channel nick: ' + (last_nick || {}).nick);
+        Session.set(
+          'lastNick-' + channel.user_server_name + '_' + channel.name,
+          (last_nick || {}).nick);
       }
     );
   }
