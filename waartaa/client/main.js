@@ -235,6 +235,7 @@ $(window).resize(updateHeight);
 
 Meteor.Router.add({
   '': function () {
+    GAnalytics.pageview();
     if (Meteor.userId()) {
       location.href = "/chat";
     } else
@@ -242,6 +243,7 @@ Meteor.Router.add({
   },
   '/chat': function () {
     if (Meteor.userId()) {
+      GAnalytics.pageview('/chat');
       Session.set('currentPage', 'chat');
       return 'chat';
     } else
