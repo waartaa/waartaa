@@ -73,29 +73,57 @@ subscribe_user_channel_logs = function () {
   });
 }
 
+subscribe_user_channel_nicks = function (channel) {
+  if (!channel)
+    return;
+  Meteor.subscribe(
+    'channel_nicks', channel.user_server_name, channel.name,
+    Session.get('lastNick-' + channel.user_server_name + '_' + channel.name),
+    Session.get('startNick-' + channel.user_server_name + '_' + channel.name),
+    function () {
+        console.log('subscribed to channel nicks');
+        console.log(ChannelNicks.find().count());
+        Meteor.setTimeout(
+          function () {
+            var last_nick = ChannelNicks.findOne(
+                {
+                  channel_name: channel.name,
+                  server_name: channel.user_server_name,
+                },
+                {
+                  sort: {nick: -1}
+                }
+              );
+            var start_nick = ChannelNicks.findOne(
+                {
+                  channel_name: channel.name,
+                  server_name: channel.user_server_name,
+                },
+                {
+                  sort: {nick: 1}
+                }
+              );
+            console.log('LAST channel nick: ' + (last_nick || {}).nick);
+            console.log('START channel nick: ' + (start_nick || {}).nick);
+            Session.set(
+              'currentLastNick-' + channel.user_server_name + '_' + channel.name,
+              (last_nick || {}).nick);
+            Session.set(
+              'currentStartNick-' + channel.user_server_name + '_' + channel.name,
+              (start_nick || {}).nick);
+          }, 500);
+      }
+    );
+}
+
 UserChannels.find().observeChanges({
   added: function (id, channel) {
     console.log('Added new channel');
     console.log(channel);
-    Meteor.subscribe(
-      'channel_nicks', channel.user_server_name, channel.name, function () {
-        console.log('subscribed to channel nicks');
-        console.log(ChannelNicks.find().count());
-        var last_nick = ChannelNicks.findOne(
-            {
-              channel_name: channel.name,
-              server_name: channel.user_server_name,
-            },
-            {
-              sort: {nick: -1}
-            }
-          );
-        console.log('LAST channel nick: ' + (last_nick || {}).nick);
-        Session.set(
-          'lastNick-' + channel.user_server_name + '_' + channel.name,
-          (last_nick || {}).nick);
-      }
-    );
+    Deps.autorun(
+      function () {
+        subscribe_user_channel_nicks(channel);
+      });
   }
 });
 

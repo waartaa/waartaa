@@ -91,19 +91,37 @@ Meteor.publish('server_nicks', function () {
 });
 */
 
-Meteor.publish('channel_nicks', function (server_name, channel_name, from) {
+Meteor.publish('channel_nicks', function (server_name, channel_name, from, to) {
   var user = Meteor.users.findOne({_id: this.userId});
   if (!user)
     return;
   var query_or = [];
   if (server_name && channel_name) {
     var query = {server_name: server_name, channel_name: channel_name};
-    if (from) {
-      query['nick'] = {$gt: from}
+    var start_nick = ChannelNicks.findOne(
+      {channel_name: channel_name, server_name: server_name},
+      {sort: {nick: 1}});
+    var last_nick = ChannelNicks.findOne(
+      {channel_name: channel_name, server_name: server_name},
+      {sort: {nick: -1}});
+    if (to && start_nick && start_nick.nick == to) {
+      from = to;
+      to = null;
+    } else if (from && last_nick && last_nick.nick == from) {
+      to = from;
+      from = null;
+    }
+    var sort_dict = {nick: 1};
+    if (to) {
+      query['nick'] = {$lte: to};
+      sort_dict = {nick: -1};
+    }
+    else if (from) {
+      query['nick'] = {$gte: from};
     }
     return ChannelNicks.find(
       query,
-      {fields: {created: 0, last_updated: 0}, limit: 40, sort: {nick: 1}});
+      {fields: {created: 0, last_updated: 0}, limit: 40, sort: sort_dict});
   } else {
     UserServers.find({user_id: user._id}).forEach(function (user_server) {
       var channel_names = [];

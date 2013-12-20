@@ -1,15 +1,16 @@
 updateHeight = function () {
-  highlightChannel();
   var body_height = $('body').height();
   var final_height = body_height - 90;
   $('#chat, #chat-main, .chatroom').height(final_height - 23);
   $('#info-panel .panel-body, #chat-servers .panel-body').height(final_height - 75);
+  $('#info-panel .inner-container').css('min-height', final_height);
   //var topic_height = Session.get('topicHeight') || 0;
   $('.chat-logs-container')//.height(final_height - 69);
   .each(function (index, elem) {
     var $topic = $(elem).prev('.topic');
     $(elem).height((final_height - $topic.height() || 0) - 25);
   });
+  highlightChannel();
 }
 
 Template.chat_connections.servers = function () {
@@ -361,8 +362,8 @@ function chatUserClickHandler (event) {
 }
 
 function serverChannelsRenderedCallback () {
-  updateHeight();
   $('#chat-servers .nano').nanoScroller();
+  updateHeight();
 }
 
 Template.server_channels.rendered = serverChannelsRenderedCallback;
@@ -372,8 +373,14 @@ Handlebars.registerHelper('channel_users', function (id) {
   var channel = UserChannels.findOne({_id: channel_id});
   if (!channel)
     return;
+  var query = {
+    channel_name: channel.name, server_name: channel.user_server_name};
+  var last_nick = Session.get(
+    'lastNick-' + channel.user_server_name + '_' + channel.name);
+  if (last_nick)
+    query['nick'] = {$gt: last_nick};
   return ChannelNicks.find(
-    {channel_name: channel.name, server_name: channel.user_server_name},
+    query,
     {fields: {nick: 1}, sort: {nick: 1}});
 });
 
@@ -992,33 +999,54 @@ Handlebars.registerHelper('isToday', function (date_obj) {
   return false;
 });
 
-$(document).on('scrollend', '#info-panel .nano', function (e) {
+function infoPanelScrollendHandler (e) {
+  $(document).off('scrollend.info_panel');
   var $target = $(e.target);
   if (Session.get('roomtype') == 'channel') {
     var channel = UserChannels.findOne({_id: Session.get('room_id')});
     if (!channel)
       return;
-    Meteor.subscribe(
-      'channel_nicks', channel.user_server_name,
-      channel.name, Session.get(
-      'lastNick-' + channel.user_server_name + '_' +
-      channel.name), function () {
-        console.log('subscribed to channel nicks');
-        console.log(ChannelNicks.find().count());
-        var last_nick = ChannelNicks.findOne(
-            {
-              channel_name: channel.name,
-              server_name: channel.user_server_name,
-            },
-            {
-              sort: {nick: -1}
-            }
-          );
-        console.log('LAST channel nick: ' + (last_nick || {}).nick);
-        Session.set(
-          'lastNick-' + channel.user_server_name + '_' + channel.name,
-          (last_nick || {}).nick);
-      }
-    );
+    var current_last_nick = Session.get(
+      'currentLastNick-' + channel.user_server_name + '_' + channel.name);
+    Session.set(
+      'lastNick-' + channel.user_server_name + '_' + channel.name,
+      current_last_nick);
+    Session.set(
+      'startNick-' + channel.user_server_name + '_' + channel.name,
+      null);
   }
-});
+  Meteor.setTimeout(function () {
+    $(document).on('scrollend.info_panel', '#info-panel .nano',
+      infoPanelScrollendHandler);
+  }, 500);
+}
+
+$(document).on('scrollend.info_panel', '#info-panel .nano',
+  infoPanelScrollendHandler);
+
+function infoPanelScrolltopHandler (e) {
+  $(document).off('scrolltop.info_panel');
+  var $target = $(e.target);
+  if (Session.get('roomtype') == 'channel') {
+    var channel = UserChannels.findOne({_id: Session.get('room_id')});
+    if (!channel)
+      return;
+    var current_last_nick = Session.get(
+      'currentLastNick-' + channel.user_server_name + '_' + channel.name);
+    var current_start_nick = Session.get(
+      'currentStartNick-' + channel.user_server_name + '_' + channel.name);
+    Session.set(
+      'startNick-' + channel.user_server_name + '_' + channel.name,
+      current_start_nick);
+    Session.set(
+      'lastNick-' + channel.user_server_name + '_' + channel.name,
+      null);
+  }
+  Meteor.setTimeout(function () {
+    $(document).on('scrolltop.info_panel', '#info-panel .nano',
+      infoPanelScrolltopHandler);
+  }, 500);
+}
+
+$(document).on('scrolltop.info_panel', '#info-panel .nano',
+  infoPanelScrolltopHandler);

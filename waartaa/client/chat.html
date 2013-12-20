@@ -502,8 +502,10 @@
 <template name="info_panel_body">
   <div class="panel-body nano">
     <div class="content">
-      {{> channel_nicks_info}}
-      {{> pm_nick_info}}
+      <div class="inner-container">
+        {{> channel_nicks_info}}
+        {{> pm_nick_info}}
+      </div>
     </div>
   </div>
 </template>
@@ -511,10 +513,18 @@
 <template name="channel_nicks_info">
   {{# each activeChannels}}
     <ul id="channel-users-{{ _id }}" class="nav nav-list info-panel-item channel" data-server-id="{{ user_server_id }}">
-      {{#each channel_users _id}}
-        {{>chat_user}}
-      {{/each}}
+      {{#isolate}}
+        {{> channel_users}}
+      {{/isolate}}
     </ul>
+  {{/each}}
+</template>
+
+<template name="channel_users">
+  {{#each channel_users _id}}
+    {{#isolate}}
+      {{>chat_user}}
+    {{/isolate}}
   {{/each}}
 </template>
 
