@@ -798,7 +798,8 @@ Handlebars.registerHelper("channelChatLogs", function (channel_id) {
 });
 
 Handlebars.registerHelper("serverChatLogs", function (server_id) {
-  var cursor = UserServerLogs.find({server_id: server_id});
+  var cursor = UserServerLogs.find(
+    {server_id: server_id}, {sort: {created: 1}});
   var session_key = 'unreadLogsCountServer_' + server_id;
   cursor.observeChanges({
     added: function (id, fields) {
@@ -813,8 +814,11 @@ Handlebars.registerHelper("serverChatLogs", function (server_id) {
 });
 
 Handlebars.registerHelper("pmChatLogs", function (server_id, nick) {
-  var cursor = PMLogs.find({
-    $or: [{from: nick}, {to_nick: nick}], server_id: server_id});
+  var cursor = PMLogs.find(
+    {
+      $or: [{from: nick}, {to_nick: nick}],
+      server_id: server_id
+    }, {sort: {created: 1}});
   var session_key = "unreadLogsCountPm-" + server_id + '_' + nick;
   cursor.observeChanges({
     added: function (id, fields) {
