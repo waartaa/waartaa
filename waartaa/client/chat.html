@@ -341,13 +341,13 @@
 </template>
 
 <template name="server_chat_logs_table">
-  <table id="server-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table server content">
+  <div id="server-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table server content">
     <div class="chatlogrows">
       {{#each serverChatLogs _id}}
         {{> chat_row}}
       {{/each}}
     </div>
-  </table>
+  </div>
 </template>
 
 <template name="pm_logs">
