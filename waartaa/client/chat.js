@@ -37,20 +37,38 @@ Template.add_server_modal.created = function () {
 function highlightChannel () {
   var room_id = Session.get('room_id');
   var server_id = Session.get('server_id');
+  var roomtype = Session.get('roomtype');
   $('li.server').removeClass('active');
   $('.server-room').parent().removeClass('active');
   var selector = '';
-  if (Session.get('roomtype') == 'channel') {
+  if (roomtype == 'channel') {
     $('.server-room#channelLink-' + room_id).parent().addClass('active');
     selector = '#channel-chatroom-' + room_id;
-  } else if (Session.get('roomtype') == 'pm') {
+  } else if (roomtype == 'pm') {
     $('#pmLink-' + room_id + '.server-room').parent().addClass('active');
     selector = '#pmChatroom-' + room_id;
-  } else if (Session.get('roomtype') == 'server') {
+  } else if (roomtype == 'server') {
     selector = '#server-chatroom-' + server_id;
   }
   $('.chatroom').hide();
   $(selector).show();
+  if (roomtype == 'channel') {
+      Session.set('topicHeight', $(selector + ' .topic').height());
+      Session.set('lastAccessedChannel-' + room_id, new Date());
+      Session.set('unreadLogsCountChannel-' + room_id, 0);
+      $('.info-panel-item.active').removeClass('active');
+      $('#channel-users-' + room_id).addClass('active');
+  } else if (roomtype == 'pm') {
+      Session.set('topicHeight', $(selector + ' .topic').height());
+      Session.set('lastAccessedPm-' + room_id, new Date());
+      Session.set('unreadLogsCountPm-' + room_id, 0);
+      $('.info-panel-item.active').removeClass('active');
+  } else if (roomtype == 'server') {
+      Session.set('topicHeight', $(selector + ' .topic').height());
+      Session.set('lastAccessedServer-' + room_id, new Date());
+      Session.set('unreadLogsCountServer-' + room_id, 0);
+      $('.info-panel-item.active').removeClass('active');
+  }
   //  $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
   $('li#server-' + server_id).addClass('active');
   //$('#chat-input').focus();
@@ -58,10 +76,47 @@ function highlightChannel () {
   refreshAutocompleteNicksSource();
   //$(selector).find('.nano').nanoScroller();
   $(selector).off('scrolltop').on('scrolltop', chatLogsContainerScrollCallback);
-
+  $(selector + ' .chat-logs-container').nanoScroller();
+  if (!$(selector).data('rendered')) {
+    $(selector).data('rendered', true);
+    $(selector + ' .chat-logs-container').nanoScroller({
+      scrollTop: $(selector + ' .chatlogrows').height()});
+  }
 }
 
 Deps.autorun(highlightChannel);
+
+function serverRoomSelectHandler (event) {
+    var $target = $(event.target);
+    if ($target.hasClass('server-room-menu-btn') || $target.parent().hasClass('server-room-menu-btn'))
+      return;
+    event.stopPropagation();
+    $('.dropdown.open, .btn-group.open').removeClass('open');
+    var prev_room_id = Session.get('room_id');
+    var prefix = '';
+    var prev_roomtype = Session.get('roomtype');
+    if (prev_roomtype == 'server' || prev_roomtype == 'channel')
+      prefix = prev_roomtype + '-';
+    Session.set('scroll_height_' + prefix + prev_room_id, $('#chat-logs-container').scrollTop() || null);
+    $('.chatroom').hide();
+    if ($target.data('roomtype') == 'channel') {
+      var server_id = $target.parents('.server').data('server-id');
+      var channel_id = $(event.target).data('id');
+      Session.set('server_id', server_id);
+      Session.set('roomtype', 'channel');
+      Session.set('room_id', channel_id);
+    } else if ($target.data('roomtype') == 'pm') {
+      var server_id = $target.parents('.server').data('server-id');
+      Session.set('server_id', server_id);
+      Session.set('roomtype', 'pm');
+      Session.set('room_id', $target.data('roomid'));
+    } else if ($target.data('roomtype') == 'server' || $target.parent().data('roomtype') == 'server') {
+      Session.set('room_id', $target.parent().data('server-id') || $target.data('server-id'));
+      Session.set('server_id', Session.get('room_id'));
+      Session.set('roomtype', 'server');
+    }
+    highlightChannel();
+}
 
 Template.chat_main.chat_logs = function () {
   var room_id = Session.get('room_id');
@@ -270,59 +325,6 @@ function getChannelNicks () {
     channel_nicks.push(channel_nick.nick);
   });
   return channel_nicks;
-}
-
-function serverRoomSelectHandler (event) {
-    var $target = $(event.target);
-    if ($target.hasClass('server-room-menu-btn') || $target.parent().hasClass('server-room-menu-btn'))
-      return;
-    event.stopPropagation();
-    $('.dropdown.open, .btn-group.open').removeClass('open');
-    var prev_room_id = Session.get('room_id');
-    var prefix = '';
-    var prev_roomtype = Session.get('roomtype');
-    if (prev_roomtype == 'server' || prev_roomtype == 'channel')
-      prefix = prev_roomtype + '-';
-    Session.set('scroll_height_' + prefix + prev_room_id, $('#chat-logs-container').scrollTop() || null);
-    $('.chatroom').hide();
-    if ($target.data('roomtype') == 'channel') {
-      var server_id = $target.parents('.server').data('server-id');
-      var channel_id = $(event.target).data('id');
-      var selector = '#channel-chatroom-' + channel_id;
-      $(selector).show();
-      $('.info-panel-item.active').removeClass('active');
-      $('#channel-users-' + channel_id).addClass('active');
-      Session.set('server_id', server_id);
-      Session.set('roomtype', 'channel');
-      Session.set('room_id', channel_id);
-      Session.set('topicHeight', $(selector + ' .topic').height());
-      Session.set('lastAccessedChannel-' + Session.get('room_id'), new Date());
-      Session.set('unreadLogsCountChannel-' + Session.get('room_id'), 0);
-    } else if ($target.data('roomtype') == 'pm') {
-      var server_id = $target.parents('.server').data('server-id');
-      Session.set('server_id', server_id);
-      Session.set('roomtype', 'pm');
-      Session.set('room_id', $target.data('roomid'));
-      Session.set('topicHeight', $(selector + ' .topic').height());
-      Session.set('lastAccessedPm-' + Session.get('room_id'), new Date());
-      Session.set('unreadLogsCountPm-' + Session.get('room_id'), 0);
-      $('.info-panel-item.active').removeClass('active');
-    } else if ($target.data('roomtype') == 'server' || $target.parent().data('roomtype') == 'server') {
-      Session.set('room_id', $target.parent().data('server-id') || $target.data('server-id'));
-      Session.set('server_id', Session.get('room_id'));
-      Session.set('roomtype', 'server');
-      var selector = '#server-chatroom-' + Session.get('room_id');
-      $(selector).show();
-      Session.set('topicHeight', $(selector + ' .topic').height());
-      Session.set('lastAccessedServer-' + Session.get('room_id'), new Date());
-      Session.set('unreadLogsCountServer-' + Session.get('room_id'), 0);
-      $('.info-panel-item.active').removeClass('active');
-    }
-    if (!$(selector).data('rendered')) {
-      $(selector + ' .chat-logs-container').nanoScroller({
-        scrollTop: $(selector + ' .chatlogrows').height()});
-      $(selector).data('rendered', true);
-    }
 } 
 
 Handlebars.registerHelper("isCurrentRoom", function (room_id, room_type, server_id) {
