@@ -223,12 +223,14 @@ IRCHandler = function (user, user_server) {
                     {upsert: true}
                 );
                 if (nick == client.nick) {
+                    /*
                     var job_key = 'WHO-' + channel;
                     if (JOBS[job_key])
                         clearInterval(JOBS[job_key]);
                     JOBS[job_key] = setInterval(
                         _getChannelWHOData, CONFIG.channel_who_poll_interval,
                         channel);
+                    */
                     console.log(user_channel);
                     UserChannels.update(
                         {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
