@@ -63,6 +63,7 @@ function highlightChannel () {
       Session.set('lastAccessedPm-' + room_id, new Date());
       Session.set('unreadLogsCountPm-' + room_id, 0);
       $('.info-panel-item.active').removeClass('active');
+      $('.info-panel-item.pm').addClass('active');
   } else if (roomtype == 'server') {
       Session.set('topicHeight', $(selector + ' .topic').height());
       Session.set('lastAccessedServer-' + room_id, new Date());
@@ -511,6 +512,10 @@ Template.user_menu.events = {
     $('.info-panel-item.active').removeClass('active');
     Session.set('roomtype', 'pm');
     Session.set('room_id', server_id + '_' + nick);
+    var server = UserServers.findOne({_id: server_id});
+    if (server)
+      Meteor.call(
+        'send_command', server.name, '/WHOIS ' + nick);
   },
   'click .whois-user': function (event) {
     var $target = $(event.target);

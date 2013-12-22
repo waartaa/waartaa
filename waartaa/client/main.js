@@ -27,6 +27,7 @@ subscribe = function () {
     });
     subscribe_user_server_logs();
     subscribe_pm_logs();
+    subscribe_server_nicks_for_pms();
   });
   Meteor.subscribe("user_channels", function () {
     UserChannels.find({}).forEach(function (channel) {
@@ -60,6 +61,21 @@ subscribe_pm_logs = function () {
 }
 
 Deps.autorun(subscribe_pm_logs);
+
+subscribe_server_nicks_for_pms = function () {
+  var user = Meteor.user();
+  if (!user)
+    return;
+  UserServers.find().forEach(function (user_server) {
+    var nicks = (user.profile.connections[user_server._id] || {}).pms || {};
+    var nicks_list = [];
+    for (nick in nicks)
+      nicks_list.push(nick);
+    Meteor.subscribe('server_nicks', user_server.name, nicks_list);
+  });
+};
+
+Deps.autorun(subscribe_server_nicks_for_pms);
 
 subscribe_user_channel_logs = function () {
   UserChannels.find({}).forEach(function (channel) {

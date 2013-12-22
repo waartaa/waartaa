@@ -91,6 +91,14 @@ Meteor.publish('server_nicks', function () {
 });
 */
 
+Meteor.publish('server_nicks', function (server_name, nicks) {
+  if (server_name && nicks)
+    return ServerNicks.find(
+      {server_name: server_name, nick: {$in: nicks}},
+      {fields: {created: 0, last_updated: 0}}
+    );
+})
+
 Meteor.publish('channel_nicks', function (server_name, channel_name, from, to) {
   var user = Meteor.users.findOne({_id: this.userId});
   if (!user)
