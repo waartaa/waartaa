@@ -1019,52 +1019,71 @@ Handlebars.registerHelper('isToday', function (date_obj) {
 });
 
 function infoPanelScrollendHandler (e) {
-  $(document).off('scrollend.info_panel');
   var $target = $(e.target);
   if (Session.get('roomtype') == 'channel') {
     var channel = UserChannels.findOne({_id: Session.get('room_id')});
     if (!channel)
       return;
+    var count = ChannelNicks.find(
+        {channel_name: channel.name, server_name: channel.user_server_name}
+      ).count();
+    var startNick = Session.get(
+        'startNick-' + channel.user_server_name + '_' + channel.name);
+    if (count < 40 && (count < 30 && !startNick))
+      return;
+    $(document).off('scrollend.info_panel');
+    var nth_channel_nick = ChannelNicks.findOne(
+      {channel_name: channel.name, server_name: channel.user_server_name},
+      {skip: 10, sort: {nick: 1}});
     var current_last_nick = Session.get(
       'currentLastNick-' + channel.user_server_name + '_' + channel.name);
     Session.set(
       'lastNick-' + channel.user_server_name + '_' + channel.name,
-      current_last_nick);
+      nth_channel_nick.nick);
     Session.set(
       'startNick-' + channel.user_server_name + '_' + channel.name,
       null);
   }
   Meteor.setTimeout(function () {
-    $(document).on('scrollend.info_panel', '#info-panel .nano',
-      infoPanelScrollendHandler);
-  }, 500);
+    $(document).off('scrollend.info_panel')
+    .on('scrollend.info_panel', '#info-panel .nano',
+        infoPanelScrollendHandler);
+  }, 2000);
 }
 
 $(document).on('scrollend.info_panel', '#info-panel .nano',
-  infoPanelScrollendHandler);
+               infoPanelScrollendHandler);
 
 function infoPanelScrolltopHandler (e) {
-  $(document).off('scrolltop.info_panel');
   var $target = $(e.target);
   if (Session.get('roomtype') == 'channel') {
     var channel = UserChannels.findOne({_id: Session.get('room_id')});
     if (!channel)
       return;
+    if (ChannelNicks.find(
+        {channel_name: channel.name, server_name: channel.user_server_name}
+      ).count() < 40)
+      return;
+    $(document).off('scrolltop.info_panel');
+    var nth_channel_nick = ChannelNicks.findOne(
+      {channel_name: channel.name, server_name: channel.user_server_name},
+      {skip: 10, sort: {nick: -1}});
     var current_last_nick = Session.get(
       'currentLastNick-' + channel.user_server_name + '_' + channel.name);
     var current_start_nick = Session.get(
       'currentStartNick-' + channel.user_server_name + '_' + channel.name);
     Session.set(
       'startNick-' + channel.user_server_name + '_' + channel.name,
-      current_start_nick);
+      nth_channel_nick.nick);
     Session.set(
       'lastNick-' + channel.user_server_name + '_' + channel.name,
       null);
   }
   Meteor.setTimeout(function () {
-    $(document).on('scrolltop.info_panel', '#info-panel .nano',
-      infoPanelScrolltopHandler);
-  }, 500);
+    $(document).off('scrolltop.info_panel')
+    .on('scrolltop.info_panel', '#info-panel .nano',
+        infoPanelScrolltopHandler);
+  }, 2000);
 }
 
 $(document).on('scrolltop.info_panel', '#info-panel .nano',

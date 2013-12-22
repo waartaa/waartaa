@@ -127,6 +127,9 @@ subscribe_user_channel_nicks = function (channel) {
             Session.set(
               'currentStartNick-' + channel.user_server_name + '_' + channel.name,
               (start_nick || {}).nick);
+            if (Session.get(
+              'startNick-' + channel.user_server_name + '_' + channel.name))
+              $('#info-panel .nano').nanoScroller({scrollTop: 30});
           }, 500);
       }
     );
