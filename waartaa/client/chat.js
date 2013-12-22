@@ -56,7 +56,7 @@ function highlightChannel () {
   //$('#chat-input').focus();
   $('#chat-input').focus();
   refreshAutocompleteNicksSource();
-  $(selector).find('.nano').nanoScroller();
+  //$(selector).find('.nano').nanoScroller();
   $(selector).off('scrolltop').on('scrolltop', chatLogsContainerScrollCallback);
 
 }
@@ -100,10 +100,14 @@ function observeChatlogTableScroll () {
   var id = $table.attr('id');
   var old_table_height = Session.get('height-' + id, 0);
   var new_table_height = $table.find('.chatlogrows').height();
-  if ($container.scrollTop() == 0 && new_table_height > old_table_height) {
+  if (Session.get('scrollStart-' + id) && $container.scrollTop() == 0 && new_table_height > old_table_height) {
     $container.nanoScroller({scrollTop: (new_table_height - old_table_height)});
+    Session.set('scrollStart-' + id);
   }
   Session.set('height-' + id, new_table_height);
+  Meteor.setTimeout(function () {
+    $table.on('scrolltop', chatLogsContainerScrollCallback);
+  }, 2000);
 }
 
 Template.channel_chat_logs_table.rendered = observeChatlogTableScroll;
@@ -131,19 +135,18 @@ function chatLogsContainerScrollCallback (event) {
     var room_id = Session.get('room_id');
     if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
       scroll_top = null;
-    if (Session.get('roomtype') == 'channel')
+    var roomtype = Session.get('roomtype');
+    if (roomtype == 'channel')
       Session.set('scroll_height_channel-' + room_id,
         scroll_top);
-    else if (Session.get('roomtype') == 'pm')
+    else if (roomtype == 'pm')
       Session.set('scroll_height_' + room_id,
         scroll_top);
-    else if (Session.get('roomtype') == 'server')
+    else if (roomtype == 'server')
       Session.set('scroll_height_server-' + Session.get('server_id'),
         scroll_top);
     Session.set(key, current_count + DEFAULT_LOGS_COUNT);
-    Meteor.setTimeout(function () {
-      $table.on('scrolltop', chatLogsContainerScrollCallback);
-    }, 500)
+    Session.set('scrollStart-' + $table.attr('id'), true);
   }
 
 Template.channel_logs.events = {
@@ -476,6 +479,8 @@ Template.chat_input.events({
       Meteor.call(
         'send_server_message', Session.get('room_id'), message, log_options);
     }
+    var scrollStartKey = Session.get('roomtype') + '-' + 'chat-logs-' + Session.get('room_id');
+    Session.set(scrollStartKey);
     //Session.set('scroll_height_' + prefix + room_id, null);
   }
 });
