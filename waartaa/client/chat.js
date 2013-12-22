@@ -157,7 +157,9 @@ function observeChatlogTableScroll () {
   var id = $table.attr('id');
   var old_table_height = Session.get('height-' + id, 0);
   var new_table_height = $table.find('.chatlogrows').height();
-  if (Session.get('selfMsg-' + id)) {
+  if (Session.get('selfMsg-' + id) ||
+      Session.get('chatlogsScrollEnd-' + id) &&
+      Session.get('chatlogsScrollEnd-' + id) == $table.scrollTop()) {
     $container.nanoScroller({scrollTop: new_table_height});
     Session.set('selfMsg-' + id);
   } else if ($table.scrollTop() == 0 && new_table_height > old_table_height) {
@@ -218,6 +220,13 @@ Template.server_logs.events = {
 Template.pm_logs.events = {
   'scroll .chat-logs-container': chatLogsContainerScrollCallback
 };
+
+$(document).on(
+  'scrollend.chat_logs_container', '.chat-logs-container',
+  function (e) {
+    var $table = $(e.target).find('.chatlogs-table');
+    Session.set('chatlogsScrollEnd-' + $table.attr('id'), $table.scrollTop());
+  });
 
 function _getMatchingNicks (term) {
   var nicks = [];
