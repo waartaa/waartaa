@@ -316,7 +316,8 @@ function serverRoomSelectHandler (event) {
       $('.info-panel-item.active').removeClass('active');
     }
     if (!$(selector).data('rendered')) {
-      $(selector + ' .chat-logs-container').scrollTop($(selector + ' table').height());
+      $(selector + ' .chat-logs-container').nanoScroller({
+        scrollTop: $(selector + ' .chatlogrows').height()});
       $(selector).data('rendered', true);
     }
 } 
@@ -475,7 +476,7 @@ Template.chat_input.events({
       Meteor.call(
         'send_server_message', Session.get('room_id'), message, log_options);
     }
-    Session.set('scroll_height_' + prefix + room_id, null);
+    //Session.set('scroll_height_' + prefix + room_id, null);
   }
 });
 

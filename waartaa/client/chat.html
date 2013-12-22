@@ -313,11 +313,15 @@
 
 <template name="channel_chat_logs_table">
 <div id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel content">
+  {{#isolate}}
   <div class="chatlogrows">
     {{#each channelChatLogs _id}}
-      {{> chat_row}}
+      {{#isolate}}
+        {{> chat_row}}
+      {{/isolate}}
     {{/each}}
   </div>
+  {{/isolate}}
 </div>
 </template>
 
