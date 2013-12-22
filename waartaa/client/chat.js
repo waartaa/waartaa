@@ -160,7 +160,7 @@ function observeChatlogTableScroll () {
   if (Session.get('selfMsg-' + id)) {
     $container.nanoScroller({scrollTop: new_table_height});
     Session.set('selfMsg-' + id);
-  } else if ($container.scrollTop() == 0 && new_table_height > old_table_height) {
+  } else if ($table.scrollTop() == 0 && new_table_height > old_table_height) {
     $container.nanoScroller({scrollTop: (new_table_height - old_table_height)});
   }
   Session.set('height-' + id, new_table_height);
