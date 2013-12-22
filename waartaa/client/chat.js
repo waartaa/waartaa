@@ -3,7 +3,7 @@ updateHeight = function () {
   var final_height = body_height - 90;
   $('#chat, #chat-main, .chatroom').height(final_height - 23);
   $('#info-panel .panel-body, #chat-servers .panel-body').height(final_height - 75);
-  $('#info-panel .inner-container').css('min-height', final_height);
+  $('#info-panel .inner-container, .chatlogrows').css('min-height', final_height);
   //var topic_height = Session.get('topicHeight') || 0;
   $('.chat-logs-container')//.height(final_height - 69);
   .each(function (index, elem) {
