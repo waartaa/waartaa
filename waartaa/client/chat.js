@@ -52,7 +52,8 @@ function highlightChannel () {
     selector = '#server-chatroom-' + server_id;
   }
   $('.chatroom').hide();
-  $(selector).show();
+  var $selector = $(selector);
+  $selector.show();
   if (roomtype == 'channel') {
       Session.set('topicHeight', $(selector + ' .topic').height());
       Session.set('lastAccessedChannel-' + room_id, new Date());
@@ -77,12 +78,12 @@ function highlightChannel () {
   $('#chat-input').focus();
   refreshAutocompleteNicksSource();
   //$(selector).find('.nano').nanoScroller();
-  $(selector).off('scrolltop').on('scrolltop', chatLogsContainerScrollCallback);
-  $(selector + ' .chat-logs-container').nanoScroller();
+  $selector.off('scrolltop').on('scrolltop', chatLogsContainerScrollCallback);
+  if ($selector.find('.pane').length == 0)
+    $(selector + ' .chat-logs-container').nanoScroller({scroll: 'bottom'});
   if (!$(selector).data('rendered')) {
     $(selector).data('rendered', true);
-    $(selector + ' .chat-logs-container').nanoScroller({
-      scrollTop: $(selector + ' .chatlogrows').height()});
+    $(selector + ' .chat-logs-container').nanoScroller({scroll: 'bottom'});
   }
 }
 
@@ -160,7 +161,7 @@ function observeChatlogTableScroll () {
   if (Session.get('selfMsg-' + id) ||
       Session.get('chatlogsScrollEnd-' + id) &&
       Session.get('chatlogsScrollEnd-' + id) == $table.scrollTop()) {
-    $container.nanoScroller({scrollTop: new_table_height});
+    $container.nanoScroller({ scroll: 'bottom' });
     Session.set('selfMsg-' + id);
   } else if ($table.scrollTop() == 0 && new_table_height > old_table_height) {
     $container.nanoScroller({scrollTop: (new_table_height - old_table_height)});
@@ -420,7 +421,7 @@ Template.server_pm_item.rendered = function () {
   Session.set("lastAccessedPm-" + this.data.server_id + '_' + this.data.from);
 };
 
-Template.chat_main.rendered = function () {
+/*Template.chat_main.rendered = function () {
   setTimeout(function () {
     updateHeight();
     var roomtype = Session.get('roomtype');
@@ -435,7 +436,7 @@ Template.chat_main.rendered = function () {
     var chat_height = Session.get(key);
     //$('#chat-logs-container').scrollTop(chat_height || $('#chat-logs').height());
   }, 0);
-};
+};*/
 
 Template.chat_main.destroyed = function () {
   var roomtype = Session.get('roomtype');
