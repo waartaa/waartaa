@@ -44,34 +44,34 @@ IRCHandler = function (user, user_server) {
     }
 
     function _joinChannelCallback (message, channel) {
+        if (channel.status == 'connected')
+            return;
         Fiber(function () {
-            if (channel.status == 'connected')
-                return;
             UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
-            if (LISTENERS.channel['message' + channel.name] != undefined)
-                return;
-            LISTENERS.channel['message', channel.name] = '';
-            client.addListener('message' + channel.name, function (
-                    nick, text, message) {
-                Fiber(function () {
-                    UserChannelLogs.insert({
-                        message: text,
-                        raw_message: message,
-                        from: nick,
-                        from_user: null,
-                        from_user_id: null,
-                        channel_name: channel.name,
-                        channel_id: channel._id,
-                        server_name: user_server.name,
-                        server_id: user_server._id,
-                        user: user.username,
-                        user_id: user._id,
-                        created: new Date(),
-                        last_updated: new Date()
-                    });
-                }).run();
-            });
         }).run();
+        if (LISTENERS.channel['message' + channel.name] != undefined)
+            return;
+        LISTENERS.channel['message', channel.name] = '';
+        client.addListener('message' + channel.name, function (
+                nick, text, message) {
+            Fiber(function () {
+                UserChannelLogs.insert({
+                    message: text,
+                    raw_message: message,
+                    from: nick,
+                    from_user: null,
+                    from_user_id: null,
+                    channel_name: channel.name,
+                    channel_id: channel._id,
+                    server_name: user_server.name,
+                    server_id: user_server._id,
+                    user: user.username,
+                    user_id: user._id,
+                    created: new Date(),
+                    last_updated: new Date()
+                });
+            }).run();
+        });
     }
 
     function _updateChannelNicks (channel_name, nicks) {
@@ -79,20 +79,25 @@ IRCHandler = function (user, user_server) {
         for (nick in nicks) {
             nicks_list.push(nick);
         }
-        ChannelNicks.remove(
-            {
-                channel_name: channel_name, server_name: user_server.name,
-                nick: {$nin: nicks_list}
-            }
-        );
+        Fiber(function () {
+            ChannelNicks.remove(
+                {
+                    channel_name: channel_name, server_name: user_server.name,
+                    nick: {$nin: nicks_list}
+                }
+            );
+        }).run();
         _.each(nicks_list, function (nick) {
-            ChannelNicks.update(
-                {channel_name: channel_name, server_name: user_server.name,
-                 nick: nick},
-                {$set: {last_updated: new Date()}},
-                {upsert: true}
-            )
+            Fiber(function () {
+                ChannelNicks.update(
+                    {channel_name: channel_name, server_name: user_server.name,
+                     nick: nick},
+                    {$set: {last_updated: new Date()}},
+                    {upsert: true}
+                );
+            }).run();
         });
+        /*
         try {
             var db_nicks_count = ChannelNicks.find(
                 {channel_name: channel_name, server_name: user_server.name}
@@ -116,7 +121,7 @@ IRCHandler = function (user, user_server) {
                         'error': err
                     }
                 );
-        }
+        }*/
     }
 
     function _addChannelNamesListener (channel_name) {
@@ -124,9 +129,7 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.channel['names' + channel_name] = '';
         client.addListener('names' + channel_name, function (nicks) {
-            Fiber(function () {
-                _updateChannelNicks(channel_name, nicks);
-            }).run();
+            _updateChannelNicks(channel_name, nicks);
         });
     }
 
@@ -179,14 +182,12 @@ IRCHandler = function (user, user_server) {
             if (WHO_DATA_POLL_LOCK[key] == user.username)
                 WHO_DATA_POLL_LOCK[key] = "";
             if (message) {
-                Fiber(function () {
-                  for (nick in message.nicks) {
-                    var who_info = message.nicks[nick];
-                    var whoisInfo = whoToWhoisInfo(nick, who_info);
-                    _create_update_server_nick(whoisInfo);
-                  }
-                  _updateChannelNicks(message.channel, message.nicks);
-                }).run();
+              for (nick in message.nicks) {
+                var who_info = message.nicks[nick];
+                var whoisInfo = whoToWhoisInfo(nick, who_info);
+                _create_update_server_nick(whoisInfo);
+              }
+              _updateChannelNicks(message.channel, message.nicks);
             }
         } catch (err) {
             logger.error(err);
@@ -273,6 +274,8 @@ IRCHandler = function (user, user_server) {
                     nick: nick
                   }
                 );
+            }).run();
+            Fiber(function () {
                 var channel = UserChannels.findOne(
                     {user_server_id: user_server._id, name: channel_name});
                 if (!channel)
@@ -300,9 +303,9 @@ IRCHandler = function (user, user_server) {
                     last_updated: new Date(),
                     type: 'ChannelPart'
                 });
-                if (channels_listening_to[channel_name])
-                    delete channels_listening_to[channel_name];
             }).run();
+            if (channels_listening_to[channel_name])
+                delete channels_listening_to[channel_name];
         });
     }
 
@@ -315,17 +318,20 @@ IRCHandler = function (user, user_server) {
                 ChannelNicks.remove(
                     {nick: nick, channel_name: {$in: channels},
                     server_name: user_server.name});
-                    UserChannels.find({
-                        user_server_name: user_server.name,
-                        user: user.username, name: {$in: channels}
-                    }).forEach(function (channel) {
-                        var part_message = "";
-                        if (nick == client.nick)
-                            part_message = 'You have left IRC';
-                        else
-                            part_message = nick + ' has left IRC';
-                        if (reason)
-                            part_message += ' (' + reason + ')';
+            }).run();
+            Fiber(function () {
+                UserChannels.find({
+                    user_server_name: user_server.name,
+                    user: user.username, name: {$in: channels}
+                }).forEach(function (channel) {
+                    var part_message = "";
+                    if (nick == client.nick)
+                        part_message = 'You have left IRC';
+                    else
+                        part_message = nick + ' has left IRC';
+                    if (reason)
+                        part_message += ' (' + reason + ')';
+                    Fiber(function () {
                         UserChannelLogs.insert({
                             message: part_message,
                             raw_message: message,
@@ -342,7 +348,8 @@ IRCHandler = function (user, user_server) {
                             last_updated: new Date(),
                             type: 'QUITIRC'
                         });
-                    });
+                    }).run();
+                });
             }).run();
         });
     }
@@ -375,11 +382,13 @@ IRCHandler = function (user, user_server) {
         LISTENERS.server['message'] = '';
         client.addListener('message', function (nick, to, text, message) {
             //console.log(nick + ', ' + to + ', ' + text + ', ' + message);
-            Fiber(function () {
-                if (to == client.nick) {
-                    var profile = user.profile;
-                    profile.connections[user_server._id].pms[nick] = "";
+            if (to == client.nick) {
+                var profile = user.profile;
+                profile.connections[user_server._id].pms[nick] = "";
+                Fiber(function () {
                     Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
+                }).run();
+                Fiber(function () {
                     var from_user = Meteor.users.findOne({username: nick}) || {};
                     var to_user = user;
                     PMLogs.insert({
@@ -399,8 +408,8 @@ IRCHandler = function (user, user_server) {
                         created: new Date(),
                         last_updated: new Date()
                     });
-                }
-            }).run();
+                }).run();
+            }
         });
     }
 
@@ -436,9 +445,11 @@ IRCHandler = function (user, user_server) {
     }
 
     function _joinServerCallback (message) {
-        UserServers.update({_id: user_server._id}, {$set: {
-            status: 'connected'}
-        });
+        Fiber(function () {
+            UserServers.update({_id: user_server._id}, {$set: {
+                status: 'connected'}
+            });
+        }).run();
         _addWhoListener();
         _addServerQuitListener();
         _addChannelTopicListener();
@@ -450,21 +461,21 @@ IRCHandler = function (user, user_server) {
         _addGlobalChannelJoinListener();
         _addGlobalChannelNamesListener();
         _pollUserStatus(60 * 1000);
-        UserChannels.find(
-        {
-            active: true, user: user.username,
-            status: {$ne: 'disconnected'},
-            user_server_name: user_server.name
-        }).forEach(function (channel) {
-            _addChannelNamesListener(channel.name);
-            _addChannelJoinListener(channel.name);
-            _addChannelPartListener(channel.name);
-            client.join(channel.name, function (message) {
-                Fiber(function (channel_name) {
+        Fiber(function () {
+            UserChannels.find(
+            {
+                active: true, user: user.username,
+                status: {$ne: 'disconnected'},
+                user_server_name: user_server.name
+            }).forEach(function (channel) {
+                _addChannelNamesListener(channel.name);
+                _addChannelJoinListener(channel.name);
+                _addChannelPartListener(channel.name);
+                client.join(channel.name, function (message) {
                     _joinChannelCallback(message, channel);
-                }).run(channel.name);
+                });
             });
-        });
+        }).run();
         client.addListener('notice', function (nick, to, text, message) {
             if (nick == null) {
                 // NOTICE from server
@@ -539,19 +550,19 @@ IRCHandler = function (user, user_server) {
     }
 
     function _partChannelCallback (message, channel_name) {
+        var listeners = client.listeners('message' + channel_name);
+        _.each(listeners, function (listener) {
+            client.removeListener('message' + channel_name, listener);
+        })
         Fiber(function() {
-            var listeners = client.listeners('message' + channel_name);
-            _.each(listeners, function (listener) {
-                client.removeListener('message' + channel_name, listener);
-            })
             UserChannels.update(
                 {name: channel_name, user_server_id: user_server._id},
                 {$set: {status: 'disconnected'}});
-            for (job in JOBS) {
-                if (job.search(channel_name) >= 0)
-                    Meteor.clearInterval(JOBS[job]);
-            }
         }).run();
+        for (job in JOBS) {
+            if (job.search(channel_name) >= 0)
+                Meteor.clearInterval(JOBS[job]);
+        }
     }
 
     function _partUserServerCallback (message, user_server, client) {
@@ -560,21 +571,25 @@ IRCHandler = function (user, user_server) {
                 {_id: user_server._id},
                 {$set: {status: 'disconnected'}}
             );
+        }).run();
+        Fiber(function () {
             UserChannels.update(
                 {user_server_id: user_server._id},
                 {$set: {status: 'disconnected'}}
             );
+        }).run();
+        Fiber(function () {
             UserChannels.find(
                 {user_server_id: user_server._id}).forEach(function (channel) {
                     var key = user_server.name + '-' + channel.name;
                     if (WHO_DATA_POLL_LOCK[key] == user.username)
                         WHO_DATA_POLL_LOCK[key] = '';
                 });
-            for (job in JOBS) {
-                Meteor.clearInterval(JOBS[job]);
-                JOBS[job] = '';
-            }
         }).run();
+        for (job in JOBS) {
+            Meteor.clearInterval(JOBS[job]);
+            JOBS[job] = '';
+        }
     }
 
     function _create_update_user_channel (user_server, channel_data) {
@@ -612,23 +627,27 @@ IRCHandler = function (user, user_server) {
     }
 
     function _create_update_server_nick (info) {
+        info['last_updated'] = new Date();
+        info['server_name'] = user_server.name;
+        info['server_id'] = user_server.server_id;
+        // SmartCollections does not support 'upsert'
+        //ServerNicks.upsert({
+        //  server_name: user_server.name, nick: info.nick},
+        //  {$set: info}
+        //);
         Fiber(function () {
-            info['last_updated'] = new Date();
-            info['server_name'] = user_server.name;
-            info['server_id'] = user_server.server_id;
-            // SmartCollections does not support 'upsert'
-            //ServerNicks.upsert({
-            //  server_name: user_server.name, nick: info.nick},
-            //  {$set: info}
-            //);
-            var server_nick = ServerNicks.findOne({
-              server_name: user_server.name, nick: info.nick});
-            if (!server_nick) {
-              info['created'] = info['last_updated'];
-              ServerNicks.insert(info);
-            } else
-              ServerNicks.update({_id: server_nick._id},
-                  {$set: info});
+            var server_nick = ServerNicks.findOne(
+                {server_name: user_server.name, nick: info.nick});
+            if (server_nick) {
+                for (key in info) {
+                    if (info[key] == server_nick[key])
+                        delete info[key];
+                }
+            }
+            ServerNicks.update(
+                {server_name: user_server.name, nick: info.nick},
+                {$set: info}
+            );
         }).run();
     }
 
@@ -814,7 +833,9 @@ IRCHandler = function (user, user_server) {
             });
         },
         create_update_user_channel: function (channel_data) {
-            _create_update_user_channel(user_server, channel_data);
+            Fiber(function () {
+                _create_update_user_channel(user_server, channel_data);
+            }).run();
         },
         removeChannel: function (channel) {},
         joinUserServer: function () {
