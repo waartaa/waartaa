@@ -13,6 +13,8 @@
     "moment": {},
     "winston-loggly": {},
     "winston": {},
-    "assert": {}
+    "assert": {},
+    "nprogress": {},
+    "GAnalytics": {}
   }
 }
