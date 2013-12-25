@@ -1,23 +1,30 @@
-//Servers = new Meteor.Collection("servers");
-//Channels = new Meteor.Collection("channels");
-//ChannelLogs = new Meteor.Collection("channel_logs");
-//PMLogs = new Meteor.Collection("pm_logs");
-//ServerLogs = new Meteor.Collection("server_logs");
-//UserServers = new Meteor.Collection("user_servers");
-
-
+/*
+Default initial chat log count to load for each room.
+A room may be a channel, server or PM room.
+*/
 DEFAULT_LOGS_COUNT = 40;
 
+
+/*
+Function to subscribe to collection data published by server.
+*/
 subscribe = function () {
+  // Subscribe to server connection presets to choose from during adding
+  // a new server
   Meteor.subscribe("servers");
-  Meteor.subscribe("channels");
-  Meteor.subscribe("channel_logs");
-  Meteor.subscribe("pm_logs");
+
+  // Subscribe to UserServers collection for the current user.
   Meteor.subscribe("user_servers", function () {
+    // Callback once subscribed to UserServers
     UserServers.find().forEach(function (user_server) {
+      // We set the initial log count for each server room.
       Session.set(
         "user_server_log_count_" + user_server._id, DEFAULT_LOGS_COUNT);
+      // We also set initial log count for the PM rooms in which the
+      // user was chatting.
       var user = Meteor.user();
+      // FIXME: We need to find a better place to save active PMs
+      // rather than in user.profile.
       var pm_nicks = (
         user.profile.connections[user_server._id] || {}).pms || [];
       for (nick in pm_nicks) {
@@ -25,36 +32,43 @@ subscribe = function () {
         Session.set('pmLogCount-' + room_id, DEFAULT_LOGS_COUNT);
       }
     });
+    // Subscribe to UserServerLogs collection
     subscribe_user_server_logs();
+    // Subscribe to PMLogs collection
     subscribe_pm_logs();
+    // Subscribe to ServerNicks collection for active PM nicks
     subscribe_server_nicks_for_pms();
   });
+
+  // Subscribe to UserChannels collection.
   Meteor.subscribe("user_channels", function () {
+    // Callback when subscribed to UserChannels
     UserChannels.find({}).forEach(function (channel) {
+      // Set initial log count for each channel room
       Session.set("user_channel_log_count_" + channel._id, DEFAULT_LOGS_COUNT);
     });
+    // Subscribe to UserChannelLogs for the subscribed UserChannels
     subscribe_user_channel_logs();
   });
-  Meteor.subscribe("user_channel_logs");
-  Meteor.subscribe("user_server_logs");
-  Meteor.subscribe("server_nicks");
-  //Meteor.subscribe('channel_nicks');
 };
 
 subscribe();
 
+/*
+Function to subscribe to PMLogs for active PMs.
+*/
 subscribe_pm_logs = function () {
   var user = Meteor.user();
   UserServers.find().forEach(function (user_server) {
+    // Server nicks with whom PM chat is active for the user.
     var nicks = (user.profile.connections[user_server._id] || {}).pms || [];
     for (nick in nicks) {
+      // PM room_id is a combination of user_server ID and PM nick.
       var room_id = user_server._id + '_' + nick;
+      // Subscribe to PMLogs with a server nick.
       Meteor.subscribe(
         'pm_logs', room_id,
-        Session.get('pmLogCount-' + room_id),
-        function () {
-          //console.log('PM logs count ' + PMLogs.find().count());
-        }
+        Session.get('pmLogCount-' + room_id)
       );
     }
   });
@@ -62,6 +76,9 @@ subscribe_pm_logs = function () {
 
 Deps.autorun(subscribe_pm_logs);
 
+/* 
+Function to subscribe to ServerNicks for active PMs
+*/
 subscribe_server_nicks_for_pms = function () {
   var user = Meteor.user();
   if (!user)
@@ -77,28 +94,49 @@ subscribe_server_nicks_for_pms = function () {
 
 Deps.autorun(subscribe_server_nicks_for_pms);
 
+/*
+Function to subscribe to UserChannelLogs for active UserChannels.
+*/
 subscribe_user_channel_logs = function () {
   UserChannels.find({}).forEach(function (channel) {
     Meteor.subscribe(
       "user_channel_logs", channel._id,
-      Session.get('user_channel_log_count_' + channel._id),
-      function () {
-        console.log(UserChannelLogs.find().count());
-      }
+      Session.get('user_channel_log_count_' + channel._id)
     );
   });
 }
 
+Deps.autorun(subscribe_user_channel_logs);
+
+/*
+Function to subscribe to ChannelNicks collection.
+ChannelNicks is a global collection (for all users) which contains
+nick names present in each channel.
+*/
 subscribe_user_channel_nicks = function (channel) {
   if (!channel)
     return;
+  /* 
+  Subscribe to certain range of ChannelNicks for a UserChannel.
+
+  The 4th argument of this call represents the from_nick: the nick from which
+  to fetch next N channel nicks (alphabetically).
+
+  The 5th argument of this call represents the to_nick: the nick before which
+  we have to fetch N previous channel nicks (alphabetically).
+
+  Only one of from_nick and to_nick is not null at a time. This is used to
+  handle upwards and downards pagination of channel nicks for a channel.
+
+  We paginate in showing channel nicks for a channel to make the client side
+  faster and more memory efficient. This gracefully handles channels like
+  #freenode with more that 1500 active channel nicks.
+  */
   Meteor.subscribe(
     'channel_nicks', channel.user_server_name, channel.name,
     Session.get('lastNick-' + channel.user_server_name + '_' + channel.name),
     Session.get('startNick-' + channel.user_server_name + '_' + channel.name),
     function () {
-        console.log('subscribed to channel nicks');
-        console.log(ChannelNicks.find().count());
         Meteor.setTimeout(
           function () {
             var last_nick = ChannelNicks.findOne(
@@ -119,8 +157,6 @@ subscribe_user_channel_nicks = function (channel) {
                   sort: {nick: 1}
                 }
               );
-            console.log('LAST channel nick: ' + (last_nick || {}).nick);
-            console.log('START channel nick: ' + (start_nick || {}).nick);
             Session.set(
               'currentLastNick-' + channel.user_server_name + '_' + channel.name,
               (last_nick || {}).nick);
@@ -135,6 +171,9 @@ subscribe_user_channel_nicks = function (channel) {
     );
 }
 
+/* 
+Automatically subscribe to ChannelNicks for newly joined UserChannels.
+*/
 UserChannels.find().observeChanges({
   added: function (id, channel) {
     console.log('Added new channel');
@@ -146,6 +185,7 @@ UserChannels.find().observeChanges({
   }
 });
 
+/*
 UserServers.find().observeChanges({
   added: function (id, user_server) {
     console.log('Added new server');
@@ -156,10 +196,11 @@ UserServers.find().observeChanges({
     });
   }
 });
+*/
 
-
-Deps.autorun(subscribe_user_channel_logs);
-
+/*
+Function to subscribe to UserServerLogs for active UserServers.
+*/
 subscribe_user_server_logs = function () {
   UserServers.find().forEach(function (user_server) {
     Meteor.subscribe(
@@ -173,9 +214,6 @@ subscribe_user_server_logs = function () {
 }
 
 Deps.autorun(subscribe_user_server_logs);
-
-Clients = new Meteor.Collection("clients");
-//Meteor.subscribe("clients");
 
 Template.header.events({
   'click #signout': function(){
