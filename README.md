@@ -6,21 +6,31 @@ multiple devices of the user along with centralized logging.
 
 ## Setup
 
-1. Install Meteor: ``$ curl https://install.meteor.com | sh``
-1. Clone repo: ``$ git clone https://github.com/rtnpro/waartaa.git``
-1. Change dir to waartaa: ``$ cd waartaa``
-1. Copy sample settings file: ``$ cp server/settings-local.js-dist server/settings-local.js``
-   and customize ``server/settings-local.js`` as needed.
-1. Install ``node-irc``: ``mkdir -p .meteor/local/build/server; cd .meteor/local/build/server; npm install irc; cd path/to/waartaa/dir;``
-1. Setup basic meteor files: ``$ meteor`` // You may get an error when you first run this.
-1. Open .meteor/packages and add ``standard-app-packages`` if it does not exist.
-1. Install ``meteorite``: ``$ npm install meteorite``
-1. Add meteor-irc: ``$ mrt add irc``
-1. Run waartaa development server: ``$ meteor``
+1. Get the source: ``$ git clone --recursive https://github.com/waartaa/waartaa.git``
+1. Install system dependencies: ``node``, ``npm`` for your system. For example:
+    1. For Fedora, you can do:
+
+    ```
+    $ sudo yum install nodejs npm -y
+    ```
+
+    1. For Mac OS X, you can install them via brew:
+
+    ```
+    $ brew install node npm
+    ```
+
+    1. Else, you can always compile from source.
+
+1. Go to ``waartaa``'s directory: ``$ cd waartaa``
+1. Run setup script: ``$ ./setup.sh``
+1. Customize ``waartaa/waartaa/server/settings-local.js`` as needed.
+1. Run waartaa: ``$ meteor``
 
 
-## Running with SmartCollections
+## Running with Meteor 0.7 Mongo OPLOG support
 
+1. ``meteor update``
 1. ``mongod [--dbpath <path_to_db>] --replSet meteor``
 1. Open mongo shell by typing ``mongo`` in your shell and then enter the
    following:
