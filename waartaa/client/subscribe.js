@@ -8,6 +8,68 @@ A room may be a channel, server or PM room.
 */
 DEFAULT_LOGS_COUNT = 40;
 
+/*
+Function to subscribe to UserServerLogs for active UserServers.
+*/
+subscribe_user_server_logs = function () {
+  UserServers.find().forEach(function (user_server) {
+    Meteor.subscribe(
+      "user_server_logs", user_server._id,
+      Session.get('user_server_log_count_' + user_server._id),
+      function () {
+        console.log(UserServerLogs.find().count());
+      }
+    );
+  });
+}
+
+/*
+Function to subscribe to UserChannelLogs for active UserChannels.
+*/
+subscribe_user_channel_logs = function () {
+  UserChannels.find({}).forEach(function (channel) {
+    Meteor.subscribe(
+      "user_channel_logs", channel._id,
+      Session.get('user_channel_log_count_' + channel._id)
+    );
+  });
+}
+
+/*
+Function to subscribe to PMLogs for active PMs.
+*/
+subscribe_pm_logs = function () {
+  var user = Meteor.user();
+  UserServers.find().forEach(function (user_server) {
+    // Server nicks with whom PM chat is active for the user.
+    var nicks = (user.profile.connections[user_server._id] || {}).pms || [];
+    for (nick in nicks) {
+      // PM room_id is a combination of user_server ID and PM nick.
+      var room_id = user_server._id + '_' + nick;
+      // Subscribe to PMLogs with a server nick.
+      Meteor.subscribe(
+        'pm_logs', room_id,
+        Session.get('pmLogCount-' + room_id)
+      );
+    }
+  });
+}
+
+/* 
+Function to subscribe to ServerNicks for active PMs
+*/
+subscribe_server_nicks_for_pms = function () {
+  var user = Meteor.user();
+  if (!user)
+    return;
+  UserServers.find().forEach(function (user_server) {
+    var nicks = (user.profile.connections[user_server._id] || {}).pms || {};
+    var nicks_list = [];
+    for (nick in nicks)
+      nicks_list.push(nick);
+    Meteor.subscribe('server_nicks', user_server.name, nicks_list);
+  });
+};
 
 /*
 Function to subscribe to collection data published by server.
@@ -58,59 +120,10 @@ subscribe = function () {
 
 subscribe();
 
-/*
-Function to subscribe to PMLogs for active PMs.
-*/
-subscribe_pm_logs = function () {
-  var user = Meteor.user();
-  UserServers.find().forEach(function (user_server) {
-    // Server nicks with whom PM chat is active for the user.
-    var nicks = (user.profile.connections[user_server._id] || {}).pms || [];
-    for (nick in nicks) {
-      // PM room_id is a combination of user_server ID and PM nick.
-      var room_id = user_server._id + '_' + nick;
-      // Subscribe to PMLogs with a server nick.
-      Meteor.subscribe(
-        'pm_logs', room_id,
-        Session.get('pmLogCount-' + room_id)
-      );
-    }
-  });
-}
-
-Deps.autorun(subscribe_pm_logs);
-
-/* 
-Function to subscribe to ServerNicks for active PMs
-*/
-subscribe_server_nicks_for_pms = function () {
-  var user = Meteor.user();
-  if (!user)
-    return;
-  UserServers.find().forEach(function (user_server) {
-    var nicks = (user.profile.connections[user_server._id] || {}).pms || {};
-    var nicks_list = [];
-    for (nick in nicks)
-      nicks_list.push(nick);
-    Meteor.subscribe('server_nicks', user_server.name, nicks_list);
-  });
-};
-
-Deps.autorun(subscribe_server_nicks_for_pms);
-
-/*
-Function to subscribe to UserChannelLogs for active UserChannels.
-*/
-subscribe_user_channel_logs = function () {
-  UserChannels.find({}).forEach(function (channel) {
-    Meteor.subscribe(
-      "user_channel_logs", channel._id,
-      Session.get('user_channel_log_count_' + channel._id)
-    );
-  });
-}
-
+Deps.autorun(subscribe_user_server_logs);
 Deps.autorun(subscribe_user_channel_logs);
+Deps.autorun(subscribe_pm_logs);
+Deps.autorun(subscribe_server_nicks_for_pms);
 
 /*
 Function to subscribe to ChannelNicks collection.
@@ -201,20 +214,3 @@ UserServers.find().observeChanges({
   }
 });
 */
-
-/*
-Function to subscribe to UserServerLogs for active UserServers.
-*/
-subscribe_user_server_logs = function () {
-  UserServers.find().forEach(function (user_server) {
-    Meteor.subscribe(
-      "user_server_logs", user_server._id,
-      Session.get('user_server_log_count_' + user_server._id),
-      function () {
-        console.log(UserServerLogs.find().count());
-      }
-    );
-  });
-}
-
-Deps.autorun(subscribe_user_server_logs);
