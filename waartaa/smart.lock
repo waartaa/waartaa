@@ -2,54 +2,22 @@
   "meteor": {},
   "dependencies": {
     "basePackages": {
-      "jquery-ui-bootstrap": {
-        "version": "0.1.2"
-      },
-      "router": {
-        "version": "0.5.4.1"
-      },
-      "observatory": {
-        "version": "0.3.21"
-      },
-      "irc": {
-        "version": "0.2.2"
-      },
-      "handlebar-helpers": {
-        "version": "0.0.9"
-      },
-      "require": {
-        "version": "0.1.0"
-      },
-      "presence": {
-        "version": "0.3.0"
-      },
-      "bootstrap-3": {
-        "version": "0.3.7"
-      },
-      "accounts-ui-bootstrap-3": {
-        "version": "0.2.4"
-      },
-      "nodetime": {
-        "version": "0.2.0"
-      },
-      "moment": {
-        "version": "2.2.1"
-      },
-      "winston-loggly": {
-        "version": "0.0.3"
-      },
-      "winston": {
-        "version": "0.0.3"
-      },
-      "assert": {
-        "version": "0.2.2"
-      },
-      "nprogress": {
-        "version": "0.0.3"
-      },
-      "GAnalytics": {
-        "version": "0.1.0"
-      }
+      "jquery-ui-bootstrap": {},
+      "router": {},
+      "observatory": {},
+      "irc": {},
+      "handlebar-helpers": {},
+      "require": {},
+      "presence": {},
+      "bootstrap-3": {},
+      "accounts-ui-bootstrap-3": {},
+      "nodetime": {},
+      "moment": {},
+      "winston-loggly": {},
+      "winston": {},
+      "assert": {},
+      "nprogress": {},
+      "GAnalytics": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
