@@ -1,78 +1,10 @@
-Template.header.events({
-  'click #signout': function(){
-    Meteor.logout(function (err) {
-      Meteor.Router.to('/');
-    });
-  }
-});
-
-Template.content.events({
-  'click .close[data-dismiss="alert"]': function (event) {
-    Session.set($(event.currentTarget).data('sessionkey')); 
-  }
-});
-
-Template.user_loggedout_content.show_signup_form = function(){
-  return Session.get('showSignupFrom');
-};
-
-Template.signin_form.SigninError = function () {
-  return Session.get('SigninFormError');
-};
-
-Template.signin_form.events({
-  'click #signup-link': function (e){
-    e.preventDefault();
-    Session.set('showSignupFrom', true);
-    Session.set('SigninFormError');
-  },
-  'submit form': function (e) {
-    e.preventDefault();
-    var user = $('#user-signin-username').val();
-    var password = $('#user-signin-password').val();
-    Meteor.loginWithPassword(user, password, function (err) {
-      if (err)
-        Session.set('SigninFormError', err);
-      else
-        Session.set('SigninFormError');
-      Meteor.Router.to('/home');
-    });
-  }
-});
-
-Template.signup_form.events({
-  'click #signin-link': function(e){
-    e.preventDefault();
-    Session.set('showSignupFrom', false);
-    Session.set('SignupFormError');
-  },
-  'submit form': function(e){
-    e.preventDefault();
-    var username = $('#user-signup-username').val();
-    var password = $('#user-signup-password').val();
-    var email = $('#user-signup-email').val();
-    var options = {username: username, email: email, password: password, profile: {}};
-    Accounts.createUser(options, function(err){
-      if (err) {
-        Session.set('SignupFormError', err);
-      } else {
-        Session.set('SignupFormError');
-      }
-    });
-  },
-});
-
-Template.signup_form.SignupError = function(){
-  var err = Session.get('SignupFormError');
-  if (err)
-    return err;
-};
-
-updateHeight();
-
+/*
+On window resize, call updateHeight() to resize the height of the page
+components so that there's no global scroll for the page.
+*/
 $(window).resize(updateHeight);
 
-
+/* Routers */
 Meteor.Router.add({
   '': function () {
     GAnalytics.pageview();
@@ -101,6 +33,7 @@ Meteor.Router.filters({
   }
 });
 
+/* Only logged in users can access the chat page */
 Meteor.Router.filter('login_required', {only: ['user_dashboard', 'chat']});
 
 Handlebars.registerHelper("isCurrentPageHome", function () {
@@ -113,6 +46,7 @@ Handlebars.registerHelper("isCurrentPageChat", function () {
   return Session.get('currentPage') === 'chat';
 });
 
+/* Configure Accounts.ui for authentication */
 Accounts.ui.config({
   requestPermissions: {
     github: ['user', 'repo']
