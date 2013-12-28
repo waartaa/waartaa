@@ -98,7 +98,6 @@ div.dropdown a {
 }
 
 .chat-logs-container {
-  overflow: scroll;
   background: #ffffff;
 }
 
@@ -192,7 +191,6 @@ body {
 
 #chat-servers .panel-body, #chat-channel-users .panel-body {
   padding: 5px 2px 5px 0;
-  overflow: auto;
 }
 
 #chat-servers, #chat-channel-users {
@@ -264,6 +262,11 @@ body {
 
 #nprogress > .bar {
   height: 3px;
+}
+
+.chatlogs-table {
+  width: 102%;
+  padding-right: 14px;
 }
 
 .chatlogs-table td > .row {
@@ -350,6 +353,15 @@ body {
   margin: 2px;
 }
 
+.chat-logs-container.nano .pane {
+  right: -1px;
+  margin: 1px;
+}
+
 .nano .slider {
   background: #111;
+}
+
+.chat-logs-container {
+  overflow-x: hidden;
 }

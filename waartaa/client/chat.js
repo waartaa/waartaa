@@ -88,6 +88,7 @@ function highlightChannel () {
 }
 
 Deps.autorun(highlightChannel);
+Deps.autorun(updateHeight);
 
 function serverRoomSelectHandler (event) {
     var $target = $(event.target);
