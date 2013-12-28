@@ -1,3 +1,5 @@
+const REGEX = "/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/g";
+
 updateHeight = function () {
   var body_height = $('body').height();
   var final_height = body_height - 90;
@@ -449,6 +451,14 @@ Template.chat_main.destroyed = function () {
 Client = {};
 
 Meteor.subscribe("client", Meteor.user() && Meteor.user().username);
+
+Handlebars.registerHelper("linkify", function (message) {
+ return new Handlebars.SafeString(
+   message.replace(REGEX, function(match) {
+     return "<a target='_blank' href='" + match + "'>" + match + "</a>";
+   })
+ );
+});
 
 Template.chat_input.events({
   'keydown #chat-input': function (e) {
