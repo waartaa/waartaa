@@ -1,0 +1,46 @@
+<template name="chat_input">
+<div class="navbar navbar-default navbar-fixed-bottom" role="navigation" style="height: 40px;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">&nbsp;</div>
+      <div class="col-md-8">
+        <form id="chat-input-form">
+          <div class="input-group">
+              <div class="input-group-btn dropup">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">{{ server_current_nick }} <span class="caret"></button>
+                {{> user_nick_options_menu}}
+              </div>
+              <input id="chat-input" class="form-control" name="chat_input" type="text"
+               autocomplete="off">
+          </div>
+        </form>
+      </div>
+      <div class="col-md-2">&nbsp;</div>
+    </div>
+  </div>
+</div>
+</template>
+
+<template name="user_nick_options_menu">
+  <ul class="dropdown-menu userNickOptions" role="menu">
+    <li>
+      <form class="form nickAwayForm" data-server-id="{{ current_user_server }}">
+        <label for="updateNickAwayCheckbox">
+          <input id="updateNickAwayCheckbox" data-server-id="{{ current_user_server }}" type="checkbox" name="away">
+          <small>Away</small>
+        </label>
+        <br/>
+        <input type="text" id="nickAwayMessageInput" name="awayMessage" placeholder="Away message..." value="{{ current_server_away_msg }}" required="true">
+      </form>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <form class="form updateNickForm" data-server-id="{{ current_server_id }}">
+        <div class="form-group">
+          <label for="updateNickInput"><small>Change nick</small></label><br/>
+          <input id="updateNickInput" class="form-control updateNickInput" type="text" name="nick" value="{{ server_current_nick }}">
+        </div>
+      </form>
+    </li>
+  </ul>
+</template>

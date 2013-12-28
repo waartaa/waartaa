@@ -1,0 +1,73 @@
+<template name="add_server_modal">
+  <div class="modal fade" id="addServerModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <form class="form" role="form">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Add a server</h4>
+          </div>
+          <div class="modal-body">
+            <fieldset>
+              <div class="form-group">
+                {{> servers_list_for_user}}
+              </div>
+              <div class="form-group">
+                <input id="server-join-nick" type="text" class="form-control" name="nick" required="true" placeholder="Nick">
+              </div>
+              <div class="form-group">
+                <input id="server-join-name" type="text" class="form-control" name="name" placeholder="Name">
+              </div>
+              <div class="form-group">
+                <input id="server-join-password" type="password" class="form-control" name="password" placeholder="Password">
+              </div>
+              <div class="form-group">
+                <input id="server-join-channels" type="text" class="form-control" name="channels" placeholder="Channels...">
+              <div>
+            </fieldset>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-primary" value="Submit">
+          </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</template>
+
+<template name="edit_server_modal">
+  <div class="modal fade" id="editServerModal-{{ _id }}" data-server-id="{{ _id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <form class="form" role="form">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Edit <strong>{{name}}</strong> server</h4>
+          </div>
+          <div class="modal-body">
+            <fieldset>
+              <input type="hidden" name="user_server_id" value="{{_id}}">
+              <div class="form-group">
+                <input type="text" class="form-control" name="nick" required="true" placeholder="Nick" value="{{ nick }}">
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" name="real_name" placeholder="Name" value="{{ real_name }}">
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" name="password" placeholder="Password" value="{{ password }}">
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" name="channels" placeholder="Channels..." value="{{ channels }}">
+              <div>
+            </fieldset>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-primary" value="Save changes">
+          </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</template>

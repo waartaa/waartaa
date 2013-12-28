@@ -1,0 +1,71 @@
+<template name="chat_connection_server">
+  <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
+    <a id='serverLink-{{ _id }}' class='server-link' data-server-id='{{ _id }}' data-roomtype="server" href="#">
+      {{ showStatusIcon status }}
+      {{name}}
+      <span class="pull-right">
+        <div class="btn-group">
+          <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          {{> server_menu}}
+        </div>
+      </span>
+    </a>
+    {{> server_channels}}
+    {{> server_pms}}
+    {{> edit_server_channel}}
+  </li>
+</template>
+
+<template name="server_menu">
+  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="server-menu-{{ _id }}" style="min-width: 85px; width: 85px;">
+    <li>
+      <a class="addChannelLink" data-toggle="modal" data-target="#addServerChannel-{{ _id }}" href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-plus"></i> Channel</a>
+    </li>
+    <li>
+      <a class="serverEditLink" href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}" data-toggle="modal" data-target="#editServerModal-{{ _id }}"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+    </li>
+    <li>
+      <a href="#" class="toggleJoinServer" style="padding: 3px 5px;" data-server-id="{{ _id }}"
+          data-status="{{ status }}">
+        <i class="glyphicon {{# if isConnected status}}glyphicon-log-out{{ else }}glyphicon-log-in{{/if}}"></i>
+        {{# if isConnected status}}Quit{{ else }}Join{{/if}}</a>
+    </li>
+    <li>
+      <a href="#" class="server-remove" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-remove"></i> Close</a>
+    </li>
+  </ul>
+  {{> edit_server_modal}}
+  {{> add_server_channel}}
+</template>
+
+<template name="add_server_channel">
+<div class="modal fade" id="addServerChannel-{{ _id }}" data-server-id="{{ _id }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="form" role="form">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">Join new channel</h4>
+        </div>
+        <div class="modal-body">
+          <fieldset>
+            <input type="hidden" name="user_server_id" value="{{_id}}">
+            <div class="form-group">
+              <input type="text" class="form-control" name="name" required="true" placeholder="#ChannelName">
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" name="password" placeholder="Password" value="{{ password }}">
+            </div>
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-primary" value="Join">
+        </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</template>

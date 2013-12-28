@@ -1,0 +1,33 @@
+<template name="server_pms">
+  <ul class="nav bs-siderbar">
+    {{#each pms _id}}
+      {{> server_pm_item}}
+    {{/each}}
+  </ul>
+</template>
+
+<template name="server_pm_item">
+  <li class="dropdown">
+    <a id="pmLink-{{ server_id }}_{{ name }}" role="button" class="server-room pm" href="#" data-roomtype="pm" data-roomid="{{ server_id}}_{{ name }}" data-nick="{{ name }}" data-server-id="{{ server_id }}">
+      <i class="glyphicon glyphicon-user"></i>
+      {{ name }}
+      <span class="pull-right">        
+        <span class="badge">{{ unread_logs_count "pm" server_id name }}</span>
+        <div class="btn-group">
+          <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          {{> server_pm_menu}}
+        </div>
+      </span>
+    </a>
+  </li>
+</template>
+
+<template name="server_pm_menu">
+  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ name }}" style="min-width: 80px; width: 80px;">
+    <li>
+      <a class="pm-remove" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}" data-server-id="{{ server_id }}"><i class="glyphicon glyphicon-remove"></i> Close</a>
+    </li>
+  </ul>
+</template>
