@@ -241,7 +241,7 @@ function _getMatchingNicks (term) {
   }
   if (!channel)
     return;
-  ChannelNicks.find(
+  ChannelNickSugesstions.find(
     {
       nick: {$regex: '^' + term + '.+'},
       channel_name: channel.name,
@@ -251,9 +251,10 @@ function _getMatchingNicks (term) {
   ).forEach(function (nick) {
     nicks.push(nick.nick);
   });
-  console.log(nicks);
   return nicks;
 }
+
+ChannelNickSugesstions = new Meteor.Collection("channel_nick_suggestions");
 
 function autocompleteNicksInitiate () {
   function split (val) {
@@ -284,8 +285,16 @@ function autocompleteNicksInitiate () {
       minLength: 1,
       source: function( request, response ) {
         // delegate back to autocomplete, but extract the last term
-        response( $.ui.autocomplete.filter(
-          _getMatchingNicks(request.term), extractLast( request.term ) ) );
+        var channel = UserChannels.findOne({_id: Session.get('room_id')});
+        if (!channel)
+          return;
+        Meteor.subscribe(
+          'channel_nick_suggestions', channel.user_server_name, channel.name,
+          request.term, 10, function () {
+            response( $.ui.autocomplete.filter(
+              _getMatchingNicks(request.term), extractLast( request.term ) ) );
+          }
+        );
       },
       search: function (event, ui) {
         console.log(event);
