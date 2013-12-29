@@ -151,6 +151,27 @@ Meteor.publish('channel_nicks', function (server_name, channel_name, from, to) {
   }
 });
 
+Meteor.publish('channel_nick_suggestions',
+  function (server_name, channel_name, pattern, limit) {
+    var _this = this;
+    ChannelNicks.find(
+      {
+        server_name: server_name,
+        channel_name: channel_name,
+        nick: {$regex: '^' + pattern + '.+'},
+      },
+      {
+        fields: {last_upated: 0, created: 0},
+        limit: limit || 10
+      }
+    ).forEach(function (channel_nick) {
+      console.log('channel_nick_suggestions_added');
+      console.log(channel_nick);
+      _this.added('channel_nick_suggestions', channel_nick._id, channel_nick);
+    });
+    _this.ready();
+  });
+
 Meteor.methods({
   say: function(message, id, roomtype) {
     var user = Meteor.users.findOne({_id: this.userId});
