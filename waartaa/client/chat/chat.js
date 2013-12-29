@@ -465,6 +465,14 @@ Client = {};
 
 Meteor.subscribe("client", Meteor.user() && Meteor.user().username);
 
+Handlebars.registerHelper("linkify", function (message) {
+ return new Handlebars.SafeString(
+   message.replace(REGEX, function(match) {
+     return "<a target='_blank' href='" + match + "'>" + match + "</a>";
+   })
+ );
+});
+
 Template.chat_users.events = {
   'click .channel-user': chatUserClickHandler,
 };

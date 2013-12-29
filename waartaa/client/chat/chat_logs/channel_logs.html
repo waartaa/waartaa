@@ -1,0 +1,28 @@
+<template name="channel_logs">
+{{#each activeChannels }}
+<div id="channel-chatroom-{{ _id }}" class="chatroom channel" style="display: none;">
+  <div class="topic">
+    <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+      <li><p>{{topic}}<p></li>
+    </ul>
+  </div>
+  <div class="chat-logs-container nano channel" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+    {{> channel_chat_logs_table}}
+  </div>
+</div>
+{{/each}}
+</template>
+
+<template name="channel_chat_logs_table">
+<div id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel content">
+  {{#isolate}}
+  <div class="chatlogrows">
+    {{#each channelChatLogs _id}}
+      {{#isolate}}
+        {{> chat_row}}
+      {{/isolate}}
+    {{/each}}
+  </div>
+  {{/isolate}}
+</div>
+</template>

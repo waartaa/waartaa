@@ -1,0 +1,24 @@
+<template name="server_logs">
+{{#each activeServers }}
+<div id="server-chatroom-{{ _id }}" class="chatroom server" style="display: none;">
+  <div class="topic">
+    <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+      <li><p>{{topic}}<p></li>
+    </ul>
+  </div>
+  <div class="chat-logs-container server nano" data-server-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+    {{> server_chat_logs_table}}
+  </div>
+</div>
+{{/each}}
+</template>
+
+<template name="server_chat_logs_table">
+  <div id="server-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table server content">
+    <div class="chatlogrows">
+      {{#each serverChatLogs _id}}
+        {{> chat_row}}
+      {{/each}}
+    </div>
+  </div>
+</template>

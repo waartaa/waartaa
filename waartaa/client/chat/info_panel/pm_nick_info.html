@@ -1,0 +1,18 @@
+<template name="pm_nick_info">
+  <ul class="info-panel-item pm{{# if isCurrentRoomtype "pm" }} active{{/if}}">
+    {{# with getCurrentPMNickInfo}}
+      <dl>
+        <dt>Username</dt>
+        <dd>{{ user }}</dd>
+      </dl>
+      <dl>
+        <dt>Real name</dt>
+        <dd>{{ realname }}</dd>
+      </dl>
+      <dl>
+        <dt>Server</dt>
+        <dd>{{ server }}</dd>
+      </dl>
+    {{/with}}
+  </ul>
+</template>

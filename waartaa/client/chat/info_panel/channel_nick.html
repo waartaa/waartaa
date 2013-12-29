@@ -1,0 +1,28 @@
+<template name="chat_user">
+  <li class="dropdown{{#if is_user_away nick server_name}} user-away{{/if}}">
+    <a id="{{ nick }}" class="channel-user" href="#">
+      {{>channel_user_icon}} {{nick}}
+      <span class="pull-right">
+        <div class="btn-group">
+          <button type="button" class="channel-user-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          {{> user_menu}}
+        </div>
+      </span>
+    </a>
+  </li>
+</template>
+
+<template name="channel_user_icon">
+  <i class="glyphicon glyphicon-user whois-tooltip{{#if is_user_away nick}} icon-white{{/if}}" title="{{whois_tooltip nick server_name}}"></i>
+</template>
+
+<template name="user_menu">
+  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ nick }}" style="min-width: 80px; width: 80px;">
+    <li>
+      <a class="pm-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ nick }}"><i class="glyphicon glyphicon-envelope"></i> PM</a>
+      <a class="whois-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ nick }}"><i class="glyphicon glyphicon-info-sign"></i> WHOIS</a>
+    </li>
+  </ul>
+</template>

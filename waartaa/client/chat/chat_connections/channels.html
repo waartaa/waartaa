@@ -1,0 +1,71 @@
+<template name="server_channels">
+  <ul class="nav bs-sidebar">
+    {{#each channels _id}}
+      {{> server_channel_item}}
+    {{/each}}
+  </ul>
+</template>
+
+<template name="server_channel_item">
+  <li class="">
+    <a id="channelLink-{{ _id }}" role="button" class="server-room channel" href="#" data-id="{{ _id }}" data-roomtype="channel">
+      {{ showStatusIcon status }}
+      {{ name }}
+      <span class="pull-right">
+        <span class="badge">{{ unread_logs_count "channel" _id }}</span>
+        <div class="btn-group">
+          <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          {{> channel_menu}}
+        </div>
+      </span>
+    </a>
+  </li>
+</template>
+
+<template name="channel_menu">
+  <ul class="dropdown-menu pull-right" role="menu" style="min-width: 80px; width: 80px;">
+    <li>
+      <a href="#" class="toggleJoinChannel" style="padding: 3px 5px;" data-channel-id="{{ _id }}"
+          data-status="{{ status }}">
+        <i class="glyphicon {{# if isConnected status}}glyphicon-log-out{{ else }}glyphicon-log-in{{/if}}"></i>
+        {{# if isConnected status}}Part{{ else }}Join{{/if}}</a>
+    </li>
+    <li>
+      <a href="#" class="editServerChannelLink" style="padding: 3px 5px;" data-channel-id="{{ _id }}"  data-toggle="modal" data-target="#editServerChannel-{{ _id }}"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+    </li>
+    <li>
+      <a href="#" class="channel-remove" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="glyphicon glyphicon-remove"></i> Close</a>
+    </li>
+  </ul>
+</template>
+
+<template name="edit_server_channel">
+  {{#with channel_to_edit}}
+    <div class="modal fade" id="editServerChannel-{{ _id }}" data-server-id="{{ user_server_id }}" data-channel-id="{{ _id }}" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <form class="form editServerChannel" role="form" data-channel-id="{{ _id }}">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel">Edit channel: {{ name }}</h4>
+            </div>
+            <div class="modal-body">
+              <fieldset>
+                <div class="form-group">
+                  <label for="editChannelPassword">Password</label>
+                  <input id="editChannelPassword" type="password" class="form-control" name="password" placeholder="Password" value="{{ password }}">
+                </div>
+              </fieldset>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <input type="submit" class="btn btn-primary" value="Save">
+            </div>
+          </form>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+  {{/with}}
+</template>

@@ -1,0 +1,26 @@
+<template name="pm_logs">
+{{#each activeServers }}
+  {{# each pms _id}}
+    <div id="pmChatroom-{{ room_id }}" class="chatroom pm" style="display: none;">
+      <div class="topic">
+        <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+          <li><p>{{topic}}<p></li>
+        </ul>
+      </div>
+      <div class="chat-logs-container pm nano" data-server-id="{{ server_id }}" data-nick="{{ name }}" style="overflow-y: auto; overflow-x: hidden;">
+        {{> pm_chat_logs_table}}
+      </div>
+    </div>
+  {{/each}}
+{{/each}}
+</template>
+
+<template name="pm_chat_logs_table">
+  <div id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table table-condensed chatlogs-table pm content">
+    <div class="chatlogrows">
+      {{#each pmChatLogs server_id name }}
+        {{> pm_chat_row}}
+      {{/each}}
+    </div>
+  </div>
+</template>
