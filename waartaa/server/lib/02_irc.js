@@ -384,9 +384,12 @@ IRCHandler = function (user, user_server) {
             //console.log(nick + ', ' + to + ', ' + text + ', ' + message);
             if (to == client.nick) {
                 var profile = user.profile;
-                profile.connections[user_server._id].pms[nick] = "";
+                
+                
                 Fiber(function () {
-                    Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
+                    var userpms=UserPms.findOne({user_id: user._id}) || {pms: {}};
+                    userpms.pms[nick] = "";
+                    UserPms.upsert({user_id: user._id, user_server_id: user_server._id,user_server_name: user_server.name,user: user.username}, {$set: {pms: userpms.pms}});
                 }).run();
                 Fiber(function () {
                     var from_user = Meteor.users.findOne({username: nick}) || {};

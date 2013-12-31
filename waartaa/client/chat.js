@@ -380,8 +380,9 @@ Handlebars.registerHelper('pms', function (id) {
   var server = UserServers.findOne({_id: id});
   var user = Meteor.user();
   var pms = [];
+   var userpms=UserPms.findOne({user_id: user._id});
   try {
-    var pms = user.profile.connections[id].pms;
+    var pms = userpms.pms;
   } catch (err) {}
   var return_pms = [];
   for (nick in pms)
@@ -537,19 +538,24 @@ Template.user_menu.events = {
     var user = Meteor.user();
     var server_id = $target.parents('.info-panel-item').data('server-id');
     var profile = user.profile;
-    if (!profile)
-      profile = {connections: {}};
-    if (!profile.connections[server_id])
-      profile.connections[server_id] = {pms: {}};
-    if (!profile.connections[server_id].pms)
-      profile.connections[server_id].pms = {};
-    profile.connections[server_id].pms[nick] = '';
-    console.log(profile);
-    Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
+    var userpms=UserPms.findOne({user_id: user._id});
+    var server = UserServers.findOne({_id: server_id});
+    var server_name = server.name;
+
+    console.log('updating pms');
+    // if (!profile)
+    //   profile = {connections: {}};
+    if (!userpms)
+      userpms = {pms: {}};
+    if (!userpms.pms)
+      userpms.pms = {};
+    userpms.pms[nick] = '';
+    //console.log(profile);
+    UserPms.upsert({user_id: user._id, user_server_id: server_id,user_server_name: server_name,user: user.username}, {$set: {pms: userpms.pms}});
     $('.info-panel-item.active').removeClass('active');
     Session.set('roomtype', 'pm');
     Session.set('room_id', server_id + '_' + nick);
-    var server = UserServers.findOne({_id: server_id});
+    
     if (server)
       Meteor.call(
         'send_command', server.name, '/WHOIS ' + nick);
@@ -651,9 +657,13 @@ Template.server_pm_menu.events = {
     var user_server_id = $target.data('server-id');
     var nick = $target.data('user-nick');
     var profile = user.profile;
-    var pms = user.profile.connections[user_server_id].pms;
+    var userpms=UserPms.findOne({user_id: user._id});
+    var pms = userpms.pms;
+     var server = UserServers.findOne({_id: user_server_id});
+    var server_name = server.name;
     delete pms[nick];
-    Meteor.users.update({_id: user._id}, {$set: {profile: profile}});
+    UserPms.upsert({user_id: user._id, user_server_id: user_server_id,user_server_name: server_name,user: user.username}, {$set: {pms: pms}});
+
   }
 }
 

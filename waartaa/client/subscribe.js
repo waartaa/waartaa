@@ -42,7 +42,7 @@ subscribe_pm_logs = function () {
   var user = Meteor.user();
   UserServers.find().forEach(function (user_server) {
     // Server nicks with whom PM chat is active for the user.
-    var nicks = (user.profile.connections[user_server._id] || {}).pms || [];
+    var nicks = (UserPms.findOne({user_server_id: user_server._id}) || {}).pms || [];
     for (nick in nicks) {
       // PM room_id is a combination of user_server ID and PM nick.
       var room_id = user_server._id + '_' + nick;
@@ -202,6 +202,7 @@ UserChannels.find().observeChanges({
   }
 });
 
+Meteor.subscribe('user_pms');
 /*
 UserServers.find().observeChanges({
   added: function (id, user_server) {
