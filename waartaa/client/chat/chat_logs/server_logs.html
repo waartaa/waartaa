@@ -1,6 +1,6 @@
 <template name="server_logs">
-{{#each activeServers }}
-<div id="server-chatroom-{{ _id }}" class="chatroom server" style="display: none;">
+{{#with currentServer }}
+<div id="server-chatroom-{{ _id }}" class="chatroom server">
   <div class="topic">
     <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
       <li><p>{{topic}}<p></li>
@@ -10,7 +10,7 @@
     {{> server_chat_logs_table}}
   </div>
 </div>
-{{/each}}
+{{/with}}
 </template>
 
 <template name="server_chat_logs_table">

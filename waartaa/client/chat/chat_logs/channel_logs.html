@@ -1,6 +1,6 @@
 <template name="channel_logs">
-{{#each activeChannels }}
-<div id="channel-chatroom-{{ _id }}" class="chatroom channel" style="display: none;">
+{{#with getCurrentChannel }}
+<div id="channel-chatroom-{{ _id }}" class="chatroom channel">
   <div class="topic">
     <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
       <li><p>{{topic}}<p></li>
@@ -10,7 +10,7 @@
     {{> channel_chat_logs_table}}
   </div>
 </div>
-{{/each}}
+{{/with}}
 </template>
 
 <template name="channel_chat_logs_table">

@@ -1,7 +1,6 @@
 <template name="pm_logs">
-{{#each activeServers }}
-  {{# each pms _id}}
-    <div id="pmChatroom-{{ room_id }}" class="chatroom pm" style="display: none;">
+  {{#with currentPM}}
+    <div id="pmChatroom-{{ room_id }}" class="chatroom pm">
       <div class="topic">
         <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
           <li><p>{{topic}}<p></li>
@@ -11,8 +10,7 @@
         {{> pm_chat_logs_table}}
       </div>
     </div>
-  {{/each}}
-{{/each}}
+  {{/with}}
 </template>
 
 <template name="pm_chat_logs_table">
