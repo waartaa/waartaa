@@ -387,9 +387,14 @@ IRCHandler = function (user, user_server) {
                 
                 
                 Fiber(function () {
-                    var userpms=UserPms.findOne({user_id: user._id}) || {pms: {}};
+                    var userpms = UserPms.findOne({user_id: user._id}) || {pms: {}};
                     userpms.pms[nick] = "";
-                    UserPms.upsert({user_id: user._id, user_server_id: user_server._id,user_server_name: user_server.name,user: user.username}, {$set: {pms: userpms.pms}});
+                    UserPms.upsert(
+                        {user_id: user._id, 
+                         user_server_id: user_server._id,
+                         user_server_name: user_server.name,
+                         user: user.username}, 
+                         {$set: {pms: userpms.pms}});
                 }).run();
                 Fiber(function () {
                     var from_user = Meteor.users.findOne({username: nick}) || {};

@@ -380,7 +380,7 @@ Handlebars.registerHelper('pms', function (id) {
   var server = UserServers.findOne({_id: id});
   var user = Meteor.user();
   var pms = [];
-   var userpms=UserPms.findOne({user_id: user._id});
+   var userpms = UserPms.findOne({user_id: user._id});
   try {
     var pms = userpms.pms;
   } catch (err) {}
@@ -538,20 +538,24 @@ Template.user_menu.events = {
     var user = Meteor.user();
     var server_id = $target.parents('.info-panel-item').data('server-id');
     var profile = user.profile;
-    var userpms=UserPms.findOne({user_id: user._id});
+    var userpms = UserPms.findOne({user_id: user._id});
     var server = UserServers.findOne({_id: server_id});
     var server_name = server.name;
 
-    console.log('updating pms');
-    // if (!profile)
-    //   profile = {connections: {}};
     if (!userpms)
       userpms = {pms: {}};
     if (!userpms.pms)
       userpms.pms = {};
     userpms.pms[nick] = '';
-    //console.log(profile);
-    UserPms.upsert({user_id: user._id, user_server_id: server_id,user_server_name: server_name,user: user.username}, {$set: {pms: userpms.pms}});
+    UserPms.upsert(
+      {
+        user_id: user._id,
+        user_server_id: server_id,
+        user_server_name: server_name,
+        user: user.username
+      },
+      {$set: {pms: userpms.pms}}
+    );
     $('.info-panel-item.active').removeClass('active');
     Session.set('roomtype', 'pm');
     Session.set('room_id', server_id + '_' + nick);
@@ -662,7 +666,12 @@ Template.server_pm_menu.events = {
      var server = UserServers.findOne({_id: user_server_id});
     var server_name = server.name;
     delete pms[nick];
-    UserPms.upsert({user_id: user._id, user_server_id: user_server_id,user_server_name: server_name,user: user.username}, {$set: {pms: pms}});
+    UserPms.upsert(
+      {user_id: user._id, 
+       user_server_id: user_server_id,
+       user_server_name: server_name,
+       user: user.username}, 
+       {$set: {pms: pms}});
 
   }
 }
