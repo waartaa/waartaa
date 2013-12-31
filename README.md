@@ -9,6 +9,10 @@ multiple devices of the user along with centralized logging.
 1. Install system dependencies: ``node``, ``npm`` for your system. For example:
     1. For Fedora, you can do: ``$ sudo yum install nodejs npm -y``
     1. For Mac OS X, you can install them via brew: ``$ brew install node npm``
+    1. For Debian/Ubuntu install only node.js and it will include npm as: 
+                                           ``sudo add-apt-repository ppa:chris-lea/node.js
+                                             sudo apt-get update
+                                             sudo apt-get install nodejs``
     1. Else, you can always compile from source.
 1. Get the source: ``$ git clone --recursive https://github.com/waartaa/waartaa.git``
 1. Go to **waartaa**'s repository directory just cloned: ``$ cd waartaa``
