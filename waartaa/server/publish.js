@@ -76,6 +76,9 @@ Meteor.publish(
     return cursor;
 });
 
+Meteor.publish('user_pms', function () {
+  return UserPms.find({user_id: this.userId});
+});
 /*
 Meteor.publish('server_nicks', function () {
   var user = Meteor.users.findOne({_id: this.userId});

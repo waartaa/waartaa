@@ -189,3 +189,14 @@ Create indices:
 > db.pm_logs.ensureIndex({user: 1, from: 1, to_nick: 1})
 > db.server_nicks.ensureIndex({user_server_id: 1})
 */
+
+/*
+UserPms: {
+  user: String,
+  user_id: String,
+  user_server_name: String,
+  user_server_id: String,
+  pms: List,
+}
+*/
+UserPms = new Meteor.Collection("user_pms");
