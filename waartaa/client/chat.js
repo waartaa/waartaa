@@ -80,13 +80,19 @@ function highlightChannel () {
   $('#chat-input').focus();
   refreshAutocompleteNicksSource();
   //$(selector).find('.nano').nanoScroller();
-  $selector.off('scrolltop').on('scrolltop', chatLogsContainerScrollCallback);
-  if ($selector.find('.pane').length == 0)
-    $(selector + ' .chat-logs-container').nanoScroller({scroll: 'bottom'});
-  if (!$(selector).data('rendered')) {
+   $selector.off('scrolltop').on('scrolltop', chatLogsContainerScrollCallback);
+ if (!$(selector).data('rendered')) {
     $(selector).data('rendered', true);
     $(selector + ' .chat-logs-container').nanoScroller({scroll: 'bottom'});
   }
+    else
+  if ($selector.find('.pane').length == 0)
+      $(selector + ' .chat-logs-container').nanoScroller({scroll: 'bottom'});
+  else
+    if($selector.find('.chatlogrows').height() > $selector.find('#channel-chat-logs-'+room_id).height())
+      {
+          $(selector + ' .chat-logs-container').nanoScroller();
+      }
 }
 
 Deps.autorun(highlightChannel);
