@@ -105,7 +105,7 @@ function _create_user_server(data, user) {
         channels: channels,
         nick: data.nick,
         real_name: data.real_name,
-        password: encrypt(data.password),
+        //password: encrypt(data.password),
         user: user.username,
         user_id: user._id,
         created: now,
@@ -116,13 +116,13 @@ function _create_user_server(data, user) {
         last_updater_id: user._id
     };
     if (user_server) {
-        var password = data.password;
-        if (data.password != user_server.password)
-            password: user_server_data.password;
+        //var password = data.password;
+        //if (data.password != user_server.password)
+        //    password: user_server_data.password;
         UserServers.update({_id: user_server._id}, {
             $set: {
                 nick: data.nick,
-                password: password,
+                //password: password,
                 real_name: data.real_name,
                 channels: user_server_data.channels,
                 last_updated: user_server_data.last_updated,
@@ -238,6 +238,7 @@ Meteor.methods({
     // Create/update user servers
     user_server_create: function (data) {
         var user = Meteor.users.findOne({_id: this.userId});
+        console.log(data);
         _create_user_server(data, user);
     },
     join_user_server: function (user_server_name) {

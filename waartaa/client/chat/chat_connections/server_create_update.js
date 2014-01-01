@@ -31,7 +31,9 @@ Template.edit_server_modal.events({
     var data = {};
     $.each($form.serializeArray(), function (index, value) {
       data[value.name] = value.value;
-    })
+    });
+    var user_server = UserServers.findOne(data.user_server_id) || {};
+    data.server_id = user_server.server_id;
     console.log(data);
     Meteor.call('user_server_create', data, function (err) {
       console.log(err);
