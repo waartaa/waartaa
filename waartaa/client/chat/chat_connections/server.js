@@ -73,7 +73,7 @@ Template.server_menu.events({
     var server_id = $this.data('server-id');
     var $modal_content = $('#addServerChannel-' + server_id);
     $modal_content.modal().on('shown.bs.modal', function (e) {
-      $modal_content.find('input[name="name"]').focus();
+      $modal_content.find('input[name="names"]').focus();
     })
     .on('hidden.bs.modal', function (e) {
       $('#chat-input').focus();
