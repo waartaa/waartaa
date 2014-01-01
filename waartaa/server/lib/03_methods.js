@@ -258,15 +258,48 @@ Meteor.methods({
         if (irc_handler)
             irc_handler.partUserServer();       
     },
-    join_user_channel: function (user_server_name, channel_name, password) {
+    join_user_channel: function (user_server_name, channel_names) {
         var user = Meteor.users.findOne({_id: this.userId});
-        var irc_handler = CLIENTS[user.username][user_server_name];
-        UserChannels.update({
-            user: user.username, user_server_name: user_server_name,
-            name: channel_name
-        }, {$set: {active: true, status: 'connecting'}}, {multi: true});
-        if (irc_handler)
-            irc_handler.joinChannel(channel_name, password);
+        var user_server = UserServers.findOne(
+            {name: user_server_name, user: user.username});
+        if (!user_server)
+            return;
+        var irc_handler = _get_irc_handler(user_server.name, this.userId);
+        if (!irc_handler)
+            return;
+        _.each(channel_names.split(','), function (channel_name) {
+            channel_name = channel_name.trim();
+            if (channel_name) {
+                UserChannels.update(
+                    {
+                        user: user.username, user_server_name: user_server_name,
+                        name: channel_name, user_server_id: user_server._id,
+                    },
+                    {
+                        $set: {active: true, status: 'connecting'}
+                    },
+                    {multi: true, upsert: true}
+                );
+                Fiber(function () {
+                    irc_handler.joinChannel(channel_name)
+                }).run();
+                Meteor.setTimeout(function() {
+                    Fiber(function () {
+                        UserChannels.update(
+                            {
+                                user: user.username,
+                                user_server_name: user_server.name,
+                                name: channel_name,
+                                active: true,
+                                status: 'connecting'
+                            },
+                            {$set: {status: 'disconnected'}},
+                            {multi: true}
+                        );
+                    }).run();
+                }, 30 * 1000);
+            }
+        });
     },
     part_user_channel: function (user_server_name, channel_name, close) {
         var user = Meteor.users.findOne({_id: this.userId});

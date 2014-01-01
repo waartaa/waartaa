@@ -113,7 +113,7 @@ Template.add_server_channel.events({
       data[value.name] = value.value;
     });
     var server = UserServers.findOne({_id: server_id});
-    Meteor.call('join_user_channel', server.name, data.name, data.password);
+    Meteor.call('join_user_channel', server.name, data.names);
     var $modal_content = $('#addServerChannel-' + server_id);
     $modal_content.modal('hide');
   }
