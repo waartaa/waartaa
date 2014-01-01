@@ -639,22 +639,6 @@ Handlebars.registerHelper('isCurrentRoomtype', function (roomtype) {
   return false;
 })
 
-Handlebars.registerHelper('showStatusIcon', function (status) {
-  var iconClass = "";
-  var statusIconHtml = '';
-  if (status == 'connected')
-    iconClass = 'glyphicon-ok-circle';
-  else if (status == 'disconnected')
-    iconClass = 'glyphicon-ban-circle';
-  else if (status == 'connecting' || status == 'disconnecting')
-    iconClass = 'spin glyphicon-refresh';
-  if (iconClass) {
-    statusIconHtml = '<icon class="tipsy-enable glyphicon ' + iconClass + '" tooltip="'
-      + status + '"></icon>';
-  }
-  return new Handlebars.SafeString(statusIconHtml);
-});
-
 Handlebars.registerHelper('isConnected', function (status) {
   if (status == 'connected')
     return true;
