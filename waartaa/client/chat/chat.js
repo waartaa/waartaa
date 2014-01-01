@@ -13,17 +13,8 @@ updateHeight = function () {
     var $topic = $(elem).prev('.topic');
     $(elem).height((final_height - $topic.height() || 0) - 25);
   });
-  highlightChannel();
 }
 
-Template.chat_connections.servers = function () {
-  return UserServers.find();
-}
-
-Template.server_channels.channels = function (server_id) {
-  return UserChannels.find(
-    {user_server_id: server_id, active: true}, {sort: {name: 1}});
-}
 
 Template._loginButtonsLoggedInDropdown.created = function () {
   NProgress.start();
@@ -33,98 +24,9 @@ Template.add_server_modal.created = function () {
   NProgress.done();
 }
 
-function highlightChannel () {
-  var room_id = Session.get('room_id');
-  var server_id = Session.get('server_id');
-  var roomtype = Session.get('roomtype');
-  $('li.server').removeClass('active');
-  $('.server-room').parent().removeClass('active');
-  var selector = '';
-  if (roomtype == 'channel') {
-    $('.server-room#channelLink-' + room_id).parent().addClass('active');
-    selector = '#channel-chatroom-' + room_id;
-  } else if (roomtype == 'pm') {
-    $('#pmLink-' + room_id + '.server-room').parent().addClass('active');
-    selector = '#pmChatroom-' + room_id;
-  } else if (roomtype == 'server') {
-    selector = '#server-chatroom-' + server_id;
-  }
-  $('.chatroom').hide();
-  var $selector = $(selector);
-  $selector.show();
-  if (roomtype == 'channel') {
-      Session.set('topicHeight', $(selector + ' .topic').height());
-      Session.set('lastAccessedChannel-' + room_id, new Date());
-      Session.set('unreadLogsCountChannel-' + room_id, 0);
-      $('.info-panel-item.active').removeClass('active');
-      $('#channel-users-' + room_id).addClass('active');
-  } else if (roomtype == 'pm') {
-      Session.set('topicHeight', $(selector + ' .topic').height());
-      Session.set('lastAccessedPm-' + room_id, new Date());
-      Session.set('unreadLogsCountPm-' + room_id, 0);
-      $('.info-panel-item.active').removeClass('active');
-      $('.info-panel-item.pm').addClass('active');
-  } else if (roomtype == 'server') {
-      Session.set('topicHeight', $(selector + ' .topic').height());
-      Session.set('lastAccessedServer-' + room_id, new Date());
-      Session.set('unreadLogsCountServer-' + room_id, 0);
-      $('.info-panel-item.active').removeClass('active');
-  }
-  //  $('#server-' + server_id + ' ul.server-link-ul li:first').addClass('active');
-  $('li#server-' + server_id).addClass('active');
-  //$('#chat-input').focus();
-  $('#chat-input').focus();
-  refreshAutocompleteNicksSource();
-  //$(selector).find('.nano').nanoScroller();
-   $selector.off('scrolltop').on('scrolltop', chatLogsContainerScrollCallback);
- if (!$(selector).data('rendered')) {
-    $(selector).data('rendered', true);
-    $(selector + ' .chat-logs-container').nanoScroller({scroll: 'bottom'});
-  }
-    else
-  if ($selector.find('.pane').length == 0)
-      $(selector + ' .chat-logs-container').nanoScroller({scroll: 'bottom'});
-  else
-    if($selector.find('.chatlogrows').height() > $selector.find('#channel-chat-logs-'+room_id).height())
-      {
-          $(selector + ' .chat-logs-container').nanoScroller();
-      }
-}
-
 Deps.autorun(highlightChannel);
 Deps.autorun(updateHeight);
 
-function serverRoomSelectHandler (event) {
-    var $target = $(event.target);
-    if ($target.hasClass('server-room-menu-btn') || $target.parent().hasClass('server-room-menu-btn'))
-      return;
-    event.stopPropagation();
-    $('.dropdown.open, .btn-group.open').removeClass('open');
-    var prev_room_id = Session.get('room_id');
-    var prefix = '';
-    var prev_roomtype = Session.get('roomtype');
-    if (prev_roomtype == 'server' || prev_roomtype == 'channel')
-      prefix = prev_roomtype + '-';
-    Session.set('scroll_height_' + prefix + prev_room_id, $('#chat-logs-container').scrollTop() || null);
-    $('.chatroom').hide();
-    if ($target.data('roomtype') == 'channel') {
-      var server_id = $target.parents('.server').data('server-id');
-      var channel_id = $(event.target).data('id');
-      Session.set('server_id', server_id);
-      Session.set('roomtype', 'channel');
-      Session.set('room_id', channel_id);
-    } else if ($target.data('roomtype') == 'pm') {
-      var server_id = $target.parents('.server').data('server-id');
-      Session.set('server_id', server_id);
-      Session.set('roomtype', 'pm');
-      Session.set('room_id', $target.data('roomid'));
-    } else if ($target.data('roomtype') == 'server' || $target.parent().data('roomtype') == 'server') {
-      Session.set('room_id', $target.parent().data('server-id') || $target.data('server-id'));
-      Session.set('server_id', Session.get('room_id'));
-      Session.set('roomtype', 'server');
-    }
-    highlightChannel();
-}
 
 Template.chat_main.chat_logs = function () {
   var room_id = Session.get('room_id');
@@ -367,10 +269,7 @@ Handlebars.registerHelper("isCurrentRoom", function (room_id, room_type, server_
   return false;*/
 });
 
-Template.chat_connection_server.events({
-  'click .server-room': serverRoomSelectHandler,
-  'click .server-link': serverRoomSelectHandler
-});
+
 
 Handlebars.registerHelper('pms', function (id) {
   var server = UserServers.findOne({_id: id});
@@ -386,6 +285,23 @@ Handlebars.registerHelper('pms', function (id) {
   return return_pms;
 });
 
+Handlebars.registerHelper('currentPM', function () {
+  var server = UserServers.findOne({_id: Session.get('server_id')});
+  var user = Meteor.user();
+  if (Session.get('roomtype') === 'pm') {
+    var room_id = Session.get('room_id');
+    var server_id = room_id.split('_')[0];
+    var nick = room_id.split('_')[1];
+    return {name: nick, server_id: server._id, room_id: server._id + '_' + nick};
+  }
+});
+
+Handlebars.registerHelper('currentServer', function () {
+  if (!Session.get('roomtype') != 'server')
+    return;
+  return server = UserServers.findOne({_id: Session.get('server_id')});
+});
+
 function chatUserClickHandler (event) {
     if ($(event.target).hasClass('btn-group') || $(event.target).parent().hasClass('btn-group'))
       return;
@@ -395,12 +311,6 @@ function chatUserClickHandler (event) {
     //$(event.target).parent().addClass('active');
 }
 
-function serverChannelsRenderedCallback () {
-  $('#chat-servers .nano').nanoScroller();
-  updateHeight();
-}
-
-Template.server_channels.rendered = serverChannelsRenderedCallback;
 
 Handlebars.registerHelper('channel_users', function (id) {
   var channel_id = id;
@@ -424,17 +334,7 @@ Template.info_panel_body.rendered = function () {
   $('#info-panel .nano').nanoScroller();
 }
 
-Template.server_channel_item.rendered = function () {
-  Session.set("lastAccessedChannel-" + this.data._id, new Date());
-};
 
-Template.chat_connection_server.rendered = function () {
-  Session.set("lastAccessedServer-" + this.data._id, new Date());
-};
-
-Template.server_pm_item.rendered = function () {
-  Session.set("lastAccessedPm-" + this.data.server_id + '_' + this.data.from);
-};
 
 /*Template.chat_main.rendered = function () {
   setTimeout(function () {
@@ -530,45 +430,7 @@ Template.chat_input.rendered = function () {
   autocompleteNicksInitiate();
 }
 
-Template.channel_menu.events = {
-  'click .channel-remove': function (e) {
-    var channel_id = $(e.target).data("channel-id");
-    var channel = UserChannels.findOne({_id: channel_id});
-    Meteor.call(
-      "part_user_channel", channel.user_server_name, channel.name, true);
-  },
-  'click .editServerChannelLink': function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var $this = $(e.target);
-    var channel_id = $this.data('channel-id');
-    Session.set('channel_id_to_edit', channel_id);
-    var $modal_content = $('#editServerChannel-' + channel_id);
-    Meteor.setTimeout(function () {
-      $modal_content.modal().on(
-        'shown.bs.modal', function (e) {
-          $modal_content.find('[name="password"]').focus();
-        })
-        .on('hidden.bs.modal', function (e) {
-          $('#chat-input').focus();
-        })
-      ;
-    }, 4);
-  },
-  'click .toggleJoinChannel': function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var $this = $(e.target);
-    var channel_id = $this.data('channel-id');
-    var channel = UserChannels.findOne({_id: channel_id});
-    var status = $this.data('status');
-    if (status == 'connected')
-      Meteor.call(
-        "part_user_channel", channel.user_server_name, channel.name, false);
-    else
-      Meteor.call('join_user_channel', channel.user_server_name, channel.name);
-  }
-}
+
 
 //$('.editServerChannelLink').live('click', _handleServerChannelEditLinkClick);
 
@@ -577,164 +439,11 @@ Template.channel_menu.rendered = function (e) {
   //  'click .editServerChannelLink'] =  _handleServerChannelEditLinkClick;
 }
 
-Handlebars.registerHelper('channel_to_edit', function (e) {
-  var channel = UserChannels.findOne({_id: Session.get('channel_id_to_edit')});
-  if (channel) {
-    channel.password = channel.password || '';
-    return channel;
-  }
-})
-
-Template.edit_server_channel.events = {
-  'submit .editServerChannel': function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var $form = $(e.target);
-    var data = {'password': $form.find('[name="password"]').val() || ''};
-    Meteor.call('edit_user_channel', $form.data('channel-id'), data, function (err) {
-      console.log(err);
-      $form.parents('.modal').modal('hide');
-    })
-  }
-}
-
-Template.server_pm_menu.events = {
-  'click .pm-remove': function (e) {
-    var user = Meteor.user();
-    var $target = $(e.target);
-    var pm_id = $(e.target).parents('li').find(
-      '.pm.server-room').attr('id');
-    var user_server_id = $target.data('server-id');
-    var nick = $target.data('user-nick');
-    var profile = user.profile;
-    var userpms=UserPms.findOne({user_id: user._id});
-    var pms = userpms.pms;
-     var server = UserServers.findOne({_id: user_server_id});
-    var server_name = server.name;
-    delete pms[nick];
-    UserPms.upsert(
-      {user_id: user._id, 
-       user_server_id: user_server_id,
-       user_server_name: server_name,
-       user: user.username}, 
-       {$set: {pms: pms}});
-
-  }
-}
-
 Template.channel_logs.rendered = function () {
   //console.log("CREATED channel_logs");
 };
 
 
-Template.add_server_modal.events({
-  'submit form': function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var data = {
-      server_id: $('#server-join-server-list').val(),
-      nick: $('#server-join-nick').val(),
-      real_name: $('#server-join-name').val(),
-      password: $('#server-join-password').val(),
-      channels: $('#server-join-channels').val()
-    };
-    console.log(data);
-    Meteor.call('user_server_create', data, function (err) {
-      console.log(err);
-      if (!err)
-        $('#addServerModal').modal('hide');
-    });
-  },
-});
-
-$('#addServerModal').on('shown.bs.modal', function (e) {
-  $('#addServerModal').find('[name="nick"]').focus();
-});
-
-Template.edit_server_modal.events({
-  'submit form': function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var $form = $(e.target);
-    var server_id = $form.parents('.modal').data('server-id');
-    var data = {};
-    $.each($form.serializeArray(), function (index, value) {
-      data[value.name] = value.value;
-    })
-    console.log(data);
-    Meteor.call('user_server_create', data, function (err) {
-      console.log(err);
-      $('#editServerModal-' + server_id).modal('hide');
-    })
-  }
-});
-
-Template.add_server_channel.events({
-  'submit form': function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var $form = $(e.target);
-    var data = {};
-    var server_id = $form.parents('.modal').data('server-id');
-    $.each($form.serializeArray(), function (index, value) {
-      data[value.name] = value.value;
-    });
-    var server = UserServers.findOne({_id: server_id});
-    Meteor.call('join_user_channel', server.name, data.name, data.password);
-    var $modal_content = $('#addServerChannel-' + server_id);
-    $modal_content.modal('hide');
-  }
-});
-
-Template.server_menu.events({
-  'click .serverEditLink': function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var $this = $(e.target);
-    var server_id = $this.data('server-id');
-    var $modal_content = $('#editServerModal-' + server_id);
-    $modal_content.modal().on('shown.bs.modal', function (e) {
-      $modal_content.find('[name="nick"]').focus();
-    })
-    .on('hidden.bs.modal', function (e) {
-      $('#chat-input').focus();
-    });
-  },
-  'click .addChannelLink': function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var $this = $(e.target);
-    var server_id = $this.data('server-id');
-    var $modal_content = $('#addServerChannel-' + server_id);
-    $modal_content.modal().on('shown.bs.modal', function (e) {
-      $modal_content.find('input[name="name"]').focus();
-    })
-    .on('hidden.bs.modal', function (e) {
-      $('#chat-input').focus();
-    });
-  },
-  'click .server-remove': function (e) {
-    var server_id = $(e.target).data("server-id");
-    var server = UserServers.findOne({_id: server_id});
-    Meteor.call(
-      "quit_user_server", server.name, true);
-  },
-  'click .toggleJoinServer': function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var $this = $(e.target);
-    var server_id = $this.data('server-id');
-    var server = UserServers.findOne({_id: server_id});
-    if (!server)
-      return;
-    var status = $this.data('status');
-    if (status == 'connected')
-      Meteor.call(
-        "quit_user_server", server.name, false);
-    else
-      Meteor.call('join_user_server', server.name);
-  }
-});
 
 Handlebars.registerHelper("activeChannels", function () {
   return UserChannels.find({active: true});
@@ -746,18 +455,7 @@ Handlebars.registerHelper("activeServers", function () {
 
 cursors_observed = {};
 
-function updateUnreadLogsCount (
-    unread_logs_count_key, last_accessed_key, last_updated) {
-  var last_accessed = Session.get(last_accessed_key);
-  var count = 0;
-  if (last_updated > last_accessed) {
-    var unread_logs_count = Session.get(unread_logs_count_key) || 0;
-    unread_logs_count += 1;
-    count += 1;
-    Session.set(unread_logs_count_key, unread_logs_count);
-  }
-  return count;
-}
+
 
 var focussed = true;
 
@@ -801,6 +499,7 @@ Handlebars.registerHelper("channelChatLogs", function (channel_id) {
       });
     }
   });
+  cursor.limit = 25;
   return cursor;
 });
 
@@ -1047,3 +746,28 @@ function infoPanelScrolltopHandler (e) {
 
 $(document).on('scrolltop.info_panel', '#info-panel .nano',
   infoPanelScrolltopHandler);
+
+Handlebars.registerHelper('session', function (key) {
+  return Session.get(key);
+});
+
+Handlebars.registerHelper('getCurrentChannel', function () {
+  if (Session.get('roomtype') == 'channel') {
+    return UserChannels.findOne({_id: Session.get('room_id')});
+  }
+});
+
+
+function logRenders () {
+    _.each(Template, function (template, name) {
+      var oldRender = template.rendered;
+      var counter = 0;
+ 
+      template.rendered = function () {
+        console.log(name, "render count: ", ++counter);
+        oldRender && oldRender.apply(this, arguments);
+      };
+    });
+  }
+
+logRenders();

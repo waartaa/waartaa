@@ -7,7 +7,7 @@
 </template>
 
 <template name="server_channel_item">
-  <li class="">
+  <li class="{{#if isChannelActive}}active{{/if}}">
     <a id="channelLink-{{ _id }}" role="button" class="server-room channel" href="#" data-id="{{ _id }}" data-roomtype="channel">
       {{ showStatusIcon status }}
       {{ name }}

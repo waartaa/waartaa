@@ -1,5 +1,5 @@
 <template name="chat_connection_server">
-  <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
+  <li id='server-{{ _id }}' class='server{{#if isServerActive}} active{{/if}}' data-server-id='{{ _id }}'>
     <a id='serverLink-{{ _id }}' class='server-link' data-server-id='{{ _id }}' data-roomtype="server" href="#">
       {{ showStatusIcon status }}
       {{name}}

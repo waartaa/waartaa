@@ -7,7 +7,7 @@
 </template>
 
 <template name="server_pm_item">
-  <li class="dropdown">
+  <li class="dropdown{{#if isPmActive}} active{{/if}}">
     <a id="pmLink-{{ server_id }}_{{ name }}" role="button" class="server-room pm" href="#" data-roomtype="pm" data-roomid="{{ server_id}}_{{ name }}" data-nick="{{ name }}" data-server-id="{{ server_id }}">
       <i class="glyphicon glyphicon-user"></i>
       {{ name }}
