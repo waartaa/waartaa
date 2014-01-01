@@ -99,7 +99,8 @@ function _create_user_server(data, user) {
     var splitted_channels = data.channels.split(',');
     for (i in splitted_channels) {
         var channel = splitted_channels[i];
-        channels.push(channel.trim());
+        if (channel.trim())
+            channels.push(channel.trim());
     }
     user_server_data = {
         channels: channels,
