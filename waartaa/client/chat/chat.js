@@ -203,32 +203,6 @@ Handlebars.registerHelper("isCurrentRoom", function (room_id, room_type, server_
 });
 
 
-
-Handlebars.registerHelper('pms', function (id) {
-  var server = UserServers.findOne({_id: id});
-  var user = Meteor.user();
-  var pms = [];
-   var userpms = UserPms.findOne({user_id: user._id});
-  try {
-    var pms = userpms.pms;
-  } catch (err) {}
-  var return_pms = [];
-  for (nick in pms)
-    return_pms.push({name: nick, server_id: server._id, room_id: server._id + '_' + nick});
-  return return_pms;
-});
-
-Handlebars.registerHelper('currentPM', function () {
-  var server = UserServers.findOne({_id: Session.get('server_id')});
-  var user = Meteor.user();
-  if (Session.get('roomtype') === 'pm') {
-    var room_id = Session.get('room_id');
-    var server_id = room_id.split('_')[0];
-    var nick = room_id.split('_')[1];
-    return {name: nick, server_id: server._id, room_id: server._id + '_' + nick};
-  }
-});
-
 function chatUserClickHandler (event) {
     if ($(event.target).hasClass('btn-group') || $(event.target).parent().hasClass('btn-group'))
       return;
