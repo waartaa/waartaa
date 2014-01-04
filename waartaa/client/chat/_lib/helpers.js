@@ -19,18 +19,17 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
   var current_count = Session.get(key, 0);
   Session.set('height-' + $table.attr('id'), $table.find('.chatlogrows').height());
   console.log('current table height: ' + Session.get('height-' + $table.attr('id')));
-  var room_id = Session.get('room_id');
+  var room = Session.get('room');
   if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
     scroll_top = null;
-  var roomtype = Session.get('roomtype');
-  if (roomtype == 'channel')
-    Session.set('scroll_height_channel-' + room_id,
+  if (room.roomtype == 'channel')
+    Session.set('scroll_height_channel-' + room.room_id,
       scroll_top);
-  else if (roomtype == 'pm')
-    Session.set('scroll_height_' + room_id,
+  else if (room.roomtype == 'pm')
+    Session.set('scroll_height_' + room.room_id,
       scroll_top);
-  else if (roomtype == 'server')
-    Session.set('scroll_height_server-' + Session.get('server_id'),
+  else if (room.roomtype == 'server')
+    Session.set('scroll_height_server-' + room.server_id,
       scroll_top);
   Session.set(key, current_count + DEFAULT_LOGS_COUNT);
 }
@@ -42,43 +41,30 @@ waartaa.chat.helpers.highlightServerRoom = function () {
   var room = Session.get('room') || {};
   $('li.server').removeClass('active');
   $('.server-room').parent().removeClass('active');
-  var selector = '';
   if (room.roomtype == 'channel') {
     $('.server-room#channelLink-' + room.room_id).parent().addClass('active');
-    selector = '#channel-chatroom-' + room.room_id;
   } else if (room.roomtype == 'pm') {
     $('#pmLink-' + room_id + '.server-room').parent().addClass('active');
-    selector = '#pmChatroom-' + room.room_id;
-  } else if (room.roomtype == 'server') {
-    selector = '#server-chatroom-' + room.server_id;
   }
-  $('.chatroom').hide();
-  var $selector = $(selector);
-  $selector.show();
   if (room.roomtype == 'channel') {
-      Session.set('topicHeight', $(selector + ' .topic').height());
+      Session.set('topicHeight', $('#chat-main .topic').height());
       Session.set('lastAccessedChannel-' + room.room_id, new Date());
       Session.set('unreadLogsCountChannel-' + room.room_id, 0);
   } else if (room.roomtype == 'pm') {
-      Session.set('topicHeight', $(selector + ' .topic').height());
+      Session.set('topicHeight', $('#chat-main .topic').height());
       Session.set('lastAccessedPm-' + room.room_id, new Date());
       Session.set('unreadLogsCountPm-' + room.room_id, 0);
   } else if (room.roomtype == 'server') {
-      Session.set('topicHeight', $(selector + ' .topic').height());
+      Session.set('topicHeight', $('#chat-main .topic').height());
       Session.set('lastAccessedServer-' + room.room_id, new Date());
       Session.set('unreadLogsCountServer-' + room.room_id, 0);
   }
   //refreshAutocompleteNicksSource();
-  //$(selector).find('.nano').nanoScroller();
-  $selector.off('scrolltop').on('scrolltop', waartaa.chat.helpers.chatLogsContainerScrollCallback);
-  if (!$(selector).data('rendered')) {
-    $(selector).data('rendered', true);
-    $(selector + ' .chat-logs-container').nanoScroller({scroll: 'bottom'});
-  } else if ($selector.find('.pane').length == 0)
-    $(selector + ' .chat-logs-container').nanoScroller({scroll: 'bottom'});
-  else if ($selector.find('.chatlogrows').height() > $selector.find(
-        '#channel-chat-logs-'+room_id).height())
-     $(selector + ' .chat-logs-container').nanoScroller();
+  Meteor.setTimeout(function () {
+    $('#chat-main .nano').nanoScroller({scroll: 'bottom'})
+    .off('scrolltop')
+    .on('scrolltop', waartaa.chat.helpers.chatLogsContainerScrollCallback);
+  }, 1000);
 };
 
 /**
