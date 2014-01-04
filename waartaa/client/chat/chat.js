@@ -1,4 +1,4 @@
-const REGEX = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/g;
+
 
 updateHeight = function () {
   var body_height = $('body').height();
@@ -24,7 +24,6 @@ Template.add_server_modal.created = function () {
   NProgress.done();
 }
 
-Deps.autorun(highlightChannel);
 Deps.autorun(updateHeight);
 
 
@@ -59,75 +58,9 @@ Template.chat_main.topic = function () {
 
 Template.chat_main.rendered = updateHeight;
 
-function observeChatlogTableScroll () {
-  var $table = $(this.find('.chatlogs-table'));
-  var $container = $table.parent();
-  var id = $table.attr('id');
-  var old_table_height = Session.get('height-' + id, 0);
-  var new_table_height = $table.find('.chatlogrows').height();
-  if (Session.get('selfMsg-' + id) ||
-      Session.get('chatlogsScrollEnd-' + id) &&
-      Session.get('chatlogsScrollEnd-' + id) == $table.scrollTop()) {
-    $container.nanoScroller({ scroll: 'bottom' });
-    Session.set('selfMsg-' + id);
-  } else if ($table.scrollTop() == 0 && new_table_height > old_table_height) {
-    $container.nanoScroller({scrollTop: (new_table_height - old_table_height)});
-  }
-  Session.set('height-' + id, new_table_height);
-  Meteor.setTimeout(function () {
-    $table.off('scrolltop').on('scrolltop', chatLogsContainerScrollCallback);
-  }, 2000);
-}
-
-Template.channel_chat_logs_table.rendered = observeChatlogTableScroll;
-Template.server_chat_logs_table.rendered = observeChatlogTableScroll;
-Template.pm_chat_logs_table.rendered = observeChatlogTableScroll;
 
 Template.chat_row.rendered = function () {};
 
-function chatLogsContainerScrollCallback (event) {
-    var scroll_top = $(event.target).scrollTop();
-    var $target = $(event.target);
-    var $table = $target.find('.chatlogs-table');
-    $table.off('scrolltop');
-    console.log("Reached top of page.");
-    var key = '';
-    if ($table.hasClass('channel'))
-      key = "user_channel_log_count_" + $target.data('channel-id');
-    else if ($table.hasClass('server'))
-      key = "user_server_log_count_" + $target.data('server-id');
-    else if ($table.hasClass('pm'))
-      key = "pmLogCount-" + $target.data('server-id') + '_' + $target.data('nick');
-    var current_count = Session.get(key, 0);
-    Session.set('height-' + $table.attr('id'), $table.find('.chatlogrows').height());
-    console.log('current table height: ' + Session.get('height-' + $table.attr('id')));
-    var room_id = Session.get('room_id');
-    if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
-      scroll_top = null;
-    var roomtype = Session.get('roomtype');
-    if (roomtype == 'channel')
-      Session.set('scroll_height_channel-' + room_id,
-        scroll_top);
-    else if (roomtype == 'pm')
-      Session.set('scroll_height_' + room_id,
-        scroll_top);
-    else if (roomtype == 'server')
-      Session.set('scroll_height_server-' + Session.get('server_id'),
-        scroll_top);
-    Session.set(key, current_count + DEFAULT_LOGS_COUNT);
-  }
-
-Template.channel_logs.events = {
-  'scrolltop .chat-logs-container': chatLogsContainerScrollCallback
-};
-
-Template.server_logs.events = {
-  'scroll .chat-logs-container': chatLogsContainerScrollCallback
-};
-
-Template.pm_logs.events = {
-  'scroll .chat-logs-container': chatLogsContainerScrollCallback
-};
 
 $(document).on(
   'scrollend.chat_logs_container', '.chat-logs-container',
@@ -296,12 +229,6 @@ Handlebars.registerHelper('currentPM', function () {
   }
 });
 
-Handlebars.registerHelper('currentServer', function () {
-  if (!Session.get('roomtype') != 'server')
-    return;
-  return server = UserServers.findOne({_id: Session.get('server_id')});
-});
-
 function chatUserClickHandler (event) {
     if ($(event.target).hasClass('btn-group') || $(event.target).parent().hasClass('btn-group'))
       return;
@@ -365,13 +292,7 @@ Client = {};
 
 Meteor.subscribe("client", Meteor.user() && Meteor.user().username);
 
-Handlebars.registerHelper("linkify", function (message) {
- return new Handlebars.SafeString(
-   message.replace(REGEX, function(match) {
-     return "<a target='_blank' href='" + match + "'>" + match + "</a>";
-   })
- );
-});
+
 
 Template.chat_users.events = {
   'click .channel-user': chatUserClickHandler,
@@ -467,42 +388,6 @@ window.onblur = function () {
   focussed = false;
 }
 
-Handlebars.registerHelper("channelChatLogs", function (channel_id) {
-  var cursor = UserChannelLogs.find({channel_id: channel_id}, {sort: {created: 1}});
-  var session_key = 'unreadLogsCountChannel-' + channel_id;
-  cursor.observeChanges({
-    added: function (id, fields) {
-      Deps.nonreactive(function () {
-        var new_logs = updateUnreadLogsCount(
-          session_key, 'lastAccessedChannel-' + fields.channel_id,
-          fields.last_updated);
-        var user_server = UserServers.findOne({_id: fields.server_id});
-        if (!user_server)
-          return;
-        if (
-          new_logs > 0 &&
-          fields.message.search(user_server.current_nick) >= 0 &&
-          (
-            (Session.get('roomtype') == 'channel' &&
-              Session.get('room_id') != fields.channel_id) ||
-            Session.get('roomtype') != 'channel')
-          ) {
-            var alert_message = fields.server_name + fields.channel_name + ': ' + fields.message;
-            $.titleAlert(alert_message, {
-              requireBlur:true,
-              stopOnFocus:true,
-              duration:10000,
-              interval:500
-            });
-          $('#audio-notification')[0].play();
-        }
-      });
-    }
-  });
-  cursor.limit = 25;
-  return cursor;
-});
-
 Handlebars.registerHelper("serverChatLogs", function (server_id) {
   var cursor = UserServerLogs.find(
     {server_id: server_id}, {sort: {created: 1}});
@@ -548,21 +433,6 @@ Handlebars.registerHelper("pmChatLogs", function (server_id, nick) {
     }
   });
   return cursor;
-});
-
-Handlebars.registerHelper("unread_logs_count", function (
-    room_type, room_id, nick) {
-  if (room_type == "pm")
-    room_id = room_id + '_' + nick;
-  var room_type = room_type[0].toUpperCase() + room_type.substr(1);
-  var key = "unreadLogsCount" + room_type + "-" + room_id;
-  var count = Session.get(key);
-  if (count > 0 && Session.get('room_id') != room_id)
-    return count;
-  else {
-    Session.set(key, 0);
-    return '';
-  }
 });
 
 Handlebars.registerHelper("server_current_nick", function () {
@@ -633,11 +503,6 @@ function _submit_nick_away_data ($form) {
     });
 }
 
-Handlebars.registerHelper('isCurrentRoomtype', function (roomtype) {
-  if (Session.get('roomtype') == roomtype)
-    return true;
-  return false;
-})
 
 Handlebars.registerHelper('isConnected', function (status) {
   if (status == 'connected')
@@ -646,19 +511,7 @@ Handlebars.registerHelper('isConnected', function (status) {
     return false;
 });
 
-Handlebars.registerHelper('showDatetime', function (datetime_obj) {
-  var today_str = moment(new Date()).format('MM/DD/YYYY');
-  if (today_str == moment(datetime_obj).format('MM/DD/YYYY'))
-    return moment(datetime_obj).format('hh:mm A');
-  else
-    return moment(datetime_obj).format('hh:mm A, DD MMM\'YY');
-});
 
-Handlebars.registerHelper('isToday', function (date_obj) {
-  if (moment(new Date()).format('MM/DD/YYYY') == moment(date_obj).format('MM/DD/YYYY'))
-    return true;
-  return false;
-});
 
 function infoPanelScrollendHandler (e) {
   var $target = $(e.target);
@@ -735,11 +588,6 @@ Handlebars.registerHelper('session', function (key) {
   return Session.get(key);
 });
 
-Handlebars.registerHelper('getCurrentChannel', function () {
-  if (Session.get('roomtype') == 'channel') {
-    return UserChannels.findOne({_id: Session.get('room_id')});
-  }
-});
 
 
 function logRenders () {

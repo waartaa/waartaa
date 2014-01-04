@@ -119,8 +119,8 @@ Template.add_server_channel.events({
   }
 });
 
-function updateUnreadLogsCount (
-    unread_logs_count_key, last_accessed_key, last_updated) {
+updateUnreadLogsCount = function (unread_logs_count_key, 
+                                  last_accessed_key, last_updated) {
   var last_accessed = Session.get(last_accessed_key);
   var count = 0;
   if (last_updated > last_accessed) {
@@ -130,4 +130,4 @@ function updateUnreadLogsCount (
     Session.set(unread_logs_count_key, unread_logs_count);
   }
   return count;
-}
+};
