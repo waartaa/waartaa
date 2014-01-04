@@ -27,8 +27,13 @@
   <div class="panel-body nano">
     <div class="content">
       <div class="inner-container">
-        {{> channel_nicks_info}}
-        {{> pm_nick_info}}
+        {{#if isCurrentRoomtype "channel"}}
+          {{> channel_nicks_info}}
+        {{else}}
+          {{#if isCurrentRoomtype "pm" }}
+            {{> pm_nick_info}}
+          {{/if}}
+        {{/if}}
       </div>
     </div>
   </div>

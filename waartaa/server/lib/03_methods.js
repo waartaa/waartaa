@@ -351,6 +351,37 @@ Meteor.methods({
     log_clients: function () {
         console.log(CLIENTS);
     },
+    toggle_pm: function (user_server_id, nick, action) {
+        var user = Meteor.users.findOne({_id: this.userId});
+        if (!user)
+            return;
+        var user_server = UserServers.findOne(
+            {_id: user_server_id, user: user.username});
+        if (!user_server)
+            return;
+        var pms = {};
+        var userPm = UserPms.findOne(
+            {user: user.username, user_server_name: user_server.name});
+        if (userPm)
+            pms = userPm.pms;
+        if (action == 'create')
+            pms[nick] = '';
+        else if (action == 'delete') {
+            try {
+                delete pms[nick];
+            } catch (err) {}
+        }
+        UserPms.update(
+          {
+            user_id: user._id,
+            user_server_id: user_server._id,
+            user_server_name: user_server.name,
+            user: user.username
+          },
+          {$set: {pms: pms}},
+          {upsert: true}
+        );
+    },
     send_pm: function (message, room_id, log_options) {
         var user_server_id = room_id.split('_')[0];
         var nick = room_id.slice(room_id.search('_') + 1);

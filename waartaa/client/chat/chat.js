@@ -279,24 +279,9 @@ Template.user_menu.events = {
     var user = Meteor.user();
     var server_id = $target.parents('.info-panel-item').data('server-id');
     var profile = user.profile;
-    var userpms = UserPms.findOne({user_id: user._id});
     var server = UserServers.findOne({_id: server_id});
     var server_name = server.name;
-
-    if (!userpms)
-      userpms = {pms: {}};
-    if (!userpms.pms)
-      userpms.pms = {};
-    userpms.pms[nick] = '';
-    UserPms.upsert(
-      {
-        user_id: user._id,
-        user_server_id: server_id,
-        user_server_name: server_name,
-        user: user.username
-      },
-      {$set: {pms: userpms.pms}}
-    );
+    Meteor.call('toggle_pm', server_id, nick, 'create');
     $('.info-panel-item.active').removeClass('active');
     Session.set('roomtype', 'pm');
     Session.set('room_id', server_id + '_' + nick);

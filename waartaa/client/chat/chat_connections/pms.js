@@ -4,25 +4,12 @@ Template.server_pm_item.rendered = function () {
 
 Template.server_pm_menu.events = {
   'click .pm-remove': function (e) {
-    var user = Meteor.user();
     var $target = $(e.target);
     var pm_id = $(e.target).parents('li').find(
       '.pm.server-room').attr('id');
     var user_server_id = $target.data('server-id');
     var nick = $target.data('user-nick');
-    var profile = user.profile;
-    var userpms=UserPms.findOne({user_id: user._id});
-    var pms = userpms.pms;
-     var server = UserServers.findOne({_id: user_server_id});
-    var server_name = server.name;
-    delete pms[nick];
-    UserPms.upsert(
-      {user_id: user._id,
-       user_server_id: user_server_id,
-       user_server_name: server_name,
-       user: user.username},
-       {$set: {pms: pms}});
-
+    Meteor.call('toggle_pm', user_server_id, nick, 'delete');
   }
 }
 
@@ -51,6 +38,8 @@ Handlebars.registerHelper('pms', function (id) {
 
 Handlebars.registerHelper('currentPM', function () {
   var server = UserServers.findOne({_id: Session.get('server_id')});
+  if (!server)
+    return;
   var user = Meteor.user();
   if (Session.get('roomtype') === 'pm') {
     var room_id = Session.get('room_id');

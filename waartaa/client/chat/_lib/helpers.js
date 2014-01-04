@@ -44,7 +44,7 @@ waartaa.chat.helpers.highlightServerRoom = function () {
   if (room.roomtype == 'channel') {
     $('.server-room#channelLink-' + room.room_id).parent().addClass('active');
   } else if (room.roomtype == 'pm') {
-    $('#pmLink-' + room_id + '.server-room').parent().addClass('active');
+    $('#pmLink-' + room.room_id + '.server-room').parent().addClass('active');
   }
   if (room.roomtype == 'channel') {
       Session.set('topicHeight', $('#chat-main .topic').height());

@@ -293,14 +293,6 @@ body {
   color: #9C9393;
 }
 
-.info-panel-item {
-  display: none;
-}
-
-.info-panel-item.active {
-  display: block;
-}
-
 .panel-info .panel-body {
   padding: 0px !important;
 }
