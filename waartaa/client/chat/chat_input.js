@@ -219,3 +219,6 @@ function refreshAutocompleteNicksSource () {
 Template.chat_input.rendered = function () {
   autocompleteNicksInitiate();
 };
+
+Template.chat_input.preserve(['.ui-autocomplete']);
+
