@@ -281,17 +281,6 @@ Handlebars.registerHelper('current_server_away_msg', function () {
   return '';
 });
 
-function _submit_nick_away_data ($form) {
-  var away_message = $form.find(
-    '#nickAwayMessageInput').val() || "I'm not around.";
-  var user_server = UserServers.findOne({_id: Session.get('server_id')});
-  if (user_server)
-    Meteor.call('mark_away', user_server.name, away_message, function (err) {
-      console.log(err);
-    });
-}
-
-
 Handlebars.registerHelper('isConnected', function (status) {
   if (status == 'connected')
     return true;
