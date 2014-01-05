@@ -885,8 +885,29 @@ IRCHandler = function (user, user_server) {
             client.addListener('nickSet', function (nick) {
                 Fiber(function () {
                     if (user_server.current_nick != nick) {
+                        ChannelNicks.remove(
+                            {
+                                server_name: user_server.name,
+                                nick: user_server.current_nick
+                            }
+                        );
                         UserServers.update({_id: user_server._id}, {$set: {current_nick: nick}});
                         user_server = UserServers.findOne({_id: user_server._id});
+                        UserChannels.find(
+                            {
+                                user_server_name: user_server.name,
+                                user: user.username
+                            }).forEach(function (channel) {
+                                ChannelNicks.update(
+                                    {
+                                        server_name: user_server.name,
+                                        channel_name: channel.name,
+                                        nick: nick
+                                    },
+                                    {$set: {}},
+                                    {upsert: true, multi: true}
+                                );
+                            });
                     }
                 }).run();
             });

@@ -99,13 +99,14 @@ function _create_user_server(data, user) {
     var splitted_channels = data.channels.split(',');
     for (i in splitted_channels) {
         var channel = splitted_channels[i];
-        channels.push(channel.trim());
+        if (channel.trim())
+            channels.push(channel.trim());
     }
     user_server_data = {
         channels: channels,
         nick: data.nick,
         real_name: data.real_name,
-        password: encrypt(data.password),
+        //password: encrypt(data.password),
         user: user.username,
         user_id: user._id,
         created: now,
@@ -116,13 +117,13 @@ function _create_user_server(data, user) {
         last_updater_id: user._id
     };
     if (user_server) {
-        var password = data.password;
-        if (data.password != user_server.password)
-            password: user_server_data.password;
+        //var password = data.password;
+        //if (data.password != user_server.password)
+        //    password: user_server_data.password;
         UserServers.update({_id: user_server._id}, {
             $set: {
                 nick: data.nick,
-                password: password,
+                //password: password,
                 real_name: data.real_name,
                 channels: user_server_data.channels,
                 last_updated: user_server_data.last_updated,
@@ -238,6 +239,7 @@ Meteor.methods({
     // Create/update user servers
     user_server_create: function (data) {
         var user = Meteor.users.findOne({_id: this.userId});
+        console.log(data);
         _create_user_server(data, user);
     },
     join_user_server: function (user_server_name) {
@@ -256,15 +258,48 @@ Meteor.methods({
         if (irc_handler)
             irc_handler.partUserServer();       
     },
-    join_user_channel: function (user_server_name, channel_name, password) {
+    join_user_channel: function (user_server_name, channel_names) {
         var user = Meteor.users.findOne({_id: this.userId});
-        var irc_handler = CLIENTS[user.username][user_server_name];
-        UserChannels.update({
-            user: user.username, user_server_name: user_server_name,
-            name: channel_name
-        }, {$set: {active: true, status: 'connecting'}}, {multi: true});
-        if (irc_handler)
-            irc_handler.joinChannel(channel_name, password);
+        var user_server = UserServers.findOne(
+            {name: user_server_name, user: user.username});
+        if (!user_server)
+            return;
+        var irc_handler = _get_irc_handler(user_server.name, this.userId);
+        if (!irc_handler)
+            return;
+        _.each(channel_names.split(','), function (channel_name) {
+            channel_name = channel_name.trim();
+            if (channel_name) {
+                UserChannels.update(
+                    {
+                        user: user.username, user_server_name: user_server_name,
+                        name: channel_name, user_server_id: user_server._id,
+                    },
+                    {
+                        $set: {active: true, status: 'connecting'}
+                    },
+                    {multi: true, upsert: true}
+                );
+                Fiber(function () {
+                    irc_handler.joinChannel(channel_name)
+                }).run();
+                Meteor.setTimeout(function() {
+                    Fiber(function () {
+                        UserChannels.update(
+                            {
+                                user: user.username,
+                                user_server_name: user_server.name,
+                                name: channel_name,
+                                active: true,
+                                status: 'connecting'
+                            },
+                            {$set: {status: 'disconnected'}},
+                            {multi: true}
+                        );
+                    }).run();
+                }, 30 * 1000);
+            }
+        });
     },
     part_user_channel: function (user_server_name, channel_name, close) {
         var user = Meteor.users.findOne({_id: this.userId});
@@ -315,6 +350,37 @@ Meteor.methods({
     },
     log_clients: function () {
         console.log(CLIENTS);
+    },
+    toggle_pm: function (user_server_id, nick, action) {
+        var user = Meteor.users.findOne({_id: this.userId});
+        if (!user)
+            return;
+        var user_server = UserServers.findOne(
+            {_id: user_server_id, user: user.username});
+        if (!user_server)
+            return;
+        var pms = {};
+        var userPm = UserPms.findOne(
+            {user: user.username, user_server_name: user_server.name});
+        if (userPm)
+            pms = userPm.pms;
+        if (action == 'create')
+            pms[nick] = '';
+        else if (action == 'delete') {
+            try {
+                delete pms[nick];
+            } catch (err) {}
+        }
+        UserPms.update(
+          {
+            user_id: user._id,
+            user_server_id: user_server._id,
+            user_server_name: user_server.name,
+            user: user.username
+          },
+          {$set: {pms: pms}},
+          {upsert: true}
+        );
     },
     send_pm: function (message, room_id, log_options) {
         var user_server_id = room_id.split('_')[0];

@@ -1,0 +1,11 @@
+<template name="chat">
+  <div id="chat" class="row" style="min-height: 0px;">
+    {{> chat_connections}}
+    {{> chat_main}}
+    {{> chat_users}}
+  </div>
+  {{> chat_input}}
+  <audio id="audio-notification">
+    <source src="/notification.mp3" type="audio/mp3">
+  </audio>
+</template>

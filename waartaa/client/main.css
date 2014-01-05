@@ -293,14 +293,6 @@ body {
   color: #9C9393;
 }
 
-.info-panel-item {
-  display: none;
-}
-
-.info-panel-item.active {
-  display: block;
-}
-
 .panel-info .panel-body {
   padding: 0px !important;
 }
@@ -364,4 +356,17 @@ body {
 
 .chat-logs-container {
   overflow-x: hidden;
+}
+
+#chatlogs-loader {
+  z-index: 9999;
+  left: 45%;
+  background-color: #C4DFF1;
+  width: 10%;
+  border-radius: 0px 0px 5px 5px;
+  top: -9px;
+  position: absolute;
+  margin: auto;
+  padding: 5px;
+  border: solid 1px rgb(26, 55, 105);
 }

@@ -1,0 +1,22 @@
+<template name="chat_connections">
+  <div id="chat-servers" class="bs-sidebar col-md-2 hidden-xs hidden-sm col-sm-1" style="overflow: auto;">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <strong>Servers</strong>
+        <span class="pull-right">
+          <button id="server-add-btn" class="btn btn-primary compact-icon-btn enable-tipsy" title="Add new server" data-toggle="modal" data-target="#addServerModal">
+            <icon class="glypicon glyphicon-plus"></icon>
+          </button>
+        </span>
+      </div>
+      <div class="panel-body nano">
+        <ul class="nav bs-sidenav content">
+          {{#each servers}}
+            {{> chat_connection_server}}
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {{> add_server_modal}}
+</template>
