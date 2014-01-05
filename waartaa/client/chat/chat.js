@@ -270,19 +270,8 @@ Handlebars.registerHelper("serverChatLogs", function (server_id) {
   return cursor;
 });
 
-Handlebars.registerHelper("server_current_nick", function () {
-  var user_server = UserServers.findOne({_id: Session.get('server_id')});
-  if (user_server) {
-    return user_server.current_nick;
-  }
-})
-
 $('.whois-tooltip, .tipsy-enable').tipsy({live: true, gravity: 'e', html: true});
 $('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
-
-Handlebars.registerHelper('current_server_id', function () {
-  return Session.get('server_id');
-});
 
 
 Handlebars.registerHelper('current_server_away_msg', function () {

@@ -10,9 +10,12 @@ Template.chat_input.events({
     var $form = $(event.target);
     var $chat_input = $form.find('#chat-input');
     var message = $chat_input.val();
+    var room = Session.get('room');
+    if (!room)
+      return;
     try {
       var user_server = UserServers.findOne(
-        {_id: Session.get('server_id')}, {});
+        {_id: room.server_id}, {});
       var myNick = user_server.current_nick;
     } catch (err) {
       //console.log(err);
@@ -22,30 +25,20 @@ Template.chat_input.events({
       return;
     $chat_input.val('');
     var log_options = {
-      room_id: Session.get('room_id'),
-      roomtype: Session.get('roomtype'),
+      room_id: room.room_id,
+      roomtype: room.roomtype,
       logInput: true
     };
-    var prefix = '';
-    if (Session.get('roomtype') == 'channel') {
-      var room_id = Session.get('room_id');
-      var channel = UserChannels.findOne({_id: room_id});
-      prefix = 'channel-';
-      Meteor.call('send_channel_message', channel._id, message, log_options);
-    } else if (Session.get('roomtype') == 'pm') {
-      var room_id = Session.get('room_id');
-      console.log(room_id);
-      var nick = room_id.substr(room_id.indexOf('_') + 1);
-      Meteor.call('send_pm', message, room_id, log_options)
-    } else if (Session.get('roomtype') == 'server') {
-      var room_id = 'server-' + Session.get('server_id');
-      prefix = 'server-';
+    if (room.roomtype == 'channel') {
+      Meteor.call('send_channel_message', room.room_id, message, log_options);
+    } else if (room.roomtype == 'pm') {
+      Meteor.call('send_pm', message, room.room_id, log_options)
+    } else if (room.roomtype == 'server') {
       Meteor.call(
-        'send_server_message', Session.get('room_id'), message, log_options);
+        'send_server_message', room.room_id, message, log_options);
     }
-    var selfMsgKey = 'selfMsg-' + Session.get('roomtype') + '-' + 'chat-logs-' + Session.get('room_id');
+    var selfMsgKey = 'selfMsg-' + room.roomtype + '-' + 'chat-logs-' + room.room_id;
     Session.set(selfMsgKey, true);
-    //Session.set('scroll_height_' + prefix + room_id, null);
   }
 });
 
@@ -90,3 +83,13 @@ Template.user_nick_options_menu.events = {
     }
   }
 };
+
+Handlebars.registerHelper("server_current_nick", function () {
+  var room = Session.get('room');
+  if (!room)
+    return;
+  var user_server = UserServers.findOne({_id: room.server_id});
+  if (user_server) {
+    return user_server.current_nick;
+  }
+});

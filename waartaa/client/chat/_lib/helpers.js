@@ -142,3 +142,9 @@ updateHeight = function () {
     $(elem).height((final_height - $topic.height() || 0) - 25);
   });
 };
+
+Handlebars.registerHelper('current_server_id', function () {
+  var room = Session.get('room') || {};
+  return room.server_id;
+});
+

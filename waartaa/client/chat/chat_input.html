@@ -24,9 +24,9 @@
 <template name="user_nick_options_menu">
   <ul class="dropdown-menu userNickOptions" role="menu">
     <li>
-      <form class="form nickAwayForm" data-server-id="{{ current_user_server }}">
+      <form class="form nickAwayForm" data-server-id="{{ current_server_id }}">
         <label for="updateNickAwayCheckbox">
-          <input id="updateNickAwayCheckbox" data-server-id="{{ current_user_server }}" type="checkbox" name="away">
+          <input id="updateNickAwayCheckbox" data-server-id="{{ current_server_id }}" type="checkbox" name="away">
           <small>Away</small>
         </label>
         <br/>
