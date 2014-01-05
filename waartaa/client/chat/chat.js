@@ -280,15 +280,19 @@ Template.user_menu.events = {
     var server_id = $target.parents('.info-panel-item').data('server-id');
     var profile = user.profile;
     var server = UserServers.findOne({_id: server_id});
-    var server_name = server.name;
-    Meteor.call('toggle_pm', server_id, nick, 'create');
-    $('.info-panel-item.active').removeClass('active');
-    Session.set('roomtype', 'pm');
-    Session.set('room_id', server_id + '_' + nick);
-    
-    if (server)
+    if (server) {
+      var server_name = server.name;
+      Meteor.call('toggle_pm', server_id, nick, 'create');
+      $('.info-panel-item.active').removeClass('active');
+      waartaa.chat.helpers.setCurrentRoom({
+        nick: nick,
+        server_id: server._id,
+        server_name: server.name,
+        roomtype: 'pm'
+      });
       Meteor.call(
         'send_command', server.name, '/WHOIS ' + nick);
+    }
   },
   'click .whois-user': function (event) {
     var $target = $(event.target);
