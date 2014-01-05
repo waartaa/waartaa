@@ -357,3 +357,16 @@ body {
 .chat-logs-container {
   overflow-x: hidden;
 }
+
+#chatlogs-loader {
+  z-index: 9999;
+  left: 45%;
+  background-color: #C4DFF1;
+  width: 10%;
+  border-radius: 0px 0px 5px 5px;
+  top: -9px;
+  position: absolute;
+  margin: auto;
+  padding: 5px;
+  border: solid 1px rgb(26, 55, 105);
+}
