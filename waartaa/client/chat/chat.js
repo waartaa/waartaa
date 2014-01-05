@@ -51,126 +51,6 @@ $(document).on(
     Session.set('chatlogsScrollEnd-' + $table.attr('id'), $table.scrollTop());
   });
 
-function _getMatchingNicks (term) {
-  var nicks = [];
-  console.log(term);
-  var channel = null;
-  if (Session.get('roomtype') == 'channel') {
-    channel = UserChannels.findOne({_id: Session.get('room_id')});
-  }
-  if (!channel)
-    return;
-  ChannelNickSugesstions.find(
-    {
-      nick: {$regex: '^' + term + '.+'},
-      channel_name: channel.name,
-      server_name: channel.user_server_name
-    },
-    {nick: 1}
-  ).forEach(function (nick) {
-    nicks.push(nick.nick);
-  });
-  return nicks;
-}
-
-ChannelNickSugesstions = new Meteor.Collection("channel_nick_suggestions");
-
-function autocompleteNicksInitiate () {
-  function split (val) {
-    return val.split(/(^|[\ ]+)/ );
-  }
-
-  function extractLast ( term ) {
-    return split(term).pop();
-  }
-
-  var auto_suggest = false;
-
-  $('#chat-input')
-    .bind('keydown', function (event) {
-      if (Session.get('roomtype') != 'channel')
-        return;
-      if (event.keyCode === $.ui.keyCode.TAB) {
-        event.preventDefault();
-        if ($( this ).data( "ui-autocomplete" ).menu.active)
-          return;
-        auto_suggest = true;
-        $('#chat-input').autocomplete('search', extractLast($(event.target).val()));
-      } else if (event.keyCode === $.ui.keyCode.SPACE)
-        auto_suggest = false;
-    })
-    .autocomplete({
-      autoFocus: true,
-      minLength: 1,
-      source: function( request, response ) {
-        // delegate back to autocomplete, but extract the last term
-        var channel = UserChannels.findOne({_id: Session.get('room_id')});
-        if (!channel)
-          return;
-        Meteor.subscribe(
-          'channel_nick_suggestions', channel.user_server_name, channel.name,
-          request.term, 10, function () {
-            response( $.ui.autocomplete.filter(
-              _getMatchingNicks(request.term), extractLast( request.term ) ) );
-          }
-        );
-      },
-      search: function (event, ui) {
-        console.log(event);
-        var $input = $('#chat-input');
-        var val = $input.val() || "";
-        console.log(auto_suggest);
-        return auto_suggest;
-      },
-      focus: function() {
-        // prevent value inserted on focus
-        return false;
-      },
-      select: function( event, ui ) {
-        var terms = split( this.value );
-        // remove the current input
-        terms.pop();
-        // add the selected item
-        terms.push( ui.item.value );
-        this.value = terms.join( "" );
-        if (this.value.length >= 1 && this.value[0] == "")
-          this.value = this.value.substr(1);
-        return false;
-      },
-      open: function($event, ui) {
-          var $widget = $("ul.ui-autocomplete");
-          var $input = $("#chat-input");
-          var position = $input.position();
-
-          var top_offset = $widget.find('li').length * 24;
-          if (top_offset > 200)
-            top_offset = 200;
-          $("#chat-input-form").append($widget);
-          $widget.width('auto')
-            .css('max-height', 200)
-            .css('overflow', 'auto')
-            .css("left", position.left + $input.val().length * 6)
-            .css("bottom", 36)
-            .css("top", - top_offset - 2);
-      }
-    });
-}
-
-function refreshAutocompleteNicksSource () {
-  $('chat-input').autocomplete('option', 'source', []);
-}
-
-function getChannelNicks () {
-  var channel_nicks = [];
-  var channel = UserChannels.findOne({_id: Session.get('room_id')}, {name: 1, user_server_name: 1}) || {};
-  ChannelNicks.find({
-    server_name: channel.user_server_name, channel_name: channel.name
-  }).forEach(function (channel_nick) {
-    channel_nicks.push(channel_nick.nick);
-  });
-  return channel_nicks;
-} 
-
 Handlebars.registerHelper("isCurrentRoom", function (room_id, room_type, server_id) {
   if (room_id == "ohB9cwuTsTnHMxT7T")
     return true;
@@ -212,10 +92,6 @@ Template.chat_main.destroyed = function () {
 Client = {};
 
 Meteor.subscribe("client", Meteor.user() && Meteor.user().username);
-
-Template.chat_input.rendered = function () {
-  autocompleteNicksInitiate();
-}
 
 
 
