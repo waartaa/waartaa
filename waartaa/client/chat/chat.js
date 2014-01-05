@@ -1,21 +1,3 @@
-
-
-updateHeight = function () {
-  var body_height = $('body').height();
-  var final_height = body_height - 90;
-  $('#chat, #chat-main, .chatroom').height(final_height - 23);
-  $('#info-panel .panel-body, #chat-servers .panel-body').height(final_height - 75);
-  $('#info-panel .inner-container').css('min-height', final_height);
-  $('.chatlogrows').css('min-height', final_height - 22);
-  //var topic_height = Session.get('topicHeight') || 0;
-  $('.chat-logs-container')//.height(final_height - 69);
-  .each(function (index, elem) {
-    var $topic = $(elem).prev('.topic');
-    $(elem).height((final_height - $topic.height() || 0) - 25);
-  });
-}
-
-
 Template._loginButtonsLoggedInDropdown.created = function () {
   NProgress.start();
 }
@@ -202,41 +184,6 @@ Handlebars.registerHelper("isCurrentRoom", function (room_id, room_type, server_
   return false;*/
 });
 
-
-function chatUserClickHandler (event) {
-    if ($(event.target).hasClass('btn-group') || $(event.target).parent().hasClass('btn-group'))
-      return;
-    event.stopPropagation();
-    //$('.channel-user').parent().removeClass('active');
-    $('.dropdown.open, .btn-group.open').removeClass('open');
-    //$(event.target).parent().addClass('active');
-}
-
-
-Handlebars.registerHelper('channel_users', function (id) {
-  var channel_id = id;
-  var channel = UserChannels.findOne({_id: channel_id});
-  if (!channel)
-    return;
-  var query = {
-    channel_name: channel.name, server_name: channel.user_server_name};
-  var last_nick = Session.get(
-    'lastNick-' + channel.user_server_name + '_' + channel.name);
-  if (last_nick)
-    query['nick'] = {$gt: last_nick};
-  return ChannelNicks.find(
-    query,
-    {fields: {nick: 1}, sort: {nick: 1}});
-});
-
-Template.chat_users.rendered = updateHeight;
-
-Template.info_panel_body.rendered = function () {
-  $('#info-panel .nano').nanoScroller();
-}
-
-
-
 /*Template.chat_main.rendered = function () {
   setTimeout(function () {
     updateHeight();
@@ -265,50 +212,6 @@ Template.chat_main.destroyed = function () {
 Client = {};
 
 Meteor.subscribe("client", Meteor.user() && Meteor.user().username);
-
-
-
-Template.chat_users.events = {
-  'click .channel-user': chatUserClickHandler,
-};
-
-Template.user_menu.events = {
-  'click .pm-user': function (event) {
-    var $target = $(event.target);
-    var nick = $target.data('user-nick');
-    var user = Meteor.user();
-    var server_id = $target.parents('.info-panel-item').data('server-id');
-    var profile = user.profile;
-    var server = UserServers.findOne({_id: server_id});
-    if (server) {
-      var server_name = server.name;
-      Meteor.call('toggle_pm', server_id, nick, 'create');
-      $('.info-panel-item.active').removeClass('active');
-      waartaa.chat.helpers.setCurrentRoom({
-        nick: nick,
-        server_id: server._id,
-        server_name: server.name,
-        roomtype: 'pm'
-      });
-      Meteor.call(
-        'send_command', server.name, '/WHOIS ' + nick);
-    }
-  },
-  'click .whois-user': function (event) {
-    var $target = $(event.target);
-    var nick = $target.data('user-nick');
-    var user = Meteor.user();
-    var server_id = $target.parents('.info-panel-item').data('server-id');
-    var server = UserServers.findOne({_id: server_id});
-    var roomtype = Session.get('roomtype');
-    var room_id = Session.get('room_id');
-    Meteor.call(
-      'send_command', server.name, '/WHOIS ' + nick, {
-        room_id: room_id,
-        roomtype: roomtype
-    });
-  }
-};
 
 Template.chat_input.rendered = function () {
   autocompleteNicksInitiate();
@@ -377,42 +280,6 @@ Handlebars.registerHelper("server_current_nick", function () {
 $('.whois-tooltip, .tipsy-enable').tipsy({live: true, gravity: 'e', html: true});
 $('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 
-function _get_nick_whois_data (nick, user_server_id) {
-  var user_server = UserServers.findOne({_id: user_server_id});
-  if (!user_server)
-    return;
-  return ServerNicks.findOne({
-    nick: nick, server_id: user_server.server_id});
-}
-
-Handlebars.registerHelper('whois_tooltip', function (nick, server_name) {
-  var tooltip = "";
-  var server_id = (UserServers.findOne({name: server_name}, {_id: 1}) || {})._id;
-  var whois_data = _get_nick_whois_data(nick, server_id);
-  if (whois_data)
-    tooltip = "Username: " + _.escape(whois_data.user) + "<br/>" +
-      "Real name: " + _.escape(whois_data.realname) + "<br/>" +
-      "Server: " + _.escape(whois_data.server) + "<br/>";
-  return new Handlebars.SafeString(tooltip);
-});
-
-Handlebars.registerHelper('getCurrentPMNickInfo', function () {
-  var room_id = Session.get('room_id');
-  if (!room_id)
-    return;
-  var server_id = room_id.split('_')[0];
-  var nick = room_id.split('_')[1];
-  return _get_nick_whois_data(nick, server_id);
-})
-
-Handlebars.registerHelper('is_user_away', function (nick, server_name) {
-  var server_id = (UserServers.findOne({name: server_name}, {_id: 1}) || {})._id || "";
-  var whois_data = _get_nick_whois_data(nick, server_id);
-  if (whois_data && whois_data.away)
-    return true;
-  return false;
-});
-
 Handlebars.registerHelper('current_server_id', function () {
   return Session.get('server_id');
 });
@@ -442,79 +309,6 @@ Handlebars.registerHelper('isConnected', function (status) {
   else
     return false;
 });
-
-
-
-function infoPanelScrollendHandler (e) {
-  var $target = $(e.target);
-  if (Session.get('roomtype') == 'channel') {
-    var channel = UserChannels.findOne({_id: Session.get('room_id')});
-    if (!channel)
-      return;
-    var count = ChannelNicks.find(
-        {channel_name: channel.name, server_name: channel.user_server_name}
-      ).count();
-    var startNick = Session.get(
-        'startNick-' + channel.user_server_name + '_' + channel.name);
-    if (count < 40 && (count < 30 && !startNick))
-      return;
-    $(document).off('scrollend.info_panel');
-    var nth_channel_nick = ChannelNicks.findOne(
-      {channel_name: channel.name, server_name: channel.user_server_name},
-      {skip: 10, sort: {nick: 1}});
-    var current_last_nick = Session.get(
-      'currentLastNick-' + channel.user_server_name + '_' + channel.name);
-    Session.set(
-      'lastNick-' + channel.user_server_name + '_' + channel.name,
-      nth_channel_nick.nick);
-    Session.set(
-      'startNick-' + channel.user_server_name + '_' + channel.name,
-      null);
-  }
-  Meteor.setTimeout(function () {
-    $(document).off('scrollend.info_panel')
-    .on('scrollend.info_panel', '#info-panel .nano',
-        infoPanelScrollendHandler);
-  }, 2000);
-}
-
-$(document).on('scrollend.info_panel', '#info-panel .nano',
-               infoPanelScrollendHandler);
-
-function infoPanelScrolltopHandler (e) {
-  var $target = $(e.target);
-  if (Session.get('roomtype') == 'channel') {
-    var channel = UserChannels.findOne({_id: Session.get('room_id')});
-    if (!channel)
-      return;
-    if (ChannelNicks.find(
-        {channel_name: channel.name, server_name: channel.user_server_name}
-      ).count() < 40)
-      return;
-    $(document).off('scrolltop.info_panel');
-    var nth_channel_nick = ChannelNicks.findOne(
-      {channel_name: channel.name, server_name: channel.user_server_name},
-      {skip: 10, sort: {nick: -1}});
-    var current_last_nick = Session.get(
-      'currentLastNick-' + channel.user_server_name + '_' + channel.name);
-    var current_start_nick = Session.get(
-      'currentStartNick-' + channel.user_server_name + '_' + channel.name);
-    Session.set(
-      'startNick-' + channel.user_server_name + '_' + channel.name,
-      nth_channel_nick.nick);
-    Session.set(
-      'lastNick-' + channel.user_server_name + '_' + channel.name,
-      null);
-  }
-  Meteor.setTimeout(function () {
-    $(document).off('scrolltop.info_panel')
-    .on('scrolltop.info_panel', '#info-panel .nano',
-        infoPanelScrolltopHandler);
-  }, 2000);
-}
-
-$(document).on('scrolltop.info_panel', '#info-panel .nano',
-  infoPanelScrolltopHandler);
 
 Handlebars.registerHelper('session', function (key) {
   return Session.get(key);
