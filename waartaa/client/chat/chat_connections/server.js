@@ -7,7 +7,6 @@ function serverRoomSelectHandler (event) {
     event.stopPropagation();
     // Close any open menu
     $('.dropdown.open, .btn-group.open').removeClass('open');
-    $('.chatroom').hide();
     if ($target.data('roomtype') == 'channel') {
       var server_id = $target.parents('.server').data('server-id');
       var channel_id = $(event.target).data('id');
