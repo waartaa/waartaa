@@ -37,14 +37,8 @@ Handlebars.registerHelper('pms', function (id) {
 });
 
 Handlebars.registerHelper('currentPM', function () {
-  var server = UserServers.findOne({_id: Session.get('server_id')});
-  if (!server)
-    return;
-  var user = Meteor.user();
-  if (Session.get('roomtype') === 'pm') {
-    var room_id = Session.get('room_id');
-    var server_id = room_id.split('_')[0];
-    var nick = room_id.split('_')[1];
-    return {name: nick, server_id: server._id, room_id: server._id + '_' + nick};
+  var room = Session.get('room') || {};
+  if (room.roomtype === 'pm') {
+    return {name: room.nick, server_id: room.server_id, room_id: room.room_id};
   }
 });

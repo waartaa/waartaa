@@ -367,37 +367,6 @@ Handlebars.registerHelper("serverChatLogs", function (server_id) {
   return cursor;
 });
 
-Handlebars.registerHelper("pmChatLogs", function (server_id, nick) {
-  var cursor = PMLogs.find(
-    {
-      $or: [{from: nick}, {to_nick: nick}],
-      server_id: server_id
-    }, {sort: {created: 1}});
-  var session_key = "unreadLogsCountPm-" + server_id + '_' + nick;
-  cursor.observeChanges({
-    added: function (id, fields) {
-      Deps.nonreactive(function () {
-        new_logs = updateUnreadLogsCount(
-          session_key, 'lastAccessedPm-' + fields.server_id + '_' + nick,
-          fields.last_updated);
-        if (
-            new_logs > 0 &&
-            Session.get('room_id') != fields.server_id + '_' + nick) {
-          var alert_message = nick + ' messaged you: ' + fields.message;
-          $.titleAlert(alert_message, {
-            requireBlur:true,
-            stopOnFocus:true,
-            duration:10000,
-            interval:500
-          });
-          $('#audio-notification')[0].play();
-        }
-      });
-    }
-  });
-  return cursor;
-});
-
 Handlebars.registerHelper("server_current_nick", function () {
   var user_server = UserServers.findOne({_id: Session.get('server_id')});
   if (user_server) {
