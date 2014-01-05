@@ -10,32 +10,34 @@ function serverRoomSelectHandler (event) {
     event.stopPropagation();
     // Close any open menu
     $('.dropdown.open, .btn-group.open').removeClass('open');
-    if ($target.data('roomtype') == 'channel') {
-      var server_id = $target.parents('.server').data('server-id');
-      var channel_id = $(event.target).data('id');
-      var channel = UserChannels.findOne({_id: channel_id}) || {};
-      waartaa.chat.helpers.setCurrentRoom({
-        roomtype: 'channel', server_id: server_id, channel_id: channel_id,
-        channel_name: channel.name, server_name: channel.user_server_name
-      });
-    } else if ($target.data('roomtype') == 'pm') {
-      var server_id = $target.parents('.server').data('server-id');
-      var nick = $target.data('nick');
-      var server = UserServers.findOne({_id: server_id});
-      waartaa.chat.helpers.setCurrentRoom({
-        roomtype: 'pm', server_id: server_id, room_id: $target.data('roomid'),
-        server_name: server.name, nick: nick
-      });
-    } else if (
-        $target.data('roomtype') == 'server' ||
-        $target.parent().data('roomtype') == 'server') {
-      var server_id = $target.parent().data('server-id') ||
-        $target.data('server-id');
-      var server = UserServers.findOne({_id: server_id});
-      waartaa.chat.helpers.setCurrentRoom({
-        roomtype: 'server', server_id: server_id, server_name: server.name
-      });
-    }
+    Meteor.setTimeout(function () {
+      if ($target.data('roomtype') == 'channel') {
+        var server_id = $target.parents('.server').data('server-id');
+        var channel_id = $(event.target).data('id');
+        var channel = UserChannels.findOne({_id: channel_id}) || {};
+        waartaa.chat.helpers.setCurrentRoom({
+          roomtype: 'channel', server_id: server_id, channel_id: channel_id,
+          channel_name: channel.name, server_name: channel.user_server_name
+        });
+      } else if ($target.data('roomtype') == 'pm') {
+        var server_id = $target.parents('.server').data('server-id');
+        var nick = $target.data('nick');
+        var server = UserServers.findOne({_id: server_id});
+        waartaa.chat.helpers.setCurrentRoom({
+          roomtype: 'pm', server_id: server_id, room_id: $target.data('roomid'),
+          server_name: server.name, nick: nick
+        });
+      } else if (
+          $target.data('roomtype') == 'server' ||
+          $target.parent().data('roomtype') == 'server') {
+        var server_id = $target.parent().data('server-id') ||
+          $target.data('server-id');
+        var server = UserServers.findOne({_id: server_id});
+        waartaa.chat.helpers.setCurrentRoom({
+          roomtype: 'server', server_id: server_id, server_name: server.name
+        });
+      }
+    }, 200);
 }
 
 Template.chat_connection_server.events({
