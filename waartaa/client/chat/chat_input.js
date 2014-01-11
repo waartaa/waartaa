@@ -45,11 +45,16 @@ Template.chat_input.events({
 function _submit_nick_away_data ($form) {
   var away_message = $form.find(
     '#nickAwayMessageInput').val() || "I'm not around.";
-  var user_server = UserServers.findOne({_id: Session.get('server_id')});
+  var room = Session.get('room') || {};
+  var user_server = UserServers.findOne({_id: room.server_id});
   if (user_server)
     Meteor.call('mark_away', user_server.name, away_message, function (err) {
       console.log(err);
+      if (!err)
+        $('.userNickOptions').parents('.dropup').removeClass('open');
     });
+  else
+    $('.userNickOptions').parents('.dropup').removeClass('open');
 }
 
 Template.user_nick_options_menu.events = {
@@ -88,6 +93,7 @@ Template.user_nick_options_menu.events = {
       if (user_server) {
         Meteor.call('mark_active', user_server.name, function (err) {
           console.log(err);
+          $('.userNickOptions').parents('.dropup').removeClass('open');
         });
       }
     }
