@@ -18,6 +18,11 @@ Template.chat_users.rendered = updateHeight;
 
 function infoPanelScrollendHandler (e) {
   var $target = $(e.target);
+  Meteor.setTimeout(function () {
+    $(document).off('scrollend.info_panel')
+    .on('scrollend.info_panel', '#info-panel .nano',
+        infoPanelScrollendHandler);
+  }, 2000);
   var room = Session.get('room') || {};
   if (room.roomtype == 'channel') {
     var channel = UserChannels.findOne({_id: room.room_id});
@@ -31,6 +36,10 @@ function infoPanelScrollendHandler (e) {
     if (count < 40 && (count < 30 && !startNick))
       return;
     $(document).off('scrollend.info_panel');
+    $('.channel-nicks-loader.scrollend').show();
+    Meteor.setTimeout(function () {
+      $('.channel-nicks-loader.scrollend').hide();
+    }, 5000);
     var nth_channel_nick = ChannelNicks.findOne(
       {channel_name: channel.name, server_name: channel.user_server_name},
       {skip: 10, sort: {nick: 1}});
@@ -43,11 +52,6 @@ function infoPanelScrollendHandler (e) {
       'startNick-' + channel.user_server_name + '_' + channel.name,
       null);
   }
-  Meteor.setTimeout(function () {
-    $(document).off('scrollend.info_panel')
-    .on('scrollend.info_panel', '#info-panel .nano',
-        infoPanelScrollendHandler);
-  }, 2000);
 }
 
 $(document).on('scrollend.info_panel', '#info-panel .nano',
@@ -55,6 +59,11 @@ $(document).on('scrollend.info_panel', '#info-panel .nano',
 
 function infoPanelScrolltopHandler (e) {
   var $target = $(e.target);
+  Meteor.setTimeout(function () {
+    $(document).off('scrolltop.info_panel')
+    .on('scrolltop.info_panel', '#info-panel .nano',
+        infoPanelScrolltopHandler);
+  }, 2000);
   var room = Session.get('room') || {};
   if (room.roomtype == 'channel') {
     var channel = UserChannels.findOne({_id: room.room_id});
@@ -65,6 +74,10 @@ function infoPanelScrolltopHandler (e) {
       ).count() < 40)
       return;
     $(document).off('scrolltop.info_panel');
+    $('.channel-nicks-loader.scrolltop').show();
+    Meteor.setTimeout(function () {
+      $('.channel-nicks-loader.scrolltop').hide();
+    }, 5000);
     var nth_channel_nick = ChannelNicks.findOne(
       {channel_name: channel.name, server_name: channel.user_server_name},
       {skip: 10, sort: {nick: -1}});
@@ -79,11 +92,6 @@ function infoPanelScrolltopHandler (e) {
       'lastNick-' + channel.user_server_name + '_' + channel.name,
       null);
   }
-  Meteor.setTimeout(function () {
-    $(document).off('scrolltop.info_panel')
-    .on('scrolltop.info_panel', '#info-panel .nano',
-        infoPanelScrolltopHandler);
-  }, 2000);
 }
 
 $(document).on('scrolltop.info_panel', '#info-panel .nano',

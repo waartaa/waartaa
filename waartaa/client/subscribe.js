@@ -156,6 +156,7 @@ subscribe_user_channel_nicks = function (channel) {
     function () {
         Meteor.setTimeout(
           function () {
+            $('.channel-nicks-loader').hide();
             var last_nick = ChannelNicks.findOne(
                 {
                   channel_name: channel.name,

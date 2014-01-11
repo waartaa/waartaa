@@ -370,3 +370,8 @@ body {
   padding: 5px;
   border: solid 1px rgb(26, 55, 105);
 }
+
+.channel-nicks-loader {
+  background-color: #E4F2FD;
+  text-align: center;
+}

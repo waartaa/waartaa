@@ -1,4 +1,7 @@
 <template name="channel_nicks_info">
+  <div class="channel-nicks-loader scrolltop row" style="display: none;">
+    Loading...
+  </div>
   {{#with currentChannel}}
     <ul id="channel-users-{{ _id }}" class="nav nav-list info-panel-item channel" data-server-id="{{ user_server_id }}">
       {{#isolate}}
@@ -6,6 +9,9 @@
       {{/isolate}}
     </ul>
   {{/with}}
+  <div class="channel-nicks-loader scrollend row" style="display: none;">
+    Loading...
+  </div>
 </template>
 
 <template name="channel_users">
