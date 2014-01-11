@@ -244,10 +244,13 @@ UserChannelLogs.find().observeChanges({
         new_logs > 0 &&
         log.message.search(user_server.current_nick) >= 0 &&
         (
-          (room.roomtype == 'channel' &&
-            room.room_id != log.channel_id) ||
-          room.roomtype != 'channel')
-        ) {
+          (
+            (room.roomtype == 'channel' &&
+              room.room_id != log.channel_id) ||
+            room.roomtype != 'channel'
+          ) || !window_focus
+        )
+      ) {
           var alert_message = log.server_name + log.channel_name + ': ' + log.message;
           $.titleAlert(alert_message, {
             requireBlur:true,
@@ -271,7 +274,10 @@ PMLogs.find().observeChanges({
       var room = Session.get('room') || {};
       if (
           new_logs > 0 &&
-          room.room_id != fields.server_id + '_' + nick) {
+          (
+            (room.room_id != fields.server_id + '_' + nick) || !window_focus
+          )
+        ) {
         var alert_message = nick + ' messaged you: ' + fields.message;
         $.titleAlert(alert_message, {
           requireBlur:true,

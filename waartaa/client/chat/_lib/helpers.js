@@ -160,3 +160,12 @@ Handlebars.registerHelper('limitStr', function (text, limit) {
   return final_text;
 });
 
+/**
+ * Check if window in focus or not
+ */
+window_focus = true;
+$(window).focus(function() {
+  window_focus = true;
+}).blur(function() {
+  window_focus = false;
+});
