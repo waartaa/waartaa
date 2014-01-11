@@ -1,7 +1,7 @@
 <template name="chat_user">
   <li class="dropdown{{#if is_user_away nick server_name}} user-away{{/if}}">
-    <a id="{{ nick }}" class="channel-user" href="#">
-      {{>channel_user_icon}} {{nick}}
+    <a id="{{ nick }}" class="channel-user" href="#" title="{{ nick }}">
+      {{>channel_user_icon}} {{ limitStr nick 15 }}
       <span class="pull-right">
         <div class="btn-group">
           <button type="button" class="channel-user-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">

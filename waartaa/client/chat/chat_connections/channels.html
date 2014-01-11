@@ -8,9 +8,9 @@
 
 <template name="server_channel_item">
   <li class="{{#if isChannelActive}}active{{/if}}">
-    <a id="channelLink-{{ _id }}" role="button" class="server-room channel" href="#" data-id="{{ _id }}" data-roomtype="channel">
+    <a id="channelLink-{{ _id }}" role="button" class="server-room channel" href="#" data-id="{{ _id }}" data-roomtype="channel" title="{{ name }}">
       {{ showStatusIcon status }}
-      {{ name }}
+      {{ limitStr name 12 }}
       <span class="pull-right">
         <span class="badge">{{ unread_logs_count "channel" _id }}</span>
         <div class="btn-group">

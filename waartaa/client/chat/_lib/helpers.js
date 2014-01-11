@@ -152,3 +152,11 @@ Handlebars.registerHelper('current_server_id', function () {
   return room.server_id;
 });
 
+Handlebars.registerHelper('limitStr', function (text, limit) {
+  var final_text = text;
+  if (text.length > limit) {
+    final_text = text.substr(0, limit - 3) + '...';
+  }
+  return final_text;
+});
+
