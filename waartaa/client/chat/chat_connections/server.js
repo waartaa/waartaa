@@ -134,14 +134,15 @@ Template.add_server_channel.events({
 });
 
 updateUnreadLogsCount = function (unread_logs_count_key, 
-                                  last_accessed_key, last_updated) {
+                                  last_accessed_key, last_updated, update_session) {
   var last_accessed = Session.get(last_accessed_key);
   var count = 0;
   if (last_updated > last_accessed) {
     var unread_logs_count = Session.get(unread_logs_count_key) || 0;
     unread_logs_count += 1;
     count += 1;
-    Session.set(unread_logs_count_key, unread_logs_count);
+    if (update_session)
+      Session.set(unread_logs_count_key, unread_logs_count);
   }
   return count;
 };

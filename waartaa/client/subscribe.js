@@ -233,13 +233,16 @@ UserChannelLogs.find().observeChanges({
   added: function (id, log) {
     Deps.nonreactive(function () {
       var session_key = 'unreadLogsCountChannel-' + log.channel_id;
+      var room = Session.get('room') || {};
+      var update_session = true;
+      if (room.roomtype == 'channel' && room.room_id == log.channel_id)
+        update_session = false;
       var new_logs = updateUnreadLogsCount(
         session_key, 'lastAccessedChannel-' + log.channel_id,
-        log.last_updated);
+        log.last_updated, update_session);
       var user_server = UserServers.findOne({_id: log.server_id});
       if (!user_server)
         return;
-      var room = Session.get('room') || {};
       if (
         new_logs > 0 &&
         log.message.search(user_server.current_nick) >= 0 &&
@@ -267,11 +270,18 @@ UserChannelLogs.find().observeChanges({
 PMLogs.find().observeChanges({
   added: function (id, fields) {
     Deps.nonreactive(function () {
+      var server = UserServers.findOne({_id: fields.server_id}) || {};
+      var nick = server.current_nick == fields.from? fields.to_nick: fields.from;
+      if (!nick)
+        return;
       var session_key = 'unreadLogsCountPm-' + fields.server_id + '_' + nick;
+      var room = Session.get('room') || {};
+      var update_session = true;
+      if (room.roomtype == 'pm' && room.room_id == fields.server_id + '_' + nick)
+        update_session = false;
       new_logs = updateUnreadLogsCount(
         session_key, 'lastAccessedPm-' + fields.server_id + '_' + nick,
-        fields.last_updated);
-      var room = Session.get('room') || {};
+        fields.last_updated, update_session);
       if (
           new_logs > 0 &&
           (
