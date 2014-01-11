@@ -1,12 +1,12 @@
 function serverRoomSelectHandler (event) {
     var $target = $(event.target);
-    // Show loader if selected room is not yet active
-    if (!$target.parent().hasClass('active'))
-      $('#chatlogs-loader').show();
     // Return if clicked on a server menu item
     if ($target.hasClass('server-room-menu-btn') ||
         $target.parent().hasClass('server-room-menu-btn'))
       return;
+    // Show loader if selected room is not yet active
+    if (!$target.parent().hasClass('active'))
+      $('#chatlogs-loader').show();
     event.stopPropagation();
     // Close any open menu
     $('.dropdown.open, .btn-group.open').removeClass('open');
