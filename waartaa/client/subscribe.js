@@ -215,3 +215,59 @@ UserServers.find().observeChanges({
   }
 });
 */
+
+UserChannelLogs.find().observeChanges({
+  added: function (id, log) {
+    Deps.nonreactive(function () {
+      var session_key = 'unreadLogsCountChannel-' + log.channel_id;
+      var new_logs = updateUnreadLogsCount(
+        session_key, 'lastAccessedChannel-' + log.channel_id,
+        log.last_updated);
+      var user_server = UserServers.findOne({_id: log.server_id});
+      if (!user_server)
+        return;
+      var room = Session.get('room') || {};
+      if (
+        new_logs > 0 &&
+        log.message.search(user_server.current_nick) >= 0 &&
+        (
+          (room.roomtype == 'channel' &&
+            room.room_id != log.channel_id) ||
+          room.roomtype != 'channel')
+        ) {
+          var alert_message = log.server_name + log.channel_name + ': ' + log.message;
+          $.titleAlert(alert_message, {
+            requireBlur:true,
+            stopOnFocus:true,
+            duration:10000,
+            interval:500
+          });
+        $('#audio-notification')[0].play();
+      }
+    });
+  }
+});
+
+PMLogs.find().observeChanges({
+  added: function (id, fields) {
+    Deps.nonreactive(function () {
+      var session_key = 'unreadLogsCountPm-' + fields.server_id + '_' + nick;
+      new_logs = updateUnreadLogsCount(
+        session_key, 'lastAccessedPm-' + fields.server_id + '_' + nick,
+        fields.last_updated);
+      var room = Session.get('room') || {};
+      if (
+          new_logs > 0 &&
+          room.room_id != fields.server_id + '_' + nick) {
+        var alert_message = nick + ' messaged you: ' + fields.message;
+        $.titleAlert(alert_message, {
+          requireBlur:true,
+          stopOnFocus:true,
+          duration:10000,
+          interval:500
+        });
+        $('#audio-notification')[0].play();
+      }
+    });
+  }
+});
