@@ -1,5 +1,5 @@
 <template name="chat_main">
-<div id="chat-main" class="col-md-8 col-sm-9 col-xs-12">
+<div id="chat-main" class="col-md-{{#if isCurrentRoomtype "server"}}10{{else}}8{{/if}} col-sm-9 col-xs-12">
   {{#constant}}
   <div id="chatlogs-loader" style="display: none;">
     <icon class="tipsy-enable glyphicon glyphicon-refresh spin" tooltip="connected" original-title=""></icon> Loading

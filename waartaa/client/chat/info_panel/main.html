@@ -1,10 +1,12 @@
 <template name="chat_users">
-<div id="info-panel" class="col-md-2 col-sm-2 hidden-xs">
-  <div class="panel panel-info">
-    {{> info_panel_header}}
-    {{> info_panel_body}}
+{{#unless isCurrentRoomtype "server"}}
+  <div id="info-panel" class="col-md-2 col-sm-2 hidden-xs">
+    <div class="panel panel-info">
+      {{> info_panel_header}}
+      {{> info_panel_body}}
+    </div>
   </div>
-</div>
+{{/unless}}
 </template>
 
 <template name="info_panel_header">
