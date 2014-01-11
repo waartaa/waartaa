@@ -10,6 +10,16 @@ function serverRoomSelectHandler (event) {
     event.stopPropagation();
     // Close any open menu
     $('.dropdown.open, .btn-group.open').removeClass('open');
+    var prev_room = Session.get('room') || {};
+    if (prev_room.roomtype == 'server')
+      Session.set(
+        'user_server_log_count_' + prev_room.server_id, DEFAULT_LOGS_COUNT);
+    else if (prev_room.roomtype == 'channel')
+      Session.set(
+        'user_channel_log_count_' + prev_room.channel_id, DEFAULT_LOGS_COUNT);
+    else if (prev_room.roomtype == 'pm')
+      Session.set(
+        'pmLogCount-' + prev_room.room_id, DEFAULT_LOGS_COUNT);
     Meteor.setTimeout(function () {
       if ($target.data('roomtype') == 'channel') {
         var server_id = $target.parents('.server').data('server-id');

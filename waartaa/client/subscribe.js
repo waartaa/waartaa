@@ -13,13 +13,15 @@ Function to subscribe to UserServerLogs for active UserServers.
 */
 subscribe_user_server_logs = function () {
   UserServers.find().forEach(function (user_server) {
-    Meteor.subscribe(
-      "user_server_logs", user_server._id,
-      Session.get('user_server_log_count_' + user_server._id),
-      function () {
-        $('.chatlogs-loader-msg').hide();
-      }
-    );
+    Deps.autorun(function () {
+      Meteor.subscribe(
+        "user_server_logs", user_server._id,
+        Session.get('user_server_log_count_' + user_server._id),
+        function () {
+          $('.chatlogs-loader-msg').hide();
+        }
+      );
+    });
   });
 }
 
@@ -28,13 +30,15 @@ Function to subscribe to UserChannelLogs for active UserChannels.
 */
 subscribe_user_channel_logs = function () {
   UserChannels.find({}).forEach(function (channel) {
-    Meteor.subscribe(
-      "user_channel_logs", channel._id,
-      Session.get('user_channel_log_count_' + channel._id),
-      function () {
-        $('.chatlogs-loader-msg').hide();
-      }
-    );
+    Deps.autorun(function () {
+      Meteor.subscribe(
+        "user_channel_logs", channel._id,
+        Session.get('user_channel_log_count_' + channel._id),
+        function () {
+          $('.chatlogs-loader-msg').hide();
+        }
+      );
+    });
   });
 }
 
@@ -50,13 +54,15 @@ subscribe_pm_logs = function () {
       // PM room_id is a combination of user_server ID and PM nick.
       var room_id = user_server._id + '_' + nick;
       // Subscribe to PMLogs with a server nick.
-      Meteor.subscribe(
-        'pm_logs', room_id,
-        Session.get('pmLogCount-' + room_id),
-        function () {
-          $('.chatlogs-loader-msg').hide();
-        }
-      );
+      Deps.autorun(function () {
+        Meteor.subscribe(
+          'pm_logs', room_id,
+          Session.get('pmLogCount-' + room_id),
+          function () {
+            $('.chatlogs-loader-msg').hide();
+          }
+        );
+      });
     }
   });
 }
