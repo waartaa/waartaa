@@ -18,7 +18,7 @@ subscribe_user_server_logs = function () {
         "user_server_logs", user_server._id,
         Session.get('user_server_log_count_' + user_server._id),
         function () {
-          $('.chatlogs-loader-msg').hide();
+          $('.chatlogs-loader-msg').fadeOut(1000);
         }
       );
     });
@@ -35,7 +35,7 @@ subscribe_user_channel_logs = function () {
         "user_channel_logs", channel._id,
         Session.get('user_channel_log_count_' + channel._id),
         function () {
-          $('.chatlogs-loader-msg').hide();
+          $('.chatlogs-loader-msg').fadeOut(1000);
         }
       );
     });
@@ -59,7 +59,7 @@ subscribe_pm_logs = function () {
           'pm_logs', room_id,
           Session.get('pmLogCount-' + room_id),
           function () {
-            $('.chatlogs-loader-msg').hide();
+            $('.chatlogs-loader-msg').fadeOut(1000);
           }
         );
       });
@@ -168,7 +168,7 @@ subscribe_user_channel_nicks = function (channel) {
     function () {
         Meteor.setTimeout(
           function () {
-            $('.channel-nicks-loader').hide();
+            $('.channel-nicks-loader').fadeOut(1000);
             var last_nick = ChannelNicks.findOne(
                 {
                   channel_name: channel.name,

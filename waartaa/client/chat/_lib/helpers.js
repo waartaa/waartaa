@@ -11,7 +11,7 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
   console.log("Reached top of page.");
   $('.chatlogs-loader-msg').show();
   Meteor.setTimeout(function () {
-    $('.chatlogs-loader-msg').hide();
+    $('.chatlogs-loader-msg').fadeOut(1000);
   }, 3000);
   var key = '';
   if ($table.hasClass('channel'))

@@ -38,7 +38,7 @@ function infoPanelScrollendHandler (e) {
     $(document).off('scrollend.info_panel');
     $('.channel-nicks-loader.scrollend').show();
     Meteor.setTimeout(function () {
-      $('.channel-nicks-loader.scrollend').hide();
+      $('.channel-nicks-loader.scrollend').fadeOut(1000);
     }, 5000);
     var nth_channel_nick = ChannelNicks.findOne(
       {channel_name: channel.name, server_name: channel.user_server_name},
@@ -76,7 +76,7 @@ function infoPanelScrolltopHandler (e) {
     $(document).off('scrolltop.info_panel');
     $('.channel-nicks-loader.scrolltop').show();
     Meteor.setTimeout(function () {
-      $('.channel-nicks-loader.scrolltop').hide();
+      $('.channel-nicks-loader.scrolltop').fadeOut(1000);
     }, 5000);
     var nth_channel_nick = ChannelNicks.findOne(
       {channel_name: channel.name, server_name: channel.user_server_name},
