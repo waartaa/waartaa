@@ -16,6 +16,9 @@
 <template name="pm_chat_logs_table">
   <div id="pm-chat-logs-{{ server_id }}_{{ name }}" class="table table-condensed chatlogs-table pm content">
     <div class="chatlogrows">
+      <div class="row chatlogs-loader-msg" style="display: none;">
+        Loading...
+      </div>
       {{#each pmChatLogs server_id name }}
         {{> pm_chat_row}}
       {{/each}}

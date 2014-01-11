@@ -9,6 +9,10 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
   var $table = $target.find('.chatlogs-table');
   $table.off('scrolltop');
   console.log("Reached top of page.");
+  $('.chatlogs-loader-msg').show();
+  Meteor.setTimeout(function () {
+    $('.chatlogs-loader-msg').hide();
+  }, 3000);
   var key = '';
   if ($table.hasClass('channel'))
     key = "user_channel_log_count_" + $target.data('channel-id');

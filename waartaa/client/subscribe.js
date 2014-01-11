@@ -17,7 +17,7 @@ subscribe_user_server_logs = function () {
       "user_server_logs", user_server._id,
       Session.get('user_server_log_count_' + user_server._id),
       function () {
-        console.log(UserServerLogs.find().count());
+        $('.chatlogs-loader-msg').hide();
       }
     );
   });
@@ -30,7 +30,10 @@ subscribe_user_channel_logs = function () {
   UserChannels.find({}).forEach(function (channel) {
     Meteor.subscribe(
       "user_channel_logs", channel._id,
-      Session.get('user_channel_log_count_' + channel._id)
+      Session.get('user_channel_log_count_' + channel._id),
+      function () {
+        $('.chatlogs-loader-msg').hide();
+      }
     );
   });
 }
@@ -49,7 +52,10 @@ subscribe_pm_logs = function () {
       // Subscribe to PMLogs with a server nick.
       Meteor.subscribe(
         'pm_logs', room_id,
-        Session.get('pmLogCount-' + room_id)
+        Session.get('pmLogCount-' + room_id),
+        function () {
+          $('.chatlogs-loader-msg').hide();
+        }
       );
     }
   });

@@ -17,6 +17,9 @@
 <div id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel content">
   {{#isolate}}
   <div class="chatlogrows">
+    <div class="row chatlogs-loader-msg" style="display: none;">
+      Loading...
+    </div>
     {{#each channelChatLogs _id}}
       {{#isolate}}
         {{> chat_row}}
