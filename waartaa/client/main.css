@@ -359,7 +359,7 @@ body {
 }
 
 #chatlogs-loader {
-  z-index: 9999;
+  z-index: 1000;
   left: 45%;
   background-color: #C4DFF1;
   width: 10%;
