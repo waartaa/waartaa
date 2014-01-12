@@ -17,7 +17,9 @@
           <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
-          {{> channel_menu}}
+          {{#isolate}}
+            {{> channel_menu}}
+          {{/isolate}}
         </div>
       </span>
     </a>

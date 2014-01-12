@@ -630,7 +630,7 @@ IRCHandler = function (user, user_server) {
                 password: channel_data.password,
                 user_id: user._id,
                 user_server_name: user_server.name,
-                last_update: new Date(),
+                last_updated: new Date(),
                 last_updater: user.username,
                 last_updater_id: user._id}
             },

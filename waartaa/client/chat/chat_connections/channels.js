@@ -8,7 +8,11 @@ Handlebars.registerHelper('channel_to_edit', function (e) {
 
 Template.server_channels.channels = function (server_id) {
   return UserChannels.find(
-    {user_server_id: server_id, active: true}, {sort: {name: 1}});
+    {user_server_id: server_id, active: true},
+    {
+      fields: {last_updated: 0},
+      sort: {name: 1}
+    });
 }
 
 function serverChannelsRenderedCallback () {
