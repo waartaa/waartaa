@@ -52,6 +52,11 @@ IRCHandler = function (user, user_server) {
         if (LISTENERS.channel['message' + channel.name] != undefined)
             return;
         LISTENERS.channel['message', channel.name] = '';
+        // Remove channel message listeners if any
+        var listeners = client.listeners('message' + channel.name);
+        _.each(listeners, function (listener) {
+            client.removeListener('message' + channel.name, listener);
+        });
         client.addListener('message' + channel.name, function (
                 nick, text, message) {
             Fiber(function () {
@@ -211,6 +216,11 @@ IRCHandler = function (user, user_server) {
         if (LISTENERS.server['join'] != undefined)
             return;
         LISTENERS.server['join'] = '';
+        // remove any pre existing 'join' listener
+        var listeners = client.listeners('join');
+        _.each(listeners, function (listener) {
+            client.removeListener('join', listener);
+        });
         client.addListener('join', function (channel, nick, message) {
             Fiber(function () {
                 var user_channel = _create_update_user_channel(
@@ -380,6 +390,11 @@ IRCHandler = function (user, user_server) {
         if (LISTENERS.server['message'] != undefined)
             return;
         LISTENERS.server['message'] = '';
+        // Remove any pre existing PM listener
+        var listeners = client.listeners('message');
+        _.each(listeners, function (listener) {
+            client.removeListener('message', listener);
+        });
         client.addListener('message', function (nick, to, text, message) {
             //console.log(nick + ', ' + to + ', ' + text + ', ' + message);
             if (to == client.nick) {
