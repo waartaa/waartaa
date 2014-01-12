@@ -5,21 +5,29 @@
   <link href='https://fonts.googleapis.com/css?family=Bitter:400,700,400italic' rel='stylesheet' type='text/css'>
 </head>
 <body>
-  {{> body}}
+  {{#isolate}}
+    {{> body}}
+  {{/isolate}}
 </body>
 
 <template name="body">
-  {{> header}}
+  {{#isolate}}
+    {{> header}}
+  {{/isolate}}
   <div class="container">
     <div class="content">
       <div class="wrapper">
         <div class="proper-content">
-          {{renderPage}}
+          {{#isolate}}
+            {{renderPage}}
+          {{/isolate}}
         </div>
       </div>
     </div>
   </div>
-  {{> footer}}
+  {{#isolate}}
+    {{> footer}}
+  {{/isolate}}
 </template>
 
 <template name="header">
