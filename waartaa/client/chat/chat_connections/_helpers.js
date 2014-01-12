@@ -3,7 +3,7 @@ Handlebars.registerHelper('showStatusIcon', function (status) {
   var statusIconHtml = '';
   if (status == 'connected')
     iconClass = 'glyphicon-ok-circle';
-  else if (status == 'disconnected')
+  else if (status == 'disconnected' || status == 'user_disconnected')
     iconClass = 'glyphicon-ban-circle';
   else if (status == 'connecting' || status == 'disconnecting')
     iconClass = 'spin glyphicon-refresh';

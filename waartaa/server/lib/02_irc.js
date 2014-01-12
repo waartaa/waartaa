@@ -473,7 +473,7 @@ IRCHandler = function (user, user_server) {
             UserChannels.find(
             {
                 active: true, user: user.username,
-                status: {$ne: 'disconnected'},
+                status: {$ne: 'user_disconnected'},
                 user_server_name: user_server.name
             }).forEach(function (channel) {
                 _addChannelNamesListener(channel.name);
@@ -566,7 +566,7 @@ IRCHandler = function (user, user_server) {
         Fiber(function() {
             UserChannels.update(
                 {name: channel_name, user_server_id: user_server._id},
-                {$set: {status: 'disconnected'}});
+                {$set: {status: 'user_disconnected'}});
         }).run();
         for (job in JOBS) {
             if (job.search(channel_name) >= 0)
@@ -903,7 +903,7 @@ IRCHandler = function (user, user_server) {
                 {
                     user_server_name: user_server.name,
                     user: user.username,
-                    status: {$ne: 'disconnected'}
+                    status: {$ne: 'user_disconnected'}
                 },
                 {$set: {status: 'connecting'}},
                 {multi: true}
