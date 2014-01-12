@@ -578,13 +578,17 @@ IRCHandler = function (user, user_server) {
         Fiber(function () {
             UserServers.update(
                 {_id: user_server._id},
-                {$set: {status: 'disconnected'}}
+                {$set: {status: 'user_disconnected'}}
             );
         }).run();
         Fiber(function () {
             UserChannels.update(
-                {user_server_id: user_server._id},
-                {$set: {status: 'disconnected'}}
+                {
+                    user_server_id: user_server._id,
+                    status: {$ne: 'user_disconnected'}
+                },
+                {$set: {status: 'disconnected'}},
+                {multi: true}
             );
         }).run();
         Fiber(function () {
@@ -884,7 +888,7 @@ IRCHandler = function (user, user_server) {
             client = new irc.Client(server_url, nick, client_options);
             client_data[server.name] = client;
             UserServers.update(
-                {_id: user_server._id, status: {$ne: 'disconnected'}},
+                {_id: user_server._id, status: {$ne: 'user_disconnected'}},
                 {
                     $set: {status: 'connecting', active: true}
                 },

@@ -185,6 +185,7 @@ function getCurrentUser() {
 }
 
 function _join_user_server(user, user_server_name) {
+    console.log('_JOIN USER SERVER');
     var user_server = UserServers.findOne({
         user: user.username, name: user_server_name});
     if (user_server) {
@@ -244,6 +245,7 @@ Meteor.methods({
     },
     join_user_server: function (user_server_name) {
         var user = Meteor.users.findOne({_id: this.userId});
+        console.log('JOIN USER SERVER');
         _join_user_server(user, user_server_name);
     },
     quit_user_server: function (user_server_name, close) {
