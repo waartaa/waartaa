@@ -483,6 +483,7 @@ IRCHandler = function (user, user_server) {
                     _joinChannelCallback(message, channel);
                 });
             });
+            disconnectConnectingChannelsOnTimeout(20000);
         }).run();
         client.addListener('notice', function (nick, to, text, message) {
             if (nick == null) {
@@ -815,6 +816,33 @@ IRCHandler = function (user, user_server) {
         }).run();
     }
 
+    function disconnectConnectingChannelsOnTimeout (timeout, channel_names) {
+        Meteor.setTimeout(function () {
+            Fiber(function () {
+                var query = {user_server_id: user_server._id, status: 'connecting'};
+                if (channel_names)
+                    query['name'] = {$in: channel_names};
+                UserChannels.update(
+                    query,
+                    {$set: {status: 'disconnected'}},
+                    {multi: true}
+                );
+            }).run();
+        }, timeout);
+    }
+
+    function disconnectConnectingServerOnTimeout (timeout) {
+        Meteor.setTimeout(function () {
+            Fiber(function () {
+                UserServers.update(
+                    {_id: user_server._id, status: 'connecting'},
+                    {$set: {status: 'disconnected'}}
+                );
+            }).run();
+        }, timeout);
+        disconnectConnectingChannelsOnTimeout(timeout);
+    }
+
     return {
         joinChannel: function (channel_name, password) {
             _addChannelNamesListener(channel_name);
@@ -832,6 +860,7 @@ IRCHandler = function (user, user_server) {
                     }).run();
                 });
             }
+            disconnectConnectingChannelsOnTimeout(20000, [channel_name]);
         },
         partChannel: function (channel_name) {
             var client = client_data[user_server.name];
@@ -878,7 +907,7 @@ IRCHandler = function (user, user_server) {
                 },
                 {$set: {status: 'connecting'}},
                 {multi: true}
-            )
+            );
             if (LISTENERS.server['nickSet'] != undefined)
                 return;
             LISTENERS.server['nickSet'] = '';
@@ -916,6 +945,7 @@ IRCHandler = function (user, user_server) {
                     _joinServerCallback(message);
                 }).run();
             });
+            disconnectConnectingServerOnTimeout(20000);
         },
         partUserServer: function () {
             var client = client_data[user_server.name];
