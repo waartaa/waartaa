@@ -46,3 +46,8 @@ Accounts.onCreateUser(function (options, user) {
   user.profile.connections = {};
   return user;
 });
+
+Accounts.config({
+  sendVerificationEmail: true,
+  forbidClientAccountCreation: false
+});
