@@ -855,111 +855,127 @@ IRCHandler = function (user, user_server) {
 
     return {
         joinChannel: function (channel_name, password) {
-            _addChannelNamesListener(channel_name);
-            _addChannelJoinListener(channel_name);
-            _addChannelPartListener(channel_name);
-            if (password) {
-                client.send('JOIN', channel_name, password);
-            } else {
-                client.join(channel_name, function (message) {
-                    Fiber(function () {
-                        var channel = _create_update_user_channel(
-                            user_server, {
-                                name: channel_name, password: password});
-                        _joinChannelCallback(message, channel);
-                    }).run();
-                });
+            try {
+                _addChannelNamesListener(channel_name);
+                _addChannelJoinListener(channel_name);
+                _addChannelPartListener(channel_name);
+                if (password) {
+                    client.send('JOIN', channel_name, password);
+                } else {
+                    client.join(channel_name, function (message) {
+                        Fiber(function () {
+                            var channel = _create_update_user_channel(
+                                user_server, {
+                                    name: channel_name, password: password});
+                            _joinChannelCallback(message, channel);
+                        }).run();
+                    });
+                }
+            } catch (err) {
+                logger.error(err);
             }
             disconnectConnectingChannelsOnTimeout(20000, [channel_name]);
         },
         partChannel: function (channel_name) {
-            var client = client_data[user_server.name];
-            client.part(channel_name, function (message) {
-                _partChannelCallback(
-                    message, channel_name);
-            });
+            try {
+                var client = client_data[user_server.name];
+                client.part(channel_name, function (message) {
+                    _partChannelCallback(
+                        message, channel_name);
+                });
+            } catch (err) {
+                logger.error(err);
+            }
         },
         create_update_user_channel: function (channel_data) {
-            Fiber(function () {
-                _create_update_user_channel(user_server, channel_data);
-            }).run();
+            try {
+                Fiber(function () {
+                    _create_update_user_channel(user_server, channel_data);
+                }).run();
+            } catch (err) {
+                logger.error(err);
+            }
         },
         removeChannel: function (channel) {},
         joinUserServer: function () {
-            var server = Servers.findOne({name: user_server.name});
-            var server_url = server.connections[0].url;
-            var server_port = server.connections[0].port || '6667';
-            var nick = user_server.nick;
-            var client_options = {
-                autoConnect: false,
-                port: ssl_credentials? '6697': server_port,
-                userName: nick,
-                realName: user_server.real_name || '~',
-                secure: ssl_credentials,
-                selfSigned: true,
-                certExpired: true,
-                debug: CONFIG.DEBUG
+            try {
+                var server = Servers.findOne({name: user_server.name});
+                var server_url = server.connections[0].url;
+                var server_port = server.connections[0].port || '6667';
+                var nick = user_server.nick;
+                var client_options = {
+                    autoConnect: false,
+                    port: ssl_credentials? '6697': server_port,
+                    userName: nick,
+                    realName: user_server.real_name || '~',
+                    secure: ssl_credentials,
+                    selfSigned: true,
+                    certExpired: true,
+                    debug: CONFIG.DEBUG
+                };
+                client = new irc.Client(server_url, nick, client_options);
+                client_data[server.name] = client;
+                UserServers.update(
+                    {_id: user_server._id, status: {$ne: 'user_disconnected'}},
+                    {
+                        $set: {status: 'connecting', active: true}
+                    },
+                    {multi: true}
+                );
+                UserChannels.update(
+                    {
+                        user_server_name: user_server.name,
+                        user: user.username,
+                        status: {$ne: 'user_disconnected'}
+                    },
+                    {$set: {status: 'connecting'}},
+                    {multi: true}
+                );
+                if (LISTENERS.server['nickSet'] != undefined)
+                    return;
+                LISTENERS.server['nickSet'] = '';
+                client.addListener('nickSet', function (nick) {
+                    Fiber(function () {
+                        if (user_server.current_nick != nick) {
+                            ChannelNicks.remove(
+                                {
+                                    server_name: user_server.name,
+                                    nick: user_server.current_nick
+                                }
+                            );
+                            UserServers.update({_id: user_server._id}, {$set: {current_nick: nick}});
+                            user_server = UserServers.findOne({_id: user_server._id});
+                            UserChannels.find(
+                                {
+                                    user_server_name: user_server.name,
+                                    user: user.username
+                                }).forEach(function (channel) {
+                                    ChannelNicks.update(
+                                        {
+                                            server_name: user_server.name,
+                                            channel_name: channel.name,
+                                            nick: nick
+                                        },
+                                        {$set: {}},
+                                        {upsert: true, multi: true}
+                                    );
+                                });
+                        }
+                    }).run();
+                });
+                client.connect(function (message) {
+                    Fiber(function () {
+                        _joinServerCallback(message);
+                    }).run();
+                });
+                disconnectConnectingServerOnTimeout(20000);
+            } catch (err) {
+                logger.error(err);
             }
-            client = new irc.Client(server_url, nick, client_options);
-            client_data[server.name] = client;
-            UserServers.update(
-                {_id: user_server._id, status: {$ne: 'user_disconnected'}},
-                {
-                    $set: {status: 'connecting', active: true}
-                },
-                {multi: true}
-            );
-            UserChannels.update(
-                {
-                    user_server_name: user_server.name,
-                    user: user.username,
-                    status: {$ne: 'user_disconnected'}
-                },
-                {$set: {status: 'connecting'}},
-                {multi: true}
-            );
-            if (LISTENERS.server['nickSet'] != undefined)
-                return;
-            LISTENERS.server['nickSet'] = '';
-            client.addListener('nickSet', function (nick) {
-                Fiber(function () {
-                    if (user_server.current_nick != nick) {
-                        ChannelNicks.remove(
-                            {
-                                server_name: user_server.name,
-                                nick: user_server.current_nick
-                            }
-                        );
-                        UserServers.update({_id: user_server._id}, {$set: {current_nick: nick}});
-                        user_server = UserServers.findOne({_id: user_server._id});
-                        UserChannels.find(
-                            {
-                                user_server_name: user_server.name,
-                                user: user.username
-                            }).forEach(function (channel) {
-                                ChannelNicks.update(
-                                    {
-                                        server_name: user_server.name,
-                                        channel_name: channel.name,
-                                        nick: nick
-                                    },
-                                    {$set: {}},
-                                    {upsert: true, multi: true}
-                                );
-                            });
-                    }
-                }).run();
-            });
-            client.connect(function (message) {
-                Fiber(function () {
-                    _joinServerCallback(message);
-                }).run();
-            });
-            disconnectConnectingServerOnTimeout(20000);
         },
         partUserServer: function () {
-            var client = client_data[user_server.name];
             try {
+                var client = client_data[user_server.name];
                 client.disconnect(function (message) {
                     _partUserServerCallback(message, user_server, client);
                 });
@@ -968,114 +984,146 @@ IRCHandler = function (user, user_server) {
             }
         },
         addUserServer: function (server_data) {
-            var now = new Date();
-            var user_server_id = UserServers.insert({
-                name: server_data.server.name,
-                server_id: server_data.server._id,
-                nick: server_data.nick,
-                password: server_data.password,
-                user: user,
-                user_id: user._id,
-                created: now,
-                creator: user,
-                creator_id: user._id,
-                last_updated: now,
-                last_updater: user,
-                last_updater_id: user._id,
-            });
-            var user_server = UserServers.findOne({_id: user_server_id});
-            _.each(server_data.channels, function (item) {
-                create_update_user_channel(user_server, item);
-            });
+            try {
+                var now = new Date();
+                var user_server_id = UserServers.insert({
+                    name: server_data.server.name,
+                    server_id: server_data.server._id,
+                    nick: server_data.nick,
+                    password: server_data.password,
+                    user: user,
+                    user_id: user._id,
+                    created: now,
+                    creator: user,
+                    creator_id: user._id,
+                    last_updated: now,
+                    last_updater: user,
+                    last_updater_id: user._id,
+                });
+                var user_server = UserServers.findOne({_id: user_server_id});
+                _.each(server_data.channels, function (item) {
+                    create_update_user_channel(user_server, item);
+                });
+            } catch (err) {
+                logger.error(err);
+            }
         },
         markAway: function (message) {
-            Fiber(function () {
-                UserServers.update({_id: user_server._id}, {$set: {away_msg: message}});
-                client.send('AWAY', message);
-            }).run();
+            try {
+                Fiber(function () {
+                    UserServers.update({_id: user_server._id}, {$set: {away_msg: message}});
+                    client.send('AWAY', message);
+                }).run();
+            } catch (err) {
+                logger.error(err);
+            }
         },
         markActive: function () {
-            client.send('AWAY', '');
+            try {
+                client.send('AWAY', '');
+            } catch (err) {
+                logger.error(err);
+            }
         },
         removeServer: function (server_id, user_id) {},
         updateServer: function (server_id, server_data, user_id) {},
         sendChannelMessage: function (channel_name, message) {
-            var channel = UserChannels.findOne({
-              name: channel_name,
-              user_server_id: user_server._id,
-            }) || {};
-            UserChannelLogs.insert({
-                message: message,
-                raw_message: {},
-                from: client.nick,
-                from_user: user.username,
-                from_user_id: user._id,
-                channel_name: channel.name,
-                channel_id: channel._id,
-                server_name: user_server.name,
-                server_id: user_server._id,
-                user: user.username,
-                user_id: user._id,
-                created: new Date(),
-                last_updated: new Date()
-            });
-            client.say(channel_name, message);
+            try {
+                var channel = UserChannels.findOne({
+                  name: channel_name,
+                  user_server_id: user_server._id,
+                }) || {};
+                UserChannelLogs.insert({
+                    message: message,
+                    raw_message: {},
+                    from: client.nick,
+                    from_user: user.username,
+                    from_user_id: user._id,
+                    channel_name: channel.name,
+                    channel_id: channel._id,
+                    server_name: user_server.name,
+                    server_id: user_server._id,
+                    user: user.username,
+                    user_id: user._id,
+                    created: new Date(),
+                    last_updated: new Date()
+                });
+                client.say(channel_name, message);
+            } catch (err) {
+                logger.error(err);
+            }
         },
         changeNick: function (nick) {
-            client.send('NICK', nick);
+            try {
+                client.send('NICK', nick);
+            } catch (err) {
+                logger.error(err);
+            }
         },
         sendServerMessage: function (message) {
-            UserServerLogs.insert({
-                message: message,
-                raw_message: message,
-                from: client.nick,
-                from_user: user.username,
-                from_user_id: user.user_id,
-                server_name: user_server.name,
-                server_id: user_server._id,
-                user: user.username,
-                user_id: user._id,
-                created: new Date(),
-                last_updated: new Date()
-            });
+            try {
+                UserServerLogs.insert({
+                    message: message,
+                    raw_message: message,
+                    from: client.nick,
+                    from_user: user.username,
+                    from_user_id: user.user_id,
+                    server_name: user_server.name,
+                    server_id: user_server._id,
+                    user: user.username,
+                    user_id: user._id,
+                    created: new Date(),
+                    last_updated: new Date()
+                });
+            } catch (err) {
+                logger.error(err);
+            }
         },
         sendPMMessage: function (to, message) {
-            PMLogs.insert({
-              message: message,
-              raw_message: {},
-              from: client.nick,
-              display_from: client.nick,
-              from_user: user.username,
-              from_user_id: user._id,
-              to_nick: to,
-              to_user: '',
-              to_user_id: '',
-              server_name: user_server.name,
-              server_id: user_server._id,
-              user: user.username,
-              user_id: user._id,
-              created: new Date(),
-              last_updated: new Date()
-            });
-            client.say(to, message);
+            try {
+                PMLogs.insert({
+                  message: message,
+                  raw_message: {},
+                  from: client.nick,
+                  display_from: client.nick,
+                  from_user: user.username,
+                  from_user_id: user._id,
+                  to_nick: to,
+                  to_user: '',
+                  to_user_id: '',
+                  server_name: user_server.name,
+                  server_id: user_server._id,
+                  user: user.username,
+                  user_id: user._id,
+                  created: new Date(),
+                  last_updated: new Date()
+                });
+                client.say(to, message);
+            } catch (err) {
+                logger.error(err);
+            }
         },
         getServerClient: function (server_id, user_id) {},
         isServerConnected: function (server_id) {},
         sendRawMessage: function (message, log_options) {
-            var args = message.substr(1).split(' ');
-            //console.log('############');
-            //console.log(args);
-            if (args[0] == 'whois' || args[0] == 'WHOIS') {
-                client.whois(args[1], function (info) {
-                    //console.log('+++++++WHOIS CALLBACK++++++++');
-                    //console.log(info);
-                    if (log_options.logInput) {
-                        _logIncomingMessage(message, log_options);
-                    }
-                    _whois_callback(info, log_options);
-                });
-            } else 
-            client.send.apply(client, args);
+            try {
+                var args = message.substr(1).split(' ');
+                //console.log('############');
+                //console.log(args);
+                if (args[0] == 'whois' || args[0] == 'WHOIS') {
+                    client.whois(args[1], function (info) {
+                        //console.log('+++++++WHOIS CALLBACK++++++++');
+                        //console.log(info);
+                        if (log_options.logInput) {
+                            _logIncomingMessage(message, log_options);
+                        }
+                        _whois_callback(info, log_options);
+                    });
+                } else 
+                client.send.apply(client, args);
+            } catch (err) {
+                logger.error(err);
+            }
         }
     }
 };
