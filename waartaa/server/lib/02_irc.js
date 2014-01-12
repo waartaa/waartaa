@@ -602,36 +602,27 @@ IRCHandler = function (user, user_server) {
     }
 
     function _create_update_user_channel (user_server, channel_data) {
-        var user_channel = UserChannels.findOne({name: channel_data.name,
-            user_server_id: user_server._id, user: user.username});
-        if (user_channel) {
-            UserChannels.update({_id: user_channel._id},
-                {$set: {
-                    password: channel_data.password,
-                    last_update: new Date(),
-                    last_updater: user.username,
-                    last_updater_id: user._id
-                }
-            });
-            user_channel_id = user_channel._id;
-        } else {
-            var now = new Date();
-            var user_channel_id = UserChannels.insert({
-                name: channel_data.name,
+        UserChannels.update(
+            {
+                name: channel_data.name, user_server_id: user_server._id,
+                user: user.username
+            },
+            {$set: {
                 password: channel_data.password,
-                user_server_id: user_server._id,
-                user_server_name: user_server.name,
-                user: user.username,
                 user_id: user._id,
-                creator: user.username,
-                creator_id: user._id,
-                created: now,
+                user_server_name: user_server.name,
+                last_update: new Date(),
                 last_updater: user.username,
-                last_updater_id: user._id,
-                last_updated: now
-            });
-        }
-        var user_channel = UserChannels.findOne({_id: user_channel_id});
+                last_updater_id: user._id}
+            },
+            {upsert: true}
+        );
+        var user_channel = UserChannels.findOne(
+            {
+                name: channel_data.name, user_server_id: user_server._id,
+                user: user.username
+            }
+        );
         return user_channel;
     }
 
