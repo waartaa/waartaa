@@ -64,6 +64,7 @@ waartaa.chat.helpers.highlightServerRoom = function () {
       Session.set('lastAccessedServer-' + room.room_id, new Date());
       Session.set('unreadLogsCountServer-' + room.room_id, 0);
   }
+  $('#chat-input').focus();
   //refreshAutocompleteNicksSource();
   Meteor.setTimeout(function () {
     $('#chat-main .nano').nanoScroller({scroll: 'bottom'})
