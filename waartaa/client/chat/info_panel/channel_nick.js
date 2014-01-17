@@ -29,9 +29,9 @@ Template.user_menu.events = {
           server_name: server.name,
           roomtype: 'pm'
         });
+        Meteor.call(
+          'send_command', server.name, '/WHOIS ' + nick, {});
       });
-      Meteor.call(
-        'send_command', server.name, '/WHOIS ' + nick);
     }
   },
   'click .whois-user': function (event) {

@@ -665,7 +665,8 @@ IRCHandler = function (user, user_server) {
             }
             ServerNicks.update(
                 {server_name: user_server.name, nick: info.nick},
-                {$set: info}
+                {$set: info},
+                {upsert: true}
             );
         }).run();
     }

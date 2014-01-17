@@ -74,12 +74,12 @@ subscribe_server_nicks_for_pms = function () {
   var user = Meteor.user();
   if (!user)
     return;
-  UserServers.find().forEach(function (user_server) {
-    var nicks = (user.profile.connections[user_server._id] || {}).pms || {};
+  UserPms.find().forEach(function (user_pms) {
+    var nicks = user_pms.pms || {};
     var nicks_list = [];
     for (nick in nicks)
       nicks_list.push(nick);
-    Meteor.subscribe('server_nicks', user_server.name, nicks_list);
+    Meteor.subscribe('server_nicks', user_pms.user_server_name, nicks_list);
   });
 };
 
