@@ -2,7 +2,9 @@ function serverRoomSelectHandler (event) {
     var $target = $(event.target);
     // Return if clicked on a server menu item
     if ($target.hasClass('server-room-menu-btn') ||
-        $target.parent().hasClass('server-room-menu-btn'))
+        $target.parent().hasClass('server-room-menu-btn') ||
+        $target.hasClass('pm-remove') ||
+        $target.parent().hasClass('pm-remove'))
       return;
     // Show loader if selected room is not yet active
     if (!$target.parent().hasClass('active'))
