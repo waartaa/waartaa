@@ -1,7 +1,10 @@
 Handlebars.registerHelper('getCurrentChannel', function () {
   var room = Session.get('room') || {};
   if (room.roomtype == 'channel') {
-    return UserChannels.findOne({_id: room.room_id});
+    return UserChannels.findOne(
+        {_id: room.room_id},
+        {fields: {last_updated: 0, created: 0}
+    });
   }
 });
 

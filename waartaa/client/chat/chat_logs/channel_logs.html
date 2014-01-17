@@ -1,14 +1,18 @@
 <template name="channel_logs">
 {{#with getCurrentChannel }}
 <div id="channel-chatroom-{{ _id }}" class="chatroom channel">
-  <div class="topic">
-    <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
-      <li><p>{{topic}}<p></li>
-    </ul>
-  </div>
-  <div class="chat-logs-container nano channel" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
-    {{> channel_chat_logs_table}}
-  </div>
+  {{#isolate}}
+    <div class="topic">
+      <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+        <li><p>{{topic}}<p></li>
+      </ul>
+    </div>
+    <div class="chat-logs-container nano channel" data-channel-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+      {{#isolate}}
+        {{> channel_chat_logs_table}}
+      {{/isolate}}
+    </div>
+  {{/isolate}}
 </div>
 {{/with}}
 </template>
