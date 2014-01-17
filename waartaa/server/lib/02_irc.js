@@ -1110,7 +1110,7 @@ IRCHandler = function (user, user_server) {
                 var args = message.substr(1).split(' ');
                 //console.log('############');
                 //console.log(args);
-                if (args[0] == 'whois' || args[0] == 'WHOIS') {
+                if (log_options && (args[0] == 'whois' || args[0] == 'WHOIS')) {
                     client.whois(args[1], function (info) {
                         //console.log('+++++++WHOIS CALLBACK++++++++');
                         //console.log(info);

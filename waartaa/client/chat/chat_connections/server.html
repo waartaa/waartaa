@@ -14,8 +14,12 @@
         </span>
       {{/isolate}}
     </a>
-    {{> server_channels}}
-    {{> server_pms}}
+    {{#isolate}}
+      {{> server_channels}}
+    {{/isolate}}
+    {{#isolate}}
+      {{> server_pms}}
+    {{/isolate}}
     {{> edit_server_channel}}
   </li>
 </template>
