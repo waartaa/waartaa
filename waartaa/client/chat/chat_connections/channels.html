@@ -9,19 +9,21 @@
 <template name="server_channel_item">
   <li>
     <a id="channelLink-{{ _id }}" role="button" class="server-room channel" href="#" data-id="{{ _id }}" data-roomtype="channel" title="{{ name }}">
-      {{ showStatusIcon status }}
-      {{ limitStr name 12 }}
-      <span class="pull-right">
-        <span class="badge">{{ unread_logs_count "channel" _id }}</span>
-        <div class="btn-group">
-          <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
-            <span class="caret"></span>
-          </button>
-          {{#isolate}}
-            {{> channel_menu}}
-          {{/isolate}}
-        </div>
-      </span>
+      {{#isolate}}
+        {{ showStatusIcon status }}
+        {{ limitStr name 12 }}
+        <span class="pull-right">
+          <span class="badge">{{ unread_logs_count "channel" _id }}</span>
+          <div class="btn-group">
+            <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+              <span class="caret"></span>
+            </button>
+            {{#isolate}}
+              {{> channel_menu}}
+            {{/isolate}}
+          </div>
+        </span>
+      {{/isolate}}
     </a>
   </li>
 </template>
