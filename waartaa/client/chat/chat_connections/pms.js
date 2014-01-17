@@ -2,9 +2,11 @@ Template.server_pm_item.rendered = function () {
   Session.set("lastAccessedPm-" + this.data.server_id + '_' + this.data.from);
 };
 
-Template.server_pm_menu.events = {
+Template.server_pm_item.events = {
   'click .pm-remove': function (e) {
-    var $target = $(e.target);
+    e.preventDefault();
+    e.stopPropagation();
+    var $target = $(e.target).parent('a');
     var pm_id = $(e.target).parents('li').find(
       '.pm.server-room').attr('id');
     var user_server_id = $target.data('server-id');

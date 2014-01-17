@@ -14,12 +14,7 @@
         {{ limitStr name 12 }}
         <span class="pull-right">        
           <span class="badge">{{ unread_logs_count "pm" server_id name }}</span>
-          <div class="btn-group">
-            <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-            </button>
-            {{> server_pm_menu}}
-          </div>
+          <a class="pm-remove" href="#" style="padding: 3px 5px;" data-user-nick="{{ name }}" data-server-id="{{ server_id }}"><i class="glyphicon glyphicon-remove"></i></a>
         </span>
       {{/isolate}}
     </a>
