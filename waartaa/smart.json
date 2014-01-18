@@ -15,6 +15,7 @@
     "winston": {},
     "assert": {},
     "nprogress": {},
-    "GAnalytics": {}
+    "GAnalytics": {},
+    "fast-render": {}
   }
 }

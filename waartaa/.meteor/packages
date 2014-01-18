@@ -36,3 +36,5 @@ winston
 assert
 GAnalytics
 email
+
+fast-render
