@@ -39,7 +39,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="{{# if currentUser }}/chat{{else}}/{{/if}}">w&#x101rt&#x101</a>
+        <a class="navbar-brand" href="{{# if currentUser }}/chat{{else}}/{{/if}}">wārtā</a>
       </div>
       <div class="collapse navbar-collapse" id="nav-collapse-1">
         <ul class="nav navbar-nav navbar-right">
@@ -78,6 +78,7 @@
 </template>
 
 <template name="user_loggedout_content">
+  {{> intro}}
 </template>
 
 <template name="signin_form">

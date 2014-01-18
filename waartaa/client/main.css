@@ -375,3 +375,61 @@ body {
   background-color: #E4F2FD;
   text-align: center;
 }
+
+#waartaa-intro {
+  margin-top: 10px;
+}
+
+.waartaa-banner {
+  /*font-family: 'Changa One';*/
+  font-weight: 900;
+  letter-spacing: -1px;
+  font-size: 50px;
+  color: #303030;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.waartaa-subbanner {
+  text-align: center;
+}
+
+.waartaa-mission-logo-cloud {
+  font-size: 75px;
+  top: 20px;
+}
+
+.waartaa-mission-logo-love {
+  font-size: 70px;
+  top: 13px;
+}
+
+.waartaa-mission-logo-irc {
+  font-size: 58px;
+}
+
+.waartaa-banner-img-container {
+  overflow: hidden;
+}
+
+.waartaa-banner-img {
+  width: 114%;
+}
+
+.waartaa-banner-main-content {
+  margin-bottom: 20px;
+}
+
+.waartaaversion {
+  color: #cfcfcf;
+}
+
+#waartaa-try-btn {
+  font-weight: bolder;
+  font-size: 24px;
+}
+
+#waartaa-intro .jumbotron {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
