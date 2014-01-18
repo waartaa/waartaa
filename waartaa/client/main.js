@@ -49,7 +49,7 @@ Handlebars.registerHelper("isCurrentPageChat", function () {
 /* Configure Accounts.ui for authentication */
 Accounts.ui.config({
   requestPermissions: {
-    github: ['user', 'repo']
+    github: ['user:email', '(no scope)']
   },
   passwordSignupFields: 'USERNAME_AND_EMAIL'
 });
