@@ -245,7 +245,8 @@ UserChannelLogs.find().observeChanges({
         return;
       if (
         new_logs > 0 &&
-        log.message.search(user_server.current_nick) >= 0 &&
+        log.from &&
+        messageContainsNick(log.message, user_server.current_nick) &&
         (
           (
             (room.roomtype == 'channel' &&
