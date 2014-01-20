@@ -1,6 +1,5 @@
 /**
  * Initialize client side namespace for waartaa
  */
-waartaa = {
-    chat: {}
-};
+waartaa = typeof(waartaa) == 'undefined'? {}: waartaa;
+waartaa['chat'] = {};

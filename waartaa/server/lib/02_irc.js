@@ -58,8 +58,7 @@ IRCHandler = function (user, user_server) {
             client.removeListener('message' + channel.name, listener);
         });
         client.addListener('message' + channel.name, function (
-                nick, text, message) {
-            Fiber(function () {
+                nick, text, message) {            Fiber(function () {
                 UserChannelLogs.insert({
                     message: text,
                     raw_message: message,
@@ -75,6 +74,15 @@ IRCHandler = function (user, user_server) {
                     created: new Date(),
                     last_updated: new Date()
                 });
+            }).run();
+            Fiber(function () {
+                if (_.isUndefined(Meteor.presences.findOne({userId: user._id}))) {
+                    if (messageContainsNick(text, user_server.current_nick)
+                            && nick) {
+                        waartaa.notifications.notify_channel_mention(
+                            user, channel, nick, text);
+                    }
+                }
             }).run();
         });
     }
@@ -411,6 +419,7 @@ IRCHandler = function (user, user_server) {
                          user: user.username}, 
                          {$set: {pms: userpms.pms}});
                 }).run();
+
                 Fiber(function () {
                     var from_user = Meteor.users.findOne({username: nick}) || {};
                     var to_user = user;
@@ -431,6 +440,13 @@ IRCHandler = function (user, user_server) {
                         created: new Date(),
                         last_updated: new Date()
                     });
+                }).run();
+
+                Fiber(function () {
+                    if (_.isUndefined(Meteor.presences.findOne({userId: user._id}))) {
+                        waartaa.notifications.notify_pm(
+                            user, nick, text, user_server);
+                    }
                 }).run();
             }
         });
