@@ -13,7 +13,11 @@
         {{ showStatusIcon status }}
         {{ limitStr name 12 }}
         <span class="pull-right">
-          <span class="badge">{{ unread_logs_count "channel" _id }}</span>
+          {{#if unread_mentions_count _id }}
+            <span class="badge mention-badge" title="{{ unread_logs_count "channel" _id }} unread logs">{{ unread_mentions_count _id }}</span>
+          {{else}}
+            <span class="badge">{{ unread_logs_count "channel" _id }}</span>
+          {{/if}}
           <div class="btn-group">
             <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
               <span class="caret"></span>

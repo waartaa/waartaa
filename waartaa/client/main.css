@@ -433,3 +433,7 @@ body {
   padding-top: 10px;
   padding-bottom: 10px;
 }
+
+.mention-badge {
+  background-color: #428bca;
+}

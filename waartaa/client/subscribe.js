@@ -243,6 +243,13 @@ UserChannelLogs.find().observeChanges({
       var user_server = UserServers.findOne({_id: log.server_id});
       if (!user_server)
         return;
+      if (messageContainsNick(log.message, user_server.current_nick)) {
+        var mention_session_key = 'unreadMentionsCountChannel-' +
+          log.channel_id;
+        updateUnreadMentionsCount(
+          mention_session_key, 'lastAccessedChannel-' + log.channel_id,
+          log.last_updated, update_session);
+      }
       if (
         new_logs > 0 &&
         log.from &&

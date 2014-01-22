@@ -134,6 +134,19 @@ Handlebars.registerHelper("unread_logs_count", function (
   }
 });
 
+Handlebars.registerHelper("unread_mentions_count", function (
+    channel_id, nick) {
+  var key = "unreadMentionsCountChannel-" + channel_id;
+  var room = Session.get('room');
+  var count = Session.get(key);
+  if (count > 0 && room.room_id != channel_id)
+    return count;
+  else {
+    Session.set(key, 0);
+    return '';
+  }
+});
+
 updateHeight = function () {
   var body_height = $('body').height();
   var final_height = body_height - 90;

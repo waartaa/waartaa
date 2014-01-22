@@ -148,3 +148,19 @@ updateUnreadLogsCount = function (unread_logs_count_key,
   }
   return count;
 };
+
+updateUnreadMentionsCount = function (
+    unread_mentions_count_key, last_accessed_key, last_updated,
+    update_session) {
+  var last_accessed = Session.get(last_accessed_key);
+  var count = 0;
+  if (last_updated > last_accessed) {
+    var unread_mentions_count = Session.get(unread_mentions_count_key) || 0;
+    unread_mentions_count += 1;
+    count += 1;
+    if (update_session)
+      Session.set(unread_mentions_count_key, unread_mentions_count);
+  }
+  return count;
+
+};
