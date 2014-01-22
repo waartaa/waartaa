@@ -33,7 +33,7 @@ function infoPanelScrollendHandler (e) {
       ).count();
     var startNick = Session.get(
         'startNick-' + channel.user_server_name + '_' + channel.name);
-    if (count < 40 && (count < 30 && !startNick))
+    if (count < 40 && (count < 30 || !startNick))
       return;
     $(document).off('scrollend.info_panel');
     $('.channel-nicks-loader.scrollend').show();
