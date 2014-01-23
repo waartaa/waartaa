@@ -1,9 +1,10 @@
 Handlebars.registerHelper("linkify", function (message) {
- return new Handlebars.SafeString(
-   message.replace(waartaa.chat.helpers.LINK_REGEX, function(match) {
-     return "<a target='_blank' href='" + match + "'>" + match + "</a>";
-   })
- );
+  if (message)
+    return new Handlebars.SafeString(
+      message.replace(waartaa.chat.helpers.LINK_REGEX, function(match) {
+        return "<a target='_blank' href='" + match + "'>" + match + "</a>";
+      })
+    );
 });
 
 Handlebars.registerHelper('showDatetime', function (datetime_obj) {
