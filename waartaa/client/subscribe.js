@@ -234,6 +234,11 @@ UserChannelLogs.find().observeChanges({
     Deps.nonreactive(function () {
       var session_key = 'unreadLogsCountChannel-' + log.channel_id;
       var room = Session.get('room') || {};
+      /** Don't update unread logs count for INFO log messages, e.g.,
+       * - Nicks joining/leaving channel
+       */
+      if (!log.from)
+        return;
       var update_session = true;
       if (room.roomtype == 'channel' && room.room_id == log.channel_id)
         update_session = false;
