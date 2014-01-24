@@ -18,7 +18,6 @@ Template.chat_input.events({
         {_id: room.server_id}, {});
       var myNick = user_server.current_nick;
     } catch (err) {
-      //console.log(err);
       var myNick = Meteor.user().username;
     }
     if (!message)
@@ -49,7 +48,6 @@ function _submit_nick_away_data ($form) {
   var user_server = UserServers.findOne({_id: room.server_id});
   if (user_server)
     Meteor.call('mark_away', user_server.name, away_message, function (err) {
-      console.log(err);
       if (!err)
         $('.userNickOptions').parents('.dropup').removeClass('open');
     });
@@ -70,7 +68,6 @@ Template.user_nick_options_menu.events = {
     var server = UserServers.findOne({_id: server_id});
     if (server) {
       Meteor.call('change_nick', server.name, nick, function (err) {
-        console.log(err);
         if (!err)
           $('.userNickOptions').parents('.dropup').removeClass('open');
       });
@@ -92,7 +89,6 @@ Template.user_nick_options_menu.events = {
       var user_server = UserServers.findOne({_id: $form.data('server-id')});
       if (user_server) {
         Meteor.call('mark_active', user_server.name, function (err) {
-          console.log(err);
           $('.userNickOptions').parents('.dropup').removeClass('open');
         });
       }
@@ -112,7 +108,6 @@ Handlebars.registerHelper("server_current_nick", function () {
 
 function _getMatchingNicks (term) {
   var nicks = [];
-  console.log(term);
   var channel = null;
   var room = Session.get('room');
   if (room.roomtype == 'channel') {

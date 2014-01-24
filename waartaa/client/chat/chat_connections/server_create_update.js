@@ -9,9 +9,7 @@ Template.add_server_modal.events({
       password: $('#server-join-password').val(),
       channels: $('#server-join-channels').val()
     };
-    console.log(data);
     Meteor.call('user_server_create', data, function (err) {
-      console.log(err);
       if (!err)
         $('#addServerModal').modal('hide');
     });
@@ -34,9 +32,7 @@ Template.edit_server_modal.events({
     });
     var user_server = UserServers.findOne(data.user_server_id) || {};
     data.server_id = user_server.server_id;
-    console.log(data);
     Meteor.call('user_server_create', data, function (err) {
-      console.log(err);
       $('#editServerModal-' + server_id).modal('hide');
     })
   }
