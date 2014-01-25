@@ -1198,6 +1198,15 @@ IRCHandler = function (user, user_server) {
                     if (args[1].toLowerCase() == 'nickserv') {
                         client.say('NickServ', args.slice(2).join(' '));
                     } else {
+                        var userpms = UserPms.findOne(
+                            {user_id: user._id}) || {pms: {}};
+                        userpms.pms[args[1]] = "";
+                        UserPms.upsert(
+                            {user_id: user._id,
+                             user_server_id: user_server._id,
+                             user_server_name: user_server.name,
+                             user: user.username},
+                             {$set: {pms: userpms.pms}});
                         _sendPMMessage(args[1], args.slice(2).join(' '));
                     }
                 } else
