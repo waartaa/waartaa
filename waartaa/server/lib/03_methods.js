@@ -246,6 +246,15 @@ Meteor.methods({
     join_user_server: function (user_server_name) {
         var user = Meteor.users.findOne({_id: this.userId});
         console.log('JOIN USER SERVER');
+        UserServers.update(
+            {
+                name: user_server_name,
+                user: user.username,
+                status: 'user_disconnected'
+            },
+            {$set: {status: 'disconnected'}},
+            {multi: true}
+        );
         _join_user_server(user, user_server_name);
     },
     quit_user_server: function (user_server_name, close) {
