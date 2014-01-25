@@ -1069,7 +1069,8 @@ IRCHandler = function (user, user_server) {
         partUserServer: function () {
             try {
                 var client = client_data[user_server.name];
-                client.disconnect(function (message) {
+                client.disconnect(
+                    CONFIG['SERVER_QUIT_MESSAGE'] || '', function (message) {
                     _partUserServerCallback(message, user_server, client);
                 });
             } catch (err) {

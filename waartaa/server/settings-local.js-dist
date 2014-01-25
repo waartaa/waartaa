@@ -10,7 +10,8 @@ GlobalServers = {
 CONFIG = {
   'channel_who_poll_interval': 20 * 1000,
   'show_last_n_logs': 20,
-  'DEBUG': false
+  'DEBUG': false,
+  'SERVER_QUIT_MESSAGE': 'waartaa says goodbye'
 }
 
 SUPER_USER = 'admin'
