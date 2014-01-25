@@ -82,7 +82,6 @@ Template.edit_server_channel.events = {
     var $form = $(e.target);
     var data = {'password': $form.find('[name="password"]').val() || ''};
     Meteor.call('edit_user_channel', $form.data('channel-id'), data, function (err) {
-      console.log(err);
       $form.parents('.modal').modal('hide');
     })
   }

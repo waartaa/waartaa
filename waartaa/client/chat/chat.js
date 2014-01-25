@@ -102,9 +102,6 @@ Template.channel_menu.rendered = function (e) {
   //  'click .editServerChannelLink'] =  _handleServerChannelEditLinkClick;
 }
 
-Template.channel_logs.rendered = function () {
-  //console.log("CREATED channel_logs");
-};
 
 
 
@@ -176,7 +173,6 @@ function logRenders () {
       var counter = 0;
  
       template.rendered = function () {
-        console.log(name, "render count: ", ++counter);
         oldRender && oldRender.apply(this, arguments);
       };
     });

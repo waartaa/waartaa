@@ -32,10 +32,6 @@ Template.accordion_join_server.events({
       password: $('#server-join-password').val(),
       channels: $('#server-join-channels').val()
     };
-    console.log(data);
-    Meteor.call('user_server_create', data, function (err) {
-      console.log(err);
-    });
   },
 });
 
@@ -51,10 +47,6 @@ Template.accordion_user_servers.events({
     var data = {};
     $.each($form.serializeArray(), function (index, value) {
       data[value.name] = value.value;
-    })
-    console.log(data);
-    Meteor.call('user_server_create', data, function (err) {
-      console.log(err);
     })
   }
 });

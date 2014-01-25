@@ -206,8 +206,6 @@ Automatically subscribe to ChannelNicks for newly joined UserChannels.
 */
 UserChannels.find().observeChanges({
   added: function (id, channel) {
-    console.log('Added new channel');
-    console.log(channel);
     Deps.autorun(
       function () {
         subscribe_user_channel_nicks(channel);
@@ -219,11 +217,7 @@ Meteor.subscribe('user_pms');
 /*
 UserServers.find().observeChanges({
   added: function (id, user_server) {
-    console.log('Added new server');
-    console.log(user_server);
     Meteor.subscribe('server_nicks', function () {
-      console.log('subscribed to server nicks');
-      console.log(ServerNicks.find().count());
     });
   }
 });

@@ -8,7 +8,6 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
   var $target = $(event.target);
   var $table = $target.find('.chatlogs-table');
   $table.off('scrolltop');
-  console.log("Reached top of page.");
   $('.chatlogs-loader-msg').show();
   Meteor.setTimeout(function () {
     $('.chatlogs-loader-msg').fadeOut(1000);
@@ -22,7 +21,6 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
     key = "pmLogCount-" + $target.data('server-id') + '_' + $target.data('nick');
   var current_count = Session.get(key, 0);
   Session.set('height-' + $table.attr('id'), $table.find('.chatlogrows').height());
-  console.log('current table height: ' + Session.get('height-' + $table.attr('id')));
   var room = Session.get('room');
   if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
     scroll_top = null;
