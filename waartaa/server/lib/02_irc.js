@@ -918,6 +918,34 @@ IRCHandler = function (user, user_server) {
         disconnectConnectingChannelsOnTimeout(timeout);
     }
 
+    function _sendPMMessage(to, message, action) {
+        try {
+            if (action && message.search('/me') == 0)
+                message = message.replace('/me', client.nick);
+            PMLogs.insert({
+              message: message,
+              raw_message: {},
+              from: client.nick,
+              display_from: action? '': client.nick,
+              from_user: user.username,
+              from_user_id: user._id,
+              to_nick: to,
+              to_user: '',
+              to_user_id: '',
+              server_name: user_server.name,
+              server_id: user_server._id,
+              user: user.username,
+              user_id: user._id,
+              created: new Date(),
+              last_updated: new Date()
+            });
+            if (!action)
+                client.say(to, message);
+        } catch (err) {
+            logger.error(err);
+        }
+    }
+
     return {
         joinChannel: function (channel_name, password) {
             try {
@@ -1148,36 +1176,12 @@ IRCHandler = function (user, user_server) {
             }
         },
         sendPMMessage: function (to, message, action) {
-            try {
-                if (action && message.search('/me') == 0)
-                    message = message.replace('/me', client.nick);
-                PMLogs.insert({
-                  message: message,
-                  raw_message: {},
-                  from: client.nick,
-                  display_from: action? '': client.nick,
-                  from_user: user.username,
-                  from_user_id: user._id,
-                  to_nick: to,
-                  to_user: '',
-                  to_user_id: '',
-                  server_name: user_server.name,
-                  server_id: user_server._id,
-                  user: user.username,
-                  user_id: user._id,
-                  created: new Date(),
-                  last_updated: new Date()
-                });
-                if (!action)
-                    client.say(to, message);
-            } catch (err) {
-                logger.error(err);
-            }
+            _sendPMMessage(to, message, action);
         },
         getServerClient: function (server_id, user_id) {},
         isServerConnected: function (server_id) {},
         sendRawMessage: function (message, log_options) {
-            try {
+            //try {
                 var args = message.substr(1).split(' ');
                 if (log_options && (args[0] == 'whois' || args[0] == 'WHOIS')) {
                     client.whois(args[1], function (info) {
@@ -1190,14 +1194,17 @@ IRCHandler = function (user, user_server) {
                     client.action(
                         log_options.target,
                         "\x01" + args.slice(1).join(" ") + "\x01");
-                } else if (args[0].toLowerCase() == 'msg' &&
-                        args[1].toLowerCase() == 'nickserv') {
-                    client.ctcp('nickserv', 'PRIVMSG', args.split(2));
+                } else if (args[0].toLowerCase() == 'msg') {
+                    if (args[1].toLowerCase() == 'nickserv') {
+                        client.say('NickServ', args.slice(2).join(' '));
+                    } else {
+                        _sendPMMessage(args[1], args.slice(2).join(' '));
+                    }
                 } else
                     client.send.apply(client, args);
-            } catch (err) {
-                logger.error(err);
-            }
+            //} catch (err) {
+            //    logger.error(err);
+            //}
         }
     }
 };
