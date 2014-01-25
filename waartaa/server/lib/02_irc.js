@@ -394,6 +394,56 @@ IRCHandler = function (user, user_server) {
     function _addWhoisListener (info) {
     }
 
+    function _addNickChangeListener () {
+        if (LISTENERS.server['nick'] != undefined)
+            return;
+        LISTENERS.server['nick'] = '';
+        // Remove any pre existing NICK listener
+        _.each(client.listeners('nick'), function (listener) {
+            client.removeListener('nick', listener);
+        });
+        client.addListener('nick', function (
+                oldnick, newnick, channels, message) {
+            // Update channel nick from old nick to new nick
+            Fiber(function () {
+                ChannelNicks.update(
+                    {
+                        nick: oldnick, channel_name: {$in: channels},
+                        server_name: user_server.name
+                    },
+                    {$set: {nick: newnick}},
+                    {multi: true}
+                );
+            }).run();
+            // Log nick change for active and connected user channels.
+            Fiber(function () {
+                UserChannels.find(
+                    {
+                        user_server_id: user_server._id, name: {$in: channels},
+                        active: true, status: 'connected'
+                    }
+                ).forEach(function (channel) {
+                    UserChannelLogs.insert({
+                        message: oldnick + ' has changed nick to ' + newnick,
+                        raw_message: '',
+                        from: '',
+                        from_user: null,
+                        from_user_id: null,
+                        channel_name: channel.name,
+                        channel_id: channel._id,
+                        server_name: user_server.name,
+                        server_id: user_server._id,
+                        user: user.username,
+                        user_id: user._id,
+                        created: new Date(),
+                        last_updated: new Date(),
+                        type: 'NICK'
+                    });
+                });
+            }).run();
+        })
+    }
+
     function _addPMListener () {
         if (LISTENERS.server['message'] != undefined)
             return;
@@ -454,7 +504,8 @@ IRCHandler = function (user, user_server) {
 
     function _addRawMessageListener() {
         client.addListener('raw', function (message) {
-            //console.log(message);
+            if (CONFIG.DEBUG)
+                console.log(message);
         });
     }
 
@@ -496,6 +547,7 @@ IRCHandler = function (user, user_server) {
         _addCtcpListener();
         _addSelfMessageListener();
         _addPMListener();
+        _addNickChangeListener();
         _addRawMessageListener();
         _addGlobalChannelJoinListener();
         _addGlobalChannelNamesListener();
