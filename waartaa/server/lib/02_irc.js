@@ -580,11 +580,59 @@ IRCHandler = function (user, user_server) {
     }
 
     function _addCtcpListener () {
-        if (LISTENERS.server['ctcp'] != 'undefined')
+        if (LISTENERS.server['ctcp'] != undefined)
             return;
         LISTENERS.server['ctcp'] = '';
-        client.addListener('ctcp', function (from, to, text, type) {
+        client.addListener('ctcp', function (from, to, text, type, message) {
             Fiber(function () {
+                try {
+                    if (type == 'privmsg' && text.search('ACTION') == 0) {
+                        text = text.replace('ACTION', from);
+                        if (to[0] == '#') {
+                            var channel = UserChannels.findOne({
+                                name: to,
+                                user_server_id: user_server._id
+                            });
+                            if (!channel)
+                                return;
+                            UserChannelLogs.insert({
+                                message: text,
+                                raw_message: message,
+                                from: '',
+                                from_user: user.username,
+                                from_user_id: user._id,
+                                channel_name: channel.name,
+                                channel_id: channel._id,
+                                server_name: user_server.name,
+                                server_id: user_server._id,
+                                user: user.username,
+                                user_id: user._id,
+                                created: new Date(),
+                                last_updated: new Date()
+                            });
+                        } else {
+                            PMLogs.insert({
+                              message: text,
+                              raw_message: message,
+                              from: from,
+                              display_from: '',
+                              from_user: user.username,
+                              from_user_id: user._id,
+                              to_nick: to,
+                              to_user: '',
+                              to_user_id: '',
+                              server_name: user_server.name,
+                              server_id: user_server._id,
+                              user: user.username,
+                              user_id: user._id,
+                              created: new Date(),
+                              last_updated: new Date()
+                            });
+                        }
+                    }
+                } catch (err) {
+                    logger.error(err);
+                }
             }).run();
         });
     }
@@ -1044,16 +1092,18 @@ IRCHandler = function (user, user_server) {
         },
         removeServer: function (server_id, user_id) {},
         updateServer: function (server_id, server_data, user_id) {},
-        sendChannelMessage: function (channel_name, message) {
+        sendChannelMessage: function (channel_name, message, action) {
             try {
                 var channel = UserChannels.findOne({
                   name: channel_name,
                   user_server_id: user_server._id,
                 }) || {};
+                if (action && message.search('/me') == 0)
+                    message = message.replace('/me', client.nick);
                 UserChannelLogs.insert({
                     message: message,
                     raw_message: {},
-                    from: client.nick,
+                    from: action? '': client.nick,
                     from_user: user.username,
                     from_user_id: user._id,
                     channel_name: channel.name,
@@ -1065,7 +1115,8 @@ IRCHandler = function (user, user_server) {
                     created: new Date(),
                     last_updated: new Date()
                 });
-                client.say(channel_name, message);
+                if (!action)
+                    client.say(channel_name, message);
             } catch (err) {
                 logger.error(err);
             }
@@ -1096,13 +1147,15 @@ IRCHandler = function (user, user_server) {
                 logger.error(err);
             }
         },
-        sendPMMessage: function (to, message) {
+        sendPMMessage: function (to, message, action) {
             try {
+                if (action && message.search('/me') == 0)
+                    message = message.replace('/me', client.nick);
                 PMLogs.insert({
                   message: message,
                   raw_message: {},
                   from: client.nick,
-                  display_from: client.nick,
+                  display_from: action? '': client.nick,
                   from_user: user.username,
                   from_user_id: user._id,
                   to_nick: to,
@@ -1115,7 +1168,8 @@ IRCHandler = function (user, user_server) {
                   created: new Date(),
                   last_updated: new Date()
                 });
-                client.say(to, message);
+                if (!action)
+                    client.say(to, message);
             } catch (err) {
                 logger.error(err);
             }
@@ -1125,19 +1179,22 @@ IRCHandler = function (user, user_server) {
         sendRawMessage: function (message, log_options) {
             try {
                 var args = message.substr(1).split(' ');
-                //console.log('############');
-                //console.log(args);
                 if (log_options && (args[0] == 'whois' || args[0] == 'WHOIS')) {
                     client.whois(args[1], function (info) {
-                        //console.log('+++++++WHOIS CALLBACK++++++++');
-                        //console.log(info);
                         if (log_options.logInput) {
                             _logIncomingMessage(message, log_options);
                         }
                         _whois_callback(info, log_options);
                     });
-                } else 
-                client.send.apply(client, args);
+                } else if (args[0] == 'me') {
+                    client.action(
+                        log_options.target,
+                        "\x01" + args.slice(1).join(" ") + "\x01");
+                } else if (args[0].toLowerCase() == 'msg' &&
+                        args[1].toLowerCase() == 'nickserv') {
+                    client.ctcp('nickserv', 'PRIVMSG', args.split(2));
+                } else
+                    client.send.apply(client, args);
             } catch (err) {
                 logger.error(err);
             }

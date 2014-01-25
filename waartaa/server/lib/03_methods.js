@@ -325,18 +325,27 @@ Meteor.methods({
         var user_server = UserServers.findOne({_id: user_channel.user_server_id});
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server.name];
+        var action = false;
         if (message[0] == '/') {
+            log_options = log_options || {};
+            log_options.target = user_channel.name;
             _send_raw_message(message, irc_handler, log_options);
-            return;
+            if (message.search('/msg') == 0)
+                return;
+            if (message.search('/me') == 0) {
+                action = true;
+            }
         }
         if (irc_handler)
-            irc_handler.sendChannelMessage(user_channel.name, message);
+            irc_handler.sendChannelMessage(user_channel.name, message, action);
     },
     send_server_message: function (user_server_id, message, log_options) {
         var user_server = UserServers.findOne(
             {_id: user_server_id, user_id: this.userId}, {name: 1});
         var irc_handler = _get_irc_handler(user_server.name, this.userId);
         if (message[0] == '/') {
+            if (message.search('/me') == 0)
+                return;
             _send_raw_message(message, irc_handler, log_options);
             return;
         }
@@ -393,11 +402,18 @@ Meteor.methods({
         var irc_handler = (CLIENTS[user.username] || {})[user_server.name];
         if (!irc_handler)
             return;
+        var action = false;
         if (message[0] == '/') {
+            log_options = log_options || {};
+            log_options.target = nick;
             _send_raw_message(message, irc_handler, log_options);
-            return;
+            if (message.search('/msg') == 0)
+                return;
+            if (message.search('/me') == 0) {
+                action = true;
+            }
         }
-        irc_handler.sendPMMessage(nick, message);
+        irc_handler.sendPMMessage(nick, message, action);
     },
     mark_away: function (user_server_name, away_message) {
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
