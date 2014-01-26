@@ -41,6 +41,10 @@ Router.map(function () {
         ChatSubscribe();
       }
     },
+    load: function () {
+      // Start showing progress
+      NProgress.start();
+    },
     waitOn: function () {
       return [
         Meteor.subscribe('servers'), Meteor.subscribe('user_servers'),

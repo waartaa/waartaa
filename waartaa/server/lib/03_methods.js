@@ -219,7 +219,7 @@ Meteor.startup(function () {
         UserServers.find(
             {
                 user: user.username, active: true,
-                status: {$ne: 'disconnected'}
+                status: {$ne: 'user_disconnected'}
             }
         ).forEach(function (user_server) {
             _join_user_server(user, user_server.name);

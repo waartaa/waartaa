@@ -121,6 +121,7 @@ ChatSubscribe = function () {
 
     // Subscribe to UserChannels collection.
     Meteor.subscribe("user_channels", function () {
+      NProgress.done();
       // Callback when subscribed to UserChannels
       UserChannels.find({}).forEach(function (channel) {
         // Set initial log count for each channel room

@@ -1,11 +1,3 @@
-Template._loginButtonsLoggedInDropdown.created = function () {
-  NProgress.start();
-}
-
-Template.add_server_modal.created = function () {
-  NProgress.done();
-}
-
 Deps.autorun(updateHeight);
 
 
