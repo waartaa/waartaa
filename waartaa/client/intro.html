@@ -34,5 +34,60 @@
       </div>
       <p style="text-align: center;"><a id="waartaa-try-btn" class="btn btn-primary btn-lg" role="button">Give it a go!</a></p>
     </div>
+    <div style="margin-top: 40px;">
+      <div class="row">
+        <div class="col-md-6">
+              <div class="lead" style="padding: 5px;">
+                Waartaa or wārtā is a word in Hindi: <strong>वार्ता</strong>, which means to communicate. And that's what waartaa is for. Waartaa is a web based <strong>IRC client as a service</strong> and it faclilitates:
+                <ul>
+                  <li><i>Centralized logging</i></li>
+                  <li><i>24x7 idling</i></li>
+                  <li><i>Unique identification across multiple clients</i></li>
+                  <li><i>Mail notification while user is away</i></li>
+                  <li><i>A rich UI for awesome user experience</i></li>
+                </ul>
+                You can setup Waartaa yourself or try our hosted instance.
+              </div>
+        </div>
+        <div class="col-md-6">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              Quickstart
+            </div>
+            <div class="panel-body">
+              <ol>
+              <li>Install system dependencies: <code>node</code>, <code>npm</code> for your system. For example:
+
+                <ol>
+                  <li>For Fedora, you can do: <code>$ sudo yum install nodejs npm -y</code>
+                  </li>
+                  <li>For Mac OS X, you can install them via brew: <code>$ brew install node npm</code>
+                  </li>
+                  <li>For Debian/Ubuntu install only node.js and it will include npm as: 
+                     <code>$ sudo add-apt-repository ppa:chris-lea/node.js<br/>
+                       $ sudo apt-get update<br/>
+                       $ sudo apt-get install nodejs
+                     </code>
+                  </li>
+                  <li>Else, you can always compile from source.</li>
+                </ol>
+              </li>
+              <li>Get the source: <code>$ git clone --recursive https://github.com/waartaa/waartaa.git</code>
+              </li>
+              <li>Go to <strong>waartaa</strong>'s repository directory just cloned: <code>$ cd waartaa</code>
+              </li>
+              <li>Run setup script: <code>$ ./setup.sh</code>
+              </li>
+              <li>Customize <code>waartaa/server/settings-local.js</code> as needed.</li>
+              <li>Go to waartaa meteor project's directory: <code>$ cd waartaa</code>
+              </li>
+              <li>Run waartaa: <code>$ meteor</code>
+              </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
