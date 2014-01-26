@@ -11,7 +11,7 @@ waartaa.notifications = {
   notify_channel_mention: function (user, channel, nick, text) {
     try {
       var options = {
-        from: 'wārtā <no-reply@waartaa.com>',
+        from: 'waartaa <no-reply@waartaa.com>',
         to: getUserEmail(user),
         subject: nick + ' mentioned you in ' + channel.name + ', ' +
           channel.user_server_name,
@@ -20,7 +20,7 @@ waartaa.notifications = {
           channel.user_server_name + ':\n\n' +
           text + '\n\n' +
           'Regards,\n' +
-          'The wārtā team\n' +
+          'The waartaa team\n' +
           Meteor.absoluteUrl() + '\n'
       };
       logger.info(options);
@@ -32,7 +32,7 @@ waartaa.notifications = {
   notify_pm: function (user, nick, text, user_server) {
     try {
       var options = {
-        from: 'wārtā <no-reply@waartaa.com>',
+        from: 'waartaa <no-reply@waartaa.com>',
         to: getUserEmail(user),
         subject: nick + ' has sent you a message in ' + user_server.name,
         text: 'Hi,\n\n' +
@@ -40,7 +40,7 @@ waartaa.notifications = {
           user_server.name + ':\n\n' +
           text + '\n\n' +
           'Regards,\n' +
-          'The wārtā team\n' +
+          'The waartaa team\n' +
           Meteor.absoluteUrl() + '\n'
       };
       logger.info(options);
