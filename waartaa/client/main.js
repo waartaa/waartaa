@@ -39,6 +39,12 @@ Router.map(function () {
         this.stop();
       }
     },
+    waitOn: function () {
+      return [
+        Meteor.subscribe('servers'), Meteor.subscribe('user_servers'),
+        Meteor.subscribe('user_channels')
+      ]
+    },
     after: function () {
       GAnalytics.pageview('/chat');
     }
