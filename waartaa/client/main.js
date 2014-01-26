@@ -37,6 +37,8 @@ Router.map(function () {
         this.render('user_loggedout_content');
         GAnalytics.pageview();
         this.stop();
+      } else {
+        ChatSubscribe();
       }
     },
     waitOn: function () {
