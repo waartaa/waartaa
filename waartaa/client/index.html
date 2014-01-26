@@ -18,9 +18,7 @@
     <div class="content">
       <div class="wrapper">
         <div class="proper-content">
-          {{#isolate}}
-            {{renderPage}}
-          {{/isolate}}
+          {{> layout}}
         </div>
       </div>
     </div>
@@ -28,6 +26,10 @@
   {{#isolate}}
     {{> footer}}
   {{/isolate}}
+</template>
+
+<template name="layout">
+  {{renderRouter}}
 </template>
 
 <template name="header">

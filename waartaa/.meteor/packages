@@ -8,7 +8,6 @@ preserve-inputs
 accounts-password
 jquery-ui-bootstrap
 jquery-ui
-router
 standard-app-packages
 HTML5-History-API
 #observatory-apollo
@@ -39,3 +38,4 @@ email
 
 fast-render
 spiderable
+iron-router

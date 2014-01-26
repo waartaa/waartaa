@@ -5,37 +5,47 @@ components so that there's no global scroll for the page.
 $(window).resize(updateHeight);
 
 /* Routers */
-Meteor.Router.add({
-  '': function () {
-    GAnalytics.pageview();
-    if (Meteor.userId()) {
-      location.href = "/chat";
-    } else
-      return 'user_loggedout_content';
-  },
-  '/chat': function () {
-    if (Meteor.userId()) {
-      GAnalytics.pageview('/chat');
-      Session.set('currentPage', 'chat');
-      return 'chat';
-    } else
-      location.href = '/';
-  }
+
+Router.configure({
+  autoRender: false,
 });
 
-Meteor.Router.filters({
-  'login_required': function (page) {
-    if (Meteor.user()) {
-      return page;
-    } else {
-      return 'user_loggedout_content';
+//Router.before(mustBeSignedIn, {except: ['index']});
+
+Router.map(function () {
+  this.route('index', {
+    path: '/',
+    template: 'user_loggedout_content',
+    before: function () {
+      if (Meteor.userId()) {
+        Router.go('/chat');
+        this.render('chat');
+        GAnalytics.pageview('/chat');
+        this.stop();
+      }
+    },
+    after: function () {
+      GAnalytics.pageview();
     }
-  }
+  });
+  this.route('chat', {
+    path: '/chat',
+    template: 'chat',
+    before: function () {
+      if (!Meteor.userId()) {
+        Router.go('/');
+        this.render('user_loggedout_content');
+        GAnalytics.pageview();
+        this.stop();
+      }
+    },
+    after: function () {
+      GAnalytics.pageview('/chat');
+    }
+  });
 });
 
-/* Only logged in users can access the chat page */
-Meteor.Router.filter('login_required', {only: ['user_dashboard', 'chat']});
-
+/* Template helpers */
 Handlebars.registerHelper("isCurrentPageHome", function () {
   return Session.get('currentPage') === 'home';
 });
