@@ -1245,8 +1245,7 @@ IRCHandler = function (user, user_server) {
                     });
                 } else if (args[0] == 'me') {
                     client.action(
-                        log_options.target,
-                        "\x01" + args.slice(1).join(" ") + "\x01");
+                        log_options.target, args.slice(1).join(" "));
                 } else if (args[0].toLowerCase() == 'msg') {
                     if (args[1].toLowerCase() == 'nickserv') {
                         client.say('NickServ', args.slice(2).join(' '));
