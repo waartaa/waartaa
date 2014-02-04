@@ -188,6 +188,7 @@ Create indices:
 > db.user_channel_logs.ensureIndex({channel_id: 1})
 > db.pm_logs.ensureIndex({user: 1, from: 1, to_nick: 1})
 > db.server_nicks.ensureIndex({user_server_id: 1})
+> db.channel_nicks.ensureIndex({server_name: 1, channel_name: 1, nick: 1})
 */
 
 /*
