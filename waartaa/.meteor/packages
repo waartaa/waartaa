@@ -36,6 +36,5 @@ assert
 GAnalytics
 email
 
-fast-render
 spiderable
 iron-router
