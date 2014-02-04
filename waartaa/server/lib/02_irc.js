@@ -970,9 +970,9 @@ IRCHandler = function (user, user_server) {
         disconnectConnectingChannelsOnTimeout(timeout);
     }
 
-    function _sendPMMessage(to, message, action) {
+    function _sendPMMessage(to, message, action, send) {
         try {
-            if (action && message.search('/me') == 0)
+            if (message.search('/me') == 0)
                 message = message.replace('/me', client.nick);
             PMLogs.insert({
               message: message,
@@ -991,7 +991,7 @@ IRCHandler = function (user, user_server) {
               created: new Date(),
               last_updated: new Date()
             });
-            if (!action)
+            if (send)
                 client.say(to, message);
         } catch (err) {
             logger.error(err);
@@ -1173,13 +1173,13 @@ IRCHandler = function (user, user_server) {
         },
         removeServer: function (server_id, user_id) {},
         updateServer: function (server_id, server_data, user_id) {},
-        sendChannelMessage: function (channel_name, message, action) {
+        sendChannelMessage: function (channel_name, message, action, send) {
             try {
                 var channel = UserChannels.findOne({
                   name: channel_name,
                   user_server_id: user_server._id,
                 }) || {};
-                if (action && message.search('/me') == 0)
+                if (message.search('/me') == 0)
                     message = message.replace('/me', client.nick);
                 UserChannelLogs.insert({
                     message: message,
@@ -1196,7 +1196,7 @@ IRCHandler = function (user, user_server) {
                     created: new Date(),
                     last_updated: new Date()
                 });
-                if (!action)
+                if (send)
                     client.say(channel_name, message);
             } catch (err) {
                 logger.error(err);
@@ -1228,8 +1228,8 @@ IRCHandler = function (user, user_server) {
                 logger.error(err);
             }
         },
-        sendPMMessage: function (to, message, action) {
-            _sendPMMessage(to, message, action);
+        sendPMMessage: function (to, message, action, send) {
+            _sendPMMessage(to, message, action, send);
         },
         getServerClient: function (server_id, user_id) {},
         isServerConnected: function (server_id) {},

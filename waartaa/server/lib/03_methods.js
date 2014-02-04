@@ -334,6 +334,7 @@ Meteor.methods({
         var user_server = UserServers.findOne({_id: user_channel.user_server_id});
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server.name];
+        var send = true;
         var action = false;
         if (message[0] == '/') {
             log_options = log_options || {};
@@ -341,12 +342,13 @@ Meteor.methods({
             _send_raw_message(message, irc_handler, log_options);
             if (message.search('/msg') == 0)
                 return;
-            if (message.search('/me') == 0) {
+            if (message.search('/me') == 0)
                 action = true;
-            }
+            send = false;
         }
         if (irc_handler)
-            irc_handler.sendChannelMessage(user_channel.name, message, action);
+            irc_handler.sendChannelMessage(
+                user_channel.name, message, action, send);
     },
     send_server_message: function (user_server_id, message, log_options) {
         var user_server = UserServers.findOne(
@@ -411,6 +413,7 @@ Meteor.methods({
         var irc_handler = (CLIENTS[user.username] || {})[user_server.name];
         if (!irc_handler)
             return;
+        var send = true;
         var action = false;
         if (message[0] == '/') {
             log_options = log_options || {};
@@ -418,11 +421,11 @@ Meteor.methods({
             _send_raw_message(message, irc_handler, log_options);
             if (message.search('/msg') == 0)
                 return;
-            if (message.search('/me') == 0) {
+            if (message.search('/me') == 0)
                 action = true;
-            }
+            send = false
         }
-        irc_handler.sendPMMessage(nick, message, action);
+        irc_handler.sendPMMessage(nick, message, action, send);
     },
     mark_away: function (user_server_name, away_message) {
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
