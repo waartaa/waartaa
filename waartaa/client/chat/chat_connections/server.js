@@ -6,13 +6,31 @@ function serverRoomSelectHandler (event) {
         $target.hasClass('pm-remove') ||
         $target.parent().hasClass('pm-remove'))
       return;
+    var prev_room = Session.get('room') || {};
+    var roomtypes = {
+      'channel': true,
+      'server': true,
+      'pm': true
+    };
     // Show loader if selected room is not yet active
-    if (!$target.parent().hasClass('active'))
-      $('#chatlogs-loader').show();
+    if (!$target.parent().hasClass('active')) {
+      if (
+          (
+            roomtypes[$target.data('roomtype')] &&
+            $target.data('id') == prev_room.room_id
+          ) ||
+          (
+            roomtypes[$target.data('roomtype')] &&
+            $target.data('roomid') == prev_room.room_id
+          )
+      )
+        $target.parent().addClass('active');
+      else
+        $('#chatlogs-loader').show();
+    }
     event.stopPropagation();
     // Close any open menu
     $('.dropdown.open, .btn-group.open').removeClass('open');
-    var prev_room = Session.get('room') || {};
     if (prev_room.roomtype == 'server')
       Session.set(
         'user_server_log_count_' + prev_room.server_id, DEFAULT_LOGS_COUNT);
