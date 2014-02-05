@@ -8,3 +8,7 @@ Template.chat_connections.created = function () {
             $('#server-add-btn').click();
     }, 4000);
 };
+
+Template.chat_connections_sentinel_content.rendered = function () {
+    waartaa.chat.helpers.highlightServerRoom();
+};

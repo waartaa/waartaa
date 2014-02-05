@@ -14,9 +14,16 @@
           {{#each servers}}
             {{> chat_connection_server}}
           {{/each}}
+          {{>chat_connections_sentinel}}
         </ul>
       </div>
     </div>
   </div>
   {{> add_server_modal}}
 </template>
+
+<template name="chat_connections_sentinel">
+  {{> chat_connections_sentinel_content}}
+</template>
+
+<template name="chat_connections_sentinel_content"></template>
