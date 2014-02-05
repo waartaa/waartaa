@@ -166,6 +166,10 @@ function autocompleteNicksInitiate () {
         var channel = UserChannels.findOne({_id: room.room_id});
         if (!channel)
           return;
+        // try to autocomplete nick from existing ChannelNickSuggestions
+        // immediately
+        response( $.ui.autocomplete.filter(
+          _getMatchingNicks(request.term), extractLast( request.term ) ) );
         Meteor.subscribe(
           'channel_nick_suggestions', channel.user_server_name, channel.name,
           request.term, 10, function () {
