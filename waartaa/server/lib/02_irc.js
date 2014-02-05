@@ -102,12 +102,17 @@ IRCHandler = function (user, user_server) {
         }).run();
         _.each(nicks_list, function (nick) {
             Fiber(function () {
-                ChannelNicks.update(
-                    {channel_name: channel_name, server_name: user_server.name,
-                     nick: nick},
-                    {$set: {last_updated: new Date()}},
-                    {upsert: true}
-                );
+                try {
+                    ChannelNicks.update(
+                        {channel_name: channel_name, server_name: user_server.name,
+                         nick: nick},
+                        {$set: {last_updated: new Date()}},
+                        {upsert: true}
+                    );
+                } catch (err) {
+                    logger.info(
+                        "ChannelNicksUpsertError", {error: err});
+                }
             }).run();
         });
         /*
@@ -233,14 +238,18 @@ IRCHandler = function (user, user_server) {
             Fiber(function () {
                 var user_channel = _create_update_user_channel(
                     user_server, {name: channel});
-                ChannelNicks.update(
-                    {
-                        nick: nick, channel_name: channel,
-                        server_name: user_server.name
-                    },
-                    {$set: {last_updated: new Date()}},
-                    {upsert: true}
-                );
+                try {
+                    ChannelNicks.update(
+                        {
+                            nick: nick, channel_name: channel,
+                            server_name: user_server.name
+                        },
+                        {$set: {last_updated: new Date()}},
+                        {upsert: true}
+                    );
+                } catch (err) {
+                    logger.info('ChannelNicksUpsertError', {error: err});
+                }
                 if (nick == client.nick) {
                     /*
                     var job_key = 'WHO-' + channel;
@@ -406,14 +415,18 @@ IRCHandler = function (user, user_server) {
                 oldnick, newnick, channels, message) {
             // Update channel nick from old nick to new nick
             Fiber(function () {
-                ChannelNicks.update(
-                    {
-                        nick: oldnick, channel_name: {$in: channels},
-                        server_name: user_server.name
-                    },
-                    {$set: {nick: newnick}},
-                    {multi: true}
-                );
+                try {
+                    ChannelNicks.update(
+                        {
+                            nick: oldnick, channel_name: {$in: channels},
+                            server_name: user_server.name
+                        },
+                        {$set: {nick: newnick}},
+                        {multi: true}
+                    );
+                } catch (err) {
+                    logger.info('ChannelNicksUpsertError', {error: err});
+                }
             }).run();
             // Log nick change for active and connected user channels.
             Fiber(function () {
@@ -1095,15 +1108,21 @@ IRCHandler = function (user, user_server) {
                                     user_server_name: user_server.name,
                                     user: user.username
                                 }).forEach(function (channel) {
-                                    ChannelNicks.update(
-                                        {
-                                            server_name: user_server.name,
-                                            channel_name: channel.name,
-                                            nick: nick
-                                        },
-                                        {$set: {}},
-                                        {upsert: true, multi: true}
-                                    );
+                                    try {
+                                        ChannelNicks.update(
+                                            {
+                                                server_name: user_server.name,
+                                                channel_name: channel.name,
+                                                nick: nick
+                                            },
+                                            {$set: {}},
+                                            {upsert: true, multi: true}
+                                        );
+                                    } catch (err) {
+                                        logger.info(
+                                            'ChannelNicksUpsertError',
+                                            {error: err})
+                                    }
                                 });
                         }
                     }).run();
