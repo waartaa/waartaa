@@ -117,6 +117,12 @@ Handlebars.registerHelper('isCurrentRoomtype', function (roomtype) {
   return false;
 });
 
+Handlebars.registerHelper('isAnyRoomSelected', function () {
+  if (Session.get('room'))
+    return true;
+  return false;
+});
+
 Handlebars.registerHelper("unread_logs_count", function (
     room_type, room_id, nick) {
   if (room_type == "pm")
