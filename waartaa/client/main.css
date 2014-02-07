@@ -377,6 +377,10 @@ body {
 }
 
 #waartaa-intro {
+  color: #4A4355;
+}
+
+#waartaa-intro {
   margin-top: 10px;
 }
 
@@ -385,13 +389,14 @@ body {
   font-weight: 900;
   letter-spacing: -1px;
   font-size: 50px;
-  color: #303030;
+  color: #4A4355;
   line-height: 1.2;
   text-align: center;
 }
 
 .waartaa-subbanner {
   text-align: center;
+  color: #938D9E;
 }
 
 .waartaa-mission-logo-cloud {
