@@ -5,6 +5,12 @@ html, body, .container, .content {
 .container, .content {
     position: relative;
 }
+
+.ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
  
 .proper-content {
     padding-top: 50px; /* >= navbar height */
