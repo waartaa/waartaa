@@ -4,7 +4,7 @@
       {{#isolate}}
         <div class="topic">
           <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
-            <li><p>{{topic}}</p></li>
+            <li><p class="ellipsis">{{topic}}</p></li>
           </ul>
         </div>
         <div class="chat-logs-container pm nano" data-server-id="{{ server_id }}" data-nick="{{ name }}" style="overflow-y: auto; overflow-x: hidden;">
