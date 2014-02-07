@@ -11,6 +11,11 @@ html, body, .container, .content {
     white-space: nowrap;
     overflow: hidden;
 }
+
+.ellipsis:hover {
+  text-overflow: inherit;
+  white-space: normal;
+}
  
 .proper-content {
     padding-top: 50px; /* >= navbar height */
