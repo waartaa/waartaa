@@ -1257,9 +1257,11 @@ IRCHandler = function (user, user_server) {
                 var args = message.substr(1).split(' ');
                 if (log_options && (args[0] == 'whois' || args[0] == 'WHOIS')) {
                     client.whois(args[1], function (info) {
+                        /*
                         if (log_options.logInput) {
                             _logIncomingMessage(message, log_options);
                         }
+                        */
                         _whois_callback(info, log_options);
                     });
                 } else if (args[0] == 'me') {
