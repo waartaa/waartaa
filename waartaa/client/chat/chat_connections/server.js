@@ -1,10 +1,7 @@
 function serverRoomSelectHandler (event) {
     var $target = $(event.target);
     // Return if clicked on a server menu item
-    if ($target.hasClass('server-room-menu-btn') ||
-        $target.parent().hasClass('server-room-menu-btn') ||
-        $target.hasClass('pm-remove') ||
-        $target.parent().hasClass('pm-remove'))
+    if ($target.parents('.btn-group').length > 0)
       return;
     var prev_room = Session.get('room') || {};
     var roomtypes = {
