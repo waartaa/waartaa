@@ -18,7 +18,7 @@ Router.map(function () {
     template: 'user_loggedout_content',
     before: function () {
       if (Meteor.userId()) {
-        Router.go('/chat');
+        Router.go('/chat/');
         this.render('chat');
         GAnalytics.pageview('/chat');
         this.stop();
@@ -29,22 +29,29 @@ Router.map(function () {
     }
   });
   this.route('chat', {
-    path: '/chat',
+    path: /^\/chat\/$/,
     template: 'chat',
-    before: function () {
-      if (!Meteor.userId()) {
-        Router.go('/');
-        this.render('user_loggedout_content');
-        GAnalytics.pageview();
-        this.stop();
-      } else {
-        ChatSubscribe();
+    before: [
+      function () {
+        if (!Meteor.userId()) {
+          Router.go('/');
+          this.render('user_loggedout_content');
+          GAnalytics.pageview();
+          this.stop();
+        } else {
+          ChatSubscribe();
+        }
+      },
+      function () {
+        // we're done waiting on all subs
+        if (this.ready()) {
+          NProgress.done(); 
+        } else {
+          NProgress.start();
+          this.stop(); // stop downstream funcs from running
+        }
       }
-    },
-    load: function () {
-      // Start showing progress
-      NProgress.start();
-    },
+    ],
     waitOn: function () {
       return [
         Meteor.subscribe('servers'), Meteor.subscribe('user_servers'),
@@ -52,7 +59,7 @@ Router.map(function () {
       ]
     },
     after: function () {
-      GAnalytics.pageview('/chat');
+      GAnalytics.pageview('/chat/');
     }
   });
 });
