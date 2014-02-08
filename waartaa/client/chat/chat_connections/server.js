@@ -93,6 +93,7 @@ Template.server_menu.events({
     var $this = $(e.target);
     var server_id = $this.data('server-id');
     var $modal_content = $('#editServerModal-' + server_id);
+    $this.parents('.open').removeClass('open');
     $modal_content.modal().on('shown.bs.modal', function (e) {
       $modal_content.find('[name="nick"]').focus();
     })
@@ -106,6 +107,7 @@ Template.server_menu.events({
     var $this = $(e.target);
     var server_id = $this.data('server-id');
     var $modal_content = $('#addServerChannel-' + server_id);
+    $this.parents('.open').removeClass('open');
     $modal_content.modal().on('shown.bs.modal', function (e) {
       $modal_content.find('input[name="names"]').focus();
     })
