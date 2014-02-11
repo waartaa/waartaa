@@ -1,9 +1,5 @@
 {
-  "meteor": {
-    "git": "https://github.com/meteor/meteor.git",
-    "branch": "master",
-    "commit": "4af3116d3faa3c4416dcfa49e32ea1d73dc15dc5"
-  },
+  "meteor": {},
   "dependencies": {
     "basePackages": {
       "jquery-ui-bootstrap": {},
