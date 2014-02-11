@@ -45,7 +45,9 @@ Router.map(function () {
       function () {
         // we're done waiting on all subs
         if (this.ready()) {
-          NProgress.done(); 
+          NProgress.done();
+          if (UserServers.find().count() == 0)
+            $('#server-add-btn').click();
         } else {
           NProgress.start();
           this.stop(); // stop downstream funcs from running
