@@ -1,5 +1,9 @@
 {
-  "meteor": {},
+  "meteor": {
+    "git": "https://github.com/meteor/meteor.git",
+    "branch": "master",
+    "commit": "4af3116d3faa3c4416dcfa49e32ea1d73dc15dc5"
+  },
   "dependencies": {
     "basePackages": {
       "jquery-ui-bootstrap": {},
@@ -18,7 +22,8 @@
       "assert": {},
       "nprogress": {},
       "GAnalytics": {},
-      "fast-render": {}
+      "fast-render": {},
+      "iron-router": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -52,14 +57,14 @@
         "commit": "b9c5a87e9f92019cca882234086b7d32719f67e2"
       },
       "presence": {
-        "git": "https://github.com/tmeasday/meteor-presence.git",
-        "tag": "v0.3.0",
-        "commit": "bc619727e46ee46573ec319f73f95f8be0d3247c"
+        "git": "https://github.com/dburles/meteor-presence.git",
+        "tag": "v0.4.1",
+        "commit": "ec4f872eb5b8acb0f4a8d4fcdfa439fcd61aa13b"
       },
       "bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
-        "tag": "v0.3.7",
-        "commit": "5dd0d142c870647b910be80bc777b96f0dd45e5e"
+        "tag": "v3.1.0-1",
+        "commit": "329dccb08bfc18c635676dea600ac9953162cda9"
       },
       "accounts-ui-bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
@@ -73,8 +78,8 @@
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
-        "tag": "v2.2.1",
-        "commit": "9ee12e714afe56b189f53076447b7b54f3012065"
+        "tag": "v2.5.1",
+        "commit": "8c9bc5d3fc96705057737cb9743d555417f6e551"
       },
       "winston-loggly": {
         "git": "https://github.com/tomrogers3/meteor-winston-loggly.git",
@@ -88,8 +93,8 @@
       },
       "assert": {
         "git": "https://github.com/peerlibrary/meteor-assert.git",
-        "tag": "v0.2.2",
-        "commit": "5f87f665ccd6c74322febaf78fe5a24dbfb7949c"
+        "tag": "v0.2.3",
+        "commit": "9c838fbf5053a9f4c9ea21cad8e2fef8f1374e7c"
       },
       "nprogress": {
         "git": "https://github.com/zhouzhuojie/meteor-nprogress.git",
@@ -103,8 +108,13 @@
       },
       "fast-render": {
         "git": "https://github.com/arunoda/meteor-fast-render.git",
-        "tag": "v0.1.11",
-        "commit": "7514e0e8f6f387f7ba510eb633568831a066b481"
+        "tag": "v0.1.13",
+        "commit": "9937198322f481eb9faf6821ecdbd631f8933e3c"
+      },
+      "iron-router": {
+        "git": "https://github.com/EventedMind/iron-router.git",
+        "tag": "v0.6.2",
+        "commit": "ce56e58b45624dce992490f3a1c10f10d3948bae"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

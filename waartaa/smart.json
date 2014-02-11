@@ -16,6 +16,7 @@
     "assert": {},
     "nprogress": {},
     "GAnalytics": {},
-    "fast-render": {}
+    "fast-render": {},
+    "iron-router": {}
   }
 }
