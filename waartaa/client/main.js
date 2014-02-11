@@ -29,6 +29,12 @@ Router.map(function () {
     }
   });
   this.route('chat', {
+    path: /^\/chat$/,
+    before: function () {
+      Router.go('/chat/');
+    }
+  });
+  this.route('chat/', {
     path: /^\/chat\/$/,
     template: 'chat',
     before: [
