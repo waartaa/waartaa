@@ -45,7 +45,9 @@
       </div>
       <div class="collapse navbar-collapse" id="nav-collapse-1">
         <ul class="nav navbar-nav navbar-right">
-          {{ loginButtons }}
+          {{#if currentUser}}
+            {{ loginButtons }}
+          {{/if}}
         </ul>
       </div>
     </div>

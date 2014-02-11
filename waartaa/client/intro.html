@@ -1,131 +1,20 @@
 <template name="intro">
-  <a href="https://github.com/waartaa/waartaa"><img style="position: absolute; top: 50px; right: 0; border: 0; z-index: 999;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
-  <div id="waartaa-intro" class="col-md-12">
-    <div>
-      <div class="waartaa-banner-main-content row">
-        <div class="col-md-5">
-          <h1 class="waartaa-banner">
-            Waartaa &nbsp;<small class="waartaaversion">0.1</small>
-          </h1>
-          <h1 class="waartaa-subbanner">
-            <span class="waartaa-mission-logo-irc">IRC</span> + 
-            <icon class="waartaa-mission-logo-cloud glyphicon glyphicon-cloud"></icon> =
-            <icon class="waartaa-mission-logo-love glyphicon glyphicon-heart"></icon>
-          </h1>
-          <p style="text-align: center;">
-            An open source communication tool built with love.
-          </p>
-        </div>
-        <div class="waartaa-banner-img-container col-md-7">
-          <img class="waartaa-banner-img img-rounded" src="/gallery/waartaa.png">
-        </div>
-      </div>
-      <div id="social-btns">
-        <div class="container">
-          <ul class="list-inline">
-            <li>
-              <iframe src="/github-btn.html?user=waartaa&repo=waartaa&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-            </li>
-            <li>
-              <iframe src="/github-btn.html?user=waartaa&repo=waartaa&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="95" height="20"></iframe>
-            </li>
-            <li>
-              <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="https://platform.twitter.com/widgets/tweet_button.1390956745.html#_=1391807018175&amp;count=horizontal&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fwww.waartaa.com%2F&amp;size=m&amp;url=http%3A%2F%2Fwww.waartaa.com%2F&amp;text=Waartaa%20%C2%B7%20An%20open%20source%20IRC%20client%20as%20a%20service&amp;via=waartaa&amp;related=rtnpro%3ACreator%20of%20Waartaa" class="twitter-share-button twitter-tweet-button twitter-count-horizontal" title="Twitter Tweet Button" data-twttr-rendered="true" style="width: 107px; height: 20px;"></iframe>
-            <li>
-              <iframe id="twitter-widget-1" scrolling="no" frameborder="0" allowtransparency="true" src="https://platform.twitter.com/widgets/follow_button.1390956745.html#_=1391800265777&amp;id=twitter-widget-1&amp;lang=en&amp;screen_name=waartaa&amp;show_count=true&amp;show_screen_name=true&amp;size=m" class="twitter-follow-button twitter-follow-button" title="Twitter Follow Button" data-twttr-rendered="true" style="width: 236px; height: 20px;"></iframe>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <p style="text-align: center; margin-top: 20px;"><a id="waartaa-try-btn" class="btn btn-primary btn-lg" role="button">Give it a go!</a></p>
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      {{> loginButtonsLoggedOut}}
     </div>
-    <div style="margin-top: 40px;">
-      <div class="row" style="margin-bottom: 40px;">
-        <h1 class="lead" style="font-size: 64px; padding: 5px; color: #938D9E; text-align: center;">
-          IRC client as a service
-        <h1>
-        <div class="row" style="color: #938D9E;">
-          <div class="col-md-3 col-sm-6 col-xs-6" style="text-align: center;">
-            <icon class="glyphicon glyphicon-cloud"></icon>
-            <p style="font-size: 18px;">Central logging</p>
-          </div>
-          <div class="col-md-3 col-sm-6 col-xs-6" style="text-align: center;">
-            <icon class="glyphicon glyphicon-time"></icon>
-            <p style="font-size: 18px;">24x7 online</p>
-          </div>
-          <div class="col-md-3 col-sm-6 col-xs-6" style="text-align: center;">
-            <icon class="glyphicon glyphicon-user"></icon>
-            <p style="font-size: 18px;">Unique identity</p>
-          </div>
-          <div class="col-md-3 col-sm-6 col-xs-6" style="text-align: center;">
-            <icon class="glyphicon glyphicon-envelope"></icon>
-            <p style="font-size: 18px;">Notifications</p>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6" style="color: #938D9E;">
-          <h1 style="text-align: center; margin-top: 25%; margin-bottom: 25%;">
-            <icon class="glyphicon glyphicon-wrench" style="font-size: 64px; top: 12px;"></icon>
-              Easy setup
-          </h1>
-        </div>
-        <div class="col-md-6">
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              Quickstart
-            </div>
-            <div class="panel-body" style="overflow: auto;">
-              <ol>
-              <li>Install system dependencies: <code>node</code>, <code>npm</code> for your system. For example:
+  </div>
+</template>
 
-                <ol>
-                  <li>For Fedora, you can do: <code>$ sudo yum install nodejs npm -y</code>
-                  </li>
-                  <li>For Mac OS X, you can install them via brew: <code>$ brew install node npm</code>
-                  </li>
-                  <li>For Debian/Ubuntu install only node.js and it will include npm as: 
-                     <code>$ sudo add-apt-repository ppa:chris-lea/node.js<br/>
-                       $ sudo apt-get update<br/>
-                       $ sudo apt-get install nodejs
-                     </code>
-                  </li>
-                  <li>Else, you can always compile from source.</li>
-                </ol>
-              </li>
-              <li>Get the source: <code>$ git clone --recursive https://github.com/waartaa/waartaa.git</code>
-              </li>
-              <li>Go to <strong>waartaa</strong>'s repository directory just cloned: <code>$ cd waartaa</code>
-              </li>
-              <li>Run setup script: <code>$ ./setup.sh</code>
-              </li>
-              <li>Customize <code>waartaa/server/settings-local.js</code> as needed.</li>
-              <li>Go to waartaa meteor project's directory: <code>$ cd waartaa</code>
-              </li>
-              <li>Run waartaa: <code>$ meteor</code>
-              </li>
-              </ol>
-            </div>
-          </div>
-        </div>
+<template name="loginButtonsLoggedOut">
+  <div class="panel panel-default" style="margin-top: 60px;">
+    <div class="panel-heading" style="text-align: center; text-transform: uppercase;">
+      <strong>Sign in/up</strong>
+    </div>
+    <div class="panel-body">
+      <div id="login-container">
+        {{> _loginButtonsLoggedOutAllServices}}
       </div>
     </div>
-    <footer class="bs-footer" role="contentinfo">
-      <div class="container">
-
-        <p>Designed and built with love and gratitude by <a href="http://twitter.com/rtnpro" target="_blank">@rtnpro</a> and <a href="http://twitter.com/chowdhury_sayan" target="_blank">@chowdhury_sayan</a>.</p>
-        <p>Maintained by the <a href="https://github.com/waartaa?tab=members">core team</a> with the help of <a href="https://github.com/waartaa/waartaa/graphs/contributors">our contributors</a>.</p>
-        <p>Code licensed under <a href="https://github.com/waartaa/waartaa/blob/master/LICENSE" target="_blank">MIT</a>.</p>
-        <ul class="footer-links muted">
-          <li>Currently v0.1</li>
-          <li>·</li>
-          <li><a href="https://github.com/waartaa/waartaa">GitHub</a></li>
-          <li>·</li>
-          <!--<li><a href="http://blog.waartaa.com">Blog</a></li>
-          <li>·</li>-->
-          <li><a href="https://github.com/waartaa/waartaa/issues?state=open">Issues</a></li>
-        </ul>
-      </div>
-    </footer>
   </div>
 </template>

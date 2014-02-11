@@ -490,3 +490,12 @@ body {
   display: inline;
   padding: 0 2px;
 }
+
+#login-container input, #login-container button {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#login-container a {
+  cursor: pointer;
+}
