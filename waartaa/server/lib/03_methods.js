@@ -214,6 +214,14 @@ function _send_raw_message(message, irc_handler, log_options) {
 
 Meteor.startup(function () {
     CLIENTS = {};
+    URGENT_QUEUE = new PowerQueue({
+        name: "urgent",
+        maxProcessing: CONFIG.URGENT_QUEUE_WORKERS_COUNT || 1
+    });
+    DELAYED_QUEUE = new PowerQueue({
+        name: "delayed",
+        maxProcessing: CONFIG.DELAYED_QUEUE_WORKERS_COUNT || 1
+    });
     //console.log(Meteor.users.find());
     Meteor.users.find({}).forEach(function (user) {
         UserServers.find(
@@ -222,7 +230,10 @@ Meteor.startup(function () {
                 status: {$ne: 'user_disconnected'}
             }
         ).forEach(function (user_server) {
-            _join_user_server(user, user_server.name);
+            DELAYED_QUEUE.add(function (done) {
+                _join_user_server(user, user_server.name);
+                done();
+            });
         });
     });
 });

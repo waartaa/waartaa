@@ -58,32 +58,39 @@ IRCHandler = function (user, user_server) {
             client.removeListener('message' + channel.name, listener);
         });
         client.addListener('message' + channel.name, function (
-                nick, text, message) {            Fiber(function () {
-                UserChannelLogs.insert({
-                    message: text,
-                    raw_message: message,
-                    from: nick,
-                    from_user: null,
-                    from_user_id: null,
-                    channel_name: channel.name,
-                    channel_id: channel._id,
-                    server_name: user_server.name,
-                    server_id: user_server._id,
-                    user: user.username,
-                    user_id: user._id,
-                    created: new Date(),
-                    last_updated: new Date()
-                });
-            }).run();
-            Fiber(function () {
-                if (_.isUndefined(Meteor.presences.findOne({userId: user._id}))) {
-                    if (messageContainsNick(text, user_server.current_nick)
-                            && nick) {
-                        waartaa.notifications.notify_channel_mention(
-                            user, channel, nick, text);
+                nick, text, message) {
+            URGENT_QUEUE.add(function (done) {
+                Fiber(function () {
+                    UserChannelLogs.insert({
+                        message: text,
+                        raw_message: message,
+                        from: nick,
+                        from_user: null,
+                        from_user_id: null,
+                        channel_name: channel.name,
+                        channel_id: channel._id,
+                        server_name: user_server.name,
+                        server_id: user_server._id,
+                        user: user.username,
+                        user_id: user._id,
+                        created: new Date(),
+                        last_updated: new Date()
+                    });
+                    done();
+                }).run();
+            });
+            DELAYED_QUEUE.add(function (done) {
+                Fiber(function () {
+                    if (_.isUndefined(Meteor.presences.findOne({userId: user._id}))) {
+                        if (messageContainsNick(text, user_server.current_nick)
+                                && nick) {
+                            waartaa.notifications.notify_channel_mention(
+                                user, channel, nick, text);
+                        }
                     }
-                }
-            }).run();
+                    done();
+                }).run();
+            });
         });
     }
 
@@ -92,28 +99,34 @@ IRCHandler = function (user, user_server) {
         for (nick in nicks) {
             nicks_list.push(nick);
         }
-        Fiber(function () {
-            ChannelNicks.remove(
-                {
-                    channel_name: channel_name, server_name: user_server.name,
-                    nick: {$nin: nicks_list}
-                }
-            );
-        }).run();
-        _.each(nicks_list, function (nick) {
+        DELAYED_QUEUE.add(function (done) {
             Fiber(function () {
-                try {
-                    ChannelNicks.update(
-                        {channel_name: channel_name, server_name: user_server.name,
-                         nick: nick},
-                        {$set: {last_updated: new Date()}},
-                        {upsert: true}
-                    );
-                } catch (err) {
-                    logger.info(
-                        "ChannelNicksUpsertError", {error: err});
-                }
+                ChannelNicks.remove(
+                    {
+                        channel_name: channel_name, server_name: user_server.name,
+                        nick: {$nin: nicks_list}
+                    }
+                );
+                done();
             }).run();
+        });
+        _.each(nicks_list, function (nick) {
+            DELAYED_QUEUE.add(function (done) {
+                Fiber(function () {
+                    try {
+                        ChannelNicks.update(
+                            {channel_name: channel_name, server_name: user_server.name,
+                             nick: nick},
+                            {$set: {}},
+                            {upsert: true}
+                        );
+                    } catch (err) {
+                        logger.info(
+                            "ChannelNicksUpsertError", {error: err});
+                    }
+                    done();
+                }).run();
+            });
         });
         /*
         try {
@@ -235,57 +248,60 @@ IRCHandler = function (user, user_server) {
             client.removeListener('join', listener);
         });
         client.addListener('join', function (channel, nick, message) {
-            Fiber(function () {
-                var user_channel = _create_update_user_channel(
-                    user_server, {name: channel});
-                try {
-                    ChannelNicks.update(
-                        {
-                            nick: nick, channel_name: channel,
-                            server_name: user_server.name
-                        },
-                        {$set: {last_updated: new Date()}},
-                        {upsert: true}
-                    );
-                } catch (err) {
-                    logger.info('ChannelNicksUpsertError', {error: err});
-                }
-                if (nick == client.nick) {
-                    /*
-                    var job_key = 'WHO-' + channel;
-                    if (JOBS[job_key])
-                        clearInterval(JOBS[job_key]);
-                    JOBS[job_key] = setInterval(
-                        _getChannelWHOData, CONFIG.channel_who_poll_interval,
-                        channel);
-                    */
-                    console.log(user_channel);
-                    UserChannels.update(
-                        {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
-                    _addChannelJoinListener(user_channel.name);
-                    _addChannelPartListener(user_channel.name);
-                    _joinChannelCallback(message, user_channel);
-                }
-                var channel_join_message = nick + ' has joined the channel.';
-                if (nick == client.nick)
-                    channel_join_message = 'You have joined the channel.';
-                UserChannelLogs.insert({
-                    message: channel_join_message,
-                    raw_message: message,
-                    from: null,
-                    from_user: null,
-                    from_user_id: null,
-                    channel_name: user_channel.name,
-                    channel_id: user_channel._id,
-                    server_name: user_server.name,
-                    server_id: user_server._id,
-                    user: user.username,
-                    user_id: user._id,
-                    created: new Date(),
-                    last_updated: new Date(),
-                    type: 'ChannelJoin'
-                });
-            }).run();
+            URGENT_QUEUE.add(function (done) {
+                Fiber(function () {
+                    var user_channel = _create_update_user_channel(
+                        user_server, {name: channel});
+                    try {
+                        ChannelNicks.update(
+                            {
+                                nick: nick, channel_name: channel,
+                                server_name: user_server.name
+                            },
+                            {$set: {}},
+                            {upsert: true}
+                        );
+                    } catch (err) {
+                        logger.info('ChannelNicksUpsertError', {error: err});
+                    }
+                    if (nick == client.nick) {
+                        /*
+                        var job_key = 'WHO-' + channel;
+                        if (JOBS[job_key])
+                            clearInterval(JOBS[job_key]);
+                        JOBS[job_key] = setInterval(
+                            _getChannelWHOData, CONFIG.channel_who_poll_interval,
+                            channel);
+                        */
+                        console.log(user_channel);
+                        UserChannels.update(
+                            {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
+                        _addChannelJoinListener(user_channel.name);
+                        _addChannelPartListener(user_channel.name);
+                        _joinChannelCallback(message, user_channel);
+                    }
+                    var channel_join_message = nick + ' has joined the channel.';
+                    if (nick == client.nick)
+                        channel_join_message = 'You have joined the channel.';
+                    UserChannelLogs.insert({
+                        message: channel_join_message,
+                        raw_message: message,
+                        from: null,
+                        from_user: null,
+                        from_user_id: null,
+                        channel_name: user_channel.name,
+                        channel_id: user_channel._id,
+                        server_name: user_server.name,
+                        server_id: user_server._id,
+                        user: user.username,
+                        user_id: user._id,
+                        created: new Date(),
+                        last_updated: new Date(),
+                        type: 'ChannelJoin'
+                    });
+                    done();
+                }).run();
+            });
         });
     }
 
@@ -294,45 +310,51 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.channel['part' + channel_name] = '';
         client.addListener('part' + channel_name, function (nick, reason, message) {
-            Fiber(function () {
-                ChannelNicks.remove(
-                  {
-                    channel_name: channel_name, server_name: user_server.name,
-                    nick: nick
-                  }
-                );
-            }).run();
-            Fiber(function () {
-                var channel = UserChannels.findOne(
-                    {user_server_id: user_server._id, name: channel_name});
-                if (!channel)
-                    return;
-                var part_message = "";
-                if (nick == client.nick)
-                    part_message = 'You have left';
-                else
-                    part_message = nick + ' has left';
-                if (reason)
-                    part_message += ' (' + reason + ')';
-                UserChannelLogs.insert({
-                    message: part_message,
-                    raw_message: message,
-                    from: null,
-                    from_user: null,
-                    from_user_id: null,
-                    channel_name: channel.name,
-                    channel_id: channel._id,
-                    server_name: user_server.name,
-                    server_id: user_server._id,
-                    user: user.username,
-                    user_id: user._id,
-                    created: new Date(),
-                    last_updated: new Date(),
-                    type: 'ChannelPart'
-                });
-            }).run();
-            if (channels_listening_to[channel_name])
-                delete channels_listening_to[channel_name];
+            URGENT_QUEUE.add(function (done) {
+                Fiber(function () {
+                    ChannelNicks.remove(
+                      {
+                        channel_name: channel_name, server_name: user_server.name,
+                        nick: nick
+                      }
+                    );
+                    done();
+                }).run();
+            });
+            URGENT_QUEUE.add(function (done) {
+                Fiber(function () {
+                    var channel = UserChannels.findOne(
+                        {user_server_id: user_server._id, name: channel_name});
+                    if (!channel)
+                        return;
+                    var part_message = "";
+                    if (nick == client.nick)
+                        part_message = 'You have left';
+                    else
+                        part_message = nick + ' has left';
+                    if (reason)
+                        part_message += ' (' + reason + ')';
+                    UserChannelLogs.insert({
+                        message: part_message,
+                        raw_message: message,
+                        from: null,
+                        from_user: null,
+                        from_user_id: null,
+                        channel_name: channel.name,
+                        channel_id: channel._id,
+                        server_name: user_server.name,
+                        server_id: user_server._id,
+                        user: user.username,
+                        user_id: user._id,
+                        created: new Date(),
+                        last_updated: new Date(),
+                        type: 'ChannelPart'
+                    });
+                    done();
+                }).run();
+                if (channels_listening_to[channel_name])
+                    delete channels_listening_to[channel_name];
+            });
         });
     }
 
@@ -346,38 +368,41 @@ IRCHandler = function (user, user_server) {
                     {nick: nick, channel_name: {$in: channels},
                     server_name: user_server.name});
             }).run();
-            Fiber(function () {
-                UserChannels.find({
-                    user_server_name: user_server.name,
-                    user: user.username, name: {$in: channels}
-                }).forEach(function (channel) {
-                    var part_message = "";
-                    if (nick == client.nick)
-                        part_message = 'You have left IRC';
-                    else
-                        part_message = nick + ' has left IRC';
-                    if (reason)
-                        part_message += ' (' + reason + ')';
-                    Fiber(function () {
-                        UserChannelLogs.insert({
-                            message: part_message,
-                            raw_message: message,
-                            from: null,
-                            from_user: null,
-                            from_user_id: null,
-                            channel_name: channel.name,
-                            channel_id: channel._id,
-                            server_name: user_server.name,
-                            server_id: user_server._id,
-                            user: user.username,
-                            user_id: user._id,
-                            created: new Date(),
-                            last_updated: new Date(),
-                            type: 'QUITIRC'
-                        });
-                    }).run();
-                });
-            }).run();
+            URGENT_QUEUE.add(function (done) {
+                Fiber(function () {
+                    UserChannels.find({
+                        user_server_name: user_server.name,
+                        user: user.username, name: {$in: channels}
+                    }).forEach(function (channel) {
+                        var part_message = "";
+                        if (nick == client.nick)
+                            part_message = 'You have left IRC';
+                        else
+                            part_message = nick + ' has left IRC';
+                        if (reason)
+                            part_message += ' (' + reason + ')';
+                        Fiber(function () {
+                            UserChannelLogs.insert({
+                                message: part_message,
+                                raw_message: message,
+                                from: null,
+                                from_user: null,
+                                from_user_id: null,
+                                channel_name: channel.name,
+                                channel_id: channel._id,
+                                server_name: user_server.name,
+                                server_id: user_server._id,
+                                user: user.username,
+                                user_id: user._id,
+                                created: new Date(),
+                                last_updated: new Date(),
+                                type: 'QUITIRC'
+                            });
+                        }).run();
+                    });
+                    done();
+                }).run();
+            });
         });
     }
 
@@ -386,12 +411,15 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['topic'] = '';
         client.addListener('topic', function (channel, topic, nick, message) {
-            Fiber(function () {
-                UserChannels.update({
-                    name: channel, user_server_id: user_server._id,
-                    user: user.username
-                }, {$set: {topic: topic}});
-            }).run();
+            URGENT_QUEUE.add(function (done) {
+                Fiber(function () {
+                    UserChannels.update({
+                        name: channel, user_server_id: user_server._id,
+                        user: user.username
+                    }, {$set: {topic: topic}});
+                    done();
+                }).run();
+            });
         });
     }
 
@@ -414,46 +442,53 @@ IRCHandler = function (user, user_server) {
         client.addListener('nick', function (
                 oldnick, newnick, channels, message) {
             // Update channel nick from old nick to new nick
-            Fiber(function () {
-                try {
-                    ChannelNicks.update(
-                        {
-                            nick: oldnick, channel_name: {$in: channels},
-                            server_name: user_server.name
-                        },
-                        {$set: {nick: newnick}},
-                        {multi: true}
-                    );
-                } catch (err) {
-                    logger.info('ChannelNicksUpsertError', {error: err});
-                }
-            }).run();
-            // Log nick change for active and connected user channels.
-            Fiber(function () {
-                UserChannels.find(
-                    {
-                        user_server_id: user_server._id, name: {$in: channels},
-                        active: true, status: 'connected'
+            DELAYED_QUEUE.add(function (done) {
+                Fiber(function () {
+                    try {
+                        ChannelNicks.update(
+                            {
+                                nick: oldnick, channel_name: {$in: channels},
+                                server_name: user_server.name
+                            },
+                            {$set: {nick: newnick}},
+                            {multi: true}
+                        );
+                    } catch (err) {
+                        logger.info('ChannelNicksUpsertError', {error: err});
                     }
-                ).forEach(function (channel) {
-                    UserChannelLogs.insert({
-                        message: oldnick + ' has changed nick to ' + newnick,
-                        raw_message: '',
-                        from: '',
-                        from_user: null,
-                        from_user_id: null,
-                        channel_name: channel.name,
-                        channel_id: channel._id,
-                        server_name: user_server.name,
-                        server_id: user_server._id,
-                        user: user.username,
-                        user_id: user._id,
-                        created: new Date(),
-                        last_updated: new Date(),
-                        type: 'NICK'
+                    done();
+                }).run();
+            });
+
+            DELAYED_QUEUE.add(function (done) {
+                // Log nick change for active and connected user channels.
+                Fiber(function () {
+                    UserChannels.find(
+                        {
+                            user_server_id: user_server._id, name: {$in: channels},
+                            active: true, status: 'connected'
+                        }
+                    ).forEach(function (channel) {
+                        UserChannelLogs.insert({
+                            message: oldnick + ' has changed nick to ' + newnick,
+                            raw_message: '',
+                            from: '',
+                            from_user: null,
+                            from_user_id: null,
+                            channel_name: channel.name,
+                            channel_id: channel._id,
+                            server_name: user_server.name,
+                            server_id: user_server._id,
+                            user: user.username,
+                            user_id: user._id,
+                            created: new Date(),
+                            last_updated: new Date(),
+                            type: 'NICK'
+                        });
                     });
-                });
-            }).run();
+                    done();
+                }).run();
+            });
         })
     }
 
@@ -468,50 +503,53 @@ IRCHandler = function (user, user_server) {
         });
         client.addListener('message', function (nick, to, text, message) {
             //console.log(nick + ', ' + to + ', ' + text + ', ' + message);
-            if (to == client.nick) {
-                var profile = user.profile;
-                
-                
-                Fiber(function () {
-                    var userpms = UserPms.findOne({user_id: user._id}) || {pms: {}};
-                    userpms.pms[nick] = "";
-                    UserPms.upsert(
-                        {user_id: user._id, 
-                         user_server_id: user_server._id,
-                         user_server_name: user_server.name,
-                         user: user.username}, 
-                         {$set: {pms: userpms.pms}});
-                }).run();
+            URGENT_QUEUE.add(function (done) {
+                if (to == client.nick) {
+                    var profile = user.profile;
+                    
+                    
+                    Fiber(function () {
+                        var userpms = UserPms.findOne({user_id: user._id}) || {pms: {}};
+                        userpms.pms[nick] = "";
+                        UserPms.upsert(
+                            {user_id: user._id, 
+                             user_server_id: user_server._id,
+                             user_server_name: user_server.name,
+                             user: user.username}, 
+                             {$set: {pms: userpms.pms}});
+                    }).run();
 
-                Fiber(function () {
-                    var from_user = Meteor.users.findOne({username: nick}) || {};
-                    var to_user = user;
-                    PMLogs.insert({
-                        message: text,
-                        raw_message: message,
-                        from: nick,
-                        display_from: nick,
-                        from_user: from_user.username,
-                        from_user_id: from_user._id,
-                        to_nick: to,
-                        to_user: to_user.username,
-                        to_user_id: to_user._id,
-                        server_name: user_server.name,
-                        server_id: user_server._id,
-                        user: user.username,
-                        user_id: user._id,
-                        created: new Date(),
-                        last_updated: new Date()
-                    });
-                }).run();
+                    Fiber(function () {
+                        var from_user = Meteor.users.findOne({username: nick}) || {};
+                        var to_user = user;
+                        PMLogs.insert({
+                            message: text,
+                            raw_message: message,
+                            from: nick,
+                            display_from: nick,
+                            from_user: from_user.username,
+                            from_user_id: from_user._id,
+                            to_nick: to,
+                            to_user: to_user.username,
+                            to_user_id: to_user._id,
+                            server_name: user_server.name,
+                            server_id: user_server._id,
+                            user: user.username,
+                            user_id: user._id,
+                            created: new Date(),
+                            last_updated: new Date()
+                        });
+                    }).run();
 
-                Fiber(function () {
-                    if (_.isUndefined(Meteor.presences.findOne({userId: user._id}))) {
-                        waartaa.notifications.notify_pm(
-                            user, nick, text, user_server);
-                    }
-                }).run();
-            }
+                    Fiber(function () {
+                        if (_.isUndefined(Meteor.presences.findOne({userId: user._id}))) {
+                            waartaa.notifications.notify_pm(
+                                user, nick, text, user_server);
+                        }
+                        }).run();
+                    done();
+                }
+            });
         });
     }
 
@@ -597,50 +635,53 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['notice'] = '';
         client.addListener('notice', function (nick, to, text, message) {
-            Fiber(function () {
-                if (nick == 'NickServ' || nick == null) {
-                    UserServerLogs.insert({
-                        message: text,
-                        raw_message: message,
-                        from: nick,
-                        from_user: null,
-                        from_user_id: null,
-                        server_name: user_server.name,
-                        server_id: user_server._id,
-                        user: user.username,
-                        user_id: user._id,
-                        created: new Date(),
-                        last_updated: new Date()
-                    });
-                } else if (nick == 'ChanServ') {
-                    try {
-                        var channel_name = text.split(']')[0].substr(1);
-                        var channel = UserChannels.findOne({
-                            name: channel_name,
-                            user_server_id: user_server._id,
-                            user: user.username
+            URGENT_QUEUE.add(function (done) {
+                Fiber(function () {
+                    if (nick == 'NickServ' || nick == null) {
+                        UserServerLogs.insert({
+                            message: text,
+                            raw_message: message,
+                            from: nick,
+                            from_user: null,
+                            from_user_id: null,
+                            server_name: user_server.name,
+                            server_id: user_server._id,
+                            user: user.username,
+                            user_id: user._id,
+                            created: new Date(),
+                            last_updated: new Date()
                         });
-                        if (channel)
-                            UserChannelLogs.insert({
-                                message: text,
-                                raw_message: message,
-                                from: nick,
-                                from_user: null,
-                                from_user_id: null,
-                                channel_name: channel.name,
-                                channel_id: channel._id,
-                                server_name: user_server.name,
-                                server_id: user_server._id,
-                                user: user.username,
-                                user_id: user._id,
-                                created: new Date(),
-                                last_updated: new Date(),
-                                type: 'ChannelNotice'
+                    } else if (nick == 'ChanServ') {
+                        try {
+                            var channel_name = text.split(']')[0].substr(1);
+                            var channel = UserChannels.findOne({
+                                name: channel_name,
+                                user_server_id: user_server._id,
+                                user: user.username
                             });
-                    } catch (err) {
+                            if (channel)
+                                UserChannelLogs.insert({
+                                    message: text,
+                                    raw_message: message,
+                                    from: nick,
+                                    from_user: null,
+                                    from_user_id: null,
+                                    channel_name: channel.name,
+                                    channel_id: channel._id,
+                                    server_name: user_server.name,
+                                    server_id: user_server._id,
+                                    user: user.username,
+                                    user_id: user._id,
+                                    created: new Date(),
+                                    last_updated: new Date(),
+                                    type: 'ChannelNotice'
+                                });
+                        } catch (err) {
+                        }
                     }
-                }
-            }).run();
+                    done();
+                }).run();
+            });
         });
     }
 
@@ -649,56 +690,59 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['ctcp'] = '';
         client.addListener('ctcp', function (from, to, text, type, message) {
-            Fiber(function () {
-                try {
-                    if (type == 'privmsg' && text.search('ACTION') == 0) {
-                        text = text.replace('ACTION', from);
-                        if (to[0] == '#') {
-                            var channel = UserChannels.findOne({
-                                name: to,
-                                user_server_id: user_server._id
-                            });
-                            if (!channel)
-                                return;
-                            UserChannelLogs.insert({
-                                message: text,
-                                raw_message: message,
-                                from: '',
-                                from_user: user.username,
-                                from_user_id: user._id,
-                                channel_name: channel.name,
-                                channel_id: channel._id,
-                                server_name: user_server.name,
-                                server_id: user_server._id,
-                                user: user.username,
-                                user_id: user._id,
-                                created: new Date(),
-                                last_updated: new Date()
-                            });
-                        } else {
-                            PMLogs.insert({
-                              message: text,
-                              raw_message: message,
-                              from: from,
-                              display_from: '',
-                              from_user: user.username,
-                              from_user_id: user._id,
-                              to_nick: to,
-                              to_user: '',
-                              to_user_id: '',
-                              server_name: user_server.name,
-                              server_id: user_server._id,
-                              user: user.username,
-                              user_id: user._id,
-                              created: new Date(),
-                              last_updated: new Date()
-                            });
+            URGENT_QUEUE.add(function (done) {
+                Fiber(function () {
+                    try {
+                        if (type == 'privmsg' && text.search('ACTION') == 0) {
+                            text = text.replace('ACTION', from);
+                            if (to[0] == '#') {
+                                var channel = UserChannels.findOne({
+                                    name: to,
+                                    user_server_id: user_server._id
+                                });
+                                if (!channel)
+                                    return;
+                                UserChannelLogs.insert({
+                                    message: text,
+                                    raw_message: message,
+                                    from: '',
+                                    from_user: user.username,
+                                    from_user_id: user._id,
+                                    channel_name: channel.name,
+                                    channel_id: channel._id,
+                                    server_name: user_server.name,
+                                    server_id: user_server._id,
+                                    user: user.username,
+                                    user_id: user._id,
+                                    created: new Date(),
+                                    last_updated: new Date()
+                                });
+                            } else {
+                                PMLogs.insert({
+                                  message: text,
+                                  raw_message: message,
+                                  from: from,
+                                  display_from: '',
+                                  from_user: user.username,
+                                  from_user_id: user._id,
+                                  to_nick: to,
+                                  to_user: '',
+                                  to_user_id: '',
+                                  server_name: user_server.name,
+                                  server_id: user_server._id,
+                                  user: user.username,
+                                  user_id: user._id,
+                                  created: new Date(),
+                                  last_updated: new Date()
+                                });
+                            }
                         }
+                    } catch (err) {
+                        logger.error(err);
                     }
-                } catch (err) {
-                    logger.error(err);
-                }
-            }).run();
+                    done();
+                }).run();
+            });
         });
     }
 
