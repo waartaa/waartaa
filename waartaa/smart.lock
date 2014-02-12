@@ -19,7 +19,8 @@
       "nprogress": {},
       "GAnalytics": {},
       "fast-render": {},
-      "iron-router": {}
+      "iron-router": {},
+      "power-queue": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -104,13 +105,18 @@
       },
       "fast-render": {
         "git": "https://github.com/arunoda/meteor-fast-render.git",
-        "tag": "v0.1.13",
-        "commit": "9937198322f481eb9faf6821ecdbd631f8933e3c"
+        "tag": "v0.1.15",
+        "commit": "baf79a3e5863acc3abfe2d0d62fb23b21fe880de"
       },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
         "tag": "v0.6.2",
         "commit": "ce56e58b45624dce992490f3a1c10f10d3948bae"
+      },
+      "power-queue": {
+        "git": "https://github.com/CollectionFS/Meteor-power-queue.git",
+        "tag": "v0.9.2",
+        "commit": "d452da900332b185cf0f7e7009ddcc0b3e804d55"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",
@@ -131,6 +137,21 @@
         "git": "https://github.com/superstringsoftware/observatory-apollo.git",
         "tag": "v0.3.2",
         "commit": "f704848187a4da2bd179864ae80a1f73a3fd22a6"
+      },
+      "reactive-property": {
+        "git": "https://github.com/CollectionFS/Meteor-reactive-property.git",
+        "branch": "master",
+        "commit": "fcd9d1cafbc2d86d5a25fb3c1d92a6d0348b6e08"
+      },
+      "micro-queue": {
+        "git": "https://github.com/CollectionFS/Meteor-micro-queue.git",
+        "branch": "master",
+        "commit": "ca613597a67cf0df7e00bbd37640915030d28280"
+      },
+      "reactive-list": {
+        "git": "https://github.com/CollectionFS/Meteor-reactive-list.git",
+        "branch": "master",
+        "commit": "d2494cea1e3dc71abd3d4dba7d8c7f0a4e8e02fb"
       },
       "observatory-galileo": {
         "git": "https://github.com/superstringsoftware/observatory-galileo.git",

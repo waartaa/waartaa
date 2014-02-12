@@ -17,6 +17,7 @@
     "nprogress": {},
     "GAnalytics": {},
     "fast-render": {},
-    "iron-router": {}
+    "iron-router": {},
+    "power-queue": {}
   }
 }

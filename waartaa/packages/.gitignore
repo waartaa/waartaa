@@ -43,3 +43,8 @@
 /assert
 /fast-render
 /iron-router
+/fast-render
+/power-queue
+/reactive-property
+/micro-queue
+/reactive-list
