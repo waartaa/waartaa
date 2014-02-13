@@ -350,10 +350,10 @@ IRCHandler = function (user, user_server) {
                         last_updated: new Date(),
                         type: 'ChannelPart'
                     });
+                    if (channels_listening_to[channel_name])
+                        delete channels_listening_to[channel_name];
                     done();
                 }).run();
-                if (channels_listening_to[channel_name])
-                    delete channels_listening_to[channel_name];
             });
         });
     }
@@ -381,24 +381,27 @@ IRCHandler = function (user, user_server) {
                             part_message = nick + ' has left IRC';
                         if (reason)
                             part_message += ' (' + reason + ')';
-                        Fiber(function () {
-                            UserChannelLogs.insert({
-                                message: part_message,
-                                raw_message: message,
-                                from: null,
-                                from_user: null,
-                                from_user_id: null,
-                                channel_name: channel.name,
-                                channel_id: channel._id,
-                                server_name: user_server.name,
-                                server_id: user_server._id,
-                                user: user.username,
-                                user_id: user._id,
-                                created: new Date(),
-                                last_updated: new Date(),
-                                type: 'QUITIRC'
-                            });
-                        }).run();
+                        URGENT_QUEUE.add(function (done) {
+                            Fiber(function () {
+                                UserChannelLogs.insert({
+                                    message: part_message,
+                                    raw_message: message,
+                                    from: null,
+                                    from_user: null,
+                                    from_user_id: null,
+                                    channel_name: channel.name,
+                                    channel_id: channel._id,
+                                    server_name: user_server.name,
+                                    server_id: user_server._id,
+                                    user: user.username,
+                                    user_id: user._id,
+                                    created: new Date(),
+                                    last_updated: new Date(),
+                                    type: 'QUITIRC'
+                                });
+                                done();
+                            }).run();
+                        });
                     });
                     done();
                 }).run();
@@ -504,11 +507,9 @@ IRCHandler = function (user, user_server) {
         client.addListener('message', function (nick, to, text, message) {
             //console.log(nick + ', ' + to + ', ' + text + ', ' + message);
             URGENT_QUEUE.add(function (done) {
-                if (to == client.nick) {
-                    var profile = user.profile;
-                    
-                    
-                    Fiber(function () {
+                Fiber(function () {
+                    if (to == client.nick) {
+                        var profile = user.profile;
                         var userpms = UserPms.findOne({user_id: user._id}) || {pms: {}};
                         userpms.pms[nick] = "";
                         UserPms.upsert(
@@ -517,9 +518,7 @@ IRCHandler = function (user, user_server) {
                              user_server_name: user_server.name,
                              user: user.username}, 
                              {$set: {pms: userpms.pms}});
-                    }).run();
 
-                    Fiber(function () {
                         var from_user = Meteor.users.findOne({username: nick}) || {};
                         var to_user = user;
                         PMLogs.insert({
@@ -539,16 +538,14 @@ IRCHandler = function (user, user_server) {
                             created: new Date(),
                             last_updated: new Date()
                         });
-                    }).run();
-
-                    Fiber(function () {
-                        if (_.isUndefined(Meteor.presences.findOne({userId: user._id}))) {
+                        if (_.isUndefined(Meteor.presences.findOne(
+                                {userId: user._id}))) {
                             waartaa.notifications.notify_pm(
                                 user, nick, text, user_server);
                         }
-                        }).run();
+                    }
                     done();
-                }
+                }).run();
             });
         });
     }
