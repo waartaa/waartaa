@@ -216,10 +216,12 @@ Meteor.startup(function () {
     CLIENTS = {};
     URGENT_QUEUE = new PowerQueue({
         name: "urgent",
+        debug: CONFIG.QUEUE_DEBUG || false,
         maxProcessing: CONFIG.URGENT_QUEUE_WORKERS_COUNT || 1
     });
     DELAYED_QUEUE = new PowerQueue({
         name: "delayed",
+        debug: CONFIG.QUEUE_DEBUG || false,
         maxProcessing: CONFIG.DELAYED_QUEUE_WORKERS_COUNT || 1
     });
     //console.log(Meteor.users.find());

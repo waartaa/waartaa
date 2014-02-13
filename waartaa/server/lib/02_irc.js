@@ -59,7 +59,7 @@ IRCHandler = function (user, user_server) {
         });
         client.addListener('message' + channel.name, function (
                 nick, text, message) {
-            URGENT_QUEUE.add(function (done) {
+            enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     UserChannelLogs.insert({
                         message: text,
@@ -76,10 +76,9 @@ IRCHandler = function (user, user_server) {
                         created: new Date(),
                         last_updated: new Date()
                     });
-                    done();
                 }).run();
             });
-            DELAYED_QUEUE.add(function (done) {
+            enqueueTask(DELAYED_QUEUE, function () {
                 Fiber(function () {
                     if (_.isUndefined(Meteor.presences.findOne({userId: user._id}))) {
                         if (messageContainsNick(text, user_server.current_nick)
@@ -88,7 +87,6 @@ IRCHandler = function (user, user_server) {
                                 user, channel, nick, text);
                         }
                     }
-                    done();
                 }).run();
             });
         });
@@ -99,7 +97,7 @@ IRCHandler = function (user, user_server) {
         for (nick in nicks) {
             nicks_list.push(nick);
         }
-        DELAYED_QUEUE.add(function (done) {
+        enqueueTask(DELAYED_QUEUE, function () {
             Fiber(function () {
                 ChannelNicks.remove(
                     {
@@ -107,11 +105,10 @@ IRCHandler = function (user, user_server) {
                         nick: {$nin: nicks_list}
                     }
                 );
-                done();
             }).run();
         });
         _.each(nicks_list, function (nick) {
-            DELAYED_QUEUE.add(function (done) {
+            enqueueTask(DELAYED_QUEUE, function () {
                 Fiber(function () {
                     try {
                         ChannelNicks.update(
@@ -124,7 +121,6 @@ IRCHandler = function (user, user_server) {
                         logger.info(
                             "ChannelNicksUpsertError", {error: err});
                     }
-                    done();
                 }).run();
             });
         });
@@ -248,7 +244,7 @@ IRCHandler = function (user, user_server) {
             client.removeListener('join', listener);
         });
         client.addListener('join', function (channel, nick, message) {
-            URGENT_QUEUE.add(function (done) {
+            enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     var user_channel = _create_update_user_channel(
                         user_server, {name: channel});
@@ -299,7 +295,6 @@ IRCHandler = function (user, user_server) {
                         last_updated: new Date(),
                         type: 'ChannelJoin'
                     });
-                    done();
                 }).run();
             });
         });
@@ -310,7 +305,7 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.channel['part' + channel_name] = '';
         client.addListener('part' + channel_name, function (nick, reason, message) {
-            URGENT_QUEUE.add(function (done) {
+            enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     ChannelNicks.remove(
                       {
@@ -318,10 +313,9 @@ IRCHandler = function (user, user_server) {
                         nick: nick
                       }
                     );
-                    done();
                 }).run();
             });
-            URGENT_QUEUE.add(function (done) {
+            enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     var channel = UserChannels.findOne(
                         {user_server_id: user_server._id, name: channel_name});
@@ -352,7 +346,6 @@ IRCHandler = function (user, user_server) {
                     });
                     if (channels_listening_to[channel_name])
                         delete channels_listening_to[channel_name];
-                    done();
                 }).run();
             });
         });
@@ -368,7 +361,7 @@ IRCHandler = function (user, user_server) {
                     {nick: nick, channel_name: {$in: channels},
                     server_name: user_server.name});
             }).run();
-            URGENT_QUEUE.add(function (done) {
+            enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     UserChannels.find({
                         user_server_name: user_server.name,
@@ -381,7 +374,7 @@ IRCHandler = function (user, user_server) {
                             part_message = nick + ' has left IRC';
                         if (reason)
                             part_message += ' (' + reason + ')';
-                        URGENT_QUEUE.add(function (done) {
+                        enqueueTask(URGENT_QUEUE, function () {
                             Fiber(function () {
                                 UserChannelLogs.insert({
                                     message: part_message,
@@ -399,11 +392,9 @@ IRCHandler = function (user, user_server) {
                                     last_updated: new Date(),
                                     type: 'QUITIRC'
                                 });
-                                done();
                             }).run();
                         });
                     });
-                    done();
                 }).run();
             });
         });
@@ -414,13 +405,12 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['topic'] = '';
         client.addListener('topic', function (channel, topic, nick, message) {
-            URGENT_QUEUE.add(function (done) {
+            enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     UserChannels.update({
                         name: channel, user_server_id: user_server._id,
                         user: user.username
                     }, {$set: {topic: topic}});
-                    done();
                 }).run();
             });
         });
@@ -445,7 +435,7 @@ IRCHandler = function (user, user_server) {
         client.addListener('nick', function (
                 oldnick, newnick, channels, message) {
             // Update channel nick from old nick to new nick
-            DELAYED_QUEUE.add(function (done) {
+            enqueueTask(DELAYED_QUEUE, function () {
                 Fiber(function () {
                     try {
                         ChannelNicks.update(
@@ -459,11 +449,10 @@ IRCHandler = function (user, user_server) {
                     } catch (err) {
                         logger.info('ChannelNicksUpsertError', {error: err});
                     }
-                    done();
                 }).run();
             });
 
-            DELAYED_QUEUE.add(function (done) {
+            enqueueTask(DELAYED_QUEUE, function () {
                 // Log nick change for active and connected user channels.
                 Fiber(function () {
                     UserChannels.find(
@@ -489,7 +478,6 @@ IRCHandler = function (user, user_server) {
                             type: 'NICK'
                         });
                     });
-                    done();
                 }).run();
             });
         })
@@ -506,7 +494,7 @@ IRCHandler = function (user, user_server) {
         });
         client.addListener('message', function (nick, to, text, message) {
             //console.log(nick + ', ' + to + ', ' + text + ', ' + message);
-            URGENT_QUEUE.add(function (done) {
+            enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     if (to == client.nick) {
                         var profile = user.profile;
@@ -544,7 +532,6 @@ IRCHandler = function (user, user_server) {
                                 user, nick, text, user_server);
                         }
                     }
-                    done();
                 }).run();
             });
         });
@@ -632,7 +619,7 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['notice'] = '';
         client.addListener('notice', function (nick, to, text, message) {
-            URGENT_QUEUE.add(function (done) {
+            enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     if (nick == 'NickServ' || nick == null) {
                         UserServerLogs.insert({
@@ -676,7 +663,6 @@ IRCHandler = function (user, user_server) {
                         } catch (err) {
                         }
                     }
-                    done();
                 }).run();
             });
         });
@@ -687,7 +673,7 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['ctcp'] = '';
         client.addListener('ctcp', function (from, to, text, type, message) {
-            URGENT_QUEUE.add(function (done) {
+            enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     try {
                         if (type == 'privmsg' && text.search('ACTION') == 0) {
@@ -737,7 +723,6 @@ IRCHandler = function (user, user_server) {
                     } catch (err) {
                         logger.error(err);
                     }
-                    done();
                 }).run();
             });
         });
