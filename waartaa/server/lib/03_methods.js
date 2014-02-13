@@ -232,9 +232,8 @@ Meteor.startup(function () {
                 status: {$ne: 'user_disconnected'}
             }
         ).forEach(function (user_server) {
-            DELAYED_QUEUE.add(function (done) {
+            enqueueTask(DELAYED_QUEUE, function () {
                 _join_user_server(user, user_server.name);
-                done();
             });
         });
     });
