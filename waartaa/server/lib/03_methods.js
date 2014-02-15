@@ -214,6 +214,11 @@ function _send_raw_message(message, irc_handler, log_options) {
 
 Meteor.startup(function () {
     CLIENTS = {};
+    JOIN_SERVER_QUEUE = new PowerQueue({
+        name: "join_server",
+        debug: CONFIG.QUEUE_DEBUG || false,
+        maxProcessing: 1
+    });
     URGENT_QUEUE = new PowerQueue({
         name: "urgent",
         debug: CONFIG.QUEUE_DEBUG || false,
@@ -229,12 +234,10 @@ Meteor.startup(function () {
         UserServers.find(
             {
                 user: user.username, active: true,
-                status: {$ne: 'user_disconnected'}
+                status: {$nin: ['user_disconnected', 'admin_disconnected']}
             }
         ).forEach(function (user_server) {
-            enqueueTask(DELAYED_QUEUE, function () {
-                _join_user_server(user, user_server.name);
-            });
+            _join_user_server(user, user_server.name);
         });
     });
 });

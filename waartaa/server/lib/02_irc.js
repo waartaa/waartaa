@@ -570,11 +570,13 @@ IRCHandler = function (user, user_server) {
     }
 
     function _joinServerCallback (message) {
-        Fiber(function () {
-            UserServers.update({_id: user_server._id}, {$set: {
-                status: 'connected'}
-            });
-        }).run();
+        /**
+         * It's the responsiblity of the calling function to decide
+         * whether to run this inside Fiber or not.
+         */
+        UserServers.update({_id: user_server._id}, {$set: {
+            status: 'connected'}
+        });
         _addWhoListener();
         _addServerQuitListener();
         _addChannelTopicListener();
@@ -587,22 +589,20 @@ IRCHandler = function (user, user_server) {
         _addGlobalChannelJoinListener();
         _addGlobalChannelNamesListener();
         _pollUserStatus(60 * 1000);
-        Fiber(function () {
-            UserChannels.find(
-            {
-                active: true, user: user.username,
-                status: {$ne: 'user_disconnected'},
-                user_server_name: user_server.name
-            }).forEach(function (channel) {
-                _addChannelNamesListener(channel.name);
-                _addChannelJoinListener(channel.name);
-                _addChannelPartListener(channel.name);
-                client.join(channel.name, function (message) {
-                    _joinChannelCallback(message, channel);
-                });
+        UserChannels.find(
+        {
+            active: true, user: user.username,
+            status: {$nin: ['user_disconnected', 'admin_disconnected']},
+            user_server_name: user_server.name
+        }).forEach(function (channel) {
+            _addChannelNamesListener(channel.name);
+            _addChannelJoinListener(channel.name);
+            _addChannelPartListener(channel.name);
+            client.join(channel.name, function (message) {
+                _joinChannelCallback(message, channel);
             });
-            disconnectConnectingChannelsOnTimeout(20000);
-        }).run();
+        });
+        disconnectConnectingChannelsOnTimeout(20000);
         client.addListener('notice', function (nick, to, text, message) {
             if (nick == null) {
                 // NOTICE from server
@@ -755,7 +755,7 @@ IRCHandler = function (user, user_server) {
             UserChannels.update(
                 {
                     user_server_id: user_server._id,
-                    status: {$ne: 'user_disconnected'}
+                    status: {$nin: ['user_disconnected', 'admin_disconnected']}
                 },
                 {$set: {status: 'disconnected'}},
                 {multi: true}
@@ -1082,86 +1082,106 @@ IRCHandler = function (user, user_server) {
         },
         removeChannel: function (channel) {},
         joinUserServer: function () {
-            try {
-                var server = Servers.findOne({name: user_server.name});
-                var server_url = server.connections[0].url;
-                var server_port = server.connections[0].port || '6667';
-                var nick = user_server.nick;
-                var client_options = {
-                    autoConnect: false,
-                    port: ssl_credentials? '6697': server_port,
-                    userName: nick,
-                    realName: user_server.real_name || '~',
-                    secure: ssl_credentials,
-                    selfSigned: true,
-                    certExpired: true,
-                    debug: CONFIG.DEBUG
-                };
-                client = new irc.Client(server_url, nick, client_options);
-                client_data[server.name] = client;
-                UserServers.update(
-                    {_id: user_server._id, status: {$ne: 'user_disconnected'}},
-                    {
-                        $set: {status: 'connecting', active: true}
-                    },
-                    {multi: true}
-                );
-                UserChannels.update(
-                    {
-                        user_server_name: user_server.name,
-                        user: user.username,
-                        status: {$ne: 'user_disconnected'}
-                    },
-                    {$set: {status: 'connecting'}},
-                    {multi: true}
-                );
-                if (LISTENERS.server['nickSet'] != undefined)
-                    return;
-                LISTENERS.server['nickSet'] = '';
-                client.addListener('nickSet', function (nick) {
-                    Fiber(function () {
-                        if (user_server.current_nick != nick) {
-                            ChannelNicks.remove(
-                                {
-                                    server_name: user_server.name,
-                                    nick: user_server.current_nick
+            SERVER_JOIN_QUEUE.add(function (done) {
+                console.log('=======JOINING SERVER========', user_server.name, user.username);
+                var timeoutId = Meteor.setTimeout(function () {
+                        done();
+                    }, 90000);
+                Fiber(function () {
+                    try {
+                        fs.writeFileSync(CONFIG.IDENT_FILE_PATH, 'global { reply "' + user.username + '" }');
+                    } catch (err) {
+                        console.log(err);
+                    }
+                    try {
+                        var server = Servers.findOne({name: user_server.name});
+                        var server_url = server.connections[0].url;
+                        var server_port = server.connections[0].port || '6667';
+                        var nick = user_server.nick;
+                        var client_options = {
+                            autoConnect: false,
+                            port: ssl_credentials? '6697': server_port,
+                            userName: nick,
+                            realName: user_server.real_name || '~',
+                            secure: ssl_credentials,
+                            selfSigned: true,
+                            certExpired: true,
+                            debug: CONFIG.DEBUG
+                        };
+                        client = new irc.Client(server_url, nick, client_options);
+                        client_data[server.name] = client;
+                        UserServers.update(
+                            {_id: user_server._id, status: {$nin: ['user_disconnected', 'admin_disconnected']}},
+                            {
+                                $set: {status: 'connecting', active: true}
+                            },
+                            {multi: true}
+                        );
+                        UserChannels.update(
+                            {
+                                user_server_name: user_server.name,
+                                user: user.username,
+                                status: {$nin: ['user_disconnected', 'admin_disconnected']}
+                            },
+                            {$set: {status: 'connecting'}},
+                            {multi: true}
+                        );
+                        if (LISTENERS.server['nickSet'] != undefined)
+                            return;
+                        LISTENERS.server['nickSet'] = '';
+                        client.addListener('nickSet', function (nick) {
+                            Fiber(function () {
+                                if (user_server.current_nick != nick) {
+                                    ChannelNicks.remove(
+                                        {
+                                            server_name: user_server.name,
+                                            nick: user_server.current_nick
+                                        }
+                                    );
+                                    UserServers.update({_id: user_server._id}, {$set: {current_nick: nick}});
+                                    user_server = UserServers.findOne({_id: user_server._id});
+                                    UserChannels.find(
+                                        {
+                                            user_server_name: user_server.name,
+                                            user: user.username
+                                        }).forEach(function (channel) {
+                                            try {
+                                                ChannelNicks.update(
+                                                    {
+                                                        server_name: user_server.name,
+                                                        channel_name: channel.name,
+                                                        nick: nick
+                                                    },
+                                                    {$set: {}},
+                                                    {upsert: true, multi: true}
+                                                );
+                                            } catch (err) {
+                                                logger.info(
+                                                    'ChannelNicksUpsertError',
+                                                    {error: err})
+                                            }
+                                        });
                                 }
-                            );
-                            UserServers.update({_id: user_server._id}, {$set: {current_nick: nick}});
-                            user_server = UserServers.findOne({_id: user_server._id});
-                            UserChannels.find(
-                                {
-                                    user_server_name: user_server.name,
-                                    user: user.username
-                                }).forEach(function (channel) {
-                                    try {
-                                        ChannelNicks.update(
-                                            {
-                                                server_name: user_server.name,
-                                                channel_name: channel.name,
-                                                nick: nick
-                                            },
-                                            {$set: {}},
-                                            {upsert: true, multi: true}
-                                        );
-                                    } catch (err) {
-                                        logger.info(
-                                            'ChannelNicksUpsertError',
-                                            {error: err})
-                                    }
-                                });
-                        }
-                    }).run();
-                });
-                client.connect(function (message) {
-                    Fiber(function () {
-                        _joinServerCallback(message);
-                    }).run();
-                });
-                disconnectConnectingServerOnTimeout(20000);
-            } catch (err) {
-                logger.error(err);
-            }
+                            }).run();
+                        });
+                        client.connect(function (message) {
+                            Fiber(function () {
+                                _joinServerCallback(message);
+                                done();
+                                console.log(
+                                    '========JOINED SERVER=========',
+                                    user_server.name, user.username);
+                                Meteor.clearTimeout(timeoutId);
+                            }).run();
+                        });
+                        disconnectConnectingServerOnTimeout(30000);
+                    } catch (err) {
+                        logger.error(err);
+                        done();
+                        Meteor.clearTimeout(timeoutId);
+                    }
+                }).run();
+            });
         },
         partUserServer: function () {
             try {

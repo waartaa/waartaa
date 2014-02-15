@@ -5,6 +5,11 @@ if (Meteor.isServer) {
         irc = require('irc');
     }
     try {
+        fs = Npm.require('fs');
+    } catch (err) {
+        fs = require('fs');
+    }
+    try {
 	   Fiber = Npm.require('fibers');
     } catch (err) {
         Fiber = require('fibers');
