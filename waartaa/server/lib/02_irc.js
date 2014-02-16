@@ -5,6 +5,8 @@ Meteor.startup(function () {
 if (typeof(logger) == 'undefined')
     logger = Winston;
 
+GLOBAL_LISTENERS = {};
+
 IRCHandler = function (user, user_server) {
     var client_data = {};
     var client = null;
@@ -156,7 +158,10 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.channel['names' + channel_name] = '';
         client.addListener('names' + channel_name, function (nicks) {
-            _updateChannelNicks(channel_name, nicks);
+            if (!GLOBAL_LISTENERS['channelNamesListener-' + user_server + channel_name]) {
+                GLOBAL_LISTENERS['channelNamesListener-' + user_server + channel_name] = true;
+                _updateChannelNicks(channel_name, nicks);
+            }
         });
     }
 
