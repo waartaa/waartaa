@@ -1,7 +1,7 @@
 Setting up the Environment
 ==========================
 
-Install the system dependencies: node, npm for you system.
+Install the system dependencies: node, npm for your system.
 
 * **Fedora**
 
