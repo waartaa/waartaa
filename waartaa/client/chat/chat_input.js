@@ -46,8 +46,8 @@ Template.chat_input.events({
             server_id: user_server._id,
             user: user.username,
             user_id: user._id,
-            created: new Date(),
-            last_updated: new Date(),
+            created: new Date(Meteor.getServerMS()),
+            last_updated: new Date(Meteor.getServerMS()),
             status: "new"
         });
     } else if (room.roomtype == 'pm') {
