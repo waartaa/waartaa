@@ -28,8 +28,28 @@ Template.chat_input.events({
       roomtype: room.roomtype,
       logInput: true
     };
+    var user = Meteor.user();
     if (room.roomtype == 'channel') {
-      Meteor.call('send_channel_message', room.room_id, message, log_options);
+      var user_server = UserServers.findOne({_id: room.server_id}) || {};
+      var channel = UserChannels.findOne({
+        user_server_id: user_server._id, _id: room.room_id});
+      if (channel)
+        UserChannelLogs.insert({
+            message: message,
+            raw_message: '',
+            from: user_server.current_nick,
+            from_user: user.username,
+            from_user_id: Meteor.userId(),
+            channel_name: channel.name,
+            channel_id: channel._id,
+            server_name: user_server.name,
+            server_id: user_server._id,
+            user: user.username,
+            user_id: user._id,
+            created: new Date(),
+            last_updated: new Date(),
+            status: "new"
+        });
     } else if (room.roomtype == 'pm') {
       Meteor.call('send_pm', message, room.room_id, log_options)
     } else if (room.roomtype == 'server') {

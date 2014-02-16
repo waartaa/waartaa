@@ -1238,7 +1238,7 @@ IRCHandler = function (user, user_server) {
         },
         removeServer: function (server_id, user_id) {},
         updateServer: function (server_id, server_data, user_id) {},
-        sendChannelMessage: function (channel_name, message, action, send) {
+        sendChannelMessage: function (channel_name, message, action, send, log) {
             try {
                 var channel = UserChannels.findOne({
                   name: channel_name,
@@ -1246,21 +1246,22 @@ IRCHandler = function (user, user_server) {
                 }) || {};
                 if (message.search('/me') == 0)
                     message = message.replace('/me', client.nick);
-                UserChannelLogs.insert({
-                    message: message,
-                    raw_message: {},
-                    from: action? '': client.nick,
-                    from_user: user.username,
-                    from_user_id: user._id,
-                    channel_name: channel.name,
-                    channel_id: channel._id,
-                    server_name: user_server.name,
-                    server_id: user_server._id,
-                    user: user.username,
-                    user_id: user._id,
-                    created: new Date(),
-                    last_updated: new Date()
-                });
+                if (log)
+                    UserChannelLogs.insert({
+                        message: message,
+                        raw_message: {},
+                        from: action? '': client.nick,
+                        from_user: user.username,
+                        from_user_id: user._id,
+                        channel_name: channel.name,
+                        channel_id: channel._id,
+                        server_name: user_server.name,
+                        server_id: user_server._id,
+                        user: user.username,
+                        user_id: user._id,
+                        created: new Date(),
+                        last_updated: new Date()
+                    });
                 if (send)
                     client.say(channel_name, message);
             } catch (err) {

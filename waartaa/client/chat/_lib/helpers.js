@@ -179,6 +179,12 @@ Handlebars.registerHelper('limitStr', function (text, limit) {
   return final_text;
 });
 
+Handlebars.registerHelper('isChatMessageNew', function (status) {
+  if (status == 'new')
+    return true;
+  return false;
+});
+
 /**
  * Check if window in focus or not
  */

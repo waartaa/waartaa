@@ -18,8 +18,12 @@
       </div>
       <div class="pull-right chatlog-time">
         <em class="pull-right chat-message-datetime">
-          <icon class="glyphicon glyphicon-time"></icon>
-          {{ showDatetime last_updated }}
+          {{# if isChatMessageNew status}}
+            <icon class="glyphicon glyphicon-refresh"></icon>
+          {{else}}
+            <icon class="glyphicon glyphicon-time"></icon>
+            {{ showDatetime last_updated }}
+          {{/if}}
         </em>
       </div>
     </div>

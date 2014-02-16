@@ -211,6 +211,34 @@ function _send_raw_message(message, irc_handler, log_options) {
     irc_handler.sendRawMessage(message, log_options);
 }
 
+_send_channel_message = function (user, user_channel_id, message, log_options) {
+    var user_channel = UserChannels.findOne({
+        _id: user_channel_id, user: user.username});
+    var irc_handler = _get_irc_handler(
+        user_channel.user_server_name, user._id);
+    if (!irc_handler)
+        return false;
+    var logged = true;
+    var send = true;
+    var action = false;
+    log_options = log_options || {};
+    if (typeof(log_options.log) == 'undefined')
+        log_options.log = true;
+    if (message[0] == '/') {
+        logged = false;
+        log_options.target = user_channel.name;
+        _send_raw_message(message, irc_handler, log_options);
+        if (message.search('/msg') == 0)
+            return false;
+        if (message.search('/me') == 0)
+            action = true;
+        send = false;
+    }
+    irc_handler.sendChannelMessage(
+        user_channel.name, message, action, send, log_options.log);
+    return logged;
+};
+
 
 Meteor.startup(function () {
     CLIENTS = {};
@@ -344,26 +372,7 @@ Meteor.methods({
     send_channel_message: function (user_channel_id, message, log_options) {
         //console.log(user_channel_id);
         var user = Meteor.users.findOne({_id: this.userId});
-        var user_channel = UserChannels.findOne({
-            _id: user_channel_id, user: user.username});
-        var user_server = UserServers.findOne({_id: user_channel.user_server_id});
-        var user = Meteor.users.findOne({_id: this.userId});
-        var irc_handler = CLIENTS[user.username][user_server.name];
-        var send = true;
-        var action = false;
-        if (message[0] == '/') {
-            log_options = log_options || {};
-            log_options.target = user_channel.name;
-            _send_raw_message(message, irc_handler, log_options);
-            if (message.search('/msg') == 0)
-                return;
-            if (message.search('/me') == 0)
-                action = true;
-            send = false;
-        }
-        if (irc_handler)
-            irc_handler.sendChannelMessage(
-                user_channel.name, message, action, send);
+        _send_channel_message(user, user_channel_id, message, log_options);
     },
     send_server_message: function (user_server_id, message, log_options) {
         var user_server = UserServers.findOne(
