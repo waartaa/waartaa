@@ -214,7 +214,7 @@ function _send_raw_message(message, irc_handler, log_options) {
 
 Meteor.startup(function () {
     CLIENTS = {};
-    JOIN_SERVER_QUEUE = new PowerQueue({
+    SERVER_JOIN_QUEUE = new PowerQueue({
         name: "join_server",
         debug: CONFIG.QUEUE_DEBUG || false,
         maxProcessing: 1
