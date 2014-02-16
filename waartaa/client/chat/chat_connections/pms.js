@@ -27,7 +27,7 @@ Template.server_pm_item.helpers({
 Handlebars.registerHelper('pms', function (id) {
   var server = UserServers.findOne({_id: id});
   var user = Meteor.user();
-  if (!server && !user)
+  if (!server || !user)
     return [];
   var pms = [];
    var userpms = UserPms.findOne(
