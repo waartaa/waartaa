@@ -503,5 +503,11 @@ Meteor.methods({
     edit_user_channel: function (user_channel_id, data) {
         UserChannels.update({_id: user_channel_id}, {
             $set: {password: data.password || ''}});
+    },
+    //get server time in milliseconds
+    getServerMS: function () {
+        var _time = (new Date).getTime();
+        console.log(_time);
+        return _time;
     }
 })
