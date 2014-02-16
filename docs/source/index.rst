@@ -11,4 +11,5 @@ release. The code is open-source, and `available on github
 .. toctree::
    :maxdepth: 2
 
-   installation
+   setting_up_the_environment
+   installing_waartaa
