@@ -1,10 +1,13 @@
 UserChannelLogs.allow({
   insert: function (userId, log) {
     log.status = 'sent';
-    log.created = new Date();
-    log.last_updated = new Date();
     var user = Meteor.users.findOne({_id: userId});
-    return _send_channel_message(
+    Meteor.setTimeout(function () {
+        _send_channel_message(
         user, log.channel_id, log.message, {log: false});
+    }, 5);
+    if (log.message[0] == '/')
+        return false;
+    return true;
   }
 });
