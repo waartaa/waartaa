@@ -86,3 +86,52 @@ Template.edit_server_channel.events = {
     })
   }
 };
+
+Template.server_channels.rendered = function(){
+  if(Session.get('room') === undefined) {
+
+    // Channel to autojoin on startup
+    var channel = UserChannels.findOne();
+
+    waartaa.chat.helpers.setCurrentRoom({
+      roomtype: 'channel',
+      server_id: channel.user_server_id,
+      channel_id: channel._id,
+      channel_name: channel.name,
+      server_name: channel.user_server_name
+    });
+
+    // HTML id of the channel on channels list
+    var channel_id = '#channelLink-' + channel._id;
+
+    // Setting Session variable 'room', since it doesn't exist yet
+    Session.set('room', {
+      room_id: channel.name,
+      server_id: channel.user_server_id,
+      server_name: channel.user_server_name,
+      channel_id: channel._id,
+      channel_name: channel.name
+    });
+
+    // Activate channel link
+    $(channel_id).parent().addClass('active');
+  }
+  else {
+    var room = Session.get('room');
+    console.log('room set');
+
+    // HTML id of the channel on channels list
+    var channel_id = '#channelLink-' + room.channel_id;
+
+    waartaa.chat.helpers.setCurrentRoom({
+      roomtype: 'channel',
+      server_id: room.server_id,
+      server_name: room.server_name,
+      channel_id: room.channel_id,
+      channel_name: room.channel_name
+    });
+
+    // Activate channel link
+    $(channel_id).parent().addClass('active');
+  }
+};
