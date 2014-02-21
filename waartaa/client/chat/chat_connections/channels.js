@@ -88,10 +88,9 @@ Template.edit_server_channel.events = {
 };
 
 Template.server_channels.rendered = function(){
-  if(UserServers.find().count() > 0) {
+  if(UserServers.find().count() > 0 && Session.get('room') === undefined) {
     // names of channels of the first server that is connected
     var server_channels = UserServers.findOne().channels.sort();
-
     // looping to find the first connected channel obtained from
     // UserServers.channel
     for (var i = 0; i < server_channels.length ; i++) {
@@ -107,14 +106,13 @@ Template.server_channels.rendered = function(){
            server_name: channel.user_server_name
          });
 
-        // HTML id of the channel on channels list
-        var channel_id = '#channelLink-' + channel._id;
-        // Activate channel link
-        $(channel_id).parent().addClass('active');
-
-        // breaking off after we have found and connected to the first channel
+        // breaking off after we have connected to the first channel
         break;
       }
     }
   }
+  // HTML id of the channel on channels list
+  var channel_id = '#channelLink-' + Session.get('room').room_id;
+  // Activate channel link
+  $(channel_id).parent().addClass('active');
 };
