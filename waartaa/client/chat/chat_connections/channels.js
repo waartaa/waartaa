@@ -88,50 +88,33 @@ Template.edit_server_channel.events = {
 };
 
 Template.server_channels.rendered = function(){
-  if(Session.get('room') === undefined) {
+  if(UserServers.find().count() > 0) {
+    // names of channels of the first server that is connected
+    var server_channels = UserServers.findOne().channels.sort();
 
-    // Channel to autojoin on startup
-    var channel = UserChannels.findOne();
+    // looping to find the first connected channel obtained from
+    // UserServers.channel
+    for (var i = 0; i < server_channels.length ; i++) {
+      // to find if the channel is actually connected
+      if(UserChannels.findOne({name:server_channels[i]}) !== undefined) {
+        var channel = UserChannels.findOne({name: server_channels[i]});
+        // Joining chat room
+        waartaa.chat.helpers.setCurrentRoom({
+           roomtype: 'channel',
+           server_id: channel.user_server_id,
+           channel_id: channel._id,
+           channel_name: channel.name,
+           server_name: channel.user_server_name
+         });
 
-    waartaa.chat.helpers.setCurrentRoom({
-      roomtype: 'channel',
-      server_id: channel.user_server_id,
-      channel_id: channel._id,
-      channel_name: channel.name,
-      server_name: channel.user_server_name
-    });
+        // HTML id of the channel on channels list
+        var channel_id = '#channelLink-' + channel._id;
+        // Activate channel link
+        $(channel_id).parent().addClass('active');
 
-    // HTML id of the channel on channels list
-    var channel_id = '#channelLink-' + channel._id;
-
-    // Setting Session variable 'room', since it doesn't exist yet
-    Session.set('room', {
-      room_id: channel.name,
-      server_id: channel.user_server_id,
-      server_name: channel.user_server_name,
-      channel_id: channel._id,
-      channel_name: channel.name
-    });
-
-    // Activate channel link
-    $(channel_id).parent().addClass('active');
-  }
-  else {
-    var room = Session.get('room');
-    console.log('room set');
-
-    // HTML id of the channel on channels list
-    var channel_id = '#channelLink-' + room.channel_id;
-
-    waartaa.chat.helpers.setCurrentRoom({
-      roomtype: 'channel',
-      server_id: room.server_id,
-      server_name: room.server_name,
-      channel_id: room.channel_id,
-      channel_name: room.channel_name
-    });
-
-    // Activate channel link
-    $(channel_id).parent().addClass('active');
+        // breaking off after we have found and connected to the first channel
+        break;
+      }
+    }
   }
 };
