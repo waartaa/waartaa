@@ -14,6 +14,16 @@ if (Meteor.isServer) {
     } catch (err) {
         Fiber = require('fibers');
     }
+    try {
+        CappedArray = Npm.require('capped-array');
+    } catch (err) {
+        CappedArray = require('capped-array');
+    }
+    try {
+        locks = Npm.require('locks');
+    } catch (err) {
+        locks = require('locks');
+    }
 	crypto = Npm.require('crypto');
     try {
         var privateKey = Assets.getText('certs/privatekey.pem');

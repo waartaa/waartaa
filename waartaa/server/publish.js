@@ -50,7 +50,14 @@ Meteor.publish('user_channel_logs', function (channel_id, n) {
     console.log(
       'Publishing logs for channel: ' + channel.name + ', ' + user.username);
     var N = n || CONFIG.show_last_n_logs;
-    var cursor = UserChannelLogs.find({channel_id: channel_id},
+    var cursor = UserChannelLogs.find(
+      {
+        channel_name: channel.name,
+        $or: [
+          {global: true, not_for_user: {$ne: user.username}},
+          {from_user: user.username}
+        ]
+      },
       {
         sort: {created: -1}, limit: N
       }
