@@ -86,33 +86,168 @@ Template.edit_server_channel.events = {
     })
   }
 };
-
+  
 Template.server_channels.rendered = function(){
-  if(UserServers.find().count() > 0 && Session.get('room') === undefined) {
-    // names of channels of the first server that is connected
-    var server_channels = UserServers.findOne().channels.sort();
-    // looping to find the first connected channel obtained from
-    // UserServers.channel
-    for (var i = 0; i < server_channels.length ; i++) {
-      // to find if the channel is actually connected
-      if(UserChannels.findOne({name:server_channels[i]}) !== undefined) {
-        var channel = UserChannels.findOne({name: server_channels[i]});
-        // Joining chat room
-        waartaa.chat.helpers.setCurrentRoom({
-           roomtype: 'channel',
-           server_id: channel.user_server_id,
-           channel_id: channel._id,
-           channel_name: channel.name,
-           server_name: channel.user_server_name
-         });
-
-        // breaking off after we have connected to the first channel
-        break;
+  // takes in key of a cookie and returns its value, null if not present
+  var get_cookie = function(key) {
+    var cookies = document.cookie.split(';');
+    for( var i = 0 ; i < cookies.length ; i++ ) {
+      var cookie = cookies[i].trim();
+      var seperator = cookie.indexOf('=');
+      var cookie_key = cookie.substring(0, seperator);
+      if( cookie_key == key ) {
+        cookie_value = cookie.substring(seperator+1);
+        return cookie_value;
       }
     }
+    return null;
+  };
+
+  var highlight_room = function() {
+    // highlights the html element of the current room
+    var room_id = Session.get('room').room_id;
+    var roomtype = Session.get('room').roomtype;
+    var activate_link = '#' + roomtype + 'Link-' + room_id;
+    $(activate_link).parent().addClass('active');
+  };
+
+  var session_room_exists = function() {
+    // checks for the presence of a the room in Session variable 'room'
+    var room = Session.get('room');
+    if(room === undefined)
+      return false;
+
+    if(room.roomtype == 'server')
+      return UserServers.findOne({'_id' : room.room_id}) !== undefined;
+    else if(room.roomtype == 'channel')
+      return UserChannels.findOne({'_id' : room.room_id}) !== undefined;
+    else if(room.roomtype == 'pm') {
+      var UserPm = UserPms.findOne({'user_server_id' : room.room_id});
+      if(UserPm === undefined)
+        return false;
+      if(Object.keys(UserPm.pms).indexOf(room.nick) != -1)
+          return true;
+        else
+          return false;
+    }
+  };
+
+  // connected becomes true only if waartaa connects to room with data from
+  // cookies
+  var connected = false;
+  var previous_userId = get_cookie('userId');
+
+  if(previous_userId == Meteor.userId()) {
+    // collecting data from cookies only if user matches
+    // setting channel if appropriate cookies are available
+    try {
+      var roomtype = get_cookie('roomtype');
+      var server_id = get_cookie('server_id');
+      // trying to set room with data available from cookies, if this fails,
+      // waartaa will connect to the first room available in the first server
+      if(roomtype == 'server') {
+        var server_status = UserServers.findOne({'_id':server_id}).status;
+        if(server_status == 'connected' || channel_status == 'connecting') {
+          waartaa.chat.helpers.setCurrentRoom({
+            roomtype : roomtype,
+            server_id : server_id
+          });
+          connected = true;
+        }
+      }
+      else if(roomtype == 'channel') {
+        var channel_id = get_cookie('channel_id');
+        var channel_status = UserChannels.findOne({'_id':channel_id}).status;
+        if(channel_status == 'connected' || channel_status == 'connecting') {
+          waartaa.chat.helpers.setCurrentRoom({
+               roomtype: roomtype,
+               server_id: server_id,
+               channel_id: channel_id
+          });
+          connected = true;
+        }
+      }
+      else if(roomtype == 'pm') {
+        var pm_nick = get_cookie('pm_nick');
+        var pms = UserPms.findOne({ user_server_id: server_id });
+        var pm_connected = '';
+        if(Object.keys(pms.pms).indexOf(pm_nick) != -1)
+          pm_connected = 'connected';
+        else
+          pm_connected = 'disconnected';
+
+        if(pm_connected == 'connected') {
+          waartaa.chat.helpers.setCurrentRoom({
+            nick: pm_nick,
+            server_id: server_id,
+            roomtype: roomtype
+          });
+          connected = true;
+        }
+      }
+      highlight_room();
+    }
+    catch(err){
+      console.log(err);
+    }
   }
-  // HTML id of the channel on channels list
-  var channel_id = '#channelLink-' + Session.get('room').room_id;
-  // Activate channel link
-  $(channel_id).parent().addClass('active');
+
+  if(!connected) {
+    // waartaa couldn't connect to a chat room with data from the cookies,
+    // connecting to the first room availble
+    try {
+      var server_id = UserServers.findOne()._id;
+      var channels = UserChannels.find({ user_server_id : server_id });
+      var pm = UserPms.findOne({ user_server_id: server_id });
+      var pm_count = 0;
+      if(pm !== undefined)
+        pm_count = Object.keys(pm.pms).length;
+
+      if(UserServers.find().count() > 0 && !session_room_exists()) {
+        if ( channels.count() === 0 && pm_count === 0) {
+          // no channels and no pms, connecting to server room
+          waartaa.chat.helpers.setCurrentRoom({
+            roomtype : 'server',
+            server_id : server_id
+          });
+        }
+        else if(channels.count() > 0 ) {
+          // connect the first room
+          var channel_objects = channels.db_objects;
+          var channel_name = channel_objects[0].name;
+          
+          // find the name on the channel shown on top in html template
+          for(var i = 1 ; i < channel_objects.length ; i++) {
+            if(channel_objects[i].name < channel_name) {
+              channel_name = channel_objects[i].name;
+            }
+          }
+          // now we know the name of the channel to connect, looking up
+          // UserChannels collection for the channel object
+          var channel = UserChannels.findOne({name:channel_name});
+          // connecting to the channel
+          waartaa.chat.helpers.setCurrentRoom({
+               roomtype: 'channel',
+               server_id: channel.user_server_id,
+               channel_id: channel._id,
+               channel_name: channel.name,
+               server_name: channel.user_server_name
+          });
+        }
+        else {
+          // connect to the first pm
+          var first_nick = Object.keys(pm.pms)[0];
+          waartaa.chat.helpers.setCurrentRoom({
+            nick: nick,
+            server_id: server_id,
+            roomtype: 'pm'
+          });
+        }
+      }
+      highlight_room();
+    }
+    catch(err) {
+      console.log(err);
+    }
+  }
 };
