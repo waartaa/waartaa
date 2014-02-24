@@ -100,7 +100,7 @@ waartaa.chat.helpers.setCurrentRoom = function (obj) {
       roomtype: obj.roomtype,
       server_id: obj.server_id,
       server_name: obj.server_name,
-      channel_id: obj.Pchannel_id,
+      channel_id: obj.channel_id,
       channel_name: obj.channel_name
     });
     // set cookie server_id and channel_id
