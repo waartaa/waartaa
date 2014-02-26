@@ -55,7 +55,8 @@ Meteor.publish('user_channel_logs', function (channel_id, n) {
         channel_name: channel.name,
         $or: [
           {global: true, not_for_user: {$ne: user.username}},
-          {from_user: user.username}
+          {from_user: user.username},
+          {user: user.username}
         ]
       },
       {
