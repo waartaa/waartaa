@@ -11,7 +11,7 @@ Handlebars.registerHelper('getCurrentChannel', function () {
 Handlebars.registerHelper("channelChatLogs", function (channel_id) {
   var channel = UserChannels.findOne({_id: channel_id});
   if (channel)
-    return UserChannelLogs.find({channel_name: channel.name}, {sort: {created: 1}});
+    return ChannelLogs.find({channel_name: channel.name}, {sort: {created: 1}});
 });
 
 Template.channel_logs.events = {

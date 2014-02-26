@@ -128,7 +128,7 @@ IRCHandler = function (user, user_server) {
                                 rwlock.unlock();
                                 var not_for_user = (UserServers.findOne({name: user_server.name, current_nick: nick}) || {}).user || null;
                                 if (shall_write)
-                                    UserChannelLogs.insert({
+                                    ChannelLogs.insert({
                                         message: text,
                                         raw_message: message,
                                         from: nick,
@@ -354,7 +354,7 @@ IRCHandler = function (user, user_server) {
                     var channel_join_message = nick + ' has joined the channel.';
                     if (nick == client.nick)
                         channel_join_message = 'You have joined the channel.';
-                    UserChannelLogs.insert({
+                    ChannelLogs.insert({
                         message: channel_join_message,
                         raw_message: message,
                         from: null,
@@ -403,7 +403,7 @@ IRCHandler = function (user, user_server) {
                         part_message = nick + ' has left';
                     if (reason)
                         part_message += ' (' + reason + ')';
-                    UserChannelLogs.insert({
+                    ChannelLogs.insert({
                         message: part_message,
                         raw_message: message,
                         from: null,
@@ -451,7 +451,7 @@ IRCHandler = function (user, user_server) {
                             part_message += ' (' + reason + ')';
                         enqueueTask(URGENT_QUEUE, function () {
                             Fiber(function () {
-                                UserChannelLogs.insert({
+                                ChannelLogs.insert({
                                     message: part_message,
                                     raw_message: message,
                                     from: null,
@@ -536,7 +536,7 @@ IRCHandler = function (user, user_server) {
                             active: true, status: 'connected'
                         }
                     ).forEach(function (channel) {
-                        UserChannelLogs.insert({
+                        ChannelLogs.insert({
                             message: oldnick + ' has changed nick to ' + newnick,
                             raw_message: '',
                             from: '',
@@ -719,7 +719,7 @@ IRCHandler = function (user, user_server) {
                                 user: user.username
                             });
                             if (channel)
-                                UserChannelLogs.insert({
+                                ChannelLogs.insert({
                                     message: text,
                                     raw_message: message,
                                     from: nick,
@@ -762,7 +762,7 @@ IRCHandler = function (user, user_server) {
                         client.nick);
                     rwlock.unlock();
                     if (shall_wrtite) {
-                        UserChannelLogs.insert({
+                        ChannelLogs.insert({
                             message: text,
                             raw_message: message,
                             from: '',
@@ -959,7 +959,7 @@ IRCHandler = function (user, user_server) {
                 if (!channel)
                     return;
                 _.each(whoisLogs, function (text) {
-                    UserChannelLogs.insert({
+                    ChannelLogs.insert({
                         message: text,
                         raw_message: info,
                         from: "WHOIS",
@@ -1033,7 +1033,7 @@ IRCHandler = function (user, user_server) {
                     }, {_id: 1, name: 1});
                 if (!channel)
                     return;
-                UserChannelLogs.insert({
+                ChannelLogs.insert({
                     message: message,
                     raw_message: {},
                     from: client.nick,
@@ -1351,7 +1351,7 @@ IRCHandler = function (user, user_server) {
                 if (message.search('/me') == 0)
                     message = message.replace('/me', client.nick);
                 if (log)
-                    UserChannelLogs.insert({
+                    ChannelLogs.insert({
                         message: message,
                         raw_message: {},
                         from: action? '': client.nick,

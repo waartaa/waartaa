@@ -1,4 +1,4 @@
-UserChannelLogs.allow({
+ChannelLogs.allow({
   insert: function (userId, log) {
     log.status = 'sent';
     var user = Meteor.users.findOne({_id: userId});
