@@ -18,6 +18,7 @@
     "GAnalytics": {},
     "fast-render": {},
     "iron-router": {},
-    "power-queue": {}
+    "power-queue": {},
+    "cron-tick": {}
   }
 }
