@@ -472,7 +472,7 @@ Meteor.methods({
             var room_id = log_options.room_id;
             if (roomtype == "channel") {
 
-                UserChannelLogs.insert({
+                ChannelLogs.insert({
                     message: text,
                     raw_message: message,
                     from: nick,

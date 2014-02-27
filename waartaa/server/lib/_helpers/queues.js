@@ -1,8 +1,9 @@
 enqueueTask = function (queue, func, timeout) {
     Fiber(function () {
-        console.log(
+        /*console.log(
             queue.title, queue.total(), queue.length(), queue.progress(),
             queue.usage(), func.toString());
+        */
         var timeout = timeout || CONFIG.DEFAULT_ASYNC_TASK_TIMEOUT || 5000;
         queue.add(function (done) {
             try {

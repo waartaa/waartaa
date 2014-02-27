@@ -27,13 +27,13 @@ ChatSubscribe = function () {
   }
 
   /*
-  Function to subscribe to UserChannelLogs for active UserChannels.
+  Function to subscribe to ChannelLogs for active UserChannels.
   */
-  subscribe_user_channel_logs = function () {
+  subscribe_channel_logs = function () {
     UserChannels.find({}).forEach(function (channel) {
       Deps.autorun(function () {
         Meteor.subscribe(
-          "user_channel_logs", channel._id,
+          "channel_logs", channel._id,
           Session.get('user_channel_log_count_' + channel._id),
           function () {
             $('.chatlogs-loader-msg').fadeOut(1000);
@@ -126,15 +126,15 @@ ChatSubscribe = function () {
         // Set initial log count for each channel room
         Session.set("user_channel_log_count_" + channel._id, DEFAULT_LOGS_COUNT);
       });
-      // Subscribe to UserChannelLogs for the subscribed UserChannels
-      subscribe_user_channel_logs();
+      // Subscribe to ChannelLogs for the subscribed UserChannels
+      subscribe_channel_logs();
     });
   };
 
   subscribe();
 
   Deps.autorun(subscribe_user_server_logs);
-  Deps.autorun(subscribe_user_channel_logs);
+  Deps.autorun(subscribe_channel_logs);
   Deps.autorun(subscribe_pm_logs);
   Deps.autorun(subscribe_server_nicks_for_pms);
 
@@ -224,7 +224,7 @@ ChatSubscribe = function () {
   });
   */
 
-  UserChannelLogs.find().observeChanges({
+  ChannelLogs.find().observeChanges({
     added: function (id, log) {
       Deps.nonreactive(function () {
         var session_key = 'unreadLogsCountChannel-' + log.channel_id;

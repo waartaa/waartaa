@@ -20,7 +20,8 @@
       "GAnalytics": {},
       "fast-render": {},
       "iron-router": {},
-      "power-queue": {}
+      "power-queue": {},
+      "cron-tick": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -55,8 +56,8 @@
       },
       "presence": {
         "git": "https://github.com/dburles/meteor-presence.git",
-        "tag": "v0.4.1",
-        "commit": "ec4f872eb5b8acb0f4a8d4fcdfa439fcd61aa13b"
+        "tag": "v0.4.2",
+        "commit": "9cec6442c9a426e3a377846073d08d085ccb5831"
       },
       "bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
@@ -65,8 +66,8 @@
       },
       "accounts-ui-bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
-        "tag": "v0.2.4",
-        "commit": "cdbd20eb065310c0cc302bbd5f22e5b2121c769a"
+        "tag": "v0.2.5",
+        "commit": "91cd37a1320213dd209c3a668bf542eeb9c39a00"
       },
       "nodetime": {
         "git": "https://github.com/subhog/meteor-nodetime.git",
@@ -105,18 +106,23 @@
       },
       "fast-render": {
         "git": "https://github.com/arunoda/meteor-fast-render.git",
-        "tag": "v0.1.15",
-        "commit": "baf79a3e5863acc3abfe2d0d62fb23b21fe880de"
+        "tag": "v0.1.16",
+        "commit": "e08aa22d76f25bb43e9d0f8bee3880c686f62b2b"
       },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
-        "tag": "v0.6.2",
-        "commit": "ce56e58b45624dce992490f3a1c10f10d3948bae"
+        "tag": "v0.6.4",
+        "commit": "927bbaed1b87894fb6fb70807f74ff3a5bd89f29"
       },
       "power-queue": {
         "git": "https://github.com/CollectionFS/Meteor-power-queue.git",
-        "tag": "v0.9.2",
-        "commit": "d452da900332b185cf0f7e7009ddcc0b3e804d55"
+        "tag": "v0.9.4",
+        "commit": "6c5f45625f879eee280dcf62ef2d5e8c35b2a25b"
+      },
+      "cron-tick": {
+        "git": "https://github.com/tmeasday/meteor-cron.git",
+        "tag": "v0.0.4",
+        "commit": "44cff9116af510fe53704fdeeff57c444ceb75ba"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",
@@ -146,12 +152,12 @@
       "micro-queue": {
         "git": "https://github.com/CollectionFS/Meteor-micro-queue.git",
         "branch": "master",
-        "commit": "ca613597a67cf0df7e00bbd37640915030d28280"
+        "commit": "d9ccd457508380837304924a3347e02616896a4b"
       },
       "reactive-list": {
         "git": "https://github.com/CollectionFS/Meteor-reactive-list.git",
         "branch": "master",
-        "commit": "d2494cea1e3dc71abd3d4dba7d8c7f0a4e8e02fb"
+        "commit": "f9f6b1e755313e270720f8fce1e062ebad2bcdd9"
       },
       "observatory-galileo": {
         "git": "https://github.com/superstringsoftware/observatory-galileo.git",

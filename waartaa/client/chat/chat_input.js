@@ -34,7 +34,7 @@ Template.chat_input.events({
       var channel = UserChannels.findOne({
         user_server_id: user_server._id, _id: room.room_id});
       if (channel)
-        UserChannelLogs.insert({
+        ChannelLogs.insert({
             message: message,
             raw_message: '',
             from: user_server.current_nick,

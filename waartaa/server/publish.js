@@ -43,14 +43,22 @@ Meteor.publish('user_channels', function () {
   this.ready();
 });
 
-Meteor.publish('user_channel_logs', function (channel_id, n) {
+Meteor.publish('channel_logs', function (channel_id, n) {
   var user = Meteor.users.findOne({_id: this.userId}) || {};
   var channel = UserChannels.findOne({_id: channel_id, user: user.username});
   if (channel) {
     console.log(
       'Publishing logs for channel: ' + channel.name + ', ' + user.username);
     var N = n || CONFIG.show_last_n_logs;
-    var cursor = UserChannelLogs.find({channel_id: channel_id},
+    var cursor = ChannelLogs.find(
+      {
+        channel_name: channel.name,
+        $or: [
+          {global: true, not_for_user: {$ne: user.username}},
+          {from_user: user.username},
+          {user: user.username}
+        ]
+      },
       {
         sort: {created: -1}, limit: N
       }

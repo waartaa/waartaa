@@ -100,6 +100,7 @@ ChannelLogs: {
 */
 ChannelLogs = new Meteor.Collection("channel_logs");
 UserChannelLogs = new Meteor.Collection("user_channel_logs");
+OldChannelLogs = new Meteor.Collection("old_channel_logs");
 
 /*
 PMLogs: {

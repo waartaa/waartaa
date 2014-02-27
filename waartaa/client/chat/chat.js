@@ -4,7 +4,7 @@ Deps.autorun(updateHeight);
 Template.chat_main.chat_logs = function () {
   var room_id = Session.get('room_id');
   if (Session.get('roomtype') == 'channel') {
-    return UserChannelLogs.find({channel_id: room_id});
+    return ChannelLogs.find({channel_id: room_id});
   } else if (Session.get('roomtype') == 'pm') {
     var nick = room_id.substr(room_id.indexOf('-') + 1);
     return PMLogs.find({
