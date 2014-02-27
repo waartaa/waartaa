@@ -15,6 +15,7 @@ CONFIG = {
   'URGENT_QUEUE_WORKERS_COUNT': 3,
   'DELAYED_QUEUE_WORKERS_COUNT': 1,
   'IDENT_FILE_PATH': '<path_to_home_dir>/.oidentd.conf'
+  'LOGS_SCROLLBACK_COUNT': 500
 }
 
 SUPER_USER = 'admin'
