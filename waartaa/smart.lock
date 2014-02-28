@@ -55,9 +55,7 @@
         "commit": "b9c5a87e9f92019cca882234086b7d32719f67e2"
       },
       "presence": {
-        "git": "https://github.com/dburles/meteor-presence.git",
-        "tag": "v0.4.2",
-        "commit": "9cec6442c9a426e3a377846073d08d085ccb5831"
+        "git": "https://github.com/tmeasday/meteor-presence.git"
       },
       "bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
