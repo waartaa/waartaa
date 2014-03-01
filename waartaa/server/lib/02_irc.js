@@ -9,6 +9,74 @@ GLOBAL_LISTENERS = {};
 RECENT_CHANNEL_LOGS = {};
 CHANNEL_LOGS_WRITE_LOCKS = {};
 
+
+ChannelListenersManager = function () {
+    var _CHANNEL_CLIENTS = {};
+    var _CHANNEL_LISTENERS = {};
+    var _MAX_LISTENERS_PER_CHANNEL = 4;
+
+    function _updateChannelListeners (server_name, channel_name) {
+        var key = server_name + channel_name;
+        var channel_clients = _CHANNEL_CLIENTS[key] || {};
+        if (_CHANNEL_LISTENERS[key] === undefined)
+            _CHANNEL_LISTENERS[key] = {};
+        var channel_listeners = _CHANNEL_LISTENERS[key] || {};
+
+        console.log("=====BEFORE======");
+        console.log(_CHANNEL_CLIENTS, _CHANNEL_LISTENERS);
+        for (nick in channel_listeners) {
+            if (channel_clients[nick] === undefined) {
+                delete channel_listeners[nick];
+            }
+        }
+        var listeners_count = Object.keys(channel_clients).length;
+        for (nick in channel_clients) {
+            if (listeners_count < _MAX_LISTENERS_PER_CHANNEL) {
+                if (channel_listeners[nick] === undefined) {
+                    channel_listeners[nick] = channel_clients[nick];
+                    listeners_count++;
+                }
+            } else
+                break;
+        }
+        console.log("=====AFTER======");
+        console.log(_CHANNEL_CLIENTS, _CHANNEL_LISTENERS);
+
+    }
+
+    return {
+        addChannelClient: function (server_name, channel_name, nick, username) {
+            var key = server_name + channel_name;
+            if (_CHANNEL_CLIENTS[key] === undefined)
+                _CHANNEL_CLIENTS[key] = {};
+            _CHANNEL_CLIENTS[key][nick] = username;
+            _updateChannelListeners(server_name, channel_name);
+        },
+        removeChannelClient: function (server_name, channel_name, nick, username) {
+            var key = server_name + channel_name;
+            try {
+                delete _CHANNEL_CLIENTS[key];
+            } catch (err) {}
+            _updateChannelListeners(server_name, channel_name);
+        },
+        isClientListener: function (server_name, channel_name, nick) {
+            var key = server_name + channel_name;
+            if ((_CHANNEL_LISTENERS[key] || {})[nick] === undefined) {
+                console.log('========NICK NOT LISTENER========');
+                console.log(server_name, channel_name, nick);
+                console.log(_CHANNEL_LISTENERS);
+                return false;
+            }
+            console.log('========NICK IS LISTENER========');
+            console.log(server_name, channel_name, nick);
+            console.log(_CHANNEL_LISTENERS);
+            return true;
+        }
+
+    };
+}
+channel_listeners_manager = ChannelListenersManager();
+
 function shallWriteChannelLog (nick, text, channel_name, server_name, client_nick) {
     console.log('++++++++++++++++++++++++++++++++');
     console.log(RECENT_CHANNEL_LOGS);
@@ -95,6 +163,8 @@ IRCHandler = function (user, user_server) {
     function _joinChannelCallback (message, channel) {
         if (channel.status == 'connected')
             return;
+        channel_listeners_manager.addChannelClient(
+            user_server.name, channel.name, client.nick, user.username);
         Fiber(function () {
             UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
         }).run();
@@ -118,36 +188,46 @@ IRCHandler = function (user, user_server) {
                     var global = false;
                     if (message.type != 'NOTICE')
                         global = true;
-                    rwlock.timedWriteLock(5000, function (error) {
-                        Fiber(function () {
-                            if (error) {
-                                console.log('Could not get the lock within 5 seconds, so gave up');
-                            } else {
-                                console.log('Acquired write lock', user_server.name, channel.name);
-                                var shall_write = shallWriteChannelLog(nick, text, channel.name, user_server.name, client.nick);
-                                rwlock.unlock();
-                                var not_for_user = (UserServers.findOne({name: user_server.name, current_nick: nick}) || {}).user || null;
-                                if (shall_write)
-                                    ChannelLogs.insert({
-                                        message: text,
-                                        raw_message: message,
-                                        from: nick,
-                                        from_user: null,
-                                        from_user_id: null,
-                                        channel_name: channel.name,
-                                        channel_id: channel._id,
-                                        server_name: user_server.name,
-                                        server_id: user_server._id,
-                                        user: user.username,
-                                        user_id: user._id,
-                                        global: global,
-                                        not_for_user: not_for_user,
-                                        created: new Date(),
-                                        last_updated: new Date()
-                                    });
-                            }
-                        }).run();
-                    });
+                    var not_for_user = null;
+
+                    function insertChannelLog () {
+                        ChannelLogs.insert({
+                            message: text,
+                            raw_message: message,
+                            from: nick,
+                            from_user: null,
+                            from_user_id: null,
+                            channel_name: channel.name,
+                            channel_id: channel._id,
+                            server_name: user_server.name,
+                            server_id: user_server._id,
+                            user: user.username,
+                            user_id: user._id,
+                            global: global,
+                            not_for_user: not_for_user,
+                            created: new Date(),
+                            last_updated: new Date()
+                        });
+                    }
+                    if (channel_listeners_manager.isClientListener(
+                            user_server.name, channel.name, client.nick)) {
+                        rwlock.timedWriteLock(5000, function (error) {
+                            Fiber(function () {
+                                if (error) {
+                                    console.log('Could not get the lock within 5 seconds, so gave up');
+                                } else {
+                                    console.log('Acquired write lock', user_server.name, channel.name);
+                                    var shall_write = shallWriteChannelLog(nick, text, channel.name, user_server.name, client.nick);
+                                    rwlock.unlock();
+                                    not_for_user = (UserServers.findOne({name: user_server.name, current_nick: nick}) || {}).user || null;
+                                    if (shall_write)
+                                        insertChannelLog();
+                                }
+                            }).run();
+                        });
+                    } else if (global == false) {
+                        insertChannelLog();
+                    }
                 }).run();
             });
             enqueueTask(DELAYED_QUEUE, function () {
@@ -744,6 +824,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _writeChannelActionMessage (channel, from, text, message) {
+        if (!channel_listeners_manager.isClientListener(
+                user_server.name, channel.name, client.nick))
+            return;
         if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name]) == 'undefined')
             CHANNEL_LOGS_WRITE_LOCKS[user_server.name] = {};
         if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name]) == 'undefined')
@@ -1167,6 +1250,8 @@ IRCHandler = function (user, user_server) {
         partChannel: function (channel_name) {
             try {
                 var client = client_data[user_server.name];
+                channel_listeners_manager.removeChannelClient(
+                    user_server.name, channel_name, client.nick, user.username);
                 client.part(channel_name, function (message) {
                     _partChannelCallback(
                         message, channel_name);
