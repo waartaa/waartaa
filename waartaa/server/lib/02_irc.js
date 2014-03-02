@@ -51,7 +51,7 @@ ChannelListenersManager = function () {
                 _CHANNEL_CLIENTS[key] = {};
             if (_CHANNEL_CLIENTS[key][nick] === undefined) {
                 _CHANNEL_CLIENTS[key][nick] = username;
-                enqueueTask(URGENT_QUEUE, function () {
+                enqueueTask(DELAYED_QUEUE, function () {
                     Fiber(function () {
                         try {
                             ChannelNicks.update(
@@ -79,7 +79,7 @@ ChannelListenersManager = function () {
                 _CHANNEL_CLIENTS[key] = {};
             if (_CHANNEL_CLIENTS[key][nick] !== undefined) {
                 delete _CHANNEL_CLIENTS[key][nick];
-                enqueueTask(URGENT_QUEUE, function () {
+                enqueueTask(DELAYED_QUEUE, function () {
                     Fiber(function () {
                         ChannelNicks.remove(
                           {
@@ -106,11 +106,13 @@ ChannelListenersManager = function () {
                     _updateChannelListeners(server_name, channel_name);
                 }
             });
-            Fiber(function () {
-                ChannelNicks.remove(
-                    {nick: nick, channel_name: {$in: channel_names},
-                    server_name: server_name}, function (err) {});
-            }).run();
+            enqueueTask(DELAYED_QUEUE, function () {
+                Fiber(function () {
+                    ChannelNicks.remove(
+                        {nick: nick, channel_name: {$in: channel_names},
+                        server_name: server_name}, function (err) {});
+                }).run();
+            });
         },
         isClientListener: function (server_name, channel_name, nick) {
             var key = server_name + channel_name;
