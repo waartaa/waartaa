@@ -166,7 +166,8 @@ IRCHandler = function (user, user_server) {
         channel_listeners_manager.addChannelClient(
             user_server.name, channel.name, client.nick, user.username);
         Fiber(function () {
-            UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
+            UserChannels.update(
+                {_id: channel._id}, {$set: {status: 'connected'}});
         }).run();
         if (LISTENERS.channel['message' + channel.name] != undefined)
             return;
@@ -207,7 +208,7 @@ IRCHandler = function (user, user_server) {
                             not_for_user: not_for_user,
                             created: new Date(),
                             last_updated: new Date()
-                        });
+                        }, function (err, id) {});
                     }
                     if (channel_listeners_manager.isClientListener(
                             user_server.name, channel.name, client.nick)) {
@@ -267,7 +268,8 @@ IRCHandler = function (user, user_server) {
                             {channel_name: channel_name, server_name: user_server.name,
                              nick: nick},
                             {$set: {}},
-                            {upsert: true}
+                            {upsert: true},
+                            function (err, updated) {}
                         );
                     } catch (err) {
                         logger.info(
@@ -410,7 +412,8 @@ IRCHandler = function (user, user_server) {
                                 server_name: user_server.name
                             },
                             {$set: {}},
-                            {upsert: true}
+                            {upsert: true},
+                            function (err, updated) {}
                         );
                     } catch (err) {
                         logger.info('ChannelNicksUpsertError', {error: err});
@@ -426,7 +429,8 @@ IRCHandler = function (user, user_server) {
                         */
                         console.log(user_channel);
                         UserChannels.update(
-                            {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
+                            {_id: user_channel._id}, {$set: {active: true}},
+                            {multi: true});
                         _addChannelJoinListener(user_channel.name);
                         _addChannelPartListener(user_channel.name);
                         _joinChannelCallback(message, user_channel);
@@ -449,7 +453,7 @@ IRCHandler = function (user, user_server) {
                         created: new Date(),
                         last_updated: new Date(),
                         type: 'ChannelJoin'
-                    });
+                    }, function (err, id) {});
                 }).run();
             });
         });
@@ -498,7 +502,7 @@ IRCHandler = function (user, user_server) {
                         created: new Date(),
                         last_updated: new Date(),
                         type: 'ChannelPart'
-                    });
+                    }, function (err, id) {});
                     if (channels_listening_to[channel_name])
                         delete channels_listening_to[channel_name];
                 }).run();
@@ -546,7 +550,7 @@ IRCHandler = function (user, user_server) {
                                     created: new Date(),
                                     last_updated: new Date(),
                                     type: 'QUITIRC'
-                                });
+                                }, function (err, id) {});
                             }).run();
                         });
                     });
@@ -599,7 +603,8 @@ IRCHandler = function (user, user_server) {
                                 server_name: user_server.name
                             },
                             {$set: {nick: newnick}},
-                            {multi: true}
+                            {multi: true},
+                            function (err, updated) {}
                         );
                     } catch (err) {
                         logger.info('ChannelNicksUpsertError', {error: err});
@@ -631,7 +636,7 @@ IRCHandler = function (user, user_server) {
                             created: new Date(),
                             last_updated: new Date(),
                             type: 'NICK'
-                        });
+                        }, function (err, id) {});
                     });
                 }).run();
             });
@@ -680,7 +685,7 @@ IRCHandler = function (user, user_server) {
                             user_id: user._id,
                             created: new Date(),
                             last_updated: new Date()
-                        });
+                        }, function (err, id) {});
                         if (_.isUndefined(Meteor.presences.findOne(
                                 {userId: user._id}))) {
                             waartaa.notifications.notify_pm(
@@ -789,7 +794,7 @@ IRCHandler = function (user, user_server) {
                             user_id: user._id,
                             created: new Date(),
                             last_updated: new Date()
-                        });
+                        }, function (err, id) {});
                     } else if (nick == 'ChanServ') {
                         try {
                             var channel_name = text.split(']')[0].substr(1);
@@ -814,7 +819,7 @@ IRCHandler = function (user, user_server) {
                                     created: new Date(),
                                     last_updated: new Date(),
                                     type: 'ChannelNotice'
-                                });
+                                }, function (err, id) {});
                         } catch (err) {
                         }
                     }
@@ -861,7 +866,7 @@ IRCHandler = function (user, user_server) {
                             not_for_user: not_for_user,
                             created: new Date(),
                             last_updated: new Date()
-                        });
+                        }, function (err, id) {});
                     }
                 }
             }).run();
@@ -904,7 +909,7 @@ IRCHandler = function (user, user_server) {
                                   user_id: user._id,
                                   created: new Date(),
                                   last_updated: new Date()
-                                });
+                                }, function (err, id) {});
                             }
                         }
                     } catch (err) {
@@ -1008,7 +1013,8 @@ IRCHandler = function (user, user_server) {
             ServerNicks.update(
                 {server_name: user_server.name, nick: info.nick},
                 {$set: info},
-                {upsert: true}
+                {upsert: true},
+                function (err, updated) {}
             );
         }).run();
     }
@@ -1057,7 +1063,7 @@ IRCHandler = function (user, user_server) {
                         created: new Date(),
                         last_updated: new Date(),
                         type: 'CMDRESP'
-                    });
+                    }, function (err, id) {});
                 });
             } else if (log_options.roomtype == 'pm') {
                 var to = log_options.room_id.substr(
@@ -1079,7 +1085,7 @@ IRCHandler = function (user, user_server) {
                       user_id: user._id,
                       created: new Date(),
                       last_updated: new Date()
-                    });
+                    }, function (err, id) {});
                 });
             } else if (log_options.roomtype == 'server') {
                 _.each(whoisLogs, function (text) {
@@ -1095,7 +1101,7 @@ IRCHandler = function (user, user_server) {
                         user_id: user._id,
                         created: new Date(),
                         last_updated: new Date()
-                    });
+                    }, function (err, id) {});
                 });
             }
         }).run();
@@ -1130,7 +1136,7 @@ IRCHandler = function (user, user_server) {
                     user_id: user._id,
                     created: new Date(),
                     last_updated: new Date()
-                });
+                }, function (err, id) {});
             } else if (log_options.roomtype == 'pm') {
                 var to = log_options.room_id.substr(
                     log_options.room_id.indexOf('_') + 1);
@@ -1150,7 +1156,7 @@ IRCHandler = function (user, user_server) {
                   user_id: user._id,
                   created: new Date(),
                   last_updated: new Date()
-                });
+                }, function (err, id) {});
             } else if (log_options.roomtype == 'server') {
                 UserServerLogs.insert({
                     message: message,
@@ -1164,7 +1170,7 @@ IRCHandler = function (user, user_server) {
                     user_id: user._id,
                     created: new Date(),
                     last_updated: new Date()
-                });
+                }, function (err, id) {});
             }
         }).run();
     }
@@ -1216,7 +1222,7 @@ IRCHandler = function (user, user_server) {
               user_id: user._id,
               created: new Date(),
               last_updated: new Date()
-            });
+            }, function (err, id) {});
             if (send)
                 client.say(to, message);
         } catch (err) {
@@ -1342,7 +1348,8 @@ IRCHandler = function (user, user_server) {
                                                         nick: nick
                                                     },
                                                     {$set: {}},
-                                                    {upsert: true, multi: true}
+                                                    {upsert: true, multi: true},
+                                                    function (err, updated) {}
                                                 );
                                             } catch (err) {
                                                 logger.info(
