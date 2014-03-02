@@ -181,11 +181,6 @@ IRCHandler = function (user, user_server) {
                 nick, text, message) {
             enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
-                    if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name]) == 'undefined')
-                        CHANNEL_LOGS_WRITE_LOCKS[user_server.name] = {};
-                    if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name]) == 'undefined')
-                        CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name] = new locks.createReadWriteLock();
-                    var rwlock = CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name];
                     var global = false;
                     if (message.type != 'NOTICE')
                         global = true;
@@ -212,6 +207,11 @@ IRCHandler = function (user, user_server) {
                     }
                     if (channel_listeners_manager.isClientListener(
                             user_server.name, channel.name, client.nick)) {
+                        if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name]) == 'undefined')
+                            CHANNEL_LOGS_WRITE_LOCKS[user_server.name] = {};
+                        if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name]) == 'undefined')
+                            CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name] = new locks.createReadWriteLock();
+                        var rwlock = CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name];
                         rwlock.timedWriteLock(5000, function (error) {
                             Fiber(function () {
                                 if (error) {
