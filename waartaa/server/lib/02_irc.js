@@ -49,15 +49,68 @@ ChannelListenersManager = function () {
             var key = server_name + channel_name;
             if (_CHANNEL_CLIENTS[key] === undefined)
                 _CHANNEL_CLIENTS[key] = {};
-            _CHANNEL_CLIENTS[key][nick] = username;
-            _updateChannelListeners(server_name, channel_name);
+            if (_CHANNEL_CLIENTS[key][nick] === undefined) {
+                _CHANNEL_CLIENTS[key][nick] = username;
+                enqueueTask(URGENT_QUEUE, function () {
+                    Fiber(function () {
+                        try {
+                            ChannelNicks.update(
+                                {
+                                    nick: nick, channel_name: channel_name,
+                                    server_name: server_name
+                                },
+                                {$set: {}},
+                                {upsert: true},
+                                function (err, updated) {}
+                            );
+                        } catch (err) {
+                            logger.info('ChannelNicksUpsertError', {error: err});
+                        }
+                    }).run();
+                });
+                _updateChannelListeners(server_name, channel_name);
+                return true;
+            }
+            return false;
         },
         removeChannelClient: function (server_name, channel_name, nick, username) {
             var key = server_name + channel_name;
-            try {
-                delete _CHANNEL_CLIENTS[key];
-            } catch (err) {}
-            _updateChannelListeners(server_name, channel_name);
+            if (_CHANNEL_CLIENTS[key] === undefined)
+                _CHANNEL_CLIENTS[key] = {};
+            if (_CHANNEL_CLIENTS[key][nick] !== undefined) {
+                delete _CHANNEL_CLIENTS[key][nick];
+                enqueueTask(URGENT_QUEUE, function () {
+                    Fiber(function () {
+                        ChannelNicks.remove(
+                          {
+                            channel_name: channel_name,
+                            server_name: server_name,
+                            nick: nick
+                          },
+                          function (err) {}
+                        );
+                    }).run();
+                });
+                _updateChannelListeners(server_name, channel_name);
+                return true;
+            }
+            return false;
+        },
+        removeNickFromChannels: function (server_name, channel_names, nick) {
+            _.each(channel_names, function (channel_name) {
+                var key = server_name + channel_name;
+                if (_CHANNEL_CLIENTS[key] === undefined)
+                    _CHANNEL_CLIENTS[key] = {};
+                if (_CHANNEL_CLIENTS[key][nick] !== undefined) {
+                    delete _CHANNEL_CLIENTS[key][nick];
+                    _updateChannelListeners(server_name, channel_name);
+                }
+            });
+            Fiber(function () {
+                ChannelNicks.remove(
+                    {nick: nick, channel_name: {$in: channel_names},
+                    server_name: server_name}, function (err) {});
+            }).run();
         },
         isClientListener: function (server_name, channel_name, nick) {
             var key = server_name + channel_name;
@@ -74,7 +127,7 @@ ChannelListenersManager = function () {
         }
 
     };
-}
+};
 channel_listeners_manager = ChannelListenersManager();
 
 function shallWriteChannelLog (nick, text, channel_name, server_name, client_nick) {
@@ -161,10 +214,10 @@ IRCHandler = function (user, user_server) {
     }
 
     function _joinChannelCallback (message, channel) {
-        if (channel.status == 'connected')
-            return;
         channel_listeners_manager.addChannelClient(
             user_server.name, channel.name, client.nick, user.username);
+        if (channel.status == 'connected')
+            return;
         Fiber(function () {
             UserChannels.update(
                 {_id: channel._id}, {$set: {status: 'connected'}});
@@ -405,19 +458,6 @@ IRCHandler = function (user, user_server) {
                 Fiber(function () {
                     var user_channel = _create_update_user_channel(
                         user_server, {name: channel});
-                    try {
-                        ChannelNicks.update(
-                            {
-                                nick: nick, channel_name: channel,
-                                server_name: user_server.name
-                            },
-                            {$set: {}},
-                            {upsert: true},
-                            function (err, updated) {}
-                        );
-                    } catch (err) {
-                        logger.info('ChannelNicksUpsertError', {error: err});
-                    }
                     if (nick == client.nick) {
                         /*
                         var job_key = 'WHO-' + channel;
@@ -430,11 +470,14 @@ IRCHandler = function (user, user_server) {
                         console.log(user_channel);
                         UserChannels.update(
                             {_id: user_channel._id}, {$set: {active: true}},
-                            {multi: true});
+                            {multi: true}, function (err, updated) {});
                         _addChannelJoinListener(user_channel.name);
                         _addChannelPartListener(user_channel.name);
                         _joinChannelCallback(message, user_channel);
                     }
+                    channel_listeners_manager.addChannelClient(
+                        user_server.name, channel, client.nick,
+                        user.username);
                     var channel_join_message = nick + ' has joined the channel.';
                     if (nick == client.nick)
                         channel_join_message = 'You have joined the channel.';
@@ -466,16 +509,9 @@ IRCHandler = function (user, user_server) {
         client.addListener('part' + channel_name, function (nick, reason, message) {
             enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
-                    ChannelNicks.remove(
-                      {
-                        channel_name: channel_name, server_name: user_server.name,
-                        nick: nick
-                      }
-                    );
-                }).run();
-            });
-            enqueueTask(URGENT_QUEUE, function () {
-                Fiber(function () {
+                    channel_listeners_manager.removeChannelClient(
+                        user_server.name, channel_name, client.nick,
+                        user.username);
                     var channel = UserChannels.findOne(
                         {user_server_id: user_server._id, name: channel_name});
                     if (!channel)
@@ -515,11 +551,8 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['quit'] = '';
         client.addListener('quit', function (nick, reason, channels, message) {
-            Fiber(function () {
-                ChannelNicks.remove(
-                    {nick: nick, channel_name: {$in: channels},
-                    server_name: user_server.name});
-            }).run();
+            channel_listeners_manager.removeNickFromChannels(
+                user_server.name, channels, nick);
             enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     UserChannels.find({
@@ -921,6 +954,8 @@ IRCHandler = function (user, user_server) {
     }
 
     function _partChannelCallback (message, channel_name) {
+        channel_listeners_manager.removeChannelClient(
+            user_server.name, channel_name, client.nick, user.username);
         var listeners = client.listeners('message' + channel_name);
         _.each(listeners, function (listener) {
             client.removeListener('message' + channel_name, listener);
