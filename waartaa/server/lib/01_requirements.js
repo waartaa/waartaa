@@ -15,12 +15,12 @@ if (Meteor.isServer) {
         Fiber = require('fibers');
     }
     try {
-        CappedArray = Npm.require('capped-array');
+        CappedArray = Meteor.require('capped-array');
     } catch (err) {
         CappedArray = require('capped-array');
     }
     try {
-        locks = Npm.require('locks');
+        locks = Meteor.require('locks');
     } catch (err) {
         locks = require('locks');
     }
