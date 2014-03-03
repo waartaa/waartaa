@@ -25,6 +25,7 @@ if (Meteor.isServer) {
         locks = require('locks');
     }
 	crypto = Npm.require('crypto');
+    Map = Meteor.require('collections/map');
     try {
         var privateKey = Assets.getText('certs/privatekey.pem');
         var certificate = Assets.getText('certs/certificate.pem');

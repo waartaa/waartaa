@@ -19,6 +19,7 @@
     "fast-render": {},
     "iron-router": {},
     "power-queue": {},
-    "cron-tick": {}
+    "cron-tick": {},
+    "npm": {}
   }
 }
