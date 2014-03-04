@@ -77,14 +77,24 @@ waartaa.chat.helpers.highlightServerRoom = function () {
  *     currently selected room.
  */
 waartaa.chat.helpers.setCurrentRoom = function (obj) {
-  if (obj.roomtype == 'server')
+  var set_cookie = function(key, value) {
+    document.cookie = key + '=' + value;
+  };
+
+  set_cookie('userId', Meteor.userId());
+  set_cookie('roomtype', obj.roomtype);
+
+  if (obj.roomtype == 'server') {
     Session.set('room', {
       room_id: obj.server_id,
       roomtype: obj.roomtype,
       server_id: obj.server_id,
       server_name: obj.server_name,
     });
-  else if (obj.roomtype == 'channel')
+    // set cookie server_id
+    set_cookie('server_id', obj.server_id);
+  }
+  else if (obj.roomtype == 'channel') {
     Session.set('room', {
       room_id: obj.channel_id,
       roomtype: obj.roomtype,
@@ -93,7 +103,11 @@ waartaa.chat.helpers.setCurrentRoom = function (obj) {
       channel_id: obj.channel_id,
       channel_name: obj.channel_name
     });
-  else if (obj.roomtype == 'pm')
+    // set cookie server_id and channel_id
+    set_cookie('server_id', obj.server_id);
+    set_cookie('channel_id', obj.channel_id);
+  }
+  else if (obj.roomtype == 'pm') {
     Session.set('room', {
       room_id: obj.server_id + '_' + obj.nick,
       roomtype: 'pm',
@@ -101,6 +115,11 @@ waartaa.chat.helpers.setCurrentRoom = function (obj) {
       server_name: obj.server_name,
       nick: obj.nick
     });
+    // set cookie pm_nick
+    set_cookie('server_id', obj.server_id);
+    set_cookie('pm_nick', obj.nick);
+
+  }
   else
     Session.set('room', {});
 };
