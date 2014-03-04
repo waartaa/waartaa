@@ -11,15 +11,17 @@ Router.map(function () {
     path: '/',
     template: 'user_loggedout_content',
     before: function () {
-      if (Meteor.userId()) {
-        Router.go('/chat/');
-        this.render('chat');
-        GAnalytics.pageview('/chat');
-        this.stop();
-      }
+      if (Meteor.isClient)
+        if (Meteor.userId()) {
+          Router.go('/chat/');
+          this.render('chat');
+          GAnalytics.pageview('/chat');
+          this.stop();
+        }
     },
     after: function () {
-      GAnalytics.pageview();
+      if (Meteor.isClient)
+        GAnalytics.pageview();
     },
     fastRender: true
   });
@@ -34,24 +36,28 @@ Router.map(function () {
     template: 'chat',
     before: [
       function () {
-        if (!Meteor.userId()) {
-          Router.go('/');
-          this.render('user_loggedout_content');
-          GAnalytics.pageview();
-          this.stop();
-        } else {
-          ChatSubscribe();
+        if (Meteor.isClient) {
+          if (!Meteor.userId()) {
+            Router.go('/');
+            this.render('user_loggedout_content');
+            GAnalytics.pageview();
+            this.stop();
+          } else {
+            ChatSubscribe();
+          }
         }
       },
       function () {
-        // we're done waiting on all subs
-        if (this.ready()) {
-          NProgress.done();
-          if (UserServers.find().count() == 0)
-            $('#server-add-btn').click();
-        } else {
-          NProgress.start();
-          this.stop(); // stop downstream funcs from running
+        if (Meteor.isClient) {
+          // we're done waiting on all subs
+          if (this.ready()) {
+            NProgress.done();
+            if (UserServers.find().count() == 0)
+              $('#server-add-btn').click();
+          } else {
+            NProgress.start();
+            this.stop(); // stop downstream funcs from running
+          }
         }
       }
     ],
@@ -62,7 +68,8 @@ Router.map(function () {
       ]
     },
     after: function () {
-      GAnalytics.pageview('/chat/');
+      if (Meteor.isClient)
+        GAnalytics.pageview('/chat/');
     },
     fastRender: true
   });

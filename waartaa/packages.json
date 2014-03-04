@@ -1,0 +1,5 @@
+{
+    "collections": "1.0.0",
+    "locks": "0.1.0",
+    "capped-array": "0.0.1"
+}

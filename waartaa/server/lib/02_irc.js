@@ -9,6 +9,162 @@ GLOBAL_LISTENERS = {};
 RECENT_CHANNEL_LOGS = {};
 CHANNEL_LOGS_WRITE_LOCKS = {};
 
+
+ChannelNicksManager = function () {
+    var _CHANNEL_NICKS_RECENTLY_JOINED = {};
+    var _CHANNEL_NICKS_RECENTLY_PARTED = {};
+    var _MAX_LENGTH = 10;
+
+    function _initializeChannelNicksDataIfAbsent (server_name, channel_name) {
+        var key = server_name + channel_name;
+        if (_CHANNEL_NICKS_RECENTLY_JOINED[key] === undefined)
+            _CHANNEL_NICKS_RECENTLY_JOINED[key] = Map();
+        if (_CHANNEL_NICKS_RECENTLY_PARTED[key] === undefined)
+            _CHANNEL_NICKS_RECENTLY_PARTED[key] = Map();
+    }
+
+    return {
+        addChannelNick: function (server_name, channel_name, nick) {
+            _initializeChannelNicksDataIfAbsent(server_name, channel_name);
+            var key = server_name + channel_name;
+            if (_CHANNEL_NICKS_RECENTLY_JOINED[key].get(nick) === undefined) {
+                _CHANNEL_NICKS_RECENTLY_JOINED[key].set(nick, '');
+                _CHANNEL_NICKS_RECENTLY_PARTED[key].delete(nick);
+                if (_CHANNEL_NICKS_RECENTLY_JOINED[key].length > _MAX_LENGTH) {
+                    _CHANNEL_NICKS_RECENTLY_JOINED[key].delete(
+                        _CHANNEL_NICKS_RECENTLY_JOINED[key].keys()[0]);
+                }
+                enqueueTask(DELAYED_QUEUE, function () {
+                    Fiber(function () {
+                        ChannelNicks.update(
+                          {
+                            channel_name: channel_name,
+                            server_name: server_name,
+                            nick: nick
+                          },
+                          {$set: {}},
+                          {upsert: true},
+                          function (err) {}
+                        );
+                    }).run();
+                });
+            }
+        },
+        removeChannelNick: function (server_name, channel_name, nick) {
+            _initializeChannelNicksDataIfAbsent(server_name, channel_name);
+            var key = server_name + channel_name;
+            if (_CHANNEL_NICKS_RECENTLY_PARTED[key].get(nick) === undefined) {
+                _CHANNEL_NICKS_RECENTLY_PARTED[key].set(nick, '');
+                _CHANNEL_NICKS_RECENTLY_JOINED[key].delete(nick);
+                if (_CHANNEL_NICKS_RECENTLY_PARTED[key].length > _MAX_LENGTH) {
+                    _CHANNEL_NICKS_RECENTLY_PARTED[key].delete(
+                        _CHANNEL_NICKS_RECENTLY_PARTED[key].keys()[0]);
+                }
+                enqueueTask(DELAYED_QUEUE, function () {
+                    Fiber(function () {
+                        ChannelNicks.remove(
+                          {
+                            channel_name: channel_name,
+                            server_name: server_name,
+                            nick: nick
+                          },
+                          function (err) {}
+                        );
+                    }).run();
+                });
+            }
+        }
+    }
+};
+channel_nicks_manager = ChannelNicksManager();
+
+
+ChannelListenersManager = function () {
+    var _CHANNEL_CLIENTS = {};
+    var _CHANNEL_LISTENERS = {};
+    var _MAX_LISTENERS_PER_CHANNEL = 4;
+
+    function _updateChannelListeners (server_name, channel_name) {
+        var key = server_name + channel_name;
+        var channel_clients = _CHANNEL_CLIENTS[key] || {};
+        if (_CHANNEL_LISTENERS[key] === undefined)
+            _CHANNEL_LISTENERS[key] = {};
+        var channel_listeners = _CHANNEL_LISTENERS[key] || {};
+
+        console.log("=====BEFORE======");
+        console.log(_CHANNEL_CLIENTS, _CHANNEL_LISTENERS);
+        for (nick in channel_listeners) {
+            if (channel_clients[nick] === undefined) {
+                delete channel_listeners[nick];
+            }
+        }
+        var listeners_count = Object.keys(channel_clients).length;
+        for (nick in channel_clients) {
+            if (listeners_count < _MAX_LISTENERS_PER_CHANNEL) {
+                if (channel_listeners[nick] === undefined) {
+                    channel_listeners[nick] = channel_clients[nick];
+                    listeners_count++;
+                }
+            } else
+                break;
+        }
+        console.log("=====AFTER======");
+        console.log(_CHANNEL_CLIENTS, _CHANNEL_LISTENERS);
+
+    }
+
+    return {
+        addChannelClient: function (server_name, channel_name, nick, username) {
+            var key = server_name + channel_name;
+            if (_CHANNEL_CLIENTS[key] === undefined)
+                _CHANNEL_CLIENTS[key] = {};
+            if (_CHANNEL_CLIENTS[key][nick] === undefined) {
+                _CHANNEL_CLIENTS[key][nick] = username;
+                _updateChannelListeners(server_name, channel_name);
+                return true;
+            }
+            return false;
+        },
+        removeChannelClient: function (server_name, channel_name, nick, username) {
+            var key = server_name + channel_name;
+            if (_CHANNEL_CLIENTS[key] === undefined)
+                _CHANNEL_CLIENTS[key] = {};
+            if (_CHANNEL_CLIENTS[key][nick] !== undefined) {
+                delete _CHANNEL_CLIENTS[key][nick];
+                _updateChannelListeners(server_name, channel_name);
+                return true;
+            }
+            return false;
+        },
+        removeNickFromChannels: function (server_name, channel_names, nick) {
+            _.each(channel_names, function (channel_name) {
+                var key = server_name + channel_name;
+                if (_CHANNEL_CLIENTS[key] === undefined)
+                    _CHANNEL_CLIENTS[key] = {};
+                if (_CHANNEL_CLIENTS[key][nick] !== undefined) {
+                    delete _CHANNEL_CLIENTS[key][nick];
+                    _updateChannelListeners(server_name, channel_name);
+                }
+            });
+        },
+        isClientListener: function (server_name, channel_name, nick) {
+            var key = server_name + channel_name;
+            if ((_CHANNEL_LISTENERS[key] || {})[nick] === undefined) {
+                console.log('========NICK NOT LISTENER========');
+                console.log(server_name, channel_name, nick);
+                console.log(_CHANNEL_LISTENERS);
+                return false;
+            }
+            console.log('========NICK IS LISTENER========');
+            console.log(server_name, channel_name, nick);
+            console.log(_CHANNEL_LISTENERS);
+            return true;
+        }
+
+    };
+};
+channel_listeners_manager = ChannelListenersManager();
+
 function shallWriteChannelLog (nick, text, channel_name, server_name, client_nick) {
     console.log('++++++++++++++++++++++++++++++++');
     console.log(RECENT_CHANNEL_LOGS);
@@ -93,10 +249,15 @@ IRCHandler = function (user, user_server) {
     }
 
     function _joinChannelCallback (message, channel) {
+        channel_nicks_manager.addChannelNick(
+            user_server.name, channel.name, client.nick);
+        channel_listeners_manager.addChannelClient(
+            user_server.name, channel.name, client.nick, user.username);
         if (channel.status == 'connected')
             return;
         Fiber(function () {
-            UserChannels.update({_id: channel._id}, {$set: {status: 'connected'}});
+            UserChannels.update(
+                {_id: channel._id}, {$set: {status: 'connected'}});
         }).run();
         if (LISTENERS.channel['message' + channel.name] != undefined)
             return;
@@ -110,44 +271,54 @@ IRCHandler = function (user, user_server) {
                 nick, text, message) {
             enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
-                    if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name]) == 'undefined')
-                        CHANNEL_LOGS_WRITE_LOCKS[user_server.name] = {};
-                    if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name]) == 'undefined')
-                        CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name] = new locks.createReadWriteLock();
-                    var rwlock = CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name];
                     var global = false;
                     if (message.type != 'NOTICE')
                         global = true;
-                    rwlock.timedWriteLock(5000, function (error) {
-                        Fiber(function () {
-                            if (error) {
-                                console.log('Could not get the lock within 5 seconds, so gave up');
-                            } else {
-                                console.log('Acquired write lock', user_server.name, channel.name);
-                                var shall_write = shallWriteChannelLog(nick, text, channel.name, user_server.name, client.nick);
-                                rwlock.unlock();
-                                var not_for_user = (UserServers.findOne({name: user_server.name, current_nick: nick}) || {}).user || null;
-                                if (shall_write)
-                                    ChannelLogs.insert({
-                                        message: text,
-                                        raw_message: message,
-                                        from: nick,
-                                        from_user: null,
-                                        from_user_id: null,
-                                        channel_name: channel.name,
-                                        channel_id: channel._id,
-                                        server_name: user_server.name,
-                                        server_id: user_server._id,
-                                        user: user.username,
-                                        user_id: user._id,
-                                        global: global,
-                                        not_for_user: not_for_user,
-                                        created: new Date(),
-                                        last_updated: new Date()
-                                    });
-                            }
-                        }).run();
-                    });
+                    var not_for_user = null;
+
+                    function insertChannelLog () {
+                        ChannelLogs.insert({
+                            message: text,
+                            raw_message: message,
+                            from: nick,
+                            from_user: null,
+                            from_user_id: null,
+                            channel_name: channel.name,
+                            channel_id: channel._id,
+                            server_name: user_server.name,
+                            server_id: user_server._id,
+                            user: user.username,
+                            user_id: user._id,
+                            global: global,
+                            not_for_user: not_for_user,
+                            created: new Date(),
+                            last_updated: new Date()
+                        }, function (err, id) {});
+                    }
+                    if (channel_listeners_manager.isClientListener(
+                            user_server.name, channel.name, client.nick)) {
+                        if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name]) == 'undefined')
+                            CHANNEL_LOGS_WRITE_LOCKS[user_server.name] = {};
+                        if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name]) == 'undefined')
+                            CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name] = new locks.createReadWriteLock();
+                        var rwlock = CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name];
+                        rwlock.timedWriteLock(5000, function (error) {
+                            Fiber(function () {
+                                if (error) {
+                                    console.log('Could not get the lock within 5 seconds, so gave up');
+                                } else {
+                                    console.log('Acquired write lock', user_server.name, channel.name);
+                                    var shall_write = shallWriteChannelLog(nick, text, channel.name, user_server.name, client.nick);
+                                    rwlock.unlock();
+                                    not_for_user = (UserServers.findOne({name: user_server.name, current_nick: nick}) || {}).user || null;
+                                    if (shall_write)
+                                        insertChannelLog();
+                                }
+                            }).run();
+                        });
+                    } else if (global == false) {
+                        insertChannelLog();
+                    }
                 }).run();
             });
             enqueueTask(DELAYED_QUEUE, function () {
@@ -180,21 +351,8 @@ IRCHandler = function (user, user_server) {
             }).run();
         });
         _.each(nicks_list, function (nick) {
-            enqueueTask(DELAYED_QUEUE, function () {
-                Fiber(function () {
-                    try {
-                        ChannelNicks.update(
-                            {channel_name: channel_name, server_name: user_server.name,
-                             nick: nick},
-                            {$set: {}},
-                            {upsert: true}
-                        );
-                    } catch (err) {
-                        logger.info(
-                            "ChannelNicksUpsertError", {error: err});
-                    }
-                }).run();
-            });
+            channel_nicks_manager.addChannelNick(
+                user_server.name, channel_name, nick);
         });
         /*
         try {
@@ -321,20 +479,10 @@ IRCHandler = function (user, user_server) {
         client.addListener('join', function (channel, nick, message) {
             enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
+                    channel_nicks_manager.addChannelNick(
+                        user_server.name, channel, nick);
                     var user_channel = _create_update_user_channel(
                         user_server, {name: channel});
-                    try {
-                        ChannelNicks.update(
-                            {
-                                nick: nick, channel_name: channel,
-                                server_name: user_server.name
-                            },
-                            {$set: {}},
-                            {upsert: true}
-                        );
-                    } catch (err) {
-                        logger.info('ChannelNicksUpsertError', {error: err});
-                    }
                     if (nick == client.nick) {
                         /*
                         var job_key = 'WHO-' + channel;
@@ -346,7 +494,8 @@ IRCHandler = function (user, user_server) {
                         */
                         console.log(user_channel);
                         UserChannels.update(
-                            {_id: user_channel._id}, {$set: {active: true}}, {  multi: true});
+                            {_id: user_channel._id}, {$set: {active: true}},
+                            {multi: true}, function (err, updated) {});
                         _addChannelJoinListener(user_channel.name);
                         _addChannelPartListener(user_channel.name);
                         _joinChannelCallback(message, user_channel);
@@ -369,7 +518,7 @@ IRCHandler = function (user, user_server) {
                         created: new Date(),
                         last_updated: new Date(),
                         type: 'ChannelJoin'
-                    });
+                    }, function (err, id) {});
                 }).run();
             });
         });
@@ -382,16 +531,8 @@ IRCHandler = function (user, user_server) {
         client.addListener('part' + channel_name, function (nick, reason, message) {
             enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
-                    ChannelNicks.remove(
-                      {
-                        channel_name: channel_name, server_name: user_server.name,
-                        nick: nick
-                      }
-                    );
-                }).run();
-            });
-            enqueueTask(URGENT_QUEUE, function () {
-                Fiber(function () {
+                    channel_nicks_manager.removeChannelNick(
+                        user_server.name, channel_name, nick);
                     var channel = UserChannels.findOne(
                         {user_server_id: user_server._id, name: channel_name});
                     if (!channel)
@@ -418,7 +559,7 @@ IRCHandler = function (user, user_server) {
                         created: new Date(),
                         last_updated: new Date(),
                         type: 'ChannelPart'
-                    });
+                    }, function (err, id) {});
                     if (channels_listening_to[channel_name])
                         delete channels_listening_to[channel_name];
                 }).run();
@@ -431,11 +572,8 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['quit'] = '';
         client.addListener('quit', function (nick, reason, channels, message) {
-            Fiber(function () {
-                ChannelNicks.remove(
-                    {nick: nick, channel_name: {$in: channels},
-                    server_name: user_server.name});
-            }).run();
+            channel_listeners_manager.removeNickFromChannels(
+                user_server.name, channels, nick);
             enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     UserChannels.find({
@@ -466,7 +604,7 @@ IRCHandler = function (user, user_server) {
                                     created: new Date(),
                                     last_updated: new Date(),
                                     type: 'QUITIRC'
-                                });
+                                }, function (err, id) {});
                             }).run();
                         });
                     });
@@ -519,7 +657,8 @@ IRCHandler = function (user, user_server) {
                                 server_name: user_server.name
                             },
                             {$set: {nick: newnick}},
-                            {multi: true}
+                            {multi: true},
+                            function (err, updated) {}
                         );
                     } catch (err) {
                         logger.info('ChannelNicksUpsertError', {error: err});
@@ -551,7 +690,7 @@ IRCHandler = function (user, user_server) {
                             created: new Date(),
                             last_updated: new Date(),
                             type: 'NICK'
-                        });
+                        }, function (err, id) {});
                     });
                 }).run();
             });
@@ -600,7 +739,7 @@ IRCHandler = function (user, user_server) {
                             user_id: user._id,
                             created: new Date(),
                             last_updated: new Date()
-                        });
+                        }, function (err, id) {});
                         if (_.isUndefined(Meteor.presences.findOne(
                                 {userId: user._id}))) {
                             waartaa.notifications.notify_pm(
@@ -709,7 +848,7 @@ IRCHandler = function (user, user_server) {
                             user_id: user._id,
                             created: new Date(),
                             last_updated: new Date()
-                        });
+                        }, function (err, id) {});
                     } else if (nick == 'ChanServ') {
                         try {
                             var channel_name = text.split(']')[0].substr(1);
@@ -734,7 +873,7 @@ IRCHandler = function (user, user_server) {
                                     created: new Date(),
                                     last_updated: new Date(),
                                     type: 'ChannelNotice'
-                                });
+                                }, function (err, id) {});
                         } catch (err) {
                         }
                     }
@@ -744,6 +883,9 @@ IRCHandler = function (user, user_server) {
     }
 
     function _writeChannelActionMessage (channel, from, text, message) {
+        if (!channel_listeners_manager.isClientListener(
+                user_server.name, channel.name, client.nick))
+            return;
         if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name]) == 'undefined')
             CHANNEL_LOGS_WRITE_LOCKS[user_server.name] = {};
         if (typeof(CHANNEL_LOGS_WRITE_LOCKS[user_server.name][channel.name]) == 'undefined')
@@ -778,7 +920,7 @@ IRCHandler = function (user, user_server) {
                             not_for_user: not_for_user,
                             created: new Date(),
                             last_updated: new Date()
-                        });
+                        }, function (err, id) {});
                     }
                 }
             }).run();
@@ -821,7 +963,7 @@ IRCHandler = function (user, user_server) {
                                   user_id: user._id,
                                   created: new Date(),
                                   last_updated: new Date()
-                                });
+                                }, function (err, id) {});
                             }
                         }
                     } catch (err) {
@@ -833,6 +975,10 @@ IRCHandler = function (user, user_server) {
     }
 
     function _partChannelCallback (message, channel_name) {
+        channel_nicks_manager.removeChannelNick(
+            user_server.name, channel_name, client.nick);
+        channel_listeners_manager.removeChannelClient(
+            user_server.name, channel_name, client.nick, user.username);
         var listeners = client.listeners('message' + channel_name);
         _.each(listeners, function (listener) {
             client.removeListener('message' + channel_name, listener);
@@ -925,7 +1071,8 @@ IRCHandler = function (user, user_server) {
             ServerNicks.update(
                 {server_name: user_server.name, nick: info.nick},
                 {$set: info},
-                {upsert: true}
+                {upsert: true},
+                function (err, updated) {}
             );
         }).run();
     }
@@ -974,7 +1121,7 @@ IRCHandler = function (user, user_server) {
                         created: new Date(),
                         last_updated: new Date(),
                         type: 'CMDRESP'
-                    });
+                    }, function (err, id) {});
                 });
             } else if (log_options.roomtype == 'pm') {
                 var to = log_options.room_id.substr(
@@ -996,7 +1143,7 @@ IRCHandler = function (user, user_server) {
                       user_id: user._id,
                       created: new Date(),
                       last_updated: new Date()
-                    });
+                    }, function (err, id) {});
                 });
             } else if (log_options.roomtype == 'server') {
                 _.each(whoisLogs, function (text) {
@@ -1012,7 +1159,7 @@ IRCHandler = function (user, user_server) {
                         user_id: user._id,
                         created: new Date(),
                         last_updated: new Date()
-                    });
+                    }, function (err, id) {});
                 });
             }
         }).run();
@@ -1047,7 +1194,7 @@ IRCHandler = function (user, user_server) {
                     user_id: user._id,
                     created: new Date(),
                     last_updated: new Date()
-                });
+                }, function (err, id) {});
             } else if (log_options.roomtype == 'pm') {
                 var to = log_options.room_id.substr(
                     log_options.room_id.indexOf('_') + 1);
@@ -1067,7 +1214,7 @@ IRCHandler = function (user, user_server) {
                   user_id: user._id,
                   created: new Date(),
                   last_updated: new Date()
-                });
+                }, function (err, id) {});
             } else if (log_options.roomtype == 'server') {
                 UserServerLogs.insert({
                     message: message,
@@ -1081,7 +1228,7 @@ IRCHandler = function (user, user_server) {
                     user_id: user._id,
                     created: new Date(),
                     last_updated: new Date()
-                });
+                }, function (err, id) {});
             }
         }).run();
     }
@@ -1133,7 +1280,7 @@ IRCHandler = function (user, user_server) {
               user_id: user._id,
               created: new Date(),
               last_updated: new Date()
-            });
+            }, function (err, id) {});
             if (send)
                 client.say(to, message);
         } catch (err) {
@@ -1240,7 +1387,7 @@ IRCHandler = function (user, user_server) {
                                         {
                                             server_name: user_server.name,
                                             nick: user_server.current_nick
-                                        }
+                                        }, function (err) {}
                                     );
                                     UserServers.update({_id: user_server._id}, {$set: {current_nick: nick}});
                                     user_server = UserServers.findOne({_id: user_server._id});
@@ -1249,21 +1396,9 @@ IRCHandler = function (user, user_server) {
                                             user_server_name: user_server.name,
                                             user: user.username
                                         }).forEach(function (channel) {
-                                            try {
-                                                ChannelNicks.update(
-                                                    {
-                                                        server_name: user_server.name,
-                                                        channel_name: channel.name,
-                                                        nick: nick
-                                                    },
-                                                    {$set: {}},
-                                                    {upsert: true, multi: true}
-                                                );
-                                            } catch (err) {
-                                                logger.info(
-                                                    'ChannelNicksUpsertError',
-                                                    {error: err})
-                                            }
+                                            channel_nicks_manager.addChannelNick(
+                                                user_server.name, channel.name,
+                                                nick);
                                         });
                                 }
                             }).run();

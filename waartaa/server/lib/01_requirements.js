@@ -15,16 +15,17 @@ if (Meteor.isServer) {
         Fiber = require('fibers');
     }
     try {
-        CappedArray = Npm.require('capped-array');
+        CappedArray = Meteor.require('capped-array');
     } catch (err) {
         CappedArray = require('capped-array');
     }
     try {
-        locks = Npm.require('locks');
+        locks = Meteor.require('locks');
     } catch (err) {
         locks = require('locks');
     }
 	crypto = Npm.require('crypto');
+    Map = Meteor.require('collections/map');
     try {
         var privateKey = Assets.getText('certs/privatekey.pem');
         var certificate = Assets.getText('certs/certificate.pem');
