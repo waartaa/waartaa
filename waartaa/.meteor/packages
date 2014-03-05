@@ -10,13 +10,9 @@ jquery-ui-bootstrap
 jquery-ui
 standard-app-packages
 HTML5-History-API
-#observatory-apollo
 page-js-ie-support
 require
-handlebar-helpers
 
-#observatory-galileo
-irc
 presence
 bootstrap-3
 accounts-github

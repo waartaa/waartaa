@@ -1,10 +1,6 @@
 {
   "packages": {
     "jquery-ui-bootstrap": {},
-    "router": {},
-    "observatory": {},
-    "irc": {},
-    "handlebar-helpers": {},
     "require": {},
     "presence": {},
     "bootstrap-3": {},
@@ -20,6 +16,8 @@
     "iron-router": {},
     "power-queue": {},
     "cron-tick": {},
-    "npm": {}
+    "npm": {},
+    "HTML5-History-API": {},
+    "page-js-ie-support": {}
   }
 }
