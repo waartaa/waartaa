@@ -1,0 +1,8 @@
+---
+- hosts: webservers
+  tasks:
+      - name: create sshd_config file.
+        shell: touch /etc/ssh/sshd_config
+        sudo: yes
+      - name: git clone
+        git: repo=git://github.com/waartaa/waartaa.git dest=/home/vagrant/waartaa
