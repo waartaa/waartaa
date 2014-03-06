@@ -86,9 +86,6 @@ Client = {};
 Meteor.subscribe("client", Meteor.user() && Meteor.user().username);
 
 
-
-//$('.editServerChannelLink').live('click', _handleServerChannelEditLinkClick);
-
 Template.channel_menu.rendered = function (e) {
   //Template.channel_menu.events[
   //  'click .editServerChannelLink'] =  _handleServerChannelEditLinkClick;
@@ -135,8 +132,8 @@ Handlebars.registerHelper("serverChatLogs", function (server_id) {
   return cursor;
 });
 
-$('.whois-tooltip, .tipsy-enable').tipsy({live: true, gravity: 'e', html: true});
-$('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
+//$('.whois-tooltip, .tipsy-enable').tipsy({live: true, gravity: 'e', html: true});
+//$('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 
 
 Handlebars.registerHelper('current_server_away_msg', function () {
