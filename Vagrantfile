@@ -10,7 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "centos64"
+  config.vm.box = "2creative-centos64"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
@@ -75,7 +75,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   config.vm.provision :ansible do |ansible|
      ansible.playbook = "waartaa_playbook.yaml"
-     ansible.inventory_path = "/etc/ansible/hosts"
+     ansible.inventory_path = "./vagrant_inventory.yaml"
   end
 
   # Enable provisioning with chef solo, specifying a cookbooks path, roles
