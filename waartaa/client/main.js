@@ -20,5 +20,6 @@ Accounts.ui.config({
   requestPermissions: {
     github: ['user:email', '(no scope)']
   },
-  passwordSignupFields: 'USERNAME_AND_EMAIL'
+  passwordSignupFields: 'USERNAME_AND_EMAIL',
+  extraSignupFields: []
 });
