@@ -42,3 +42,4 @@ micro-queue
 reactive-list
 cron-tick
 npm
+crypto-md5
