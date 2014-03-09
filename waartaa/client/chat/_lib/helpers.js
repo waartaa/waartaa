@@ -51,16 +51,17 @@ waartaa.chat.helpers.highlightServerRoom = function () {
     $('#serverLink-' + room.server_id).parent().addClass('active');
   if (room.roomtype == 'channel') {
       Session.set('topicHeight', $('#chat-main .topic').height());
-      Session.set('lastAccessedChannel-' + room.room_id, new Date());
+      waartaa.chat.helpers.roomAccessedTimestamp.reset('channel', room);
+      waartaa.chat.helpers.unreadLogsCount.clear('channel', room);
       Session.set('unreadLogsCountChannel-' + room.room_id, 0);
   } else if (room.roomtype == 'pm') {
       Session.set('topicHeight', $('#chat-main .topic').height());
-      Session.set('lastAccessedPm-' + room.room_id, new Date());
-      Session.set('unreadLogsCountPm-' + room.room_id, 0);
+      waartaa.chat.helpers.roomAccessedTimestamp.reset('pm', room);
+      waartaa.chat.helpers.unreadLogsCount.clear('pm', room);
   } else if (room.roomtype == 'server') {
       Session.set('topicHeight', $('#chat-main .topic').height());
-      Session.set('lastAccessedServer-' + room.room_id, new Date());
-      Session.set('unreadLogsCountServer-' + room.room_id, 0);
+      waartaa.chat.helpers.roomAccessedTimestamp.reset('server', room);
+      waartaa.chat.helpers.unreadLogsCount.clear('server', room);
   }
   $('#chat-input').focus();
   //refreshAutocompleteNicksSource();
@@ -70,6 +71,7 @@ waartaa.chat.helpers.highlightServerRoom = function () {
     .on('scrolltop', waartaa.chat.helpers.chatLogsContainerScrollCallback);
   }, 1000);
 };
+
 
 /**
  * Sets the current room obj in Session against the key 'room'.
@@ -83,6 +85,8 @@ waartaa.chat.helpers.setCurrentRoom = function (obj) {
 
   set_cookie('userId', Meteor.userId());
   set_cookie('roomtype', obj.roomtype);
+
+  var prevRoom = Session.get('room');
 
   if (obj.roomtype == 'server') {
     Session.set('room', {
@@ -122,7 +126,167 @@ waartaa.chat.helpers.setCurrentRoom = function (obj) {
   }
   else
     Session.set('room', {});
+  if (prevRoom && JSON.stringify(prevRoom.toString()) !=
+      JSON.stringify(Session.get('room')))
+    waartaa.chat.helpers.roomAccessedTimestamp.update(
+      prevRoom.roomtype, prevRoom);
 };
+
+
+/**
+ * Creates an MD5 checksum for a chat room. We have no guarantee on the
+ * characters used in channel names, nicks, etc. Sometimes, it breaks HTML
+ * when there are bad chars in the text. A checksum is always unique for a
+ * text and always contains only alphanumeric characters. So, this checksum
+ * can be flawlessly rendered in HTML as IDs and for other usage.
+ *
+ * @param {string} roomType This a string specifying the type of the chat room.
+ * @param {object} roomObj This is an object representing a chat room. This is
+ *    similar to the room object we store as current room in Session.
+ */
+waartaa.chat.helpers.getRoomChecksum = function (roomType, roomObj) {
+  if (roomType == 'server')
+    return CryptoJS.MD5(roomObj.server_name).toString();
+  else if (roomType == 'channel')
+    return CryptoJS.MD5(roomObj.server_name + roomObj.channel_name).toString();
+  else if (roomType == 'pm')
+    return CryptoJS.MD5(roomObj.server_name + roomObj.nick).toString();
+};
+
+
+/**
+ * Returns true if roomObj for a chat room is the currently selected chat room,
+ * else false.
+ *
+ * @param {string} roomType This a string specifying the type of the chat room.
+ * @param {object} roomObj This is an object representing a chat room. This is
+ *    similar to the room object we store as current room in Session.
+ */
+function isCurrentRoom(roomType, roomObj) {
+  var currentRoom = Session.get('room');
+  if (roomType == 'channel' &&
+      currentRoom.channel_name == roomObj.channel_name &&
+      currentRoom.server_name == roomObj.server_name
+  )
+    return true;
+  else if (roomType == 'pm' &&
+      currentRoom.server_name == roomObj.server_name &&
+      currentRoom.nick == roomObj.nick
+  )
+    return true;
+  else if (roomType == 'server' &&
+      currentRoom.server_name == roomObj.server_name
+  )
+    return true;
+  return false;
+}
+
+
+/**
+ * Handle updating last accessed timestamp for a server room.
+ */
+function RoomAccessedTimestampHandler () {
+  var sessionKeyPrefix = 'lastAccessedRoom-';
+
+  return {
+    initialize: function (roomType, roomObj) {
+      /**
+       * Insert last accessed timestamp for a server room into Session if it is
+       * not present in Session.
+       */
+      var sessionKey = sessionKeyPrefix + waartaa.chat.helpers.getRoomChecksum(
+        roomType, roomObj);
+      if (!(sessionKey in Session.keys))
+        Session.set(sessionKey, new Date());
+    },
+    update: function (roomType, roomObj) {
+      /**
+       * Update last accessed timestamp for a server room in Session if it
+       * already exists.
+       */
+      var sessionKey = sessionKeyPrefix + waartaa.chat.helpers.getRoomChecksum(
+        roomType, roomObj);
+      if (sessionKey in Session.keys)
+        Session.set(sessionKey, new Date());
+    },
+    reset: function (roomType, roomObj) {
+      /**
+       * Set last accessed timestamp for a server room in Session to null.
+       */
+      var sessionKey = sessionKeyPrefix + waartaa.chat.helpers.getRoomChecksum(
+        roomType, roomObj);
+      Session.set(sessionKey);
+    },
+    isNewer: function (roomType, roomObj, timestamp) {
+      /**
+       * Returns true if timestamp is newer than the last accessed timestamp
+       * of the server room, else false.
+       */
+      var sessionKey = sessionKeyPrefix + waartaa.chat.helpers.getRoomChecksum(
+        roomType, roomObj);
+      var lastAccessedTimestamp = Session.get(sessionKey);
+      if (lastAccessedTimestamp && timestamp > lastAccessedTimestamp)
+        return true;
+      return false;
+    }
+  };
+}
+waartaa.chat.helpers.roomAccessedTimestamp = RoomAccessedTimestampHandler();
+
+/**
+ * Handle updating unread logs count for a server room.
+ */
+function UnreadLogsCountHandler () {
+
+  function _getSessionKey(roomType, roomObj, options) {
+    /**
+     * Return session key to be used to store/access unread logs count
+     * for the server room from Session.
+     */
+    return (
+      options && options.mention? "unreadMentionsCount-": "ureadLogsCount-")
+      + waartaa.chat.helpers.getRoomChecksum(roomType, roomObj);
+  }
+
+  return {
+    increment: function (roomType, roomObj, log, options) {
+      /**
+       * Increment unread logs count for a server room if the log is newer
+       * than the last accessed time of the server room.
+       */
+      if (isCurrentRoom(roomType, roomObj))
+        return;
+      if (waartaa.chat.helpers.roomAccessedTimestamp.isNewer(
+          roomType, roomObj, log.created)) {
+        var session_key = _getSessionKey(roomType, roomObj);
+        var count = Session.get(session_key) || 0;
+        count++;
+        Session.set(session_key, count);
+        if (options && options.mention) {
+          session_key = _getSessionKey(roomType, roomObj, options);
+          count = Session.get(session_key) || 0;
+          count++;
+          Session.set(session_key, count);
+        }
+      }
+    },
+    get: function (roomType, roomObj, options) {
+      /**
+       * Get the last accessed time for a server room.
+       */
+      var session_key = _getSessionKey(roomType, roomObj, options);
+      return Session.get(session_key) || 0;
+    },
+    clear: function (roomType, roomObj) {
+      /**
+       * Reset the unread logs count and mention count for a server room.
+       */
+      Session.set(_getSessionKey(roomType, roomObj));
+      Session.set(_getSessionKey(roomType, roomObj, {'mention': true}));
+    }
+  };
+}
+waartaa.chat.helpers.unreadLogsCount = UnreadLogsCountHandler();
 
 waartaa.chat.helpers.refreshAutocompleteNicksSource = function () {
 
@@ -144,30 +308,36 @@ Handlebars.registerHelper('isAnyRoomSelected', function () {
 
 Handlebars.registerHelper("unread_logs_count", function (
     room_type, room_id, nick) {
-  if (room_type == "pm")
-    room_id = room_id + '_' + nick;
-  var room_type = room_type[0].toUpperCase() + room_type.substr(1);
-  var key = "unreadLogsCount" + room_type + "-" + room_id;
-  var count = Session.get(key);
-  if (count > 0 && Session.get('room_id') != room_id)
-    return count;
-  else {
-    Session.set(key, 0);
-    return '';
+  var room = {};
+  if (room_type == 'server') {
+    var server = UserServers.findOne({_id: room_id});
+    room.server_name = server.name;
+  } else if (room_type == 'channel') {
+    var channel = UserChannels.findOne({_id: room_id});
+    room.server_name = channel.user_server_name;
+    room.channel_name = channel.name;
+  } else if (room_type == 'pm') {
+    var server = UserServers.findOne({_id: room_id});
+    room.server_name = server.name;
+    room.nick = nick;
   }
+  count = waartaa.chat.helpers.unreadLogsCount.get(room_type, room);
+  if (count > 0)
+    return count;
+  return '';
 });
 
 Handlebars.registerHelper("unread_mentions_count", function (
     channel_id, nick) {
-  var key = "unreadMentionsCountChannel-" + channel_id;
-  var room = Session.get('room');
-  var count = Session.get(key);
-  if (count > 0 && room.room_id != channel_id)
+  var channel = UserChannels.findOne({_id: channel_id});
+  count = waartaa.chat.helpers.unreadLogsCount.get(
+    'channel', {
+      server_name: channel.user_server_name,
+      channel_name: channel.name
+    }, {mention: true});
+  if (count > 0)
     return count;
-  else {
-    Session.set(key, 0);
-    return '';
-  }
+  return '';
 });
 
 updateHeight = function () {

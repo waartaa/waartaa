@@ -146,23 +146,26 @@ Template.server_channels.rendered = function(){
       // trying to set room with data available from cookies, if this fails,
       // waartaa will connect to the first room available in the first server
       if(roomtype == 'server') {
-        var server_status = UserServers.findOne({'_id':server_id}).status;
-        if(server_status == 'connected' || channel_status == 'connecting') {
+        var server = UserServers.findOne({'_id':server_id});
+        if(server.status == 'connected' || channel_status == 'connecting') {
           waartaa.chat.helpers.setCurrentRoom({
             roomtype : roomtype,
-            server_id : server_id
+            server_id : server_id,
+            server_name: server.name
           });
           connected = true;
         }
       }
       else if(roomtype == 'channel') {
         var channel_id = get_cookie('channel_id');
-        var channel_status = UserChannels.findOne({'_id':channel_id}).status;
-        if(channel_status == 'connected' || channel_status == 'connecting') {
+        var channel = UserChannels.findOne({'_id':channel_id});
+        if(channel.status == 'connected' || channel.status == 'connecting') {
           waartaa.chat.helpers.setCurrentRoom({
                roomtype: roomtype,
                server_id: server_id,
-               channel_id: channel_id
+               channel_id: channel_id,
+               channel_name: channel.name,
+               server_name: channel.user_server_name
           });
           connected = true;
         }
@@ -177,10 +180,12 @@ Template.server_channels.rendered = function(){
           pm_connected = 'disconnected';
 
         if(pm_connected == 'connected') {
+          var server = UserServers.findOne({'_id':server_id});
           waartaa.chat.helpers.setCurrentRoom({
             nick: pm_nick,
             server_id: server_id,
-            roomtype: roomtype
+            roomtype: roomtype,
+            server_name: server.name,
           });
           connected = true;
         }

@@ -36,6 +36,12 @@ ChatSubscribe = function () {
           "channel_logs", channel._id,
           Session.get('user_channel_log_count_' + channel._id),
           function () {
+            waartaa.chat.helpers.roomAccessedTimestamp.initialize(
+              'channel', {
+                server_name: channel.user_server_name,
+                channel_name: channel.name
+              }
+            );
             $('.chatlogs-loader-msg').fadeOut(1000);
           }
         );
@@ -60,6 +66,12 @@ ChatSubscribe = function () {
             'pm_logs', room_id,
             Session.get('pmLogCount-' + room_id),
             function () {
+              waartaa.chat.helpers.roomAccessedTimestamp.initialize(
+                'pm', {
+                  server_name: user_server.name,
+                  nick: nick
+                }
+              );
               $('.chatlogs-loader-msg').fadeOut(1000);
             }
           );
@@ -234,23 +246,28 @@ ChatSubscribe = function () {
          */
         if (!log.from)
           return;
-        var update_session = true;
-        if (room.roomtype == 'channel' && room.room_id == log.channel_id)
-          update_session = false;
-        var new_logs = updateUnreadLogsCount(
-          session_key, 'lastAccessedChannel-' + log.channel_id,
-          log.last_updated, update_session);
-        var user_server = UserServers.findOne({_id: log.server_id});
-        if (!user_server)
-          return;
-        if (messageContainsNick(log.message, user_server.current_nick)) {
-          var mention_session_key = 'unreadMentionsCountChannel-' +
-            log.channel_id;
-          updateUnreadMentionsCount(
-            mention_session_key, 'lastAccessedChannel-' + log.channel_id,
-            log.last_updated, update_session);
-        }
+        var options = null;
+        var user_server = UserServers.findOne({name: log.server_name});
+
+        if (user_server && messageContainsNick(
+            log.message, user_server.current_nick))
+          options = {'mention': true};
+
+        waartaa.chat.helpers.unreadLogsCount.increment(
+          'channel', {
+            server_name: log.server_name,
+            channel_name: log.channel_name
+          }, log, options
+        );
+        var new_logs = waartaa.chat.helpers.unreadLogsCount.get(
+          'channel', {
+            server_name: log.server_name,
+            channel_name: log.channel_name
+          }
+        );
+        // Alert user on mention on unfocussed chat room
         if (
+          user_server &&
           new_logs > 0 &&
           log.from &&
           messageContainsNick(log.message, user_server.current_nick) &&
@@ -262,7 +279,8 @@ ChatSubscribe = function () {
             ) || !window_focus
           )
         ) {
-            var alert_message = log.server_name + log.channel_name + ': ' + log.message;
+            var alert_message = log.server_name + log.channel_name + ': ' +
+              log.message;
             $.titleAlert(alert_message, {
               requireBlur:true,
               stopOnFocus:true,
