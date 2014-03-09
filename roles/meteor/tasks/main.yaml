@@ -1,0 +1,4 @@
+---
+- name: install meteor via shell
+  sudo: yes
+  shell: curl https://install.meteor.com | /bin/sh
