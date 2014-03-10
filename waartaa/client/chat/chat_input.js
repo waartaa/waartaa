@@ -248,10 +248,9 @@ Template.chat_input.rendered = function () {
 Template.chat_input.preserve(['.ui-autocomplete']);
 
 Template.chat_input.renderNickOptions = function () {
-  if (!Session.get('room')){
-    return 0;
+  if (Session.get('room')) {
+    return true;
   }
-  else{
-    return 1;
-  }
+  return false;
 };
+
