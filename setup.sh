@@ -7,7 +7,7 @@ curl https://install.meteor.com | /bin/sh
 sudo -H npm install -g meteorite
 
 # Install node modules
-sudo -H npm install -g waartaa/node-irc collections
+npm install
 
 # Change to the meteor project waartaa directory
 cd waartaa
