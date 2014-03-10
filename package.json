@@ -1,0 +1,16 @@
+{
+  "name" : "Waartaa",
+  "version": "0.0.1",
+  "repository": {
+    "type" : "git",
+    "url"  : "https://github.com/waartaa/waartaa.git"
+  },
+  "dependencies" : {
+    "collections"  : "1.0.0",
+    "locks"        : "0.1.0",
+    "capped-array" : "0.0.1",
+    "nodetime"     : "0.8.14",
+    "irc"          : "https://github.com/waartaa/node-irc/tarball/master"
+  }
+}
+
