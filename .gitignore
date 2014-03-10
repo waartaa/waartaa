@@ -3,3 +3,4 @@
 00_monitor.js
 *.pem
 *.csr
+node_modules
