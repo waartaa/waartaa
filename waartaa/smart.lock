@@ -5,7 +5,6 @@
       "jquery-ui-bootstrap": {},
       "require": {},
       "presence": {},
-      "bootstrap-3": {},
       "accounts-ui-bootstrap-3": {},
       "nodetime": {},
       "moment": {},
@@ -38,11 +37,6 @@
         "git": "https://github.com/dburles/meteor-presence.git",
         "tag": "v0.4.3",
         "commit": "8bfcae844195ff5681a123cb4302af9e719663ac"
-      },
-      "bootstrap-3": {
-        "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
-        "tag": "v3.1.1-1",
-        "commit": "63dd38968828bb8963636df93e9a1c45e2dfe67e"
       },
       "accounts-ui-bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
