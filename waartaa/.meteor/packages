@@ -14,7 +14,6 @@ page-js-ie-support
 require
 
 presence
-bootstrap-3
 accounts-github
 
 accounts-ui-bootstrap-3
@@ -43,3 +42,4 @@ reactive-list
 cron-tick
 npm
 crypto-md5
+bootswatch-lumen

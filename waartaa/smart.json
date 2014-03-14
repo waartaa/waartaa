@@ -3,7 +3,6 @@
     "jquery-ui-bootstrap": {},
     "require": {},
     "presence": {},
-    "bootstrap-3": {},
     "accounts-ui-bootstrap-3": {},
     "nodetime": {},
     "moment": {},
@@ -19,6 +18,7 @@
     "npm": {},
     "HTML5-History-API": {},
     "page-js-ie-support": {},
-    "crypto-md5": {}
+    "crypto-md5": {},
+    "bootswatch-lumen": {}
   }
 }
