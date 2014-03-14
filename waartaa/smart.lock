@@ -20,7 +20,8 @@
       "npm": {},
       "HTML5-History-API": {},
       "page-js-ie-support": {},
-      "crypto-md5": {}
+      "crypto-md5": {},
+      "bootswatch-lumen": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -117,6 +118,11 @@
         "git": "https://github.com/oortcloud/meteor-crypto-md5.git",
         "tag": "v3.1.2.2",
         "commit": "75bbb3eeace302122d3554a6212a6fe92553fa18"
+      },
+      "bootswatch-lumen": {
+        "git": "https://github.com/desouradeep/meteor-bootswatch-lumen",
+        "tag": "v0.0.4",
+        "commit": "ff334b8d0400673083a3d3705c4f04c40b983268"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

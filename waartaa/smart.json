@@ -18,6 +18,7 @@
     "npm": {},
     "HTML5-History-API": {},
     "page-js-ie-support": {},
-    "crypto-md5": {}
+    "crypto-md5": {},
+    "bootswatch-lumen": {}
   }
 }
