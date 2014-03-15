@@ -7,7 +7,7 @@ ChatSubscribe = function () {
   Default initial chat log count to load for each room.
   A room may be a channel, server or PM room.
   */
-  DEFAULT_LOGS_COUNT = Math.floor( ($(window).height() / 100) * 5);
+  DEFAULT_LOGS_COUNT = Math.floor( ( ($('body').height() - 113 )/ 100) * 5);
 
   /*
   Function to subscribe to UserServerLogs for active UserServers.
