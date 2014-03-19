@@ -1,4 +1,3 @@
-
 Template.chat_input.events({
   'keydown #chat-input': function (e) {
     var keyCode = e.keyCode || e.which;
@@ -10,6 +9,7 @@ Template.chat_input.events({
     var $form = $(event.target);
     var $chat_input = $form.find('#chat-input');
     var message = $chat_input.val();
+    message = message.replace(/<(.*)>/g,'&lt;$1&gt;');
     var room = Session.get('room');
     if (!room)
       return;
