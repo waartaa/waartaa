@@ -25,6 +25,13 @@
         {{/if}}
       </strong>
   </div>
+  {{#unless isCurrentRoomtype "pm" }}
+    {{#unless isCurrentRoomtype "server" }}
+      <div>
+        <input id="users-search" type="text" placeholder="Search..." />
+      </div>
+    {{/unless}}
+  {{/unless}}
 </template>
 
 <template name="info_panel_body">

@@ -1,3 +1,4 @@
+
 Handlebars.registerHelper('channel_users', function (id) {
   var channel_id = id;
   var channel = UserChannels.findOne({_id: channel_id});
@@ -7,8 +8,16 @@ Handlebars.registerHelper('channel_users', function (id) {
     channel_name: channel.name, server_name: channel.user_server_name};
   var last_nick = Session.get(
     'lastNick-' + channel.user_server_name + '_' + channel.name);
-  if (last_nick)
-    query['nick'] = {$gt: last_nick};
+  var searchKey = Session.get('searchKey');
+  if (searchKey) {
+    searchKey  = '^' + searchKey;
+    query['nick'] = {$regex: searchKey, $options: 'i'};
+  }
+  else {
+    if (last_nick)
+      query['nick'] = {$gt: last_nick};
+  }
+
   return ChannelNicks.find(
     query,
     {fields: {nick: 1}, sort: {nick: 1}});
