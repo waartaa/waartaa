@@ -1,0 +1,16 @@
+---
+  - name: install custom node deps
+    shell: npm install chdir=~/waartaa
+
+
+  - name: copy conf files
+    shell: cp settings-local.js-dist settings-local.js chdir=~/waartaa/waartaa/server/
+
+  - name: install meteorite deps
+    shell: mrt install chdir=~/waartaa/waartaa
+    retries: 5
+
+  - name: run waartaa
+    shell: meteor chdir=~/waartaa/waartaa
+    retries: 3
+
