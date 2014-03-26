@@ -82,10 +82,22 @@ html, body, .container, .content {
   color: black;
   text-decoration: none !important;
   background-color: #eeeeee !important;
+  z-index: 2;
+  position: absolute;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .topic p {
   margin: 5px;
+}
+
+.chatroom-with-topic > .chat-logs-container {
+  padding-top: 33px;
+}
+
+.chatroom-with-topic .chatlogs-table.content {
+  padding-top: 33px;
 }
 
 div.dropdown a {
@@ -276,8 +288,7 @@ body {
 }
 
 .chatlogs-table {
-  width: 102%;
-  padding-right: 14px;
+  padding-right: 5px;
 }
 
 .chatlogs-table td > .row {
