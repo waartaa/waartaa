@@ -1,6 +1,0 @@
----
-- name: install meteor
-  hosts: webservers
-  roles:
-      - common
-      - meteor

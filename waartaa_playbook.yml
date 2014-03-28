@@ -1,0 +1,9 @@
+---
+- name: Setup Waartaa
+  hosts: all
+  roles: 
+    - common
+    - nginx
+    - nodejs
+    - meteor
+    - waartaa
