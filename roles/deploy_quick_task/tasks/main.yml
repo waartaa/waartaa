@@ -1,0 +1,63 @@
+---
+  - name: ensure {{ deploy_dir }} exists
+    sudo: yes
+    file: name={{ item }} state=directory owner=root group=root
+    with_items: 
+      - $deploy_dir
+      - $deploy_app_dir
+
+  - name: clone
+    sudo: yes
+    git: repo={{ repo_url }} dest={{ deploy_app_dir }}
+
+  - name: install meteor dependencies
+    sudo: yes
+    shell: chdir={{ deploy_app_dir }} mrt install
+
+  - name: remove current running app
+    sudo: yes
+    shell: chdir={{ deploy_app_dir }} rm -rf bundle
+
+  - name: bundle app
+    sudo: yes
+    shell: chdir={{ deploy_app_dir }} meteor bundle bundle.tgz
+
+  - name: unbundle app
+    sudo: yes
+    shell: chdir={{ deploy_app_dir }} tar -xzvf bundle.tgz
+
+  - name: register the current pids
+    sudo: yes
+    shell: ps aux | grep {{ pid_expression }} | grep -v grep | awk '{print $2}'
+    register: pids
+
+  - name: start app with forever
+    sudo: yes
+    shell:  > 
+      PORT={{ port }}
+      MONGO_URL={{ mongo_url }}
+      forever start "{{ deploy_app_dir }}"/bundle/main.js
+    async: 10
+    poll: 1
+
+  - name: copy nginx virtual host file
+    sudo: yes
+    template: src="{{app_name}}.j2" 
+              dest="/etc/nginx/sites-available/{{app_name}}" 
+              owner=root 
+              group=root
+  
+  - name: link nginx virtual host file
+    sudo: yes
+    file: src="/etc/nginx/sites-available/{{app_name}}" 
+          dest="/etc/nginx/sites-enabled/{{app_name}}" 
+          state=link
+  
+  - name: restart nginx
+    sudo: yes
+    service: name=nginx state=restarted
+  
+  - name: kill the old pids
+    sudo: yes
+    shell: kill -9 {{ item }}    
+    with_items: pids.stdout_lines

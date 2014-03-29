@@ -10,7 +10,6 @@
     shell: mrt install chdir=~/waartaa/waartaa
     retries: 5
 
-  - name: run waartaa
-    shell: meteor chdir=~/waartaa/waartaa
-    retries: 3
+  - name: create local db dir
+    shell: mkdir -p ~/db
 

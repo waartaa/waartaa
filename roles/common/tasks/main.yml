@@ -1,0 +1,5 @@
+--- 
+  - name: install the 'Development tools' package group
+    sudo: yes
+    yum: name="@Development tools" state=present
+

@@ -1,0 +1,11 @@
+---
+  - name: Install nginx
+    sudo: yes
+    yum: name=nginx state=present
+
+
+  - name: restart nginx
+    sudo: yes
+    service: name=nginx state=restarted enabled=yes
+    tags:
+      - nginx
