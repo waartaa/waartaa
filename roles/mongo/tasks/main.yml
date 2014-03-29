@@ -1,20 +1,31 @@
 ---
-  - name: add 10gen key
+  - name: Configure package management service (YUM)
     sudo: yes
-    apt_key: id=7F0CEB10 url="http://docs.mongodb.org/10gen-gpg-key.asc" state=present
+    template: src=mongodb.repo.j2 dest=/etc/yum.repos.d/mongodb.repo owner=root group=root
 
-  - name: copy 10gen.list to /etc/apt/sources.list.d
-    sudo: yes
-    copy: src=10gen.list dest=/etc/apt/sources.list.d/10gen.list owner=root group=root
 
-  - name: install MongoDB
+  - name: Install MongoDB packages
     sudo: yes
-    apt: pkg=mongodb-10gen={{ mongo_version }} update_cache=yes
+    yum: name=mongo-10gen-{{ mongo_version }}
+    yum: name=mongo-10gen-server-{{ mongo_version }}
 
   - name: update the MongoDB conf file
     sudo: yes 
-    template: src=mongodb.conf.j2 dest=/etc/mongodb.conf owner=root group=root
+    template: src=mongodb.conf.j2 dest=/etc/mongod.conf owner=root group=root
 
   - name: ensure MongoDB is running
     sudo: yes
-    service: name=mongodb state=started
+    service: name=mongod state=started enabled=yes
+
+  - name: Create the file to initialize the mongod replica set
+    template: src=repset_init.j2 dest=/tmp/repset_init.js
+
+  - name: Pause for a while
+    pause: seconds=5
+
+  - name: Initialize the replication set
+    shell: /usr/bin/mongo --port 27017 /tmp/repset_init.js
+
+  - name: Setup env variables
+    shell: echo -e "export MONGO_URL=mongodb://127.0.0.1:27017/waartaa\nexport MONGO_OPLOG_URL=mongodb://127.0.0.1:27017/local" >> .bashrc
+

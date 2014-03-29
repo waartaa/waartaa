@@ -1,22 +1,19 @@
-# mongodb.conf
+# mongo.conf
 
-# Where to store the data.
-
-# Note: if you run mongodb as a non-root user (recommended) you may
-# need to create and set permissions for this directory manually,
-# e.g., if the parent directory isn't mutable by the mongodb user.
-dbpath=/var/lib/mongodb
-
-# where to log
-logpath=/var/log/mongodb/mongodb.log
+#where to log
+logpath=/var/log/mongo/mongod.log
 
 logappend=true
 
-# Run service on port
-port={{ app_db_port | default( mongo_port ) }}
+# fork and run in background
+fork = true
 
-# Bind service to particular IP(s)
-bind_ip={{ mongo_bind_ips }}
+#port = 27017
+
+dbpath=/var/lib/mongo
+
+# location of pidfile
+pidfilepath = /var/run/mongodb/mongod.pid
 
 # Disables write-ahead journaling
 # nojournal = true
@@ -49,7 +46,7 @@ bind_ip={{ mongo_bind_ips }}
 # Ignore query hints
 #nohints = true
 
-# Disable the HTTP interface (Defaults to localhost:28017).
+# Disable the HTTP interface (Defaults to localhost:27018).
 #nohttpinterface = true
 
 # Turns off server-side scripting.  This will result in greatly limited
@@ -76,8 +73,7 @@ bind_ip={{ mongo_bind_ips }}
 
 # Replication Options
 
-# in master/slave replicated mongo databases, specify here whether
-# this is a slave or master
+# in replicated mongo databases, specify here whether this is a slave or master
 #slave = true
 #source = master.example.com
 # Slave only: specify a single database to replicate
@@ -85,6 +81,7 @@ bind_ip={{ mongo_bind_ips }}
 # or
 #master = true
 #source = slave.example.com
-
-# in replica set configuration, specify the name of the replica set
-# replSet = setname
+smallfiles = true
+nohttpinterface = true
+oplogSize = 8
+replSet = meteor

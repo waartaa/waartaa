@@ -10,6 +10,3 @@
     shell: mrt install chdir=~/waartaa/waartaa
     retries: 5
 
-  - name: create local db dir
-    shell: mkdir -p ~/db
-

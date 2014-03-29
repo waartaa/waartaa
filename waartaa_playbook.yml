@@ -5,5 +5,7 @@
     - common
     - nginx
     - nodejs
+    - mongo
     - meteor
     - waartaa
+
