@@ -1,0 +1,4 @@
+---
+mongo_port: 27017
+mongo_bind_ips: 127.0.0.1
+mongo_version: 2.4.8

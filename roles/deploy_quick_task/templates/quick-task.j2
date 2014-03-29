@@ -1,0 +1,30 @@
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  ''    close;
+}
+
+upstream {{ nginx_upstream_name }} {
+  server {{ nginx_upstream_server }};
+}
+
+server {
+  listen      {{ nginx_server_listen }};
+  access_log  {{ nginx_server_log }};
+  root        {{ nginx_server_root }};
+  index       {{ nginx_server_index }};
+  
+  server_name {{ app_name }};
+  
+  location / {
+    rewrite /(.*) /$1 break;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-NginX-Proxy true;
+    proxy_pass {{ nginx_server_proxy_pass }};
+    proxy_redirect off;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+}

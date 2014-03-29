@@ -1,0 +1,31 @@
+---
+  - name: Configure package management service (YUM)
+    sudo: yes
+    template: src=mongodb.repo.j2 dest=/etc/yum.repos.d/mongodb.repo owner=root group=root
+
+
+  - name: Install MongoDB packages
+    sudo: yes
+    yum: name=mongo-10gen-{{ mongo_version }}
+    yum: name=mongo-10gen-server-{{ mongo_version }}
+
+  - name: update the MongoDB conf file
+    sudo: yes 
+    template: src=mongodb.conf.j2 dest=/etc/mongod.conf owner=root group=root
+
+  - name: ensure MongoDB is running
+    sudo: yes
+    service: name=mongod state=started enabled=yes
+
+  - name: Create the file to initialize the mongod replica set
+    template: src=repset_init.j2 dest=/tmp/repset_init.js
+
+  - name: Pause for a while
+    pause: seconds=5
+
+  - name: Initialize the replication set
+    shell: /usr/bin/mongo --port 27017 /tmp/repset_init.js
+
+  - name: Setup env variables
+    shell: echo -e "export MONGO_URL=mongodb://127.0.0.1:27017/waartaa\nexport MONGO_OPLOG_URL=mongodb://127.0.0.1:27017/local" >> .bashrc
+

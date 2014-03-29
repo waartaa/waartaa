@@ -1,0 +1,12 @@
+---
+nodejs_playbook_version: "0.1.2"
+nodejs_version: "0.10.24"
+nodejs_version_tag: "v{{nodejs_version}}"
+nodejs_file_tag: "node-{{nodejs_version_tag}}"
+nodejs_file_name: "{{nodejs_file_tag}}.tar.gz"
+nodejs_base_url: "http://nodejs.org/dist/v{{nodejs_version}}/{{nodejs_file_name}}"
+nodejs_path: "/usr/local/"
+nodejs_tmp_dir: "/tmp/"
+nodejs_global_packages:
+  - nodemon
+  - debug

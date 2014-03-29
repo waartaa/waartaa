@@ -1,0 +1,13 @@
+---
+#
+# integration-tests.yml
+#
+
+- hosts: all
+  sudo: True
+  tasks:
+    # Tests
+    - name: Check node
+      command: which node
+      register: node_path
+    - debug: msg="All Tests passed!"

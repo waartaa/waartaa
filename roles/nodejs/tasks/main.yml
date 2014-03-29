@@ -1,0 +1,32 @@
+---
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Checking installed version of nodejs
+  shell: /usr/bin/test "$({{nodejs_path}}bin/node -v 2> /dev/null)" = {{nodejs_version_tag}}
+  register: wanted_version_installed
+  ignore_errors: True
+  changed_when: "wanted_version_installed.rc == 1"
+
+- name: Download nodejs {{nodejs_version_tag}}
+  get_url: url={{nodejs_base_url}} dest={{nodejs_tmp_dir}}{{nodejs_file_name}}
+  when: wanted_version_installed.rc == 1
+
+- name: Unpack nodejs {{nodejs_version_tag}}
+  command: tar -xvzf {{nodejs_file_name}} chdir={{nodejs_tmp_dir}}
+  when: wanted_version_installed.rc == 1
+
+- name: Compile and install nodejs {{nodejs_version_tag}}
+  shell: ./configure --prefix={{nodejs_path}} && make && make install chdir={{nodejs_tmp_dir}}{{nodejs_file_tag}}
+  sudo: true
+  when: wanted_version_installed.rc == 1
+
+- name: NPM Install global packages
+  sudo: yes
+  environment:
+    PATH: $PATH:/usr/local/bin
+  npm: name={{item}} global=yes
+  with_items: nodejs_global_packages
