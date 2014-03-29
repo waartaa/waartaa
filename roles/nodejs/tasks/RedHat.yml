@@ -1,6 +1,7 @@
 ---
 - name: Install RedHat packages
-  yum: pkg={{item}} state=present
+  sudo: yes
+  yum: name={{item}} state=present
   with_items:
     - wget
     - curl

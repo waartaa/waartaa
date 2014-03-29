@@ -66,6 +66,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ansible.playbook = "waartaa_playbook.yml"
     
     # Inventory file
-    # ansible.inventory_path = "provision/ansible_hosts"
+    ansible.inventory_path = "vagrant_inventory"
   end
 end
