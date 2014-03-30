@@ -288,6 +288,11 @@ body {
   border-bottom: 1px dashed #F4F2F7;
 }
 
+.highlight-mention{
+    background-color: #eee;
+    color: #000;
+}
+
 .chatlog-from {
 }
 
