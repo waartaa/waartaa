@@ -5,15 +5,11 @@
   <link href='https://fonts.googleapis.com/css?family=Bitter:400,700,400italic' rel='stylesheet' type='text/css'>
 </head>
 <body>
-  {{#isolate}}
-    {{> body}}
-  {{/isolate}}
+  {{> body}}
 </body>
 
 <template name="body">
-  {{#isolate}}
-    {{> header}}
-  {{/isolate}}
+  {{> header}}
   <div class="container">
     <div class="content">
       <div class="wrapper">
@@ -23,13 +19,11 @@
       </div>
     </div>
   </div>
-  {{#isolate}}
-    {{> footer}}
-  {{/isolate}}
+  {{> footer}}
 </template>
 
 <template name="layout">
-  {{renderRouter}}
+  {{> yield}}
 </template>
 
 <template name="header">

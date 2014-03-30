@@ -146,7 +146,7 @@ Template.server_channels.rendered = function(){
       // trying to set room with data available from cookies, if this fails,
       // waartaa will connect to the first room available in the first server
       if(roomtype == 'server') {
-        var server = UserServers.findOne({'_id':server_id});
+        var server = UserServers.findOne({'_id':server_id}) || {};
         if(server.status == 'connected' || channel_status == 'connecting') {
           waartaa.chat.helpers.setCurrentRoom({
             roomtype : roomtype,
@@ -158,7 +158,7 @@ Template.server_channels.rendered = function(){
       }
       else if(roomtype == 'channel') {
         var channel_id = get_cookie('channel_id');
-        var channel = UserChannels.findOne({'_id':channel_id});
+        var channel = UserChannels.findOne({'_id':channel_id}) || {};
         if(channel.status == 'connected' || channel.status == 'connecting') {
           waartaa.chat.helpers.setCurrentRoom({
                roomtype: roomtype,

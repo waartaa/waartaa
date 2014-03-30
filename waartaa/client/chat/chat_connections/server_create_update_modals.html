@@ -65,3 +65,12 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 </template>
+
+<template name="servers_list_for_user">
+  <select id="server-join-server-list" class="form-control" name="server" required="true" placeholder="Select a server...">
+    <option selected="selected" value="">Select a server...</option>
+    {{#each serversForUser}}
+      <option value="{{_id}}">{{name}}</option>
+    {{/each}}
+  </select>
+</template>

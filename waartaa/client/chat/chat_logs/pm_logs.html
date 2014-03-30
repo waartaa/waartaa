@@ -1,18 +1,14 @@
 <template name="pm_logs">
   {{#with currentPM}}
     <div id="pmChatroom-{{ room_id }}" class="chatroom pm">
-      {{#isolate}}
-        <div class="topic">
-          <ul class="nav nav-tabs nav-stacked" style="{{# unless topic }}display:none;{{/unless}}">
-            <li><p class="ellipsis">{{topic}}</p></li>
-          </ul>
-        </div>
-        <div class="chat-logs-container pm nano" data-server-id="{{ server_id }}" data-nick="{{ name }}" style="overflow-y: auto; overflow-x: hidden;">
-          {{#isolate}}
-            {{> pm_chat_logs_table}}
-          {{/isolate}}
-        </div>
-      {{/isolate}}
+      <div class="topic">
+        <ul class="nav nav-tabs nav-stacked" style="{{# unless topic }}display:none;{{/unless}}">
+          <li><p class="ellipsis">{{topic}}</p></li>
+        </ul>
+      </div>
+      <div class="chat-logs-container pm nano" data-server-id="{{ server_id }}" data-nick="{{ name }}" style="overflow-y: auto; overflow-x: hidden;">
+        {{> pm_chat_logs_table}}
+      </div>
     </div>
   {{/with}}
 </template>

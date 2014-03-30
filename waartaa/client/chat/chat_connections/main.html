@@ -20,13 +20,11 @@
     </div>
   </div>
   {{> add_server_modal}}
-  {{#isolate}}
-    {{#each servers}}
-      {{> edit_server_channel}}
-      {{> edit_server_modal}}
-      {{> add_server_channel}}
-    {{/each}}
-  {{/isolate}}
+  {{#each servers}}
+    {{> edit_server_channel}}
+    {{> edit_server_modal}}
+    {{> add_server_channel}}
+  {{/each}}
 </template>
 
 <template name="chat_connections_sentinel">

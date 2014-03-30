@@ -1,17 +1,15 @@
 <template name="chat_main">
 <div id="chat-main" class="col-md-{{#if isCurrentRoomtype "server"}}10{{else}}8{{/if}} col-sm-9 col-xs-12">
-  {{#isolate}}
-    {{#if isCurrentRoomtype "channel"}}
-      {{> channel_logs}}
+  {{#if isCurrentRoomtype "channel"}}
+    {{> channel_logs}}
+  {{else}}
+    {{#if isCurrentRoomtype "server"}}
+      {{> server_logs}}
     {{else}}
-      {{#if isCurrentRoomtype "server"}}
-        {{> server_logs}}
-      {{else}}
-        {{#if isCurrentRoomtype "pm"}}
-          {{> pm_logs}}
-        {{/if}}
+      {{#if isCurrentRoomtype "pm"}}
+        {{> pm_logs}}
       {{/if}}
     {{/if}}
-  {{/isolate}}
+  {{/if}}
 </div>
 </template>

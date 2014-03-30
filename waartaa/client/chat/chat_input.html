@@ -6,14 +6,12 @@
       <div class="col-md-8">
         <form id="chat-input-form">
           <div class="input-group">
-              {{#isolate}}
               <div class="input-group-btn dropup">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">{{ server_current_nick }} <span class="caret"></span></button>
                 {{#if renderNickOptions}}
                     {{> user_nick_options_menu}}
                 {{/if}}
               </div>
-              {{/isolate}}
               <input id="chat-input" class="form-control" name="chat_input" type="text"
                autocomplete="off">
           </div>

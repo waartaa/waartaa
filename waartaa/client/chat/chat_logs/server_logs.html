@@ -1,18 +1,14 @@
 <template name="server_logs">
 {{#with currentServer }}
 <div id="server-chatroom-{{ _id }}" class="chatroom server">
-  {{#isolate}}
-    <div class="topic">
-      <ul class="nav nav-tabs nav-stacked" style="{{# unless topic }}display:none;{{/unless}}">
-        <li><p class="ellipsis">{{topic}}</p></li>
-      </ul>
-    </div>
-    <div class="chat-logs-container server nano" data-server-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
-      {{#isolate}}
-        {{> server_chat_logs_table}}
-      {{/isolate}}
-    </div>
-  {{/isolate}}
+  <div class="topic">
+    <ul class="nav nav-tabs nav-stacked" style="{{# unless topic }}display:none;{{/unless}}">
+      <li><p class="ellipsis">{{topic}}</p></li>
+    </ul>
+  </div>
+  <div class="chat-logs-container server nano" data-server-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+    {{> server_chat_logs_table}}
+  </div>
 </div>
 {{/with}}
 </template>

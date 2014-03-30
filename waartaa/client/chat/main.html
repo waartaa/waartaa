@@ -1,23 +1,13 @@
 <template name="chat">
   <div id="chat" class="row" style="min-height: 0px;">
-    {{#constant}}
-      <div id="chatlogs-loader" style="display: none; text-align: center;">
-        Loading...
-      </div>
-    {{/constant}}
-    {{#isolate}}
-      {{> chat_connections}}
-    {{/isolate}}
-    {{#isolate}}
-      {{> chat_main}}
-    {{/isolate}}
-    {{#isolate}}
-      {{> chat_users}}
-    {{/isolate}}
+    <div id="chatlogs-loader" style="display: none; text-align: center;">
+      Loading...
+    </div>
+    {{> chat_connections}}
+    {{> chat_main}}
+    {{> chat_users}}
   </div>
-  {{#isolate}}
-    {{> chat_input}}
-  {{/isolate}}
+  {{> chat_input}}
   <audio id="audio-notification">
     <source src="/notification.ogg" type="audio/ogg">
   </audio>

@@ -1,7 +1,7 @@
 /* Routers */
 
 Router.configure({
-  autoRender: false,
+  layoutTemplate: 'body'
 });
 
 //Router.before(mustBeSignedIn, {except: ['index']});
@@ -10,7 +10,7 @@ Router.map(function () {
   this.route('index', {
     path: '/',
     template: 'user_loggedout_content',
-    before: function () {
+    onBeforeAction: function () {
       if (Meteor.isClient)
         if (Meteor.userId()) {
           Router.go('/chat/');
@@ -19,7 +19,7 @@ Router.map(function () {
           this.stop();
         }
     },
-    after: function () {
+    onAfterAction: function () {
       if (Meteor.isClient)
         GAnalytics.pageview();
     },
@@ -27,14 +27,14 @@ Router.map(function () {
   });
   this.route('chat', {
     path: /^\/chat$/,
-    before: function () {
+    onBeforeAction: function () {
       Router.go('/chat/');
     }
   });
   this.route('chat/', {
     path: /^\/chat\/$/,
     template: 'chat',
-    before: [
+    onBeforeAction: [
       function () {
         if (Meteor.isClient) {
           if (!Meteor.userId()) {
@@ -67,7 +67,7 @@ Router.map(function () {
         Meteor.subscribe('user_channels')
       ]
     },
-    after: function () {
+    onAfterAction: function () {
       if (Meteor.isClient)
         GAnalytics.pageview('/chat/');
     },

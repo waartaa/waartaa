@@ -1,25 +1,19 @@
 <template name="chat_connection_server">
   <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
     <a id='serverLink-{{ _id }}' class='server-link' data-server-id='{{ _id }}' data-roomtype="server" href="#" title="{{ name }}">
-      {{#isolate}}
-        {{ showStatusIcon status }}
-        {{ limitStr name 12 }}
-        <span class="pull-right">
-          <div class="btn-group">
-            <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-            </button>
-            {{> server_menu}}
-          </div>
-        </span>
-      {{/isolate}}
+      {{ showStatusIcon status }}
+      {{ limitStr name 12 }}
+      <span class="pull-right">
+        <div class="btn-group">
+          <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          {{> server_menu}}
+        </div>
+      </span>
     </a>
-    {{#isolate}}
-      {{> server_channels}}
-    {{/isolate}}
-    {{#isolate}}
-      {{> server_pms}}
-    {{/isolate}}
+    {{> server_channels}}
+    {{> server_pms}}
   </li>
 </template>
 

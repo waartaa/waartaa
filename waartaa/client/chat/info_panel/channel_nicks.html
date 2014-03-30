@@ -4,9 +4,7 @@
   </div>
   {{#with currentChannel}}
     <ul id="channel-users-{{ _id }}" class="nav nav-list info-panel-item channel" data-server-id="{{ user_server_id }}">
-      {{#isolate}}
-        {{> channel_users}}
-      {{/isolate}}
+      {{> channel_users}}
     </ul>
   {{/with}}
   <div class="channel-nicks-loader scrollend row" style="display: none;">
@@ -16,8 +14,6 @@
 
 <template name="channel_users">
   {{#each channel_users _id}}
-    {{#isolate}}
-      {{>chat_user}}
-    {{/isolate}}
+    {{>chat_user}}
   {{/each}}
 </template>
