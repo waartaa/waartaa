@@ -3,7 +3,7 @@
 <div id="channel-chatroom-{{ _id }}" class="chatroom channel">
   {{#isolate}}
     <div class="topic">
-      <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+      <ul class="nav nav-tabs nav-stacked" style="{{# unless topic }}display:none;{{/unless}}">
         <li><p class="ellipsis">{{ linkify topic }}</p></li>
       </ul>
     </div>

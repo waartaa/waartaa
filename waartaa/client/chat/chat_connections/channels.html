@@ -51,25 +51,25 @@
     <div class="modal fade" id="editServerChannel-{{ _id }}" data-server-id="{{ user_server_id }}" data-channel-id="{{ _id }}" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog">
         <form class="form editServerChannel" role="form" data-channel-id="{{ _id }}">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-              <h4 class="modal-title" id="myModalLabel">Edit channel: {{ name }}</h4>
-            </div>
-            <div class="modal-body">
-              <fieldset>
-                <div class="form-group">
-                  <label for="editChannelPassword">Password</label>
-                  <input id="editChannelPassword" type="password" class="form-control" name="password" placeholder="Password" value="{{ password }}">
+            <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Edit channel: {{ name }}</h4>
                 </div>
-              </fieldset>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              <input type="submit" class="btn btn-primary" value="Save">
-            </div>
-          </form>
-        </div><!-- /.modal-content -->
+                <div class="modal-body">
+                  <fieldset>
+                    <div class="form-group">
+                      <label for="editChannelPassword">Password</label>
+                      <input id="editChannelPassword" type="password" class="form-control" name="password" placeholder="Password" value="{{ password }}">
+                    </div>
+                  </fieldset>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <input type="submit" class="btn btn-primary" value="Save">
+                </div>
+            </div><!-- /.modal-content -->
+        </form>
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
   {{/with}}

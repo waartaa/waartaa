@@ -3,7 +3,7 @@
 <div id="server-chatroom-{{ _id }}" class="chatroom server">
   {{#isolate}}
     <div class="topic">
-      <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+      <ul class="nav nav-tabs nav-stacked" style="{{# unless topic }}display:none;{{/unless}}">
         <li><p class="ellipsis">{{topic}}</p></li>
       </ul>
     </div>
