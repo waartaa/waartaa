@@ -1,4 +1,4 @@
-Handlebars.registerHelper('getCurrentPMNickInfo', function () {
+UI.registerHelper('getCurrentPMNickInfo', function () {
   var room = Session.get('room') || {};
   if (room.roomtype != 'pm')
     return;

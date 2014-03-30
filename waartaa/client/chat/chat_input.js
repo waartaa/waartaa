@@ -116,7 +116,7 @@ Template.user_nick_options_menu.events = {
   }
 };
 
-Handlebars.registerHelper("server_current_nick", function () {
+UI.registerHelper("server_current_nick", function () {
   var room = Session.get('room');
   if (!room)
     return;

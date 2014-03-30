@@ -56,6 +56,6 @@ Meteor.startup(function () {
 
 
 // pass the clock to the HTML template
-Handlebars.registerHelper('time', function () {
+UI.registerHelper('time', function () {
   return new Date(Meteor.getServerMS());
 });

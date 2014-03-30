@@ -2,7 +2,7 @@ Template.pm_logs.events = {
   'scroll .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
 
-Handlebars.registerHelper("pmChatLogs", function (server_id, nick) {
+UI.registerHelper("pmChatLogs", function (server_id, nick) {
   return PMLogs.find(
     {
       $or: [{from: nick}, {to_nick: nick}],

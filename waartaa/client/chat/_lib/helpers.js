@@ -294,19 +294,19 @@ waartaa.chat.helpers.refreshAutocompleteNicksSource = function () {
 
 waartaa.chat.helpers.LINK_REGEX = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/g;
 
-Handlebars.registerHelper('isCurrentRoomtype', function (roomtype) {
+UI.registerHelper('isCurrentRoomtype', function (roomtype) {
   if ((Session.get('room') || {}).roomtype == roomtype)
     return true;
   return false;
 });
 
-Handlebars.registerHelper('isAnyRoomSelected', function () {
+UI.registerHelper('isAnyRoomSelected', function () {
   if (Session.get('room'))
     return true;
   return false;
 });
 
-Handlebars.registerHelper("unread_logs_count", function (
+UI.registerHelper("unread_logs_count", function (
     room_type, room_id, nick) {
   var room = {};
   if (room_type == 'server') {
@@ -327,7 +327,7 @@ Handlebars.registerHelper("unread_logs_count", function (
   return '';
 });
 
-Handlebars.registerHelper("unread_mentions_count", function (
+UI.registerHelper("unread_mentions_count", function (
     channel_id, nick) {
   var channel = UserChannels.findOne({_id: channel_id});
   count = waartaa.chat.helpers.unreadLogsCount.get(
@@ -355,12 +355,12 @@ updateHeight = function () {
   });
 };
 
-Handlebars.registerHelper('current_server_id', function () {
+UI.registerHelper('current_server_id', function () {
   var room = Session.get('room') || {};
   return room.server_id;
 });
 
-Handlebars.registerHelper('limitStr', function (text, limit) {
+UI.registerHelper('limitStr', function (text, limit) {
   var final_text = text;
   if (text.length > limit) {
     final_text = text.substr(0, limit - 3) + '...';
@@ -368,7 +368,7 @@ Handlebars.registerHelper('limitStr', function (text, limit) {
   return final_text;
 });
 
-Handlebars.registerHelper('isChatMessageNew', function (status) {
+UI.registerHelper('isChatMessageNew', function (status) {
   if (status == 'new')
     return true;
   return false;

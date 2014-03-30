@@ -1,4 +1,4 @@
-Handlebars.registerHelper('channel_users', function (id) {
+UI.registerHelper('channel_users', function (id) {
   var channel_id = id;
   var channel = UserChannels.findOne({_id: channel_id});
   if (!channel)

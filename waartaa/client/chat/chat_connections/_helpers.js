@@ -1,4 +1,4 @@
-Handlebars.registerHelper('showStatusIcon', function (status) {
+UI.registerHelper('showStatusIcon', function (status) {
   var iconClass = "";
   var statusIconHtml = '';
   if (status == 'connected')
@@ -11,5 +11,5 @@ Handlebars.registerHelper('showStatusIcon', function (status) {
     statusIconHtml = '<icon class="tipsy-enable glyphicon ' + iconClass + '" tooltip="'
       + status + '"></icon>';
   }
-  return new Handlebars.SafeString(statusIconHtml);
+  return new Spacebars.SafeString(statusIconHtml);
 });

@@ -43,7 +43,7 @@ $(document).on(
     Session.set('chatlogsScrollEnd-' + $table.attr('id'), $table.scrollTop());
   });
 
-Handlebars.registerHelper("isCurrentRoom", function (room_id, room_type, server_id) {
+UI.registerHelper("isCurrentRoom", function (room_id, room_type, server_id) {
   if (room_id == "ohB9cwuTsTnHMxT7T")
     return true;
   return false;
@@ -94,11 +94,11 @@ Template.channel_menu.rendered = function (e) {
 
 
 
-Handlebars.registerHelper("activeChannels", function () {
+UI.registerHelper("activeChannels", function () {
   return UserChannels.find({active: true});
 });
 
-Handlebars.registerHelper("activeServers", function () {
+UI.registerHelper("activeServers", function () {
   return UserServers.find();
 });
 
@@ -116,7 +116,7 @@ window.onblur = function () {
   focussed = false;
 }
 
-Handlebars.registerHelper("serverChatLogs", function (server_id) {
+UI.registerHelper("serverChatLogs", function (server_id) {
   var cursor = UserServerLogs.find(
     {server_id: server_id}, {sort: {created: 1}});
   var session_key = 'unreadLogsCountServer_' + server_id;
@@ -136,21 +136,21 @@ Handlebars.registerHelper("serverChatLogs", function (server_id) {
 //$('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 
 
-Handlebars.registerHelper('current_server_away_msg', function () {
+UI.registerHelper('current_server_away_msg', function () {
   var user_server =  UserServers.findOne({_id: Session.get('server_id')});
   if (user_server)
     return user_server.away_msg || "I'm not around.";
   return '';
 });
 
-Handlebars.registerHelper('isConnected', function (status) {
+UI.registerHelper('isConnected', function (status) {
   if (status == 'connected')
     return true;
   else
     return false;
 });
 
-Handlebars.registerHelper('session', function (key) {
+UI.registerHelper('session', function (key) {
   return Session.get(key);
 });
 

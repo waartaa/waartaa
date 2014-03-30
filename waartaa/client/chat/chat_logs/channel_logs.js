@@ -1,4 +1,4 @@
-Handlebars.registerHelper('getCurrentChannel', function () {
+UI.registerHelper('getCurrentChannel', function () {
   var room = Session.get('room') || {};
   if (room.roomtype == 'channel') {
     return UserChannels.findOne(
@@ -8,7 +8,7 @@ Handlebars.registerHelper('getCurrentChannel', function () {
   }
 });
 
-Handlebars.registerHelper("channelChatLogs", function (channel_id) {
+UI.registerHelper("channelChatLogs", function (channel_id) {
   var channel = UserChannels.findOne({_id: channel_id});
   if (channel)
     return ChannelLogs.find({channel_name: channel.name}, {sort: {created: 1}});

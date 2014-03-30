@@ -51,7 +51,7 @@ Template.user_menu.events = {
   }
 };
 
-Handlebars.registerHelper('is_user_away', function (nick, server_name) {
+UI.registerHelper('is_user_away', function (nick, server_name) {
   var server_id = (UserServers.findOne({name: server_name}, {_id: 1}) || {})._id || "";
   var whois_data = _get_nick_whois_data(nick, server_id);
   if (whois_data && whois_data.away)
@@ -67,7 +67,7 @@ _get_nick_whois_data = function (nick, user_server_id) {
     nick: nick, server_id: user_server.server_id});
 };
 
-Handlebars.registerHelper('whois_tooltip', function (nick, server_name) {
+UI.registerHelper('whois_tooltip', function (nick, server_name) {
   var tooltip = "";
   var server_id = (UserServers.findOne({name: server_name}, {_id: 1}) || {})._id;
   var whois_data = _get_nick_whois_data(nick, server_id);
@@ -75,5 +75,5 @@ Handlebars.registerHelper('whois_tooltip', function (nick, server_name) {
     tooltip = "Username: " + _.escape(whois_data.user) + "<br/>" +
       "Real name: " + _.escape(whois_data.realname) + "<br/>" +
       "Server: " + _.escape(whois_data.server) + "<br/>";
-  return new Handlebars.SafeString(tooltip);
+  return new Spacebars.SafeString(tooltip);
 });

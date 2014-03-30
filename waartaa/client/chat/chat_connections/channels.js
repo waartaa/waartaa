@@ -1,4 +1,4 @@
-Handlebars.registerHelper('channel_to_edit', function (e) {
+UI.registerHelper('channel_to_edit', function (e) {
   var channel = UserChannels.findOne({_id: Session.get('channel_id_to_edit')});
   if (channel) {
     channel.password = channel.password || '';

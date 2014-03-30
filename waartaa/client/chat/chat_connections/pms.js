@@ -24,7 +24,7 @@ Template.server_pm_item.helpers({
   }
 });
 
-Handlebars.registerHelper('pms', function (id) {
+UI.registerHelper('pms', function (id) {
   var server = UserServers.findOne({_id: id});
   var user = Meteor.user();
   if (!server || !user)
@@ -41,7 +41,7 @@ Handlebars.registerHelper('pms', function (id) {
   return return_pms;
 });
 
-Handlebars.registerHelper('currentPM', function () {
+UI.registerHelper('currentPM', function () {
   var room = Session.get('room') || {};
   if (room.roomtype === 'pm') {
     return {name: room.nick, server_id: room.server_id, room_id: room.room_id};

@@ -5,13 +5,13 @@ components so that there's no global scroll for the page.
 $(window).resize(updateHeight);
 
 /* Template helpers */
-Handlebars.registerHelper("isCurrentPageHome", function () {
+UI.registerHelper("isCurrentPageHome", function () {
   return Session.get('currentPage') === 'home';
 });
-Handlebars.registerHelper("isUserLoggedIn", function () {
+UI.registerHelper("isUserLoggedIn", function () {
   return Meteor.user();
 });
-Handlebars.registerHelper("isCurrentPageChat", function () {
+UI.registerHelper("isCurrentPageChat", function () {
   return Session.get('currentPage') === 'chat';
 });
 

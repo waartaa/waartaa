@@ -1,4 +1,4 @@
-Handlebars.registerHelper('currentServer', function () {
+UI.registerHelper('currentServer', function () {
   var room = Session.get('room');
   if (room.roomtype != 'server')
     return;
