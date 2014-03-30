@@ -1,7 +1,7 @@
 
 <template name="chat_row">
   <div class="row chatlog-row{{# unless from}} chatlog-notice{{/unless}}">
-    <div class="col-md-12">
+    <div class="col-md-12{{#if checkOwnNickInMsg message server_current_nick from}} highlight-mention{{/if}}">
       <div class="pull-left chatlog-from">
         {{# if from}}
           <span class="label label-info">

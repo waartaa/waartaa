@@ -1,3 +1,10 @@
+Handlebars.registerHelper("checkOwnNickInMsg", function (message, current_nick, from) {
+    var pattern=new RegExp("(^|[^\\d\\w])"+current_nick+"(^|[^\\d\\w])");
+    if(message.match(pattern) && from)
+	return true;
+    return false;
+});
+
 Handlebars.registerHelper("linkify", function (message) {
   if (message)
     return new Handlebars.SafeString(
