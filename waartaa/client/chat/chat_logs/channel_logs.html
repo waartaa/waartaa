@@ -2,7 +2,7 @@
 {{#with getCurrentChannel }}
 <div id="channel-chatroom-{{ _id }}" class="chatroom channel{{#if topic}} chatroom-with-topic{{/if}}">
   <div class="topic">
-    <ul class="nav nav-tabs nav-stacked" {{# unless topic }}style="display:none;"{{/unless}}>
+    <ul class="nav nav-tabs nav-stacked" style="{{# unless topic}}display:none;{{/unless}}">
       <li><p class="ellipsis">{{ linkify topic }}</p></li>
     </ul>
   </div>
@@ -15,15 +15,8 @@
 
 <template name="channel_chat_logs_table">
 <div id="channel-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table channel content chatlogrows">
-  <div class="row chatlogs-loader-msg" style="display: none;">
-    Loading...
-  </div>
   {{#each channelChatLogs _id}}
     {{> chat_row}}
   {{/each}}
-  {{> channel_chatlogs_end}}
 </div>
-</template>
-
-<template name="channel_chatlogs_end">
 </template>

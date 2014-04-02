@@ -11,7 +11,3 @@ UI.registerHelper('currentServer', function () {
 Template.server_logs.events = {
   'scroll .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
-
-Template.server_chatlogs_end.rendered = function () {
-    $('#chatlogs-loader').fadeOut();
-};
