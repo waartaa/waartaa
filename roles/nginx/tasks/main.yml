@@ -1,4 +1,9 @@
 ---
+  - name: Install EPEL package
+    sudo: yes
+    command: rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+
+
   - name: Install nginx
     sudo: yes
     yum: name=nginx state=present
