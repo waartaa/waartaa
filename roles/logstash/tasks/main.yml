@@ -1,0 +1,16 @@
+---
+  - name: Create repo file for ElasticSearch
+    sudo: yes
+    template: src=elasticsearch.repo.j2 dest=/etc/yum.repos.d/elasticsearch.repo
+
+  - name: Create repo file for Logstash
+    sudo: yes
+    template: src=logstash.repo.j2 dest=/etc/yum.repos.d/logstash.repo
+
+  - name: Install ElasticSearch
+    sudo: yes
+    yum: name=elasticsearch state=installed
+
+  - name: Install Logstash
+    sudo: yes
+    yum: name=logstash state=installed
