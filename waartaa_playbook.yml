@@ -7,5 +7,5 @@
     - nodejs
     - mongo
     - meteor
+    - logstash
     - waartaa
-
