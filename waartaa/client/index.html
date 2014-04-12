@@ -40,7 +40,7 @@
       <div class="collapse navbar-collapse" id="nav-collapse-1">
         <ul class="nav navbar-nav navbar-right">
           {{#if currentUser}}
-            {{ loginButtons }}
+            {{> loginButtons }}
           {{/if}}
         </ul>
       </div>
@@ -59,7 +59,7 @@
           {{> user_loggedin_content}}
         {{else}}
           <h1>Hello</h1>
-          {{loginButtons}}
+          {{> loginButtons }}
         {{/if}}
       </div>
     </div>

@@ -37,3 +37,13 @@ Template.edit_server_modal.events({
     })
   }
 });
+
+Template.servers_list_for_user.serversForUser = function () {
+  var user_servers = UserServers.find();
+  var server_names = [];
+  user_servers.forEach(function(user_server) {
+    server_names.push(user_server.name);
+  });
+
+  return Servers.find({'name':{ $nin: server_names}});
+};
