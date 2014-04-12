@@ -21,7 +21,8 @@
       "npm": {},
       "HTML5-History-API": {},
       "page-js-ie-support": {},
-      "crypto-md5": {}
+      "crypto-md5": {},
+      "jquery-titlealert": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -86,8 +87,8 @@
       },
       "fast-render": {
         "git": "https://github.com/arunoda/meteor-fast-render.git",
-        "tag": "v0.1.23",
-        "commit": "933b9d8992f1c7004f9993b1b15dffe3bac672f3"
+        "tag": "v0.1.25",
+        "commit": "010c4ee25b48ab6a7373000be48f9cd4a8535880"
       },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
@@ -96,8 +97,8 @@
       },
       "power-queue": {
         "git": "https://github.com/CollectionFS/Meteor-power-queue.git",
-        "tag": "v0.9.7",
-        "commit": "2626e2728d4caa943f80164e85156423c3b83e2f"
+        "tag": "v0.9.9",
+        "commit": "567d3905784a8be6aacfbb69d477003ba9b5c4b5"
       },
       "cron-tick": {
         "git": "https://github.com/tmeasday/meteor-cron.git",
@@ -124,6 +125,11 @@
         "tag": "v3.1.2.2",
         "commit": "75bbb3eeace302122d3554a6212a6fe92553fa18"
       },
+      "jquery-titlealert": {
+        "git": "https://github.com/mjnovice/jquery-titlealert.git",
+        "tag": "v0.0.2",
+        "commit": "b258f2d34d8e8d3b1040414f81e9bc7b7be9bca1"
+      },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",
         "tag": "v1.9.2",
@@ -136,18 +142,18 @@
       },
       "reactive-property": {
         "git": "https://github.com/CollectionFS/Meteor-reactive-property.git",
-        "branch": "master",
-        "commit": "fcd9d1cafbc2d86d5a25fb3c1d92a6d0348b6e08"
+        "tag": "v0.0.1",
+        "commit": "f742b8656bb88fafff2a9c3a32ff1f97b3ebf2f7"
       },
       "micro-queue": {
         "git": "https://github.com/CollectionFS/Meteor-micro-queue.git",
-        "branch": "master",
-        "commit": "585b00e56a837fe602d8a3ff54f7440d88d35ca0"
+        "tag": "v0.0.3",
+        "commit": "70266ce2c273a12c5af17b5c056253936caabb01"
       },
       "reactive-list": {
         "git": "https://github.com/CollectionFS/Meteor-reactive-list.git",
-        "branch": "master",
-        "commit": "e0bf1cd1c2b71b6fad411cef3e345bad16cb98c7"
+        "tag": "v0.0.7",
+        "commit": "5855e3795947145b20a331250113ce927060445b"
       },
       "crypto-base": {
         "git": "https://github.com/oortcloud/meteor-crypto-base.git",
