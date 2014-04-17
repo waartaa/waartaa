@@ -11,8 +11,9 @@ UI.registerHelper("pmChatLogs", function (server_id, nick) {
     {fields: {created: 0, last_updated: 0}});
 });
 
-Template.pm_chat_row.created = function (e) {
+Template.pm_chat_logs_table.created = function (e) {
   Meteor.setTimeout(function () {
+    updateHeight();
     $('#chatlogs-loader:visible').fadeOut();
-  }, 1000);
+  }, 10);
 };

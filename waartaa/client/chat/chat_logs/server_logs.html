@@ -6,7 +6,7 @@
       <li><p class="ellipsis">{{topic}}</p></li>
     </ul>
   </div>
-  <div class="chat-logs-container server nano" data-server-id="{{ _id }}" style="overflow-y: auto; overflow-x: hidden;">
+  <div class="chat-logs-container server nano" data-server-id="{{ _id }}">
     {{> server_chat_logs_table}}
   </div>
 </div>
@@ -14,14 +14,12 @@
 </template>
 
 <template name="server_chat_logs_table">
-  <div id="server-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table server content">
-    <div class="chatlogrows">
-      <div class="row chatlogs-loader-msg" style="display: none;">
-        Loading...
-      </div>
-      {{#each serverChatLogs _id}}
-        {{> chat_row}}
-      {{/each}}
+  <div id="server-chat-logs-{{ _id }}" class="table table-condensed chatlogs-table server content chatlogrows">
+    <div class="row chatlogs-loader-msg" style="display: none;">
+      Loading...
     </div>
+    {{#each serverChatLogs _id}}
+      {{> chat_row}}
+    {{/each}}
   </div>
 </template>

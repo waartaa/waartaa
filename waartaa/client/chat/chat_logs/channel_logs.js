@@ -18,10 +18,10 @@ Template.channel_logs.events = {
   'scrolltop .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
 
-Template.chat_row.created = function (e) {
-  updateHeight();
+Template.channel_chat_logs_table.created = function (e) {
   Meteor.setTimeout(function () {
-    $('#chatlogs-loader:visible').fadeOut();
     updateHeight();
-  }, 1000);
+    $('#chatlogs-loader:visible').fadeOut();
+  }, 10);
 };
+

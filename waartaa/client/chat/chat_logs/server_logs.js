@@ -11,3 +11,11 @@ UI.registerHelper('currentServer', function () {
 Template.server_logs.events = {
   'scroll .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
+
+Template.server_chat_logs_table.created = function (e) {
+  Meteor.setTimeout(function () {
+    updateHeight();
+    $('#chatlogs-loader:visible').fadeOut();
+  }, 10);
+};
+
