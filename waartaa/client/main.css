@@ -93,11 +93,7 @@ html, body, .container, .content {
 }
 
 .chatroom-with-topic > .chat-logs-container {
-  padding-top: 33px;
-}
-
-.chatroom-with-topic .chatlogs-table.content {
-  padding-top: 33px;
+  top: 33px;
 }
 
 div.dropdown a {

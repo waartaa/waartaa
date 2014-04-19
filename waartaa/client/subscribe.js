@@ -208,6 +208,7 @@ ChatSubscribe = function () {
                 (start_nick || {}).nick);
               if (Session.get(
                 'startNick-' + channel.user_server_name + '_' + channel.name))
+                $('#info-panel .nano').nanoScroller();
                 $('#info-panel .nano').nanoScroller({scrollTop: 30});
             }, 500);
         }

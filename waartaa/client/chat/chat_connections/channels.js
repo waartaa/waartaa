@@ -15,14 +15,14 @@ Template.server_channels.channels = function (server_id) {
     });
 }
 
-function serverChannelsRenderedCallback () {
+function serverChannelsCreatedCallback () {
   $('#chat-servers .nano').nanoScroller();
   updateHeight();
 }
 
-Template.server_channels.rendered = serverChannelsRenderedCallback;
+Template.server_channels.created = serverChannelsCreatedCallback;
 
-Template.server_channel_item.rendered = function () {
+Template.server_channel_item.created = function () {
   Session.set("lastAccessedChannel-" + this.data._id, new Date());
 };
 
@@ -87,7 +87,7 @@ Template.edit_server_channel.events = {
   }
 };
   
-Template.server_channels.rendered = function(){
+Template.server_channels.created = function(){
   // takes in key of a cookie and returns its value, null if not present
   var get_cookie = function(key) {
     var cookies = document.cookie.split(';');
