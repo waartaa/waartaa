@@ -243,7 +243,7 @@ function refreshAutocompleteNicksSource () {
 }
 
 Template.chat_input.created = function () {
-  autocompleteNicksInitiate();
+  Meteor.setTimeout(autocompleteNicksInitiate, 0);
 };
 
 Template.chat_input.preserve(['.ui-autocomplete']);
