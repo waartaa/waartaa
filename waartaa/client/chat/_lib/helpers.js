@@ -70,6 +70,7 @@ waartaa.chat.helpers.highlightServerRoom = function () {
     .off('scrolltop')
     .on('scrolltop', waartaa.chat.helpers.chatLogsContainerScrollCallback);
   }, 1000);
+  Session.set('shallUpdateHeight', true);
 };
 
 
@@ -346,13 +347,10 @@ updateHeight = function () {
   $('#chat, #chat-main, .chatroom').height(final_height - 23);
   $('#info-panel .panel-body, #chat-servers .panel-body').height(final_height - 75);
   $('#info-panel .inner-container').css('min-height', final_height);
-  $('.chatlogrows').css('min-height', final_height - 22);
-  //var topic_height = Session.get('topicHeight') || 0;
-  $('.chat-logs-container')//.height(final_height - 69);
-  .each(function (index, elem) {
-    var $topic = $(elem).prev('.topic');
-    $(elem).height((final_height - $topic.height() || 0) - 25);
-  });
+  if ($('.chatroom-with-topic').length > 0)
+    $('.chat-logs-container').height(final_height - 60);
+  else
+    $('.chat-logs-container').height(final_height - 22);
 };
 
 UI.registerHelper('current_server_id', function () {

@@ -1,4 +1,8 @@
 waartaa.chat.helpers.chatLogRowCreateHandler = function () {
+    if (Session.get('shallUpdateHeight')) {
+      Meteor.setTimeout(updateHeight, 0);
+      Session.set('shallUpdateHeight');
+    }
     $('.chat-logs-container.nano').nanoScroller();
     var last_log_id = Session.get('chatroom_last_log_id');
     if (last_log_id)
