@@ -4,26 +4,19 @@
   <link href='https://fonts.googleapis.com/css?family=Oleo+Script:700' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Bitter:400,700,400italic' rel='stylesheet' type='text/css'>
 </head>
-<body>
-  {{> body}}
-</body>
 
-<template name="body">
+<template name="layout">
   {{> header}}
   <div class="container">
     <div class="content">
       <div class="wrapper">
         <div class="proper-content">
-          {{> layout}}
+          {{> yield}}
         </div>
       </div>
     </div>
   </div>
   {{> footer}}
-</template>
-
-<template name="layout">
-  {{> yield}}
 </template>
 
 <template name="header">

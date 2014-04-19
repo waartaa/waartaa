@@ -1,7 +1,7 @@
 /* Routers */
 
 Router.configure({
-  layoutTemplate: 'body'
+  layoutTemplate: 'layout'
 });
 
 //Router.before(mustBeSignedIn, {except: ['index']});
