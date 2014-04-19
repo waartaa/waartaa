@@ -8,14 +8,29 @@ UI.registerHelper('currentServer', function () {
   );
 });
 
+UI.registerHelper("serverChatLogs", function (server_id) {
+  var cursor = UserServerLogs.find(
+    {server_id: server_id}, {sort: {created: 1}});
+  var last_log = UserServerLogs.findOne({server_id: server_id}, {sort: {created: -1}});
+  Session.set('chatroom_last_log_id');
+  if (last_log)
+    Session.set('chatroom_last_log_id', last_log._id);
+  var session_key = 'unreadLogsCountServer_' + server_id;
+  cursor.observeChanges({
+    added: function (id, fields) {
+      Deps.nonreactive(function () {
+        updateUnreadLogsCount(
+          session_key, 'lastAccessedServer-' + fields.server_id,
+          fields.last_updated)
+      });
+    }
+  });
+  return cursor;
+});
+
 Template.server_logs.events = {
   'scroll .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
 
-Template.server_chat_logs_table.created = function (e) {
-  Meteor.setTimeout(function () {
-    updateHeight();
-    $('#chatlogs-loader:visible').fadeOut();
-  }, 10);
-};
+Template.server_chat_logs_table.created = waartaa.chat.helpers.chatLogsTableCreateHandler;
 

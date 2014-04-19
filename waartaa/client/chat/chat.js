@@ -116,22 +116,6 @@ window.onblur = function () {
   focussed = false;
 }
 
-UI.registerHelper("serverChatLogs", function (server_id) {
-  var cursor = UserServerLogs.find(
-    {server_id: server_id}, {sort: {created: 1}});
-  var session_key = 'unreadLogsCountServer_' + server_id;
-  cursor.observeChanges({
-    added: function (id, fields) {
-      Deps.nonreactive(function () {
-        updateUnreadLogsCount(
-          session_key, 'lastAccessedServer-' + fields.server_id,
-          fields.last_updated)
-      });
-    }
-  });
-  return cursor;
-});
-
 //$('.whois-tooltip, .tipsy-enable').tipsy({live: true, gravity: 'e', html: true});
 //$('#server-add-btn.enable-tipsy').tipsy({live: true, gravity: 's'});
 

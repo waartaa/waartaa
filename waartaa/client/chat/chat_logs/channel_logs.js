@@ -10,18 +10,20 @@ UI.registerHelper('getCurrentChannel', function () {
 
 UI.registerHelper("channelChatLogs", function (channel_id) {
   var channel = UserChannels.findOne({_id: channel_id});
-  if (channel)
+  if (channel) {
+    var last_log = ChannelLogs.findOne({channel_name: channel.name}, {sort: {created: -1}});
+    Session.set('chatroom_last_log_id');
+    if (last_log)
+      Session.set('chatroom_last_log_id', last_log._id);
     return ChannelLogs.find({channel_name: channel.name}, {sort: {created: 1}});
+  }
 });
 
 Template.channel_logs.events = {
   'scrolltop .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
 
-Template.channel_chat_logs_table.created = function (e) {
-  Meteor.setTimeout(function () {
-    updateHeight();
-    $('#chatlogs-loader:visible').fadeOut();
-  }, 10);
-};
+Template.channel_chat_logs_table.created = waartaa.chat.helpers.chatLogsTableCreateHandler;
+
+Template.chat_row.created = waartaa.chat.helpers.chatLogRowCreateHandler;
 
