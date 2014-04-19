@@ -14,8 +14,6 @@ UI.registerHelper('channel_users', function (id) {
     {fields: {nick: 1}, sort: {nick: 1}});
 });
 
-Template.chat_users.rendered = updateHeight;
-
 function infoPanelScrollendHandler (e) {
   var $target = $(e.target);
   Meteor.setTimeout(function () {

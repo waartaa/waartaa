@@ -23,7 +23,5 @@ Template.channel_logs.events = {
   'scrolltop .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
 
-Template.channel_chat_logs_table.created = waartaa.chat.helpers.chatLogsTableCreateHandler;
-
 Template.chat_row.created = waartaa.chat.helpers.chatLogRowCreateHandler;
 

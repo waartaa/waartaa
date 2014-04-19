@@ -72,7 +72,7 @@ Template.chat_connection_server.events({
   'click .server-link': serverRoomSelectHandler
 });
 
-Template.chat_connection_server.rendered = function () {
+Template.chat_connection_server.created = function () {
   Session.set("lastAccessedServer-" + this.data._id, new Date());
 };
 

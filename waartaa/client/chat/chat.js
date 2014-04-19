@@ -30,12 +30,6 @@ Template.chat_main.topic = function () {
   }
 };
 
-Template.chat_main.rendered = updateHeight;
-
-
-Template.chat_row.rendered = function () {};
-
-
 $(document).on(
   'scrollend.chat_logs_container', '.chat-logs-container',
   function (e) {
@@ -47,31 +41,7 @@ UI.registerHelper("isCurrentRoom", function (room_id, room_type, server_id) {
   if (room_id == "ohB9cwuTsTnHMxT7T")
     return true;
   return false;
-  /*
-  var session_roomtype = Session.get('roomtype');
-  var session_room_id = Session.get('room_id');
-  var session_server_id = Session.get('server_id');
-  if (session_roomtype = room_type && session_room_id == room_id && session_server_id == server_id)
-    return true;
-  return false;*/
 });
-
-/*Template.chat_main.rendered = function () {
-  setTimeout(function () {
-    updateHeight();
-    var roomtype = Session.get('roomtype');
-    var key = '';
-    var room_id = Session.get('room_id');
-    if (roomtype == 'channel')
-      key = 'scroll_height_channel-' + room_id;
-    else if (roomtype == 'pm')
-      key = 'scroll_height_' + room_id;
-    else if (roomtype == 'server')
-      key = 'scroll_height_server-' + room_id;
-    var chat_height = Session.get(key);
-    //$('#chat-logs-container').scrollTop(chat_height || $('#chat-logs').height());
-  }, 0);
-};*/
 
 Template.chat_main.destroyed = function () {
   var roomtype = Session.get('roomtype');
@@ -84,15 +54,6 @@ Template.chat_main.destroyed = function () {
 Client = {};
 
 Meteor.subscribe("client", Meteor.user() && Meteor.user().username);
-
-
-Template.channel_menu.rendered = function (e) {
-  //Template.channel_menu.events[
-  //  'click .editServerChannelLink'] =  _handleServerChannelEditLinkClick;
-}
-
-
-
 
 UI.registerHelper("activeChannels", function () {
   return UserChannels.find({active: true});
@@ -138,17 +99,3 @@ UI.registerHelper('session', function (key) {
   return Session.get(key);
 });
 
-
-
-function logRenders () {
-    _.each(Template, function (template, name) {
-      var oldRender = template.rendered;
-      var counter = 0;
- 
-      template.rendered = function () {
-        oldRender && oldRender.apply(this, arguments);
-      };
-    });
-  }
-
-logRenders();

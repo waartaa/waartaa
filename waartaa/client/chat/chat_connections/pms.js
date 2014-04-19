@@ -1,4 +1,4 @@
-Template.server_pm_item.rendered = function () {
+Template.server_pm_item.created = function () {
   Session.set("lastAccessedPm-" + this.data.server_id + '_' + this.data.from);
 };
 

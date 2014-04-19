@@ -32,5 +32,3 @@ Template.server_logs.events = {
   'scroll .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
 
-Template.server_chat_logs_table.created = waartaa.chat.helpers.chatLogsTableCreateHandler;
-

@@ -20,7 +20,5 @@ UI.registerHelper("pmChatLogs", function (server_id, nick) {
     {fields: {created: 0, last_updated: 0}});
 });
 
-Template.pm_chat_logs_table.created = waartaa.chat.helpers.chatLogsTableCreateHandler;
-
 Template.pm_chat_row.created = waartaa.chat.helpers.chatLogRowCreateHandler;
 

@@ -19,6 +19,16 @@ function observeChatlogTableScroll () {
   }, 2000);
 }
 
-Template.channel_chat_logs_table.rendered = observeChatlogTableScroll;
-Template.server_chat_logs_table.rendered = observeChatlogTableScroll;
-Template.pm_chat_logs_table.rendered = observeChatlogTableScroll;
+Template.channel_chat_logs_table.created = function () {
+  Meteor.setTimeout(observeChatlogTableScroll, 0);
+  waartaa.chat.helpers.chatLogsTableCreateHandler();
+};
+Template.server_chat_logs_table.created = function () {
+  Meteor.setTimeout(observeChatlogTableScroll, 0);
+  waartaa.chat.helpers.chatLogsTableCreateHandler();
+};
+Template.pm_chat_logs_table.created = function () {
+  Meteor.setTimeout(observeChatlogTableScroll, 0);
+  waartaa.chat.helpers.chatLogsTableCreateHandler();
+};
+

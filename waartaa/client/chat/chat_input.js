@@ -242,7 +242,7 @@ function refreshAutocompleteNicksSource () {
   $('chat-input').autocomplete('option', 'source', []);
 }
 
-Template.chat_input.rendered = function () {
+Template.chat_input.created = function () {
   autocompleteNicksInitiate();
 };
 
