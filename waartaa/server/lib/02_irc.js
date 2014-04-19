@@ -571,7 +571,7 @@ IRCHandler = function (user, user_server) {
                     part_message = nick + ' has left';
                     if (reason)
                         part_message += ' (' + reason + ')';
-                    channelLogsManager({
+                    channelLogsManager.insertIfNeeded({
                         message: part_message,
                         raw_message: message,
                         from: null,
