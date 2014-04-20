@@ -121,12 +121,12 @@ Template.server_menu.events({
   'click .toggleJoinServer': function (e) {
     e.preventDefault();
     e.stopPropagation();
-    var $this = $(e.target);
+    var $this = $(e.currentTarget);
     var server_id = $this.data('server-id');
     var server = UserServers.findOne({_id: server_id});
     if (!server)
       return;
-    var status = $this.data('status');
+    var status = $this.attr('data-status');
     if (status == 'connected')
       Meteor.call(
         "quit_user_server", server.name, false);
