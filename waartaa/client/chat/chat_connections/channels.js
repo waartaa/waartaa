@@ -63,10 +63,10 @@ Template.channel_menu.events = {
   'click .toggleJoinChannel': function (e) {
     e.preventDefault();
     e.stopPropagation();
-    var $this = $(e.target);
+    var $this = $(e.currentTarget);
     var channel_id = $this.data('channel-id');
     var channel = UserChannels.findOne({_id: channel_id});
-    var status = $this.data('status');
+    var status = $this.attr('data-status');
     if (status == 'connected')
       Meteor.call(
         "part_user_channel", channel.user_server_name, channel.name, false);
