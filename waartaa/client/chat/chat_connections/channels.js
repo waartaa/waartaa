@@ -105,8 +105,11 @@ Template.server_channels.created = function(){
 
   var highlight_room = function() {
     // highlights the html element of the current room
-    var room_id = Session.get('room').room_id;
-    var roomtype = Session.get('room').roomtype;
+    var room = Session.get('room');
+    if (!room)
+      return;
+    var room_id = room.room_id;
+    var roomtype = room.roomtype;
     var activate_link = '#' + roomtype + 'Link-' + room_id;
     $(activate_link).parent().addClass('active');
   };
