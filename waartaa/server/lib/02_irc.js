@@ -213,6 +213,7 @@ function shallWriteChannelLog (nick, text, channel_name, server_name, client_nic
 ChannelLogsManager = function () {
     function _insert (log) {
         ChannelLogs.insert(log, function (err, id) {});
+        OldChannelLogs.insert(log, function (err, id) {});
     }
     return {
         insertIfNeeded: function (log, client_nick) {
@@ -253,14 +254,50 @@ ChannelLogsManager = function () {
                 });
             } else if (global == false) {
                 _insert(log);
-            }       
+            }
         },
         insert: function (log) {
             _insert(log);
+        },
+        cleanup: function () {
+          /* Cleanup logs from the main ChannelLogs collection */
+          Fiber(function () {
+            processedChannels = {};
+            UserChannels.find().forEach(function (channel) {
+              var channelIdentifier = channel.user_server_name + channel.name;
+              if (processedChannels[channelIdentifier] != undefined)
+                return;
+              var extraLogsCount = ChannelLogs.find(
+                {
+                  channel_name: channel.name,
+                  server_name: channel.user_server_name
+                }).count() - CONFIG.CHANNEL_LOGS_COLLECTION_LIMIT_PER_CHANNEL || 0;
+              if (extraLogsCount <= 0)
+                return;
+              var thresholdLogTimestamp = (ChannelLogs.findOne({
+                channel_name: channel.name,
+                server_name: channel.user_server_name
+              }, {sort: {created: 1}, skip: extraLogsCount}) || {}).created;
+              if (thresholdLogTimestamp)
+                ChannelLogs.remove({
+                  channel_name: channel.name,
+                  server_name: channel.user_server_name,
+                  created: {$lte: thresholdLogTimestamp}
+                });
+            });
+          }).run();
         }
     };
 };
 channelLogsManager = ChannelLogsManager();
+
+Meteor.startup(function () {
+  channelLogsManager.cleanup();
+  var task_id = Meteor.setInterval(
+    channelLogsManager.cleanup,
+    CONFIG.CHANNEL_LOGS_CLEANUP_INTERVAL
+  );
+});
 
 IRCHandler = function (user, user_server) {
     var client_data = {};
