@@ -246,8 +246,6 @@ Template.chat_input.created = function () {
   Meteor.setTimeout(Deps.autorun(autocompleteNicksInitiate), 0);
 };
 
-Template.chat_input.preserve(['.ui-autocomplete']);
-
 Template.chat_input.renderNickOptions = function () {
   if (Session.get('room')) {
     return true;
