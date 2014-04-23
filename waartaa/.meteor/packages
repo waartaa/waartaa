@@ -15,7 +15,6 @@ presence
 bootstrap-3
 accounts-github
 
-accounts-ui-bootstrap-3
 underscore
 
 nodetime
@@ -41,3 +40,4 @@ cron-tick
 npm
 crypto-md5
 blaze-layout
+accounts-ui-bootstrap-3

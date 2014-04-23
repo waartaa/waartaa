@@ -6,7 +6,6 @@
       "require": {},
       "presence": {},
       "bootstrap-3": {},
-      "accounts-ui-bootstrap-3": {},
       "nodetime": {},
       "moment": {},
       "winston-loggly": {},
@@ -22,7 +21,8 @@
       "HTML5-History-API": {},
       "page-js-ie-support": {},
       "crypto-md5": {},
-      "jquery-titlealert": {}
+      "jquery-titlealert": {},
+      "accounts-ui-bootstrap-3": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -44,11 +44,6 @@
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
         "tag": "v3.1.1-1",
         "commit": "63dd38968828bb8963636df93e9a1c45e2dfe67e"
-      },
-      "accounts-ui-bootstrap-3": {
-        "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
-        "tag": "v0.3.0-1",
-        "commit": "93ffa5d0e325dc7026de89f6d90c178fa04bdd3a"
       },
       "nodetime": {
         "git": "https://github.com/subhog/meteor-nodetime.git",
@@ -87,13 +82,13 @@
       },
       "fast-render": {
         "git": "https://github.com/arunoda/meteor-fast-render.git",
-        "tag": "v0.1.25",
-        "commit": "010c4ee25b48ab6a7373000be48f9cd4a8535880"
+        "tag": "v0.2.3",
+        "commit": "d56bd4a4d222bf176241cd6e756aa349cb24c260"
       },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
-        "tag": "v0.7.0",
-        "commit": "05f34bc48c4cad9fdaa366c1ddcabe6980232ece"
+        "tag": "v0.7.1",
+        "commit": "d1ffb3f06ea4c112132b030f2eb1a70b81675ecb"
       },
       "power-queue": {
         "git": "https://github.com/CollectionFS/Meteor-power-queue.git",
@@ -130,6 +125,11 @@
         "tag": "v0.0.2",
         "commit": "b258f2d34d8e8d3b1040414f81e9bc7b7be9bca1"
       },
+      "accounts-ui-bootstrap-3": {
+        "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
+        "tag": "v0.3.0-1",
+        "commit": "93ffa5d0e325dc7026de89f6d90c178fa04bdd3a"
+      },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",
         "tag": "v1.9.2",
@@ -137,8 +137,8 @@
       },
       "blaze-layout": {
         "git": "https://github.com/EventedMind/blaze-layout.git",
-        "tag": "v0.2.2",
-        "commit": "8bc53798fe5965669ae67c72f91829fcfdceabfd"
+        "tag": "v0.2.4",
+        "commit": "b40e9b0612329288d75cf52ad14a7da64bb8618f"
       },
       "reactive-property": {
         "git": "https://github.com/CollectionFS/Meteor-reactive-property.git",
