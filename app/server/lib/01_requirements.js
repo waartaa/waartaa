@@ -26,4 +26,10 @@ if (Meteor.isServer) {
   }
   crypto = Npm.require('crypto');
   Map = Meteor.require('collections/map');
+  try {
+    elasticsearch = Npm.require('elasticsearch');
+  } catch (err) {
+    elasticsearch = require('elasticsearch');
+  }
 }
+
