@@ -1,0 +1,15 @@
+<template name="navLogin">
+    {{> _navLoginButtons}}
+</template>
+
+<template name="_navLoginButtons">
+    <div id="nav-login-buttons" class="pull-right">
+        {{#if isUserLoggedIn }}
+        <span class="navbar-brand regular bold">{{ displayUserName }}</span>
+        <div class="navbar-brand fa fa-wrench"></div>
+        <a id="login-buttons-logout" class="navbar-brand cursor-pointer fa fa-sign-out"></a>
+        {{else}}
+        <div class="navbar-brand fa fa-sign-in"></div>
+        {{/if}}
+    </div>
+</template>

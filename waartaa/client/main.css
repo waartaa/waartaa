@@ -511,3 +511,15 @@ body {
 #login-container a {
   cursor: pointer;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.regular {
+    font-size: 15px;
+}
+
+.bold {
+    font-weight: bold !important;
+}
