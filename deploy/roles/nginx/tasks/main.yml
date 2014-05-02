@@ -1,0 +1,16 @@
+---
+  - name: Make sure epel is installed 
+    yum: name=http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm state=installed
+    sudo: yes
+
+
+  - name: Install nginx
+    sudo: yes
+    yum: name=nginx state=present
+
+
+  - name: restart nginx
+    sudo: yes
+    service: name=nginx state=restarted enabled=yes
+    tags:
+      - nginx

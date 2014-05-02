@@ -1,0 +1,10 @@
+---
+  - name: Install nodejs
+    yum: name=nodejs
+    sudo: yes
+
+
+  - name: Install npm
+    yum: name=npm
+    sudo: yes
+

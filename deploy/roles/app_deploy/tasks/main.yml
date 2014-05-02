@@ -1,0 +1,19 @@
+---
+  - name: "Push waartaa bundle to app servers"
+    synchronize: src=./dist/current dest={{ deploy_dir }} recursive=yes
+
+
+  - name: "Copy waartaa upstart file"
+    template: src=waartaa.conf.j2 dest=/etc/init/waartaa.conf
+    sudo: yes
+
+
+  - name: "Install npm deps"
+    shell: npm install chdir={{ app_dir }}
+    sudo: yes
+
+
+  - name: "Restart Waartaa service"
+    shell: initctl waartaa
+    sudo: yes
+

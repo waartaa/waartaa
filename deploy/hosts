@@ -1,0 +1,14 @@
+[local]
+localhost ansible_connection=local
+
+[waartaa_all]
+waartaa_appserver
+waartaa_dbserver
+
+
+[waartaa_app_servers]
+waartaa_appserver
+
+[waartaa_db_servers]
+waartaa_db_server
+
