@@ -1,9 +1,0 @@
-# Deploy waartaa
-
-This directory contains ansible scripts necessary to
-deploy waartaa.
-
-*.local files in this directory are ignored. So, you can copy
-hosts to hosts.local for your deployment. Also, copy ``group_vars/all-dist``
-to ``group_vars/all`` and customized as necessary.
-
