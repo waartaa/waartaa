@@ -42,6 +42,15 @@ def customize_package_json():
         BUNDLE_PATH, 'package.json'), 'w')
     json.dump(package_json, f, indent=2)
     f.close()
+    if 'newrelic' in extra_deps:
+        f = open(os.path.join(
+            BUNDLE_PATH, 'main.js'))
+        content = 'require("newrelic");\n' + f.read()
+        f.close()
+        f = open(os.path.join(
+            BUNDLE_PATH, 'main.js'), 'w')
+        f.write(content)
+        f.close()
 
 
 if __name__ == '__main__':
