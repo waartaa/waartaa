@@ -1,0 +1,30 @@
+---
+  - name: "Push waartaa bundle to app servers"
+    synchronize: src=./dist/current dest={{ deploy_dir }} recursive=yes
+
+
+  - name: "Copy waartaa upstart file"
+    template: src=waartaa.conf.j2 dest=/etc/init/waartaa.conf mode=644
+    sudo: yes
+
+
+  - name: "Copy newrelic conf"
+    template: src=newrelic.js.j2 dest={{ app_dir }}/newrelic.js
+    when: newrelic
+
+
+  - name: "Copy server settings file for Waartaa"
+    template: src=settings_local.js.j2 dest={{ app_dir }}/programs/server/app/server/settings-local.js
+
+
+  - name: "Install npm deps"
+    shell: npm install chdir={{ app_dir }}
+
+
+  - name: "Start oidentd service"
+    shell: /usr/local/sbin/oidentd
+    sudo: yes
+
+  - name: "Restart Waartaa service"
+    shell: initctl stop waartaa; initctl start waartaa
+    sudo: yes

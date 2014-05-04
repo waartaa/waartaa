@@ -1,0 +1,25 @@
+# upstart file at /etc/init/waartaa.conf
+
+author "{{ author_name }} <{{ author_email }}>"
+
+start on runlevel [2345]
+stop on runlevel [06]
+
+instance {{ user }}
+
+respawn
+respawn limit 10 5
+
+script
+  APP_DIR={{ app_dir }}
+  LOG_FILE={{ log_file }}
+  cd $APP_DIR
+  PORT={{ port }} \
+  MONGO_URL={{ mongo_url }} \
+  MONGO_OPLOG_URL={{ mongo_oplog_url }} \
+  MAIL_URL={{ mail_url }} \
+  METEOR_SETTINGS={{ meteor_settings }} \
+  ROOT_URL={{ root_url }} \
+  NEW_RELIC_HOME=$APP_DIR \
+  /usr/bin/node "$APP_DIR/main.js" >> $LOG_FILE
+end script
