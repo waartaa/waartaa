@@ -1,0 +1,37 @@
+(function(){GlobalServers = {
+  'Freenode': {
+    connections: [
+      {url: 'irc.freenode.net', port: '6667'},
+      {url: 'irc.freenode.net', port: '8000'}
+    ]
+  },
+  'Mozilla': {
+    connections: [
+      {url: 'irc.mozilla.org', 'port': '6667'}
+    ]
+  }
+}
+
+CONFIG = {
+  'channel_who_poll_interval': {{ waartaa_channel_poll_interval }},
+  'show_last_n_logs': {{ waartaa_show_last_n_logs }},
+  'DEBUG': {{ waartaa_debug_mode }},
+  'SERVER_QUIT_MESSAGE': '{{ waartaa_server_quit_message }}',
+  'URGENT_QUEUE_WORKERS_COUNT': 3,
+  'DELAYED_QUEUE_WORKERS_COUNT': 1,
+  'IDENT_FILE_PATH': '{{ waartaa_ident_file_path }}',
+  'LOGS_SCROLLBACK_COUNT': {{ waartaa_logs_scrollback_count }},
+  'CHANNEL_LOGS_COLLECTION_LIMIT_PER_CHANNEL': {{ waartaa_channel_logs_collection_limit_per_channel }},
+  'CHANNEL_LOGS_CLEANUP_INTERVAL': {{ waartaa_channel_logs_cleanup_interval }}
+}
+
+SUPER_USER = '{{ waartaa_super_user }}'
+SUPER_USER_EMAIL = '{{ waartaa_super_user_email }}'
+SUPER_USER_PASSWORD = '{{ waartaa_super_user_password }}'
+
+SECRET_KEY = '{{ waartaa_secret_key }}'
+
+Meteor.AppCache.config({firefox: true});
+
+
+})();

@@ -10,4 +10,3 @@ mongo_oplog_url: mongodb://127.0.0.1:27017/local
 root_url: http://localhost:8080
 meteor_settings: "'{\"presenceTimeout\":30000,\"DEBUG\":false}'"
 port: 3000
-

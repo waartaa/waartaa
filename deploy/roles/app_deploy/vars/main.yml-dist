@@ -1,0 +1,17 @@
+---
+waartaa_channel_poll_interval: 20 * 1000
+waartaa_show_last_n_logs: 30
+waartaa_debug_mode: 'false'
+waartaa_server_quit_message: waartaa says goodbye
+waartaa_ident_file_path: /home/server_username/.oidentd.conf
+waartaa_logs_scrollback_count: 500
+waartaa_channel_logs_collection_limit_per_channel: 1000
+waartaa_channel_logs_cleanup_interval: 2 * 3600 * 1000
+waartaa_super_user: admin
+waartaa_super_user_email: admin@example.com
+waartaa_super_user_password: blah
+waartaa_secret_key: some key
+newrelic: true
+newrelic_app_name: ''
+newrelic_license_key: ''
+newrelic_logging_level: trace
