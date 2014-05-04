@@ -381,6 +381,14 @@ body {
   overflow-x: hidden;
 }
 
+.nano >.nano-content {
+  overflow-y: hidden !important;
+}
+
+.nano.has-scrollbar > .nano-content {
+  overflow-y: auto !important;
+}
+
 #chatlogs-loader {
   z-index: 1000;
   left: 45%;
