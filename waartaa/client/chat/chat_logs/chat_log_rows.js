@@ -5,12 +5,20 @@ UI.registerHelper("checkOwnNickInMsg", function (message, current_nick, from) {
     return false;
 });
 
-UI.registerHelper("linkify", function (message) {
+UI.registerHelper("decorate", function (message) {
+  function linkify (message) {
+    return message.replace(waartaa.chat.helpers.LINK_REGEX, function(match) {
+      return "<a target='_blank' href='" + match + "'>" + match + "</a>";
+    });
+  }
+
+  function escape_chevrons (message) {
+      return message.replace(/<(.*)>/g,'&lt;$1&gt;');
+  }
+
   if (message)
     return new Spacebars.SafeString(
-      message.replace(waartaa.chat.helpers.LINK_REGEX, function(match) {
-        return "<a target='_blank' href='" + match + "'>" + match + "</a>";
-      })
+      linkify(escape_chevrons(message))
     );
 });
 
