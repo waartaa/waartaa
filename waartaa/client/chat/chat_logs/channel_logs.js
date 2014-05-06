@@ -15,6 +15,8 @@ UI.registerHelper("channelChatLogs", function (channel_id) {
     Session.set('chatroom_last_log_id');
     if (last_log)
       Session.set('chatroom_last_log_id', last_log._id);
+    else
+      $('#chatlogs-loader:visible').fadeOut();
     return ChannelLogs.find({channel_name: channel.name}, {sort: {created: 1}});
   }
 });

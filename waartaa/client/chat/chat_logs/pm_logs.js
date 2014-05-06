@@ -12,6 +12,8 @@ UI.registerHelper("pmChatLogs", function (server_id, nick) {
   Session.set('chatroom_last_log_id');
   if (last_log)
     Session.set('chatroom_last_log_id', last_log._id);
+  else
+    $('#chatlogs-loader:visible').fadeOut();
   return PMLogs.find(
     {
       $or: [{from: nick}, {to_nick: nick}],

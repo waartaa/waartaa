@@ -15,6 +15,9 @@ UI.registerHelper("serverChatLogs", function (server_id) {
   Session.set('chatroom_last_log_id');
   if (last_log)
     Session.set('chatroom_last_log_id', last_log._id);
+  else
+    $('#chatlogs-loader:visible').fadeOut();
+    
   var session_key = 'unreadLogsCountServer_' + server_id;
   cursor.observeChanges({
     added: function (id, fields) {
