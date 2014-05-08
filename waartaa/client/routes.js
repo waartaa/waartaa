@@ -25,6 +25,21 @@ Router.map(function () {
     },
     fastRender: true
   });
+
+  this.route('account', {
+    path: /^\/settings$/,
+    onBeforeAction: function() {
+      Router.go('/settings/');
+    }
+  });
+
+  this.route('account/', {
+    path: /^\/settings\/$/,
+    template: 'account-settings',
+    layoutTemplate: 'layout',
+    }
+  );
+
   this.route('chat', {
     path: /^\/chat$/,
     onBeforeAction: function () {

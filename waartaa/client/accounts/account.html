@@ -6,10 +6,55 @@
     <div id="nav-login-buttons" class="pull-right">
         {{#if isUserLoggedIn }}
         <span class="navbar-brand regular bold">{{ displayUserName }}</span>
-        <div class="navbar-brand fa fa-wrench"></div>
+        <a href="/settings" class="navbar-brand fa fa-wrench"></a>
         <a id="login-buttons-logout" class="navbar-brand cursor-pointer fa fa-sign-out"></a>
         {{else}}
         <div class="navbar-brand fa fa-sign-in"></div>
         {{/if}}
+    </div>
+</template>
+
+<template name="account-settings">
+    <div class="account-settings-container">
+        <div class="settings-container medium-margin-top">
+            <div class="container-header regular bold">Change Password</div>
+            <div class="container-inner less-margin-top">
+                <form>
+                    <div>
+                        <dl>
+                            <dt><label for="user_old_password">Current Password</label></dt>
+                            <dd><input class="form-control" type="password" id="current-password"></dd>
+                        </dl>
+                    </div>
+                    <div>
+                        <dl>
+                            <dt><label for="user_new_password">New Password</label></dt>
+                            <dd><input class="form-control" type="password" id="new-password" /></dd>
+                        </dl>
+                    </div>
+                    <div>
+                        <dl>
+                            <dt><label for="user_retype_password">Retype New Password</label></dt>
+                            <dd><input class="form-control" type="password" id="retype-password"></dd>
+                        </dl>
+                    </div>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </form>
+            </div>
+        </div>
+        <div class="settings-container">
+            <div class="container-header medium-margin-top bold">Change Email</div>
+            <div class="container-inner less-margin-top">
+                <form>
+                    <div>
+                        <dl>
+                            <dt><label for="user_email_address">Email Address</label></dt>
+                            <dd><input type="email" class="form-control" id="new-email-id" placeholder="Enter new email address"></dd>
+                        </dl>
+                    </div>
+                    <button type="submit" class="btn btn-success">Send Verification Link</button>
+                </form>
+            </div>
+        </div>
     </div>
 </template>
