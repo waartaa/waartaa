@@ -269,7 +269,7 @@ ChatSubscribe = function () {
         // Alert user on mention on unfocussed chat room
         if (
           user_server &&
-          new_logs > 0 &&
+          (new_logs > 0 || !window_focus) &&
           log.from &&
           messageContainsNick(log.message, user_server.current_nick) &&
           (
@@ -310,7 +310,7 @@ ChatSubscribe = function () {
           session_key, 'lastAccessedPm-' + fields.server_id + '_' + nick,
           fields.last_updated, update_session);
         if (
-            new_logs > 0 &&
+            (new_logs > 0 || !window_focus) &&
             (
               (room.room_id != fields.server_id + '_' + nick) || !window_focus
             )
