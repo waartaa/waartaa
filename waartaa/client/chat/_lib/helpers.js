@@ -24,15 +24,28 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
   var room = Session.get('room');
   if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
     scroll_top = null;
-  if (room.roomtype == 'channel')
+  var oldest_log_id_in_room = null;
+  if (room.roomtype == 'channel') {
+    oldest_log_id_in_room = (ChannelLogs.findOne(
+      {channel_name: room.channel_name}, {sort: {created: 1}}) || {})._id;
     Session.set('scroll_height_channel-' + room.room_id,
       scroll_top);
-  else if (room.roomtype == 'pm')
+  } else if (room.roomtype == 'server') {
+    oldest_log_id_in_room = (UserServerLogs.findOne(
+    {server_id: room.room_id}, {sort: {created: 1}}) || {})._id;
     Session.set('scroll_height_' + room.room_id,
       scroll_top);
-  else if (room.roomtype == 'server')
+  } else if (room.roomtype == 'pm') {
+    oldest_log_id_in_room = (PMLogs.find(
+    {
+      $or: [{from: room.nick}, {to_nick: room.nick}],
+      server_id: room.server_id
+    }, {sort: {created: 1}},
+    {fields: {created: 0, last_updated: 0}}) || {})._id;
     Session.set('scroll_height_server-' + room.server_id,
       scroll_top);
+  }
+  Session.set('oldest_log_id_in_room', oldest_log_id_in_room);
   Session.set(key, current_count + DEFAULT_LOGS_COUNT);
 }
 
@@ -79,10 +92,12 @@ waartaa.chat.helpers.highlightServerRoom = function () {
  * @param {object} obj This is an object holding attributes of the
  *     currently selected room.
  */
-waartaa.chat.helpers.setCurrentRoom = function (obj) {
+waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
   var set_cookie = function(key, value) {
     document.cookie = key + '=' + value;
   };
+
+  Session.set('oldest_log_id_in_room');
 
   set_cookie('userId', Meteor.userId());
   set_cookie('roomtype', obj.roomtype);
@@ -131,6 +146,8 @@ waartaa.chat.helpers.setCurrentRoom = function (obj) {
       JSON.stringify(Session.get('room')))
     waartaa.chat.helpers.roomAccessedTimestamp.update(
       prevRoom.roomtype, prevRoom);
+  if (callback)
+    callback();
 };
 
 
