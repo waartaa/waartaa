@@ -5,3 +5,4 @@
 *.csr
 node_modules
 *~
+build
