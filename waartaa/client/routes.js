@@ -35,10 +35,20 @@ Router.map(function () {
 
   this.route('account/', {
     path: /^\/settings\/$/,
-    template: 'account-settings',
+    template: 'accountSettings',
     layoutTemplate: 'layout',
-    }
-  );
+    onBeforeAction: [
+        function () {
+            if (Meteor.isClient) {
+                if(!Meteor.userId()) {
+                    Router.go('/');
+                    this.render('user_loggedout_content');
+                    this.stop();
+                }
+            }
+        },
+    ],
+  });
 
   this.route('chat', {
     path: /^\/chat$/,
