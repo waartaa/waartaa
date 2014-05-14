@@ -19,18 +19,24 @@
     Template.accountSettings.events({
         'click #btn-change-password': function(e) {
             var user = Meteor.user();
+            event.preventDefault();
+            $('.error').addClass('hidden');
             if (user) {
                 var currentPassword = $('#current-password').val();
                 var newPassword = $('#new-password').val();
                 var rnewPassword = $('#retype-password').val();
 
                 if (newPassword == rnewPassword) {
-                    Accounts.changePassword(currentPassword, newPassword);
+                    Accounts.changePassword(currentPassword, newPassword, function(e){
+                        console.log(e);
+                    });
                 } else {
-                    Meteor.Error(403, "Password do not match");
+                    $('.error').html('Password do not match');
+                    $('.error').removeClass('hidden');
                 }
             } else {
-                Meteor.Error(404, "User is not authenicated");
+                $('.error').html('User is not authenticated');
+                $('.error').removeClass('hidden');
             }
         }
     });

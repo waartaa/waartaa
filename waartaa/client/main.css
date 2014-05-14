@@ -524,6 +524,10 @@ body {
     font-weight: bold !important;
 }
 
+.hidden {
+    display: hidden;
+}
+
 .settings-container {
   position: relative;
   background: #efefef;
