@@ -9,12 +9,11 @@ ChannelLogs.allow({
     }
     _send_channel_message(
     user, log.channel_id, log.message, log_options);
-    if (log.message[0] == '/')
-        return false;
     if (log.message.substr(0, 3) == '/me') {
         log.message = log.message.replace('/me', log.from);
         log.from = null;
-    }
+    } else if (log.message[0] == '/')
+        return false;
     return true;
   }
 });
