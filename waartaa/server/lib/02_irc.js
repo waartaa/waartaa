@@ -653,6 +653,8 @@ IRCHandler = function (user, user_server) {
                         part_message = nick + ' has left IRC';
                         if (reason)
                             part_message += ' (' + reason + ')';
+                        channel_nicks_manager.removeChannelNick(
+                            channel.user_server_name, channel.name, nick);
                         enqueueTask(URGENT_QUEUE, function () {
                             Fiber(function () {
                                 channelLogsManager.insertIfNeeded({
