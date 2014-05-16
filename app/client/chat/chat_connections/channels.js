@@ -16,7 +16,7 @@ Template.server_channels.channels = function (server_id) {
 }
 
 function serverChannelsCreatedCallback () {
-  $('#chat-servers .nan').nanoScroller();
+  $('#chat-servers .nano').nanoScroller();
   updateHeight();
 }
 
@@ -35,7 +35,7 @@ Template.server_channel_item.helpers({
   }
 });
 
-Template.channel_menu.events = {
+Template.channel_menu.events({
   'click .channel-remove': function (e) {
     var channel_id = $(e.target).data("channel-id");
     var channel = UserChannels.findOne({_id: channel_id});
@@ -73,7 +73,7 @@ Template.channel_menu.events = {
     else
       Meteor.call('join_user_channel', channel.user_server_name, channel.name);
   }
-};
+});
 
 Template.edit_server_channel.events = {
   'submit .editServerChannel': function (e) {
