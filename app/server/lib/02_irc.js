@@ -252,14 +252,16 @@ ChannelLogsManager = function () {
   function _insert (log) {
     ChannelLogs.insert(log, function (err, id) {});
     OldChannelLogs.insert(log, function (err, id) {});
-    var es_client = elasticsearch.Client({
-      host: 'localhost:9200'
-    });
-    es_client.index({
-      index: 'channel_logs',
-      type: 'log',
-      body: log
-    }, function (err, resp) {});
+    if(CONFIG.ENABLE_ELASTIC_SEARCH) {
+      var es_client = elasticsearch.Client({
+        host: 'localhost:9200'
+      });
+      es_client.index({
+        index: 'channel_logs',
+        type: 'log',
+        body: log
+      }, function (err, resp) {});
+    }
   }
   return {
     insertIfNeeded: function (log, client_nick) {
