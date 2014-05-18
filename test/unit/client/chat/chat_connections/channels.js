@@ -27,20 +27,19 @@
 
       var channel_id = 'xyz';
 
-      var getLastAccessedChannel = function () {
-        return Session.get("lastAccessedChannel-" + channel_id);
+      var getLastAccessedChannelKey = function () {
+        return "lastAccessedChannel-" + channel_id;
       };
 
       afterEach(function () {
-        Session.set(getLastAccessedChannel(), undefined);
+        Session.set(getLastAccessedChannelKey(), undefined);
       });
 
       it("sets lastAccessedChannel-<channel-id> in session", function () {
-        Template.server_channel_item.data = {};
-        Template.server_channel_item.data._id = channel_id;
+        Template.server_channel_item.data = {_id: channel_id};
         Template.server_channel_item.created();
         var date_obj = new Date();
-        var session_date_obj = getLastAccessedChannel();
+        var session_date_obj = Session.get(getLastAccessedChannelKey());
         expect(session_date_obj).not.toBeUndefined();
         expect(session_date_obj.toString()).toBe(date_obj.toString());
       });

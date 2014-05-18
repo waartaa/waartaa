@@ -28,7 +28,8 @@ module.exports = function(config){
             'app/lib/models/chat.js',
 
             // App code loaded next
-            'app/client/chat/chat_connections/channels.js'
+            'app/client/chat/chat_connections/channels.js',
+            'app/client/chat/chat_connections/server.js'
 
 	        // simulate meteor's load order rules:
 	        // - lib directory first
@@ -120,7 +121,7 @@ module.exports = function(config){
         logLevel : config.LOG_ERROR,
 
         // enable / disable watching file and executing tests whenever any file changes
-        autoWatch : false,
+        autoWatch : true,
 
 
         // Start these browsers, currently available:
