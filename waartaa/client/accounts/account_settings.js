@@ -40,4 +40,15 @@
             }
         }
     });
+
+    Template.accountSettings.events({
+        'click #btn-change-email': function(e) {
+            var userId = Meteor.userId()
+            event.preventDefault();
+            if (userId) {
+                 var email = $('#new-email').val();
+                 Meteor.call('change_email', userId, email);
+            }
+        }
+    });
 })();

@@ -509,5 +509,9 @@ Meteor.methods({
         var _time = (new Date).getTime();
         console.log(_time);
         return _time;
-    }
+    },
+    // Send Verification Email
+    change_email: function(userId, email) {
+        Accounts.sendVerificationEmail(userId, email);
+    },
 })
