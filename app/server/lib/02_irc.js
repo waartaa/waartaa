@@ -894,9 +894,8 @@ IRCHandler = function (user, user_server) {
                 // NOTICE from server
             }
         });
-        client.addListener('error', function (err) {
-            Fiber(function () {
-            }).run();
+        client.on('error', function (err) {
+            logger.error(err);
         });
     }
 

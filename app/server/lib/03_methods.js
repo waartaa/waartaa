@@ -1,3 +1,5 @@
+IRC_NICK_REGEX = /^[A-Za-z_\-\[\]\\^{}|`][\w\-\[\]\\^{}|`]{2,15}$/;
+
 function get_admin_users () {
     var user_ids = {};
     var admin_users = Meteor.users.find({is_admin: true});
@@ -19,6 +21,9 @@ function validate_server_form_data(data, user, server) {
         throw new Meteor.Error(400, "Missing server name.");
     else if (! data.connections.length)
         throw new Meteor.Error(400, "Missing connections for server.");
+    else if ( !data.nick.match(IRC_NICK_REGEX)
+            && data.nick.toLowerCase() == data.name.toLowerCase())
+        throw new Meteor.Meteor.Error(400, "Invalid nick");
     else if (Servers.findOne({name: data.name}))
         throw new Meteor.Error(403, "A server by this name already exists.");
 }
