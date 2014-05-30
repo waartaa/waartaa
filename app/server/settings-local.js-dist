@@ -35,7 +35,10 @@ CONFIG = {
   // PATHS for SSL credential files are relative to app/private directory
   'SSL_DEFAULT_CA_FILE': '',
   'SSL_DEFAULT_PRIVATE_KEY_FILE': 'certs/privatekey.pem',
-  'SSL_DEFAULT_CERT_FILE': 'certs/certificate.pem'
+  'SSL_DEFAULT_CERT_FILE': 'certs/certificate.pem',
+  'ENABLE_ELASTIC_SEARCH': true,
+  'ELASTIC_SEARCH_HOST': 'localhost:9200',
+  'ELASTIC_SEARCH_DATA_LIMIT': 20
 };
 
 SUPER_USER = 'admin';
