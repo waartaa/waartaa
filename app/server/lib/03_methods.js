@@ -177,7 +177,7 @@ function _create_user_server(data, user) {
         var channel_name = user_server.channels[i];
         Meteor.call('join_user_channel', user_server.name, channel_name);
     }*/
-    Meteor.call('join_user_server', user_server.name);
+    _join_user_server(user, user_server.name);
 }
 
 function getCurrentUser() {
