@@ -1312,6 +1312,8 @@ IRCHandler = function (user, user_server) {
     }
 
     function _sendPMMessage(to, message, action, send) {
+        if ( !client )
+            return;
         try {
             if (message.search('/me') == 0)
                 message = message.replace('/me', client.nick);
@@ -1529,6 +1531,8 @@ IRCHandler = function (user, user_server) {
         removeServer: function (server_id, user_id) {},
         updateServer: function (server_id, server_data, user_id) {},
         sendChannelMessage: function (channel_name, message, action, send, log) {
+            if ( !client )
+                return;
             try {
                 var channel = UserChannels.findOne({
                   name: channel_name,
@@ -1591,6 +1595,8 @@ IRCHandler = function (user, user_server) {
         getServerClient: function (server_id, user_id) {},
         isServerConnected: function (server_id) {},
         sendRawMessage: function (message, log_options) {
+            if ( !client )
+                return;
             //try {
                 var args = message.substr(1).split(' ');
                 if (log_options && (args[0] == 'whois' || args[0] == 'WHOIS')) {
