@@ -22,7 +22,8 @@
       "page-js-ie-support": {},
       "crypto-md5": {},
       "jquery-titlealert": {},
-      "accounts-ui-bootstrap-3": {}
+      "accounts-ui-bootstrap-3": {},
+      "chosen-package": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -129,6 +130,11 @@
         "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
         "tag": "v0.3.3",
         "commit": "2e50b605d8d5ed68e48c4529a65f13552d8af3f9"
+      },
+      "chosen-package": {
+        "git": "https://github.com/Ore4444/chosen-package.git",
+        "tag": "v0.11.1",
+        "commit": "8d1a748bafaae8b6005a979ab7261ac14ff38052"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

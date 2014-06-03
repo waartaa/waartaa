@@ -49,5 +49,12 @@
 /crypto-base
 /blaze-layout
 /jquery-titlealert
+<<<<<<< HEAD
 /kadira
+<<<<<<< HEAD
 /bootstrap3-less
+=======
+=======
+/chosen-package
+>>>>>>> 7071aba... Integrate search UI and API
+>>>>>>> 4ad603a... Integrate search UI and API
