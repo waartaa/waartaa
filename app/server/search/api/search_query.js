@@ -27,6 +27,18 @@ SearchQuery = function (q) {
         "term": {"from": this.q.from}
       });
     }
+    // Filter NOT NULL from field
+    else {
+      filter.push({
+        "not": {
+          "missing": {
+            "field": "from",
+            "existence":  true,
+            "null_value": "true"
+          }
+        }
+      });
+    }
     // Filter by date range
     if (this.q.dateFrom && this.q.dateTo) {
       filter.push({
