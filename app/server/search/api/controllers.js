@@ -64,8 +64,13 @@ SearchController = (function () {
     var resp;
     if (isOK) {
       var d = [];
-      for(var i=0; i<data.hits.hits.length; i++)
-        d.push(data.hits.hits[i]._source);
+      for (var i=0; i<data.hits.hits.length; i++) {
+        var doc = data.hits.hits[i];
+        if (doc.highlight) {
+          doc._source.message = doc.highlight.message[0];
+        }
+        d.push(doc._source);
+      }
       resp = {
         status: true,
         results: {

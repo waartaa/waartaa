@@ -38,6 +38,9 @@ waartaa.search.helpers = {
           return results.data;
         }
       }));
+      // decode html trick
+      // decoded highlighted search terms
+      chatHTML = $('<textarea />').html(chatHTML).val();
       $('#search-errors').hide();
       $('#chat-logs .logs').html(chatHTML);
       $('#chat-logs .results-count').html('About ' + results.totalCount + ' result(s) in ' + results.took/1000 + ' seconds');
@@ -58,12 +61,6 @@ waartaa.search.helpers = {
 };
 
 Template.search.helpers({
-  addChannelHash: function (channelName) {
-    if(channelName) {
-      return '#' + channelName;
-    }
-  },
-
   stripChannelHash: function (channelName) {
     if (channelName && channelName[0] == '#') {
       return channelName.substring(1, channelName.length);

@@ -90,6 +90,16 @@ SearchQuery = function (q) {
       qJSON.track_scores = true;
     }
 
+    // Highlight search terms
+    if (this.q.message || this.q.to) {
+      qJSON.highlight = {
+        "tags_schema": "styled",
+        "fields": {
+          "message": {}
+        }
+      }
+    }
+
     this.qJSON = qJSON;
 
     return this;
