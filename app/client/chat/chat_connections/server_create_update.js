@@ -2,6 +2,7 @@ Template.add_server_modal.events({
   'submit form': function (e) {
     e.preventDefault();
     e.stopPropagation();
+    var $this = $(e.target);
     var data = {
       server_id: $('#server-join-server-list').val(),
       nick: $('#server-join-nick').val(),
@@ -9,15 +10,21 @@ Template.add_server_modal.events({
       password: $('#server-join-password').val(),
       channels: $('#server-join-channels').val()
     };
+    $this.find('.form-group').removeClass('has-feedback has-error');
     Meteor.call('user_server_create', data, function (err) {
       if (!err)
         $('#addServerModal').modal('hide');
+      else {
+        var $errField = $this.find('[name="' + err.reason.field + '"]');
+        $errField.parents('.form-group').addClass('has-feedback has-error');
+      }
     });
   },
 });
 
 $('#addServerModal').on('shown.bs.modal', function (e) {
-  $('#addServerModal').find('[name="nick"]').focus();
+  $('#addServerModal').find('[name="nick"]').focus()
+    .end().find('.form-group').removeClass('has-feedback has-error');
 });
 
 Template.edit_server_modal.events({

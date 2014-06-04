@@ -21,15 +21,21 @@ function validate_server_form_data(data, user, server) {
         throw new Meteor.Error(400, "Missing server name.");
     else if (! data.connections.length)
         throw new Meteor.Error(400, "Missing connections for server.");
-    else if ( !data.nick.match(IRC_NICK_REGEX)
-            && data.nick.toLowerCase() == data.name.toLowerCase())
-        throw new Meteor.Meteor.Error(400, "Invalid nick");
     else if (Servers.findOne({name: data.name}))
         throw new Meteor.Error(403, "A server by this name already exists.");
 }
 
 function validate_user_server_form_data(data, user, server) {
-
+    var server = Servers.findOne({_id: data.server_id});
+    if ( !server )
+        throw new Meteor.Error(404, {
+            field: 'server',
+            message: "Server not found"});
+    else if ( !data.nick.match(IRC_NICK_REGEX)
+            || data.nick.toLowerCase() == server.name.toLowerCase())
+        throw new Meteor.Error(400, {
+            field: 'nick',
+            message: "Invalid nick"});
 }
 
 function _create_update_server(server, data, user) {
@@ -111,6 +117,7 @@ function _create_user_server(data, user) {
         channels: channels,
         nick: data.nick,
         real_name: data.real_name,
+        active: true,
         //password: encrypt(data.password),
         user: user.username,
         user_id: user._id,
@@ -133,7 +140,8 @@ function _create_user_server(data, user) {
                 channels: user_server_data.channels,
                 last_updated: user_server_data.last_updated,
                 last_updater: user_server_data.last_updater,
-                last_updater_id: user_server_data.last_updater_id
+                last_updater_id: user_server_data.last_updater_id,
+                active: user_server_data.active
             }
         });
         var user_server = UserServers.findOne({_id: user_server._id});
@@ -279,15 +287,14 @@ Meteor.methods({
     // Create/update global servers (by admin users)
     server_create_update : function (data) {
         var user = Meteor.users.findOne({_id: this.userId});
-        validate_server_form_data(data, user);
-        var server = None;
-        if (data.id)
-            server = Servers.findOne({_id: data.id});
+        var server = Servers.findOne({_id: data.id});
+        validate_server_form_data(data, user, server);
         _create_update_server(server, data, user);
     },
     // Create/update user servers
     user_server_create: function (data) {
         var user = Meteor.users.findOne({_id: this.userId});
+        validate_user_server_form_data(data, user);
         console.log(data);
         _create_user_server(data, user);
     },
