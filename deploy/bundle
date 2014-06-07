@@ -24,7 +24,7 @@ def bundle_waartaa():
     if os.path.exists(BUNDLE_PATH):
         print "Cleaning up existing distribution directory."
         shutil.rmtree(BUNDLE_PATH)
-    os.chdir(os.path.join(PROJECT_PATH, 'waartaa'))
+    os.chdir(os.path.join(PROJECT_PATH, 'app'))
     exec_command('demeteorizer -n 0.10.26 -o %s' % BUNDLE_PATH)
 
 
