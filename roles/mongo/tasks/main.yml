@@ -6,12 +6,12 @@
 
   - name: Install MongoDB packages
     sudo: yes
-    yum: name=mongo-10gen-{{ mongo_version }}
-    yum: name=mongo-10gen-server-{{ mongo_version }}
+    yum: name=mongodb
+    yum: name=mongodb-server
 
   - name: update the MongoDB conf file
     sudo: yes 
-    template: src=mongodb.conf.j2 dest=/etc/mongod.conf owner=root group=root
+    template: src=mongodb.conf.j2 dest=/etc/mongodb.conf owner=root group=root
 
   - name: ensure MongoDB is running
     sudo: yes
