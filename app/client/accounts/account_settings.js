@@ -16,11 +16,14 @@
         return '';
     };
 
+    Template.accountSettings.formMessage = function(){
+        return Session.get('formMessage');
+    };
+
     Template.accountSettings.events({
         'click #btn-change-password': function(e) {
             var user = Meteor.user();
             event.preventDefault();
-            $('.error').addClass('hidden');
             if (user) {
                 var currentPassword = $('#current-password').val();
                 var newPassword = $('#new-password').val();
@@ -28,11 +31,14 @@
 
                 if (newPassword == rnewPassword) {
                     Accounts.changePassword(currentPassword, newPassword, function(e){
-                        console.log(e);
+                        if(e) {
+                            Session.set('formMessage', 'Incorrect Password');
+                        } else {
+                            Session.set('formMessage', 'Password Changed');
+                        }
                     });
                 } else {
-                    $('.error').html('Password do not match');
-                    $('.error').removeClass('hidden');
+                    Session.set('formMessage', 'Password do not match');
                 }
             } else {
                 $('.error').html('User is not authenticated');
