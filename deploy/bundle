@@ -1,0 +1,58 @@
+#! /usr/bin/env python
+import os
+import shutil
+import json
+from subprocess import Popen, PIPE
+
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+BUNDLE_PATH = os.path.join(PROJECT_PATH, 'deploy/dist/current')
+
+
+def exec_command(command):
+    args = command.split(' ')
+    p = Popen(args, stdout=PIPE, bufsize=1)
+    for line in iter(p.stdout.readline, b''):
+        print line
+    p.communicate()
+
+
+def bundle_waartaa():
+    try:
+        os.makedirs(BUNDLE_PATH)
+    except OSError:
+        pass
+    if os.path.exists(BUNDLE_PATH):
+        print "Cleaning up existing distribution directory."
+        shutil.rmtree(BUNDLE_PATH)
+    os.chdir(os.path.join(PROJECT_PATH, 'app'))
+    exec_command('demeteorizer -n 0.10.26 -o %s' % BUNDLE_PATH)
+
+
+def customize_package_json():
+    f = open(os.path.join(
+        PROJECT_PATH, 'deploy/extra_node_deps.json'))
+    extra_deps = json.load(f)
+    f.close()
+    f = open(os.path.join(
+        BUNDLE_PATH, 'package.json'))
+    package_json = json.load(f)
+    f.close()
+    package_json['dependencies'].update(extra_deps)
+    f = open(os.path.join(
+        BUNDLE_PATH, 'package.json'), 'w')
+    json.dump(package_json, f, indent=2)
+    f.close()
+    if 'newrelic' in extra_deps:
+        f = open(os.path.join(
+            BUNDLE_PATH, 'main.js'))
+        content = 'require("newrelic");\n' + f.read()
+        f.close()
+        f = open(os.path.join(
+            BUNDLE_PATH, 'main.js'), 'w')
+        f.write(content)
+        f.close()
+
+
+if __name__ == '__main__':
+    bundle_waartaa()
+    customize_package_json()

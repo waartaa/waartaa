@@ -1,0 +1,58 @@
+
+<template name="chat_row">
+  <div class="row chatlog-row{{# unless from}} chatlog-notice{{/unless}}">
+    <div class="col-md-12{{#if checkOwnNickInMsg message server_current_nick from}} highlight-mention{{/if}}">
+      <div class="pull-left chatlog-from">
+        {{# if from}}
+          <span class="label label-info">
+            <icon class="glyphicon glyphicon-user"></icon>
+            <strong>{{from}}</strong>
+          </span>
+        {{/if}}
+      </div>
+      <div class="{{# if isToday last_updated}}col-md-10{{else}}col-md-9{{/if}} chatlog-message">
+          {{# unless from}}
+            <icon class="glyphicon glyphicon-info-sign"></icon>
+          {{/unless}}
+          {{decorate message}}
+      </div>
+      <div class="pull-right chatlog-time">
+        <em class="pull-right chat-message-datetime">
+          {{# if isChatMessageNew status}}
+            <icon class="glyphicon glyphicon-refresh"></icon>
+          {{else}}
+            <icon class="glyphicon glyphicon-time"></icon>
+            {{ showDatetime last_updated }}
+          {{/if}}
+        </em>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="pm_chat_row">
+  <div class="row chatlog-row{{# unless display_from}} chatlog-notice{{/unless}}">
+    <div class="col-md-12">
+      <div class="pull-left chatlog-from">
+        {{# if display_from}}
+          <span class="label label-info">
+            <icon class="glyphicon glyphicon-user"></icon>
+            <strong>{{display_from}}</strong>
+          </span>
+        {{/if}}
+      </div>
+      <div class="{{# if isToday last_updated}}col-md-10{{else}}col-md-9{{/if}} chatlog-message">
+          {{# unless from}}
+            <icon class="glyphicon glyphicon-info-sign"></icon>
+          {{/unless}}
+          {{decorate message}}
+      </div>
+      <div class="pull-right chatlog-time">
+        <em class="pull-right chat-message-datetime">
+          <icon class="glyphicon glyphicon-time"></icon>
+          {{ showDatetime last_updated }}
+        </em>
+      </div>
+    </div>
+  </div>
+</template>

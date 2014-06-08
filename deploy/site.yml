@@ -1,0 +1,23 @@
+---
+# The main playbook to deploy the site
+
+- hosts: waartaa_all
+  roles:
+   - common
+
+
+- hosts: waartaa_app_servers
+  roles:
+    - nginx
+    - nodejs
+
+
+- hosts: waartaa_db_servers
+  roles:
+   - mongo
+
+
+- hosts: waartaa_app_servers
+  roles:
+   - app_deploy
+

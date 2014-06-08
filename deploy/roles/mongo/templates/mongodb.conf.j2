@@ -1,7 +1,7 @@
 # mongo.conf
 
 #where to log
-logpath=/var/log/mongodb/mongodb.log
+logpath=/var/log/mongo/mongod.log
 
 logappend=true
 
@@ -10,10 +10,10 @@ fork = true
 
 #port = 27017
 
-dbpath=/var/lib/mongodb
+dbpath=/var/lib/mongo
 
 # location of pidfile
-pidfilepath = /var/run/mongodb/mongodb.pid
+pidfilepath = /var/run/mongodb/mongod.pid
 
 # Disables write-ahead journaling
 # nojournal = true

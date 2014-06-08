@@ -1,0 +1,12 @@
+---
+author_name: your name
+author_email: youremail@foo.com
+user: server_username
+deploy_dir: /home/server_username/deploy
+app_dir: /home/server_username/deploy/current
+log_file: /home/server_username/deploy/current/waartaa.log
+mongo_url: mongodb://127.0.0.1:27017/waartaa
+mongo_oplog_url: mongodb://127.0.0.1:27017/local
+root_url: http://localhost:8080
+meteor_settings: "'{\"presenceTimeout\":30000,\"DEBUG\":false}'"
+port: 3000

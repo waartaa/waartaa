@@ -3,3 +3,7 @@
     sudo: yes
     yum: name="@Development tools" state=present
 
+  - name: Make sure epel is installed 
+    yum: name=http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm state=installed
+    sudo: yes
+
