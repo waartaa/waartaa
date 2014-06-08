@@ -519,3 +519,90 @@ body {
 #login-container a {
   cursor: pointer;
 }
+
+/*** Search UI ***/
+#search-container {
+  width: 900px;
+  margin: 0 auto;
+}
+
+#search-fields {
+  margin-top: 10px;
+  display: block;
+  position: relative;
+}
+
+#search-message {
+  width: 350px;
+  float: left;
+}
+
+.chzn-container {
+  margin-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 1px;
+  float: left;
+}
+
+#search-button {
+  width: 85px;
+  margin-left: 10px;
+  height: 30px;
+  float: left;
+  border: #fff;
+  border-radius: 3px;
+}
+
+#search-message-from {
+  clear:both;
+}
+
+#search-results {
+  clear: both;
+  position: relative;
+  top: 20px;
+}
+
+#advance-search {
+  position: relative;
+  top: 10px;
+  clear: both;
+}
+
+.advance-field {
+  clear: both;
+  width: 350px;
+  margin-top: 5px;
+  display: none;
+}
+
+.advance-field-first {
+  top: 10px;
+}
+
+.advance-field input {
+  margin-right: 10px;
+  width: 200px;
+  height: 25px;
+}
+
+#search-results {
+  width: 810px;
+  display: none;
+}
+
+#chat-logs .logs {
+  margin-top: 5px;
+}
+
+.search-errors {
+  display: none;
+}
+
+.search-errors ul {
+  margin-left: -10px;
+}
+
+em.hlt1 {
+  font-weight: bold;
+}

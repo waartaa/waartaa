@@ -1,0 +1,48 @@
+<template name="search">
+  <div id="search-container">
+    <div class="chatlogs-loader-msg" style="">Searching...</div>
+    <div id="search-fields">
+      <input id="search-message" type= "text" class="form-control" placeholder="Search message(Optional)...">
+      <select data-placeholder="Select channel" class="chosen-select" tabindex="-1" style="width: 350px; margin-left:10px">
+        <option value></option>
+        {{#each servers}}
+          <optgroup label={{ name }}>
+          {{#each channels _id}}
+            <option value={{ stripChannelHash name }}>{{ name }}</option>
+          {{/each}}
+          </optgroup>
+        {{/each}}
+      </select>
+      <input id="search-button" type="button" value="Search">
+      <div id="advance-search">
+        <a href="#" class="advance-field-link" data-active="false">Show advance search</a>
+        <div class="advance-field advance-field-first">
+          <label>From:</label>
+          <input id="search-message-from" type="text" class="form-control">
+        </div>
+        <div class="advance-field">
+          <label>To:</label>
+          <input id="search-message-to" type="text" class="form-control">
+        </div>
+        <div class="advance-field">
+          <label>Date From:</label>
+          <input id="start-date" type="text" class="datepicker">
+        </div>
+        <div class="advance-field">
+          <label>Date To:</label>
+          <input id="end-date" type="text" class="datepicker">
+        </div>
+      </div>
+    </div>
+    <div id="search-results">
+      <div id="chat-logs">
+        <div class="results-count"></div>
+        <div class="logs"></div>
+      </div>
+      <div id="search-errors">
+        <strong>Your search contain error(s):</strong>
+        <div class="errors"></div>
+      </div>
+    </div>
+  </div>
+</template>
