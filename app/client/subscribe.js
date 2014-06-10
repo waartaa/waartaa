@@ -143,7 +143,11 @@ ChatSubscribe = function () {
     });
   };
 
-  subscribe();
+  isSubscribed = Session.get('is_subscribed');
+  if (!isSubscribed) {
+      subscribe();
+      Session.set('is_subscribed', true);
+  }
 
   Deps.autorun(subscribe_user_server_logs);
   Deps.autorun(subscribe_channel_logs);
