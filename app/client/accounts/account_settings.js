@@ -26,23 +26,27 @@
             event.preventDefault();
             if (user) {
                 var currentPassword = $('#current-password').val();
-                var newPassword = $('#new-password').val();
-                var rnewPassword = $('#retype-password').val();
+                var newPassword = $('#new-password').val().trim();
+                var rnewPassword = $('#retype-password').val().trim();
 
-                if (newPassword == rnewPassword) {
-                    Accounts.changePassword(currentPassword, newPassword, function(e){
-                        if(e) {
-                            Session.set('formMessage', 'Incorrect Password');
-                        } else {
-                            Session.set('formMessage', 'Password Changed');
-                        }
-                    });
+                // Check if the password is more than 6 characters
+                if (newPassword.length < 8) {
+                    Session.set('formMessage', 'Password less than 8 characters');
                 } else {
-                    Session.set('formMessage', 'Password do not match');
+                    if (newPassword == rnewPassword) {
+                        Accounts.changePassword(currentPassword, newPassword, function(e){
+                            if(e) {
+                                Session.set('formMessage', 'Incorrect Password');
+                            } else {
+                                Session.set('formMessage', 'Password Changed');
+                            }
+                        });
+                    } else {
+                        Session.set('formMessage', 'Password do not match');
+                    }
                 }
             } else {
-                $('.error').html('User is not authenticated');
-                $('.error').removeClass('hidden');
+                Session.set('formMessage', 'User is not authenticated');
             }
         }
     });
