@@ -25,6 +25,31 @@ Router.map(function () {
     },
     fastRender: true
   });
+
+  this.route('account', {
+    path: /^\/settings$/,
+    onBeforeAction: function() {
+      Router.go('/settings/');
+    }
+  });
+
+  this.route('account/', {
+    path: /^\/settings\/$/,
+    template: 'accountSettings',
+    layoutTemplate: 'layout',
+    onBeforeAction: [
+        function () {
+            if (Meteor.isClient) {
+                if(!Meteor.userId()) {
+                    Router.go('/');
+                    this.render('user_loggedout_content');
+                    this.stop();
+                }
+            }
+        },
+    ],
+  });
+
   this.route('chat', {
     path: /^\/chat$/,
     onBeforeAction: function () {

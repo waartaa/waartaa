@@ -1,0 +1,59 @@
+<template name="navLogin">
+    {{> _navLoginButtons}}
+</template>
+
+<template name="_navLoginButtons">
+    <ul id="user-links" class="nav navbar-nav navbar-right">
+        {{#if isUserLoggedIn }}
+            <li>
+                <a href="javascript:void(0);" class="fa fa-user"> {{ displayUserName }}</a>
+            </li>
+            <li>
+                <a href="/settings" class="fa fa-wrench"></a>
+            </li>
+            <li>
+                <a id="login-buttons-logout" class="fa fa-sign-out"></a>
+            </li>
+        {{else}}
+            <li class="navbar-brand fa fa-sign-in"></li>
+        {{/if}}
+    </ul>
+</template>
+
+<template name="accountSettings">
+    <ol class="breadcrumb">
+        <li><a href="/chat" class="fa fa-home"> Chat</a></li>
+        <li class="active">Settings</li>
+    </ol>
+    <div class="account-settings-container">
+        <div class="settings-container medium-margin-top">
+            <div class="container-header regular bold">Change Password</div>
+            <div class="container-inner less-margin-top">
+                {{# if formMessage }}
+                <div class="error alert alert-warning"> {{ formMessage }}</div>
+                {{/if}}
+                <form>
+                    <div>
+                        <dl>
+                            <dt><label for="user_old_password">Current Password</label></dt>
+                            <dd><input class="form-control" type="password" id="current-password"></dd>
+                        </dl>
+                    </div>
+                    <div>
+                        <dl>
+                            <dt><label for="user_new_password">New Password</label></dt>
+                            <dd><input class="form-control" type="password" id="new-password" /></dd>
+                        </dl>
+                    </div>
+                    <div>
+                        <dl>
+                            <dt><label for="user_retype_password">Retype New Password</label></dt>
+                            <dd><input class="form-control" type="password" id="retype-password"></dd>
+                        </dl>
+                    </div>
+                    <button type="submit" id="btn-change-password" class="btn btn-success">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>

@@ -519,3 +519,71 @@ body {
 #login-container a {
   cursor: pointer;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.regular {
+    font-size: 15px;
+}
+
+.bold {
+    font-weight: bold !important;
+}
+
+.hidden {
+    display: hidden;
+}
+
+.settings-container {
+  position: relative;
+  background: #efefef;
+  padding: 3px;
+  border-radius: 3px;
+  margin: 0 0 15px;
+}
+
+.settings-container .container-header {
+  background-color: #e0e0e0;
+  margin: 0;
+  border: 1px solid #d8d8d8;
+  border-bottom: 0;
+  padding: 10px 10px 11px;
+  font-size: 14px;
+}
+
+.settings-container .container-inner {
+  padding-left: 10px;
+  padding-bottom: 5px;
+  width: 95%;
+}
+
+.settings-container label {
+  font-size: 13px;
+  font-color: #666;
+}
+
+.account-settings-container {
+  width: 715px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.medium-margin-top{
+  margin-top: 20px;
+}
+
+.less-margin-top {
+  margin-top: 10px;
+}
+
+#user-links {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#user-links > li > a {
+  padding-right: 5px;
+  padding-left: 5px;
+}
