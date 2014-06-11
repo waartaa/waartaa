@@ -3,18 +3,28 @@
 </template>
 
 <template name="_navLoginButtons">
-    <div id="nav-login-buttons" class="pull-right">
+    <ul id="user-links" class="nav navbar-nav navbar-right">
         {{#if isUserLoggedIn }}
-        <span class="navbar-brand regular bold">{{ displayUserName }}</span>
-        <a href="/settings" class="navbar-brand fa fa-wrench"></a>
-        <a id="login-buttons-logout" class="navbar-brand cursor-pointer fa fa-sign-out"></a>
+            <li>
+                <a href="javascript:void(0);" class="fa fa-user"> {{ displayUserName }}</a>
+            </li>
+            <li>
+                <a href="/settings" class="fa fa-wrench"></a>
+            </li>
+            <li>
+                <a id="login-buttons-logout" class="fa fa-sign-out"></a>
+            </li>
         {{else}}
-        <div class="navbar-brand fa fa-sign-in"></div>
+            <li class="navbar-brand fa fa-sign-in"></li>
         {{/if}}
-    </div>
+    </ul>
 </template>
 
 <template name="accountSettings">
+    <ol class="breadcrumb">
+        <li><a href="/chat" class="fa fa-home"> Chat</a></li>
+        <li class="active">Settings</li>
+    </ol>
     <div class="account-settings-container">
         <div class="settings-container medium-margin-top">
             <div class="container-header regular bold">Change Password</div>

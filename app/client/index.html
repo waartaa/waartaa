@@ -32,11 +32,9 @@
         <a class="navbar-brand" href="{{# if currentUser }}/chat/{{else}}/{{/if}}">Waartaa <span style="color: #ACA9EB;"><sup><strong>β</strong></sup></span></a>
       </div>
       <div class="collapse navbar-collapse" id="nav-collapse-1">
-        <ul class="nav navbar-nav navbar-right">
-          {{#if currentUser}}
-            {{> navLogin }}
-          {{/if}}
-        </ul>
+        {{#if currentUser}}
+          {{> navLogin }}
+        {{/if}}
       </div>
     </div>
   </nav>

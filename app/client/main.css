@@ -577,3 +577,13 @@ body {
 .less-margin-top {
   margin-top: 10px;
 }
+
+#user-links {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#user-links > li > a {
+  padding-right: 5px;
+  padding-left: 5px;
+}
