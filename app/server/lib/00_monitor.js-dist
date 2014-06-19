@@ -4,8 +4,8 @@ copy this file to waartaa/server/lib/00_monitor.js
 and add proper nodetime's APP KEY.
 */
 if (Meteor.isServer) {
-    Npm.require('nodetime').profile({
-      accountKey: 'NODETIME APP KEY', 
-      appName: 'Waartaa'
-    });
+  Npm.require('nodetime').profile({
+    accountKey: 'NODETIME APP KEY', 
+    appName: 'Waartaa'
+  });
 }
