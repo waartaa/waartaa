@@ -1,9 +1,5 @@
 enqueueTask = function (queue, func, timeout) {
     Fiber(function () {
-        /*console.log(
-            queue.title, queue.total(), queue.length(), queue.progress(),
-            queue.usage(), func.toString());
-        */
         var timeout = timeout || CONFIG.DEFAULT_ASYNC_TASK_TIMEOUT || 5000;
         queue.add(function (done) {
             try {
@@ -16,7 +12,8 @@ enqueueTask = function (queue, func, timeout) {
                     Meteor.clearTimeout(timeoutId);
                 }).run();
             } catch (err) {
-                console.log(err, err.stack);
+                logger.error(
+                    'queuedTaskError: %s', err, {traceback: err.stack});
                 done();
                 Meteor.clearTimeout(timeoutId);
             }

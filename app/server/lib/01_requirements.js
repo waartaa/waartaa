@@ -10,7 +10,7 @@ if (Meteor.isServer) {
         fs = require('fs');
     }
     try {
-	   Fiber = Npm.require('fibers');
+       Fiber = Npm.require('fibers');
     } catch (err) {
         Fiber = require('fibers');
     }
@@ -24,7 +24,7 @@ if (Meteor.isServer) {
     } catch (err) {
         locks = require('locks');
     }
-	crypto = Npm.require('crypto');
+    crypto = Npm.require('crypto');
     Map = Meteor.require('collections/map');
     try {
         var privateKey = Assets.getText('certs/privatekey.pem');

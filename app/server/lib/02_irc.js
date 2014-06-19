@@ -90,9 +90,6 @@ ChannelListenersManager = function () {
         if (_CHANNEL_LISTENERS[key] === undefined)
             _CHANNEL_LISTENERS[key] = {};
         var channel_listeners = _CHANNEL_LISTENERS[key] || {};
-
-        console.log("=====BEFORE======");
-        console.log(_CHANNEL_CLIENTS, _CHANNEL_LISTENERS);
         for (nick in channel_listeners) {
             if (channel_clients[nick] === undefined) {
                 delete channel_listeners[nick];
@@ -108,9 +105,6 @@ ChannelListenersManager = function () {
             } else
                 break;
         }
-        console.log("=====AFTER======");
-        console.log(_CHANNEL_CLIENTS, _CHANNEL_LISTENERS);
-
     }
 
     return {
@@ -150,14 +144,8 @@ ChannelListenersManager = function () {
         isClientListener: function (server_name, channel_name, nick) {
             var key = server_name + channel_name;
             if ((_CHANNEL_LISTENERS[key] || {})[nick] === undefined) {
-                console.log('========NICK NOT LISTENER========');
-                console.log(server_name, channel_name, nick);
-                console.log(_CHANNEL_LISTENERS);
                 return false;
             }
-            console.log('========NICK IS LISTENER========');
-            console.log(server_name, channel_name, nick);
-            console.log(_CHANNEL_LISTENERS);
             return true;
         }
 
@@ -166,8 +154,6 @@ ChannelListenersManager = function () {
 channel_listeners_manager = ChannelListenersManager();
 
 function shallWriteChannelLog (nick, text, channel_name, server_name, client_nick) {
-    console.log('++++++++++++++++++++++++++++++++');
-    console.log(RECENT_CHANNEL_LOGS);
     if (RECENT_CHANNEL_LOGS[server_name] === undefined)
         RECENT_CHANNEL_LOGS[server_name] = {};
     if (RECENT_CHANNEL_LOGS[server_name][channel_name] === undefined)
@@ -178,16 +164,12 @@ function shallWriteChannelLog (nick, text, channel_name, server_name, client_nic
     var current_message = {
         nick: nick, text: text, client_nick: client_nick
     };
-    console.log('current_message', current_message);
-    console.log('latest_message', latest_message);
-    console.log('second_latest_message', second_latest_message);
     var shall_wrtite = false;
     if (latest_message) {
         if (latest_message.client_nick == current_message.client_nick)
             shall_wrtite = true;
         else if (latest_message.nick != current_message.nick ||
                 latest_message.text != current_message.text) {
-            console.log('second_latest_message', second_latest_message);
             if (second_latest_message) {
                 if (second_latest_message.text != current_message.text) {
                     shall_wrtite = true;
@@ -199,13 +181,8 @@ function shallWriteChannelLog (nick, text, channel_name, server_name, client_nic
     } else {
         shall_wrtite = true;
     }
-    console.log('shall_wrtite', shall_wrtite);
     if (shall_wrtite) {
-        console.log('recent_channel_logs', recent_channel_logs);
         recent_channel_logs.push(current_message);
-        console.log('recent_channel_logs', recent_channel_logs);
-        console.log(RECENT_CHANNEL_LOGS[server_name][channel_name]);
-        console.log('recent_channel_logs', recent_channel_logs);
     }
     return shall_wrtite;
 }
@@ -234,12 +211,11 @@ ChannelLogsManager = function () {
                 rwlock.timedWriteLock(5000, function (error) {
                     Fiber(function () {
                         if (error) {
-                            console.log(
+                            logger.debug(
+                                'channelLogWaitOnLockTimeout: %s',
                                 'Could not get the lock within 5 seconds, ' +
                                 'so gave up');
                         } else {
-                            console.log('Acquired write lock', server_name,
-                                        channel_name);
                             var shall_write = shallWriteChannelLog(
                                 nick, log.message, channel_name, server_name,
                                 client_nick);
@@ -419,31 +395,6 @@ IRCHandler = function (user, user_server) {
             channel_nicks_manager.addChannelNick(
                 user_server.name, channel_name, nick);
         });
-        /*
-        try {
-            var db_nicks_count = ChannelNicks.find(
-                {channel_name: channel_name, server_name: user_server.name}
-            ).count();
-            var irc_nicks_count = nicks_list.length;
-            assert(db_nicks_count == irc_nicks_count);
-        } catch (err) {
-            console.log(err);
-            if (err)
-                logger.error(
-                    'ChannelNicksUpdateError for ' + user_server.name +
-                        channel_name,
-                    {
-                        'nicks_list': nicks_list,
-                        'irc_nicks_count': irc_nicks_count,
-                        'db_nicks_count': db_nicks_count,
-                        'nicks_nin': ChannelNicks.find({
-                            channel_name: channel_name, server_name: user_server.name,
-                            nick: { $nin: nicks_list }
-                        }, {'nick': 1}).fetch(),
-                        'error': err
-                    }
-                );
-        }*/
     }
 
     function _addChannelNamesListener (channel_name) {
@@ -463,10 +414,7 @@ IRCHandler = function (user, user_server) {
             return;
         LISTENERS.server['names'] = '';
         client.addListener('names', function (channel, nicks) {
-                //console.log("++++++++++++++GLOBAL CHANNEL NAMES LISTENERS: " + channel + ' ' + user.username + ' ' + user_server.name);
-                //console.log(nicks);
             Fiber(function () {
-                //console.log(nicks);
                 var user_channel = UserChannels.findOne({
                     name: channel, active: true, user: user.username});
                 if (user_channel) {
@@ -549,15 +497,6 @@ IRCHandler = function (user, user_server) {
                     var user_channel = _create_update_user_channel(
                         user_server, {name: channel});
                     if (nick == client.nick) {
-                        /*
-                        var job_key = 'WHO-' + channel;
-                        if (JOBS[job_key])
-                            clearInterval(JOBS[job_key]);
-                        JOBS[job_key] = setInterval(
-                            _getChannelWHOData, CONFIG.channel_who_poll_interval,
-                            channel);
-                        */
-                        console.log(user_channel);
                         UserChannels.update(
                             {_id: user_channel._id}, {$set: {active: true}},
                             {multi: true}, function (err, updated) {});
@@ -782,7 +721,6 @@ IRCHandler = function (user, user_server) {
             client.removeListener('message', listener);
         });
         client.addListener('message', function (nick, to, text, message) {
-            //console.log(nick + ', ' + to + ', ' + text + ', ' + message);
             enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     if (to == client.nick) {
@@ -828,8 +766,7 @@ IRCHandler = function (user, user_server) {
 
     function _addRawMessageListener() {
         client.addListener('raw', function (message) {
-            if (CONFIG.DEBUG)
-                console.log(message);
+            logger.debug('rawIrcMessage: %s', message);
         });
     }
 
@@ -1392,7 +1329,6 @@ IRCHandler = function (user, user_server) {
         removeChannel: function (channel) {},
         joinUserServer: function () {
             SERVER_JOIN_QUEUE.add(function (done) {
-                console.log('=======JOINING SERVER========', user_server.name, user.username);
                 var timeoutId = Meteor.setTimeout(function () {
                         done();
                     }, 90000);
@@ -1400,7 +1336,7 @@ IRCHandler = function (user, user_server) {
                     try {
                         fs.writeFileSync(CONFIG.IDENT_FILE_PATH, 'global { reply "' + user.username + '" }');
                     } catch (err) {
-                        console.log(err);
+                        logger.debug('identFileWriteError: %s', err);
                     }
                     try {
                         var server = Servers.findOne({name: user_server.name});
@@ -1468,9 +1404,6 @@ IRCHandler = function (user, user_server) {
                             Fiber(function () {
                                 _joinServerCallback(message);
                                 done();
-                                console.log(
-                                    '========JOINED SERVER=========',
-                                    user_server.name, user.username);
                                 Meteor.clearTimeout(timeoutId);
                             }).run();
                         });

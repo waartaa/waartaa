@@ -198,7 +198,6 @@ function getCurrentUser() {
 }
 
 function _join_user_server(user, user_server_name) {
-    console.log('_JOIN USER SERVER');
     var user_server = UserServers.findOne({
         user: user.username, name: user_server_name});
     if (user_server) {
@@ -275,7 +274,6 @@ Meteor.startup(function () {
         debug: CONFIG.QUEUE_DEBUG || false,
         maxProcessing: CONFIG.DELAYED_QUEUE_WORKERS_COUNT || 1
     });
-    //console.log(Meteor.users.find());
     Meteor.users.find({}).forEach(function (user) {
         UserServers.find(
             {
@@ -300,12 +298,10 @@ Meteor.methods({
     user_server_create: function (data) {
         var user = Meteor.users.findOne({_id: this.userId});
         validate_user_server_form_data(data, user);
-        console.log(data);
         _create_user_server(data, user);
     },
     join_user_server: function (user_server_name) {
         var user = Meteor.users.findOne({_id: this.userId});
-        console.log('JOIN USER SERVER');
         UserServers.update(
             {
                 name: user_server_name,
@@ -321,7 +317,6 @@ Meteor.methods({
         var irc_handler = _get_irc_handler(user_server_name, this.userId);
         var user = Meteor.users.findOne({_id: this.userId});
         var active = close? false: true;
-        console.log('SERVER STATUS: ' + active);
         UserServers.update(
             {
                 user: user.username, name: user_server_name,
@@ -376,7 +371,6 @@ Meteor.methods({
         var user = Meteor.users.findOne({_id: this.userId});
         var irc_handler = CLIENTS[user.username][user_server_name];
         var active = close? false: true;
-        console.log('CHANNEL STATUS: ' + active);
         UserChannels.update(
             {
                 user: user.username, name: channel_name,
@@ -387,7 +381,6 @@ Meteor.methods({
 
     },
     send_channel_message: function (user_channel_id, message, log_options) {
-        //console.log(user_channel_id);
         var user = Meteor.users.findOne({_id: this.userId});
         _send_channel_message(user, user_channel_id, message, log_options);
     },
@@ -412,7 +405,7 @@ Meteor.methods({
             irc_handler.changeNick(nick);
     },
     log_clients: function () {
-        console.log(CLIENTS);
+        logger.debug('ircClient: %s', CLIENTS);
     },
     toggle_pm: function (user_server_id, nick, action) {
         var user = Meteor.users.findOne({_id: this.userId});
@@ -524,7 +517,6 @@ Meteor.methods({
     //get server time in milliseconds
     getServerMS: function () {
         var _time = (new Date).getTime();
-        console.log(_time);
         return _time;
     },
     // Send Verification Email
