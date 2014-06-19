@@ -194,8 +194,7 @@ Template.server_channels.created = function(){
         }
       }
       highlight_room();
-    }
-    catch(err){
+    } catch (err) {
       console.log(err);
     }
   }
@@ -253,8 +252,7 @@ Template.server_channels.created = function(){
         }
       }
       highlight_room();
-    }
-    catch(err) {
+    } catch (err) {
       console.log(err);
     }
   }

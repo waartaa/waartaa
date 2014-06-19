@@ -1,8 +1,8 @@
 UI.registerHelper("checkOwnNickInMsg", function (message, current_nick, from) {
-    var pattern=new RegExp("(^|[^\\d\\w])"+current_nick+"(^|[^\\d\\w])");
-    if(message.match(pattern) && from)
-	return true;
-    return false;
+  var pattern=new RegExp("(^|[^\\d\\w])"+current_nick+"(^|[^\\d\\w])");
+  if(message.match(pattern) && from)
+    return true;
+  return false;
 });
 
 UI.registerHelper("decorate", function (message) {
