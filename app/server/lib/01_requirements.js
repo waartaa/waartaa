@@ -24,6 +24,11 @@ if (Meteor.isServer) {
     } catch (err) {
         locks = require('locks');
     }
+    try {
+        elasticsearch = Npm.require('elasticsearch');
+    } catch (err) {
+        elasticsearch = require('elasticsearch');
+    }
 	crypto = Npm.require('crypto');
     Map = Meteor.require('collections/map');
     try {
