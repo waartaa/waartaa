@@ -358,6 +358,9 @@ IRCHandler = function (user, user_server) {
         });
         client.addListener('message' + channel.name, function (
                 nick, text, message) {
+            if ( !channel_listeners_manager.isClientListener(
+                    user_server.name, channel.name, client.nick) )
+                return;
             enqueueTask(URGENT_QUEUE, function () {
                 Fiber(function () {
                     var global = false;
@@ -1411,6 +1414,9 @@ IRCHandler = function (user, user_server) {
                             certExpired: true,
                             debug: CONFIG.DEBUG
                         };
+                        if (user_server.name == 'local') {
+                            client_options = {autoConnect: false};
+                        }
                         client = new irc.Client(server_url, nick, client_options);
                         client_data[server.name] = client;
                         UserServers.update(
