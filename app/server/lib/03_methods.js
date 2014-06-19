@@ -260,6 +260,11 @@ Meteor.startup(function () {
         debug: CONFIG.QUEUE_DEBUG || false,
         maxProcessing: 1
     });
+    CHANNEL_JOIN_QUEUE = new PowerQueue({
+        name: "join_channel",
+        debug: CONFIG.QUEUE_DEBUG || false,
+        maxProcessing: 1
+    });
     URGENT_QUEUE = new PowerQueue({
         name: "urgent",
         debug: CONFIG.QUEUE_DEBUG || false,

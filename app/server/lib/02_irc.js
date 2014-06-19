@@ -887,8 +887,11 @@ IRCHandler = function (user, user_server) {
             _addChannelNamesListener(channel.name);
             _addChannelJoinListener(channel.name);
             _addChannelPartListener(channel.name);
-            client.join(channel.name, function (message) {
-                _joinChannelCallback(message, channel);
+            CHANNEL_JOIN_QUEUE.add(function (done) {
+                client.join(channel.name, function (message) {
+                    _joinChannelCallback(message, channel);
+                    done();
+                });
             });
         });
         disconnectConnectingChannelsOnTimeout(20000);
