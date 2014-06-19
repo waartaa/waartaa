@@ -16,7 +16,7 @@ ChatSubscribe = function () {
     UserServers.find().forEach(function (user_server) {
       Deps.autorun(function () {
         Meteor.subscribe(
-          "user_server_logs", user_server._id,
+          "user_server_logs", user_server.name,
           Session.get('user_server_log_count_' + user_server._id),
           function () {
             $('.chatlogs-loader-msg').fadeOut(1000);
@@ -33,7 +33,7 @@ ChatSubscribe = function () {
     UserChannels.find({}).forEach(function (channel) {
       Deps.autorun(function () {
         Meteor.subscribe(
-          "channel_logs", channel._id,
+          "channel_logs", channel.name,
           Session.get('user_channel_log_count_' + channel._id),
           function () {
             waartaa.chat.helpers.roomAccessedTimestamp.initialize(
