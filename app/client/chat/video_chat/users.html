@@ -1,0 +1,26 @@
+<template name="video_chat_nicks">
+  <div class="channel-nicks-loader scrolltop row" style="display: none;">
+    Loading...
+  </div>
+  {{> video_chat_users}}
+  <div class="channel-nicks-loader scrollend row" style="display: none;">
+    Loading...
+  </div>
+</template>
+
+<template name="video_chat_users">
+  <ul id="video-chat-users" class="nav nav-list info-panel-item channel">
+  {{#each list }}
+    <li class="dropdown">
+      <a id="user-{{id}}" class="channel-user" href="#" title="{{name}}">
+        {{limitStr name 15}}
+        <span class="pull-right">
+          <div class="btn-group">
+            {{showCallButton id}}
+          </div>
+        </span>
+      </a>
+    </li>
+  {{/each}}
+  </ul>
+</template>

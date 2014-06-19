@@ -189,6 +189,19 @@ Meteor.publish('channel_nick_suggestions',
     _this.ready();
   });
 
+Meteor.publish('user', function () {
+  var user = Meteor.users.find(
+    {_id: this.userId},
+    {
+      fields: {
+        createdAt: 0,
+        services: 0
+      }
+    }
+  );
+  return user;
+});
+
 Meteor.methods({
   say: function(message, id, roomtype) {
     var user = Meteor.users.findOne({_id: this.userId});

@@ -60,8 +60,10 @@ waartaa.chat.helpers.highlightServerRoom = function () {
     $('.server-room#channelLink-' + room.room_id).parent().addClass('active');
   } else if (room.roomtype == 'pm') {
     $('#pmLink-' + room.room_id + '.server-room').parent().addClass('active');
-  } else if (room.roomtype == 'server')
+  } else if (room.roomtype == 'server') {
     $('#serverLink-' + room.server_id).parent().addClass('active');
+  } else if (room.roomtype == 'video')
+    $('#video-server-link').parent().addClass('active');
   if (room.roomtype == 'channel') {
       Session.set('topicHeight', $('#chat-main .topic').height());
       waartaa.chat.helpers.roomAccessedTimestamp.reset('channel', room);
@@ -140,6 +142,11 @@ waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
     set_cookie('pm_nick', obj.nick);
 
   }
+  else if (obj.roomtype == 'video') {
+    Session.set('room', {
+      roomtype: 'video'
+    });
+  }
   else
     Session.set('room', {});
   if (prevRoom && JSON.stringify(prevRoom.toString()) !=
@@ -171,6 +178,84 @@ waartaa.chat.helpers.getRoomChecksum = function (roomType, roomObj) {
     return CryptoJS.MD5(roomObj.server_name + roomObj.nick).toString();
 };
 
+waartaa.chat.helpers.serverRoomSelectHandler = function (event) {
+    var $target = $(event.target);
+    // Return if clicked on a server menu item
+    if ($target.parents('.btn-group').length > 0)
+      return;
+    var prev_room = Session.get('room') || {};
+    var roomtypes = {
+      'channel': true,
+      'server': true,
+      'pm': true
+    };
+    // Show loader if selected room is not yet active
+    if (!$target.parent().hasClass('active')) {
+      if (
+          (
+            roomtypes[$target.data('roomtype')] &&
+            $target.data('id') == prev_room.room_id
+          ) ||
+          (
+            roomtypes[$target.data('roomtype')] &&
+            $target.data('roomid') == prev_room.room_id
+          )
+      )
+        $target.parent().addClass('active');
+      else if($target.data('roomtype') != 'video')
+        $('#chatlogs-loader').show();
+    }
+    event.stopPropagation();
+    // Close any open menu
+    $('.dropdown.open, .btn-group.open').removeClass('open');
+    if (prev_room.roomtype == 'server')
+      Session.set(
+        'user_server_log_count_' + prev_room.server_id, DEFAULT_LOGS_COUNT);
+    else if (prev_room.roomtype == 'channel')
+      Session.set(
+        'user_channel_log_count_' + prev_room.channel_id, DEFAULT_LOGS_COUNT);
+    else if (prev_room.roomtype == 'pm')
+      Session.set(
+        'pmLogCount-' + prev_room.room_id, DEFAULT_LOGS_COUNT);
+    else if (prev_room.roomtype == 'video') {
+      // set self and remote video objects src to empty
+      // otherwise re-rendering them doesn't show stream
+      VideoChat.resetLocalVideoObj();
+      VideoChat.resetRemoteVideoObj();
+    }
+    Meteor.setTimeout(function () {
+      if ($target.data('roomtype') == 'channel') {
+        var server_id = $target.parents('.server').data('server-id');
+        var channel_id = $(event.target).data('id');
+        var channel = UserChannels.findOne({_id: channel_id}) || {};
+        waartaa.chat.helpers.setCurrentRoom({
+          roomtype: 'channel', server_id: server_id, channel_id: channel_id,
+          channel_name: channel.name, server_name: channel.user_server_name
+        });
+      } else if ($target.data('roomtype') == 'pm') {
+        var server_id = $target.parents('.server').data('server-id');
+        var nick = $target.data('nick');
+        var server = UserServers.findOne({_id: server_id});
+        waartaa.chat.helpers.setCurrentRoom({
+          roomtype: 'pm', server_id: server_id, room_id: $target.data('roomid'),
+          server_name: server.name, nick: nick
+        });
+      } else if (
+          $target.data('roomtype') == 'server' ||
+          $target.parent().data('roomtype') == 'server') {
+        var server_id = $target.parent().data('server-id') ||
+          $target.data('server-id');
+        var server = UserServers.findOne({_id: server_id});
+        waartaa.chat.helpers.setCurrentRoom({
+          roomtype: 'server', server_id: server_id, server_name: server.name
+        });
+      } else if ($target.data('roomtype') == 'video') {
+        waartaa.chat.helpers.setCurrentRoom({
+          roomtype: 'video'
+        });
+      }
+    }, 200);
+}
 
 /**
  * Returns true if roomObj for a chat room is the currently selected chat room,
@@ -387,6 +472,15 @@ UI.registerHelper('isChatMessageNew', function (status) {
   if (status == 'new')
     return true;
   return false;
+});
+
+UI.registerHelper('isVideoChatEnabled', function () {
+  var user = Meteor.user();
+  if (user) {
+    return user.allowVideoChat ? true: false;
+  } else {
+    return false;
+  }
 });
 
 /**

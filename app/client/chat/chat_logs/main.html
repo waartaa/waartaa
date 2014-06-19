@@ -8,8 +8,17 @@
     {{else}}
       {{#if isCurrentRoomtype "pm"}}
         {{> pm_logs}}
+      {{else}}
+        {{#if isCurrentRoomtype "video"}}
+          {{> video_chat}}
+        {{/if}}
       {{/if}}
     {{/if}}
   {{/if}}
+  <div id="call-accept-container">
+    <div class="call-accept-label">Accept video call from abd@abcd.com?</div>
+    <button id="call-accept-btn" class="btn green-btn accept-reject-btn">Accept</button>
+    <button id="call-reject-btn" class="btn red-btn accept-reject-btn">Reject</button>
+  </div>
 </div>
 </template>

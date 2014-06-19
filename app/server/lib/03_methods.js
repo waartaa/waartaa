@@ -526,4 +526,10 @@ Meteor.methods({
     change_email: function(userId, email) {
         Accounts.sendVerificationEmail(userId, email);
     },
+    enable_video_chat: function (enable) {
+      Meteor.users.update(
+          Meteor.userId(),
+          {$set: {allowVideoChat: enable}}
+      );
+    }
 })

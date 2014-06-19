@@ -7,7 +7,9 @@
     {{> chat_main}}
     {{> chat_users}}
   </div>
-  {{> chat_input}}
+  {{#unless isCurrentRoomtype "video"}}
+    {{> chat_input}}
+  {{/unless}}
   <audio id="audio-notification">
     <source src="/notification.ogg" type="audio/ogg">
   </audio>

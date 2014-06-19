@@ -48,6 +48,18 @@
             } else {
                 Session.set('formMessage', 'User is not authenticated');
             }
+        },
+
+        'click #btn-enable-video-chat': function (e) {
+          var user = Meteor.user();
+          if (user) {
+            var enable = $('#enable-video-chat').prop('checked');
+            Meteor.call('enable_video_chat', enable);
+            if (!enable) {
+              VideoChat.disconnect();
+            }
+            Router.go('/chat');
+          }
         }
     });
 

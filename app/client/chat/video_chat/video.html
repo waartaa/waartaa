@@ -1,0 +1,20 @@
+<template name="video_chat">
+  <div id="video-chat-container">
+    <div id="self-video-container" style="display:none;">
+      <video id="self-video" class="video-screen" autoplay></video>
+      <div id="self-username" class="video-user channel-user">{{showLocalUsername}}</div>
+      <div style="margin-left:5px; margin-top:10px;">
+        <input type="checkbox" id="enable-camera" {{isCameraEnabled}}>
+        <label for="enable-camera">Camera</label>
+      </div>
+      {{ showHangupButton }}
+    </div>
+    <div id="remote-video-container" style="display:none;">
+      <video id="remote-video" class="video-screen" autoplay></video>
+      <div id="remote-username" class="video-user channel-user">{{showRemoteUsername}}</div>
+    </div>
+  </div>
+  <div id="video-bottom-container">
+    <div class="errMsg"></div>
+  </div>
+</template>

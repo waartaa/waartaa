@@ -48,6 +48,11 @@ Router.map(function () {
             }
         },
     ],
+    waitOn: function () {
+      return [
+        Meteor.subscribe('user')
+      ]
+    }
   });
 
   this.route('chat', {
@@ -89,7 +94,7 @@ Router.map(function () {
     waitOn: function () {
       return [
         Meteor.subscribe('servers'), Meteor.subscribe('user_servers'),
-        Meteor.subscribe('user_channels')
+        Meteor.subscribe('user_channels'), Meteor.subscribe('user')
       ]
     },
     onAfterAction: function () {

@@ -14,6 +14,9 @@
           {{#each servers}}
             {{> chat_connection_server}}
           {{/each}}
+          {{#if isVideoChatEnabled}}
+            {{> video_chat_connection_server}}
+          {{/if}}
         </ul>
       </div>
     </div>

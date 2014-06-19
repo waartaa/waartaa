@@ -36,6 +36,10 @@
         {{else}}
           {{#if isCurrentRoomtype "pm" }}
             {{> pm_nick_info}}
+          {{else}}
+            {{#if isCurrentRoomtype "video"}}
+              {{> video_chat_nicks}}
+            {{/if}}
           {{/if}}
         {{/if}}
       </div>
