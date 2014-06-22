@@ -6,7 +6,7 @@
       <li><p class="ellipsis">{{ decorate topic }}</p></li>
     </ul>
   </div>
-  <div class="chat-logs-container nano channel" data-channel-id="{{ _id }}">
+  <div class="chat-logs-container channel scroller-container" data-channel-id="{{ _id }}">
     {{> channel_chat_logs_table}}
   </div>
 </div>
@@ -14,7 +14,7 @@
 </template>
 
 <template name="channel_chat_logs_table">
-<div id="channel-chat-logs-{{ _id }}" class="chatlogs-table channel nano-content chatlogrows">
+<div id="channel-chat-logs-{{ _id }}" class="chatlogs-table channel chatlogrows">
   <div class="row chatlogs-loader-msg" style="display: none;">
     Loading...
   </div>

@@ -4,13 +4,20 @@
 waartaa.chat.helpers = {};
 
 waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
-  var scroll_top = $(event.target).scrollTop();
+  var $target = $(event.target);
+  var scroll_top = $target.scrollTop();
+  if (scroll_top != 0)
+    return;
+  $target.off('scroll');
   var $target = $(event.target);
   var $table = $target.find('.chatlogs-table');
-  $table.off('scrolltop');
+  var prevHeight = $table.height();
   $('.chatlogs-loader-msg').show();
   Meteor.setTimeout(function () {
     $('.chatlogs-loader-msg').fadeOut(1000);
+    $target.on('scroll', waartaa.chat.helpers.chatLogsContainerScrollCallback);
+    var currentHeight = $table.height();
+    $target.scrollTop(currentHeight - prevHeight);
   }, 3000);
   var key = '';
   if ($table.hasClass('channel'))
@@ -79,9 +86,9 @@ waartaa.chat.helpers.highlightServerRoom = function () {
   $('#chat-input').focus();
   //refreshAutocompleteNicksSource();
   Meteor.setTimeout(function () {
-    $('#chat-main .nano').nanoScroller({scroll: 'bottom'})
-    .off('scrolltop')
-    .on('scrolltop', waartaa.chat.helpers.chatLogsContainerScrollCallback);
+    $('.chat-logs-container').scrollTop($('.chat-logs-container').height())
+    .off('scroll')
+    .on('scroll', waartaa.chat.helpers.chatLogsContainerScrollCallback);
   }, 1000);
   Session.set('shallUpdateHeight', true);
 };
@@ -360,14 +367,19 @@ UI.registerHelper("unread_mentions_count", function (
 
 updateHeight = function () {
   var body_height = $('body').height();
-  var final_height = body_height - 90;
-  $('#chat, #chat-main, .chatroom').height(final_height - 23);
-  $('#info-panel .panel-body, #chat-servers .panel-body').height(final_height - 75);
-  $('#info-panel .inner-container').css('min-height', final_height);
-  if ($('.chatroom-with-topic').length > 0)
-    $('.chat-logs-container').height(final_height - 60);
-  else
-    $('.chat-logs-container').height(final_height - 22);
+  var navbarHeight = $('#global-navbar').outerHeight(true);
+  var chatFooterHeight = $('#chat-footer').outerHeight(true);
+  var finalHeight = body_height - (navbarHeight + chatFooterHeight) + 4;
+  $('#chat, #chat-main, .chatroom').height(finalHeight);
+  $('#chat .panel').each(function (index, elem) {
+    var $this = $(elem);
+    $this.find('.panel-body').height(
+      finalHeight - $this.find('.panel-heading').outerHeight(true) - 5)
+    .end().height(finalHeight - 5);
+  });
+  $('.chat-logs-container').height(
+    finalHeight - $('.chat-logs-container .topic').outerHeight(true)
+  );
 };
 
 UI.registerHelper('current_server_id', function () {

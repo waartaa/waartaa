@@ -5,6 +5,5 @@ Template.chat_connections.servers = function () {
 Template.chat_connections.created = function () {
     Meteor.setTimeout(function () {
       waartaa.chat.helpers.highlightServerRoom();
-      $('#chat-servers .nano').nanoScroller();
     }, 1000);
 };

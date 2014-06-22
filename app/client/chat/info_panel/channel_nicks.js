@@ -16,10 +16,12 @@ UI.registerHelper('channel_users', function (id) {
 
 function infoPanelScrollendHandler (e) {
   var $target = $(e.target);
+  //var $scrollerContent = $target.find('.scroller-content');
+  //if ($target.scrollTop() != $scrollerContent.height())
+  //  return;
   Meteor.setTimeout(function () {
-    $(document).off('scrollend.info_panel')
-    .on('scrollend.info_panel', '#info-panel .nano',
-        infoPanelScrollendHandler);
+    $('#info-panel .scroller-container').off('scroll.info_panel')
+    .on('scroll.info_panel', infoPanelScrollHandler);
   }, 2000);
   var room = Session.get('room') || {};
   if (room.roomtype == 'channel') {
@@ -33,7 +35,7 @@ function infoPanelScrollendHandler (e) {
         'startNick-' + channel.user_server_name + '_' + channel.name);
     if (count < 40 && (count < 30 || !startNick))
       return;
-    $(document).off('scrollend.info_panel');
+    //$(document).off('scroll.info_panel');
     $('.channel-nicks-loader.scrollend').show();
     Meteor.setTimeout(function () {
       $('.channel-nicks-loader.scrollend').fadeOut(1000);
@@ -52,15 +54,13 @@ function infoPanelScrollendHandler (e) {
   }
 }
 
-$(document).on('scrollend.info_panel', '#info-panel .nano',
-               infoPanelScrollendHandler);
-
 function infoPanelScrolltopHandler (e) {
   var $target = $(e.target);
+  //if ($target.scrollTop() != 0)
+  //  return;
   Meteor.setTimeout(function () {
-    $(document).off('scrolltop.info_panel')
-    .on('scrolltop.info_panel', '#info-panel .nano',
-        infoPanelScrolltopHandler);
+    $('#info-panel .scroller-container').off('scroll.info_panel')
+    .on('scroll.info_panel', infoPanelScrollHandler);
   }, 2000);
   var room = Session.get('room') || {};
   if (room.roomtype == 'channel') {
@@ -92,8 +92,14 @@ function infoPanelScrolltopHandler (e) {
   }
 }
 
-$(document).on('scrolltop.info_panel', '#info-panel .nano',
-  infoPanelScrolltopHandler);
+function infoPanelScrollHandler (e) {
+  var $target = $(e.target);
+  var $scrollContent = $target.find('.scroller-content');
+  if ( $target.scrollTop() == 0 )
+    infoPanelScrolltopHandler(e);
+  else if ( ($target.scrollTop() + $target.height()) == $scrollContent.height())
+    infoPanelScrollendHandler(e);
+}
 
 Template.channel_nicks_info.helpers({
   currentChannel: function () {
@@ -103,3 +109,10 @@ Template.channel_nicks_info.helpers({
     return UserChannels.findOne({_id: room.room_id});
   }
 });
+
+Template.channel_nicks_info.created = function () {
+  Meteor.setTimeout(function () {
+    $('#info-panel .scroller-container').on(
+      'scroll.info_panel', infoPanelScrollHandler);
+  }, 1000);
+};

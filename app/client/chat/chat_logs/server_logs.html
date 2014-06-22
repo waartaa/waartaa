@@ -6,7 +6,7 @@
       <li><p class="ellipsis">{{topic}}</p></li>
     </ul>
   </div>
-  <div class="chat-logs-container server nano" data-server-id="{{ _id }}">
+  <div class="chat-logs-container server scroller-container" data-server-id="{{ _id }}">
     {{> server_chat_logs_table}}
   </div>
 </div>
@@ -14,7 +14,7 @@
 </template>
 
 <template name="server_chat_logs_table">
-  <div id="server-chat-logs-{{ _id }}" class="chatlogs-table server nano-content chatlogrows">
+  <div id="server-chat-logs-{{ _id }}" class="chatlogs-table server chatlogrows">
     <div class="row chatlogs-loader-msg" style="display: none;">
       Loading...
     </div>

@@ -16,7 +16,6 @@ Template.server_channels.channels = function (server_id) {
 }
 
 function serverChannelsCreatedCallback () {
-  $('#chat-servers .nano').nanoScroller();
   updateHeight();
 }
 

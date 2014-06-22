@@ -52,6 +52,7 @@ html, body, .container, .content {
 
 #chat {
   margin-top: 10px;
+  overflow: hidden;
 }
 
 #chat-main {
@@ -93,7 +94,7 @@ html, body, .container, .content {
 }
 
 .chatroom-with-topic > .chat-logs-container {
-  top: 33px;
+  padding-top: 30px;
 }
 
 div.dropdown a {
@@ -322,10 +323,6 @@ body {
 
 .info-panel-item.pm {
   padding-left: 5px;
-}
-
-#info-panel .panel-body {
-  overflow-y: auto;
 }
 
 .nano:hover > .nano-pane, .nano-pane.active, .nano-pane.flashed {
@@ -586,4 +583,29 @@ body {
 #user-links > li > a {
   padding-right: 5px;
   padding-left: 5px;
+}
+
+.scroller-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.scroller-container::-webkit-scrollbar-track
+{
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  background-color: #F5F5F5;
+}
+
+.scroller-container::-webkit-scrollbar
+{
+  width: 5px;
+  background-color: #F5F5F5;
+}
+
+.scroller-container::-webkit-scrollbar-thumb
+{
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #999;
 }
