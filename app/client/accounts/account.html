@@ -3,10 +3,10 @@
 </template>
 
 <template name="_navLoginButtons">
-    <ul id="user-links" class="nav navbar-nav navbar-right">
+    <ul id="user-links" class="navbar-nav navbar-right wr-navbar-icons">
         {{#if isUserLoggedIn }}
             <li>
-                <a href="javascript:void(0);" class="fa fa-user"> {{ displayUserName }}</a>
+                <a href="#" class="fa fa-user"> {{ displayUserName }}</a>
             </li>
             <li>
                 <a href="/settings/" class="fa fa-wrench"></a>
@@ -26,9 +26,9 @@
         <li class="active">Settings</li>
     </ol>
     <div class="account-settings-container">
-        <div class="settings-container medium-margin-top">
+        <div class="settings-container margin-20">
             <div class="container-header regular bold">Change Password</div>
-            <div class="container-inner less-margin-top">
+            <div class="container-inner margin-10">
                 {{# if formMessage }}
                 <div class="error alert alert-warning"> {{ formMessage }}</div>
                 {{/if}}
