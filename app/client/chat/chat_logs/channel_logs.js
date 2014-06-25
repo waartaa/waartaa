@@ -22,8 +22,10 @@ UI.registerHelper("channelChatLogs", function (channel_id) {
 });
 
 Template.channel_logs.events = {
-  'scrolltop .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
+  'scroll .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
 
+Template.channel_logs.rendered = waartaa.chat.helpers.chatLogsContainerRendered;
 Template.chat_row.created = waartaa.chat.helpers.chatLogRowCreateHandler;
+Template.chat_row.rendered = waartaa.chat.helpers.chatLogRowRenderedHandler;
 

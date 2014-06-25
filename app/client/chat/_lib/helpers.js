@@ -6,6 +6,10 @@ waartaa.chat.helpers = {};
 waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
   var $target = $(event.target);
   var scroll_top = $target.scrollTop();
+  Session.set('scrollAtBottom', (
+    $('.chat-logs-container').scrollTop() +
+    $('.chat-logs-container').height()) == $(
+      '.chat-logs-container .chatlogs-table').height() - 50? true: false);
   if (scroll_top != 0)
     return;
   $target.off('scroll');
@@ -31,28 +35,28 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
   var room = Session.get('room');
   if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
     scroll_top = null;
-  var oldest_log_id_in_room = null;
+  var oldest_log_in_room = null;
   if (room.roomtype == 'channel') {
-    oldest_log_id_in_room = (ChannelLogs.findOne(
-      {channel_name: room.channel_name}, {sort: {created: 1}}) || {})._id;
+    oldest_log_in_room = ChannelLogs.findOne(
+      {channel_name: room.channel_name}, {sort: {created: 1}});
     Session.set('scroll_height_channel-' + room.room_id,
       scroll_top);
   } else if (room.roomtype == 'server') {
-    oldest_log_id_in_room = (UserServerLogs.findOne(
-    {server_id: room.room_id}, {sort: {created: 1}}) || {})._id;
+    oldest_log_in_room = UserServerLogs.findOne(
+    {server_id: room.room_id}, {sort: {created: 1}});
     Session.set('scroll_height_' + room.room_id,
       scroll_top);
   } else if (room.roomtype == 'pm') {
-    oldest_log_id_in_room = (PMLogs.find(
+    oldest_log_in_room = PMLogs.find(
     {
       $or: [{from: room.nick}, {to_nick: room.nick}],
       server_id: room.server_id
     }, {sort: {created: 1}},
-    {fields: {created: 0, last_updated: 0}}) || {})._id;
+    {fields: {created: 0, last_updated: 0}});
     Session.set('scroll_height_server-' + room.server_id,
       scroll_top);
   }
-  Session.set('oldest_log_id_in_room', oldest_log_id_in_room);
+  Session.set('oldest_log_in_room', oldest_log_in_room);
   Session.set(key, current_count + DEFAULT_LOGS_COUNT);
 }
 
@@ -60,6 +64,7 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
  * [Reactive] Higlight currently selected server room.
  */
 waartaa.chat.helpers.highlightServerRoom = function () {
+  Session.set('scrollAtBottom', true);
   var room = Session.get('room') || {};
   $('li.server').removeClass('active');
   $('.server-room').parent().removeClass('active');
@@ -86,7 +91,7 @@ waartaa.chat.helpers.highlightServerRoom = function () {
   $('#chat-input').focus();
   //refreshAutocompleteNicksSource();
   Meteor.setTimeout(function () {
-    $('.chat-logs-container').scrollTop($('.chat-logs-container').height())
+    $('.chat-logs-container')
     .off('scroll')
     .on('scroll', waartaa.chat.helpers.chatLogsContainerScrollCallback);
   }, 1000);
@@ -378,7 +383,7 @@ updateHeight = function () {
     .end().height(finalHeight - 5);
   });
   $('.chat-logs-container').height(
-    finalHeight - $('.chat-logs-container .topic').outerHeight(true)
+    finalHeight - $('.chat-logs-container .topic').outerHeight(true) - 30
   );
 };
 

@@ -14,7 +14,7 @@ function observeChatlogTableScroll () {
   }
   Session.set('height-' + id, new_table_height);
   Meteor.setTimeout(function () {
-    $table.off('scrolltop').on('scrolltop',
+    $table.off('scroll').on('scroll',
       waartaa.chat.helpers.chatLogsContainerScrollCallback);
   }, 2000);
 }
