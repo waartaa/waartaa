@@ -1,16 +1,20 @@
 <template name="search">
-  <div id="search-container">
+  <div class="search-container">
     {{>bookmark_model}}
     <div class="chatlogs-loader-msg" style="">Searching...</div>
-    <div id="search-fields">
-      <input id="search-message" type= "text" class="form-control" placeholder="Search message(Optional)...">
+    <div class="left-col">
+      <div id="search-fields">
+        <i class="fa fa-search"></i>
+        <input id="search-message" type= "text" class="form-control search-input" placeholder="Search">
+      </div>
+      <a href="#" class="margin-5 display-block"><i class="fa fa-plus"></i> More options</a>
       <select data-placeholder="Select channel" class="chosen-select" tabindex="-1" style="width: 350px; margin-left:10px">
         <option value></option>
         {{#each servers}}
           <optgroup label={{ name }}>
-          {{#each channels _id}}
-            <option value={{ stripChannelHash name }}>{{ name }}</option>
-          {{/each}}
+            {{#each channels _id}}
+             <option value={{ stripChannelHash name }}>{{ name }}</option>
+            {{/each}}
           </optgroup>
         {{/each}}
       </select>
