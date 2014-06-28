@@ -824,8 +824,8 @@ IRCHandler = function (user, user_server) {
       _addChannelNamesListener(channel.name);
       _addChannelJoinListener(channel.name);
       _addChannelPartListener(channel.name);
-      CHANNEL_JOIN_QUEUE.add(function (done) {
-        client.join(channel.name, function (message) {
+      client.join(channel.name, function (message) {
+        CHANNEL_JOIN_QUEUE.add(function (done) {
           Fiber(function () {
             _joinChannelCallback(message, channel);
             done();
