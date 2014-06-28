@@ -213,10 +213,14 @@ function _join_user_server(user, user_server_name) {
 }
 
 function _get_irc_handler (user_server_name, user_id) {
-  var user = Meteor.users.findOne({_id: user_id});
-  var user_server = UserServers.findOne({
-    name: user_server_name, user: user.username});
-  return CLIENTS[user.username][user_server.name];
+  try {
+    var user = Meteor.users.findOne({_id: user_id});
+    var user_server = UserServers.findOne({
+      name: user_server_name, user: user.username});
+    return CLIENTS[user.username][user_server.name];
+  } catch (err) {
+    return {};
+  }
 }
 
 function _send_raw_message(message, irc_handler, log_options) {
@@ -315,14 +319,15 @@ Meteor.methods({
   },
   quit_user_server: function (user_server_name, close) {
     var irc_handler = _get_irc_handler(user_server_name, this.userId);
-    var user = Meteor.users.findOne({_id: this.userId});
-    var active = close? false: true;
-    UserServers.update(
-      {
-        user: user.username, name: user_server_name,
-      }, {$set: {active: active, status: 'disconnecting'}}, {multi: true});
-    if (irc_handler)
-      irc_handler.partUserServer();     
+    if (irc_handler) {
+      var user = Meteor.users.findOne({_id: this.userId});
+      var active = close? false: true;
+      UserServers.update(
+        {
+          user: user.username, name: user_server_name,
+        }, {$set: {active: active, status: 'disconnecting'}}, {multi: true});
+      irc_handler.partUserServer();
+    }
   },
   join_user_channel: function (user_server_name, channel_names) {
     var user = Meteor.users.findOne({_id: this.userId});
