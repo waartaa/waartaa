@@ -22,6 +22,7 @@ waartaa.chat.helpers.chatLogRowRenderedHandler = function () {
   if (last_log_id && last_log_id == this.data._id) {
     $('#chatlogs-loader:visible').fadeOut();
     Session.set('chatroom_last_log_id');
+    updateHeight();
     if ( Session.get('scrollAtBottom') != false )
       $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
   }
