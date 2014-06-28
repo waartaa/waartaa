@@ -25,11 +25,11 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
   }, 3000);
   var key = '';
   if ($table.hasClass('channel'))
-    key = "user_channel_log_count_" + $target.data('channel-id');
+    key = "user_channel_log_count_" + $target.attr('data-channel-id');
   else if ($table.hasClass('server'))
-    key = "user_server_log_count_" + $target.data('server-id');
+    key = "user_server_log_count_" + $target.attr('data-server-id');
   else if ($table.hasClass('pm'))
-    key = "pmLogCount-" + $target.data('server-id') + '_' + $target.data('nick');
+    key = "pmLogCount-" + $target.attr('data-server-id') + '_' + $target.attr('data-nick');
   var current_count = Session.get(key, 0);
   Session.set('height-' + $table.attr('id'), $table.find('.chatlogrows').height());
   var room = Session.get('room');
