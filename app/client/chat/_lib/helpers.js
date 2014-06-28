@@ -383,7 +383,7 @@ updateHeight = function () {
     .end().height(finalHeight - 5);
   });
   $('.chat-logs-container').height(
-    finalHeight - $('.chat-logs-container .topic').outerHeight(true) - 30
+    finalHeight - $('.chatroom .topic').height()
   );
 };
 
