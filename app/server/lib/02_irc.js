@@ -463,7 +463,7 @@ IRCHandler = function (user, user_server) {
         _updateChannelNicks(message.channel, message.nicks);
       }
     } catch (err) {
-      logger.error(err);
+      logger.error('addWhoListenerError: %s', err, {traceback: err.stack});
     }
     });
   }
@@ -826,8 +826,10 @@ IRCHandler = function (user, user_server) {
       _addChannelPartListener(channel.name);
       CHANNEL_JOIN_QUEUE.add(function (done) {
         client.join(channel.name, function (message) {
-          _joinChannelCallback(message, channel);
-          done();
+          Fiber(function () {
+            _joinChannelCallback(message, channel);
+            done();
+          }).run();
         });
       });
     });
@@ -838,7 +840,7 @@ IRCHandler = function (user, user_server) {
       }
     });
     client.on('error', function (err) {
-      logger.error(err);
+      logger.error('nodeIRCError: %s', err, {traceback: err.stack});
     });
   }
 
@@ -959,7 +961,7 @@ IRCHandler = function (user, user_server) {
               }
             }
           } catch (err) {
-            logger.error(err);
+        logger.error('addCTCPListenerError: %s', err, {traceback: err.stack});
           }
         }).run();
       });
@@ -1279,7 +1281,7 @@ IRCHandler = function (user, user_server) {
       if (send)
         client.say(to, message);
     } catch (err) {
-      logger.error(err);
+        logger.error('sendPMMessageError: %s', err, {traceback: err.stack});
     }
   }
 
@@ -1302,7 +1304,7 @@ IRCHandler = function (user, user_server) {
           });
         }
       } catch (err) {
-        logger.error(err);
+        logger.error('joinChannelError: %s', err, {traceback: err.stack});
       }
       disconnectConnectingChannelsOnTimeout(20000, [channel_name]);
     },
@@ -1314,7 +1316,7 @@ IRCHandler = function (user, user_server) {
             message, channel_name);
         });
       } catch (err) {
-        logger.error(err);
+        logger.error('partChannelError: %s', err, {traceback: err.stack});;
       }
     },
     create_update_user_channel: function (channel_data) {
@@ -1323,7 +1325,8 @@ IRCHandler = function (user, user_server) {
           _create_update_user_channel(user_server, channel_data);
         }).run();
       } catch (err) {
-        logger.error(err);
+        logger.error('createUpdateUserChannelError: %s', err,
+                     {traceback: err.stack});;
       }
     },
     removeChannel: function (channel) {},
@@ -1409,7 +1412,8 @@ IRCHandler = function (user, user_server) {
             });
             disconnectConnectingServerOnTimeout(30000);
           } catch (err) {
-            logger.error(err);
+            logger.error('joinUserServerError: %s', err,
+                         {traceback: err.stack});
             done();
             Meteor.clearTimeout(timeoutId);
           }
@@ -1449,7 +1453,7 @@ IRCHandler = function (user, user_server) {
           create_update_user_channel(user_server, item);
         });
       } catch (err) {
-        logger.error(err);
+        logger.error('addUserServerError: %s', err, {traceback: err.stack});
       }
     },
     markAway: function (message) {
@@ -1459,14 +1463,14 @@ IRCHandler = function (user, user_server) {
           client.send('AWAY', message);
         }).run();
       } catch (err) {
-        logger.error(err);
+        logger.error('markAwayError: %s', err, {traceback: err.stack});
       }
     },
     markActive: function () {
       try {
         client.send('AWAY', '');
       } catch (err) {
-        logger.error(err);
+        logger.error('markActiveError: %s', err, {traceback: err.stack});
       }
     },
     removeServer: function (server_id, user_id) {},
@@ -1501,14 +1505,15 @@ IRCHandler = function (user, user_server) {
         if (send)
           client.say(channel_name, message);
       } catch (err) {
-        logger.error(err);
+        logger.error('sendChannelMessageError: %s', err,
+                     {traceback: err.stack});
       }
     },
     changeNick: function (nick) {
       try {
         client.send('NICK', nick);
       } catch (err) {
-        logger.error(err);
+        logger.error('changeNickError: %s', err, {traceback: err.stack});
       }
     },
     sendServerMessage: function (message) {
@@ -1527,7 +1532,7 @@ IRCHandler = function (user, user_server) {
           last_updated: new Date()
         });
       } catch (err) {
-        logger.error(err);
+        logger.error('sendServerMessageError: %s', err, {traceback: err.stack});
       }
     },
     sendPMMessage: function (to, message, action, send) {

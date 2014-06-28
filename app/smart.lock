@@ -72,8 +72,8 @@
       },
       "nprogress": {
         "git": "https://github.com/zhouzhuojie/meteor-nprogress.git",
-        "tag": "v0.0.4",
-        "commit": "8333206b751a24fac1fbd1b03fa37621bcefe50c"
+        "tag": "v0.0.5",
+        "commit": "bb88a057166e0f1386ab8bc0a1e080b48aa59159"
       },
       "GAnalytics": {
         "git": "https://github.com/datariot/meteor-ganalytics.git",
