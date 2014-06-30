@@ -4,48 +4,59 @@
 waartaa.chat.helpers = {};
 
 waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
-  var scroll_top = $(event.target).scrollTop();
+  var $target = $(event.target);
+  var scroll_top = $target.scrollTop();
+  Session.set('scrollAtBottom', (
+    $('.chat-logs-container').scrollTop() +
+    $('.chat-logs-container').height()) == $(
+      '.chat-logs-container .chatlogs-table').height() - 50? true: false);
+  if (scroll_top != 0)
+    return;
+  $target.off('scroll');
   var $target = $(event.target);
   var $table = $target.find('.chatlogs-table');
-  $table.off('scrolltop');
+  var prevHeight = $table.height();
   $('.chatlogs-loader-msg').show();
   Meteor.setTimeout(function () {
     $('.chatlogs-loader-msg').fadeOut(1000);
+    $target.on('scroll', waartaa.chat.helpers.chatLogsContainerScrollCallback);
+    var currentHeight = $table.height();
+    $target.scrollTop(currentHeight - prevHeight);
   }, 3000);
   var key = '';
   if ($table.hasClass('channel'))
-    key = "user_channel_log_count_" + $target.data('channel-id');
+    key = "user_channel_log_count_" + $target.attr('data-channel-id');
   else if ($table.hasClass('server'))
-    key = "user_server_log_count_" + $target.data('server-id');
+    key = "user_server_log_count_" + $target.attr('data-server-id');
   else if ($table.hasClass('pm'))
-    key = "pmLogCount-" + $target.data('server-id') + '_' + $target.data('nick');
+    key = "pmLogCount-" + $target.attr('data-server-id') + '_' + $target.attr('data-nick');
   var current_count = Session.get(key, 0);
   Session.set('height-' + $table.attr('id'), $table.find('.chatlogrows').height());
   var room = Session.get('room');
   if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
     scroll_top = null;
-  var oldest_log_id_in_room = null;
+  var oldest_log_in_room = null;
   if (room.roomtype == 'channel') {
-    oldest_log_id_in_room = (ChannelLogs.findOne(
-      {channel_name: room.channel_name}, {sort: {created: 1}}) || {})._id;
+    oldest_log_in_room = ChannelLogs.findOne(
+      {channel_name: room.channel_name}, {sort: {created: 1}});
     Session.set('scroll_height_channel-' + room.room_id,
       scroll_top);
   } else if (room.roomtype == 'server') {
-    oldest_log_id_in_room = (UserServerLogs.findOne(
-    {server_id: room.room_id}, {sort: {created: 1}}) || {})._id;
+    oldest_log_in_room = UserServerLogs.findOne(
+    {server_id: room.room_id}, {sort: {created: 1}});
     Session.set('scroll_height_' + room.room_id,
       scroll_top);
   } else if (room.roomtype == 'pm') {
-    oldest_log_id_in_room = (PMLogs.find(
+    oldest_log_in_room = PMLogs.find(
     {
       $or: [{from: room.nick}, {to_nick: room.nick}],
       server_id: room.server_id
     }, {sort: {created: 1}},
-    {fields: {created: 0, last_updated: 0}}) || {})._id;
+    {fields: {created: 0, last_updated: 0}});
     Session.set('scroll_height_server-' + room.server_id,
       scroll_top);
   }
-  Session.set('oldest_log_id_in_room', oldest_log_id_in_room);
+  Session.set('oldest_log_in_room', oldest_log_in_room);
   Session.set(key, current_count + DEFAULT_LOGS_COUNT);
 }
 
@@ -53,6 +64,7 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
  * [Reactive] Higlight currently selected server room.
  */
 waartaa.chat.helpers.highlightServerRoom = function () {
+  Session.set('scrollAtBottom', true);
   var room = Session.get('room') || {};
   $('li.server').removeClass('active');
   $('.server-room').parent().removeClass('active');
@@ -79,9 +91,9 @@ waartaa.chat.helpers.highlightServerRoom = function () {
   $('#chat-input').focus();
   //refreshAutocompleteNicksSource();
   Meteor.setTimeout(function () {
-    $('#chat-main .nano').nanoScroller({scroll: 'bottom'})
-    .off('scrolltop')
-    .on('scrolltop', waartaa.chat.helpers.chatLogsContainerScrollCallback);
+    $('.chat-logs-container')
+    .off('scroll')
+    .on('scroll', waartaa.chat.helpers.chatLogsContainerScrollCallback);
   }, 1000);
   Session.set('shallUpdateHeight', true);
 };
@@ -360,14 +372,19 @@ UI.registerHelper("unread_mentions_count", function (
 
 updateHeight = function () {
   var body_height = $('body').height();
-  var final_height = body_height - 90;
-  $('#chat, #chat-main, .chatroom').height(final_height - 23);
-  $('#info-panel .panel-body, #chat-servers .panel-body').height(final_height - 75);
-  $('#info-panel .inner-container').css('min-height', final_height);
-  if ($('.chatroom-with-topic').length > 0)
-    $('.chat-logs-container').height(final_height - 60);
-  else
-    $('.chat-logs-container').height(final_height - 22);
+  var navbarHeight = $('#global-navbar').outerHeight(true);
+  var chatFooterHeight = $('#chat-footer').outerHeight(true);
+  var finalHeight = body_height - (navbarHeight + chatFooterHeight) + 4;
+  $('#chat, #chat-main, .chatroom').height(finalHeight);
+  $('#chat .panel').each(function (index, elem) {
+    var $this = $(elem);
+    $this.find('.panel-body').height(
+      finalHeight - $this.find('.panel-heading').outerHeight(true) - 5)
+    .end().height(finalHeight - 5);
+  });
+  $('.chat-logs-container').height(
+    finalHeight - $('.chatroom .topic').height()
+  );
 };
 
 UI.registerHelper('current_server_id', function () {

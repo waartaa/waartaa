@@ -12,12 +12,12 @@ Meteor.publish('user_servers', function () {
   this.ready();
 });
 
-Meteor.publish('user_server_logs', function (user_server_id, n) {
+Meteor.publish('user_server_logs', function (user_server_name, n) {
   if (this.userId) {
     var user = Meteor.users.findOne({_id: this.userId});
     var N = n || CONFIG.show_last_n_logs;
     var cursor = UserServerLogs.find(
-      {server_id: user_server_id, user: user.username},
+      {server_name: user_server_name, user: user.username},
       {
         sort: {created: -1}, limit: N
       }
@@ -43,9 +43,12 @@ Meteor.publish('user_channels', function () {
   this.ready();
 });
 
-Meteor.publish('channel_logs', function (channel_id, n) {
+Meteor.publish('channel_logs', function (channel_name, n) {
   var user = Meteor.users.findOne({_id: this.userId}) || {};
-  var channel = UserChannels.findOne({_id: channel_id, user: user.username});
+  console.log(user);
+  var channel = UserChannels.findOne({name: channel_name, user: user.username});
+  console.log('CHANNEL');
+  console.log(channel);
   if (channel) {
     console.log(
       'Publishing logs for channel: ' + channel.name + ', ' + user.username);

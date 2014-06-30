@@ -15,7 +15,6 @@ Meteor.setServerTime = function() {
     //difference between server and client
     var serverOffset = serverMS - localMS;
     //store difference in the session
-    console.log('Meteor.setServerTime()', { serverMS: serverMS, localMS: localMS, serverOffset: serverOffset });
     Session.set('serverTimeOffset', serverOffset);
   });
 };

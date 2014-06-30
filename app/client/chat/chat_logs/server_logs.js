@@ -34,4 +34,5 @@ UI.registerHelper("serverChatLogs", function (server_id) {
 Template.server_logs.events = {
   'scroll .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
+Template.server_logs.rendered = waartaa.chat.helpers.chatLogsContainerRendered;
 

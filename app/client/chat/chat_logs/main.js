@@ -7,14 +7,14 @@ function observeChatlogTableScroll () {
   if (Session.get('selfMsg-' + id) ||
       Session.get('chatlogsScrollEnd-' + id) &&
       Session.get('chatlogsScrollEnd-' + id) == $table.scrollTop()) {
-    $container.nanoScroller({ scroll: 'bottom' });
+    $container.scrollTop($container.height());
     Session.set('selfMsg-' + id);
   } else if ($table.scrollTop() == 0 && new_table_height > old_table_height) {
-    $container.nanoScroller({scrollTop: (new_table_height - old_table_height)});
+    $container.scrollTop(new_table_height - old_table_height);
   }
   Session.set('height-' + id, new_table_height);
   Meteor.setTimeout(function () {
-    $table.off('scrolltop').on('scrolltop',
+    $table.off('scroll').on('scroll',
       waartaa.chat.helpers.chatLogsContainerScrollCallback);
   }, 2000);
 }

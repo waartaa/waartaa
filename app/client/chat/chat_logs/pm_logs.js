@@ -23,4 +23,5 @@ UI.registerHelper("pmChatLogs", function (server_id, nick) {
 });
 
 Template.pm_chat_row.created = waartaa.chat.helpers.chatLogRowCreateHandler;
+Template.pm_chat_row.rendered = waartaa.chat.helpers.chatLogRowRenderedHandler;
 

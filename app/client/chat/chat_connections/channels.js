@@ -16,7 +16,6 @@ Template.server_channels.channels = function (server_id) {
 }
 
 function serverChannelsCreatedCallback () {
-  $('#chat-servers .nano').nanoScroller();
   updateHeight();
 }
 
@@ -194,8 +193,7 @@ Template.server_channels.created = function(){
         }
       }
       highlight_room();
-    }
-    catch(err){
+    } catch (err) {
       console.log(err);
     }
   }
@@ -253,8 +251,7 @@ Template.server_channels.created = function(){
         }
       }
       highlight_room();
-    }
-    catch(err) {
+    } catch (err) {
       console.log(err);
     }
   }

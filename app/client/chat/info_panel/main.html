@@ -28,9 +28,9 @@
 </template>
 
 <template name="info_panel_body">
-  <div class="panel-body nano">
-    <div class="nano-content">
-      <div class="inner-container">
+  <div class="panel-body scroller-container">
+    <div>
+      <div class="scroller-content">
         {{#if isCurrentRoomtype "channel"}}
           {{> channel_nicks_info}}
         {{else}}

@@ -6,7 +6,7 @@
           <li><p class="ellipsis">{{topic}}</p></li>
         </ul>
       </div>
-      <div class="chat-logs-container pm nano" data-server-id="{{ server_id }}" data-nick="{{ name }}">
+      <div class="chat-logs-container pm scroller-container" data-server-id="{{ server_id }}" data-nick="{{ name }}">
         {{> pm_chat_logs_table}}
       </div>
     </div>
@@ -14,7 +14,7 @@
 </template>
 
 <template name="pm_chat_logs_table">
-  <div id="pm-chat-logs-{{ server_id }}_{{ name }}" class="chatlogs-table pm nano-content chatlogrows">
+  <div id="pm-chat-logs-{{ server_id }}_{{ name }}" class="chatlogs-table pm chatlogrows">
     <div class="row chatlogs-loader-msg" style="display: none;">
       Loading...
     </div>

@@ -13,10 +13,7 @@ Router.map(function () {
     onBeforeAction: function () {
       if (Meteor.isClient)
         if (Meteor.userId()) {
-          Router.go('/chat/');
-          this.render('chat');
-          GAnalytics.pageview('/chat');
-          this.stop();
+          this.redirect('/chat/');
         }
     },
     onAfterAction: function () {
@@ -29,7 +26,7 @@ Router.map(function () {
   this.route('account', {
     path: /^\/settings$/,
     onBeforeAction: function() {
-      Router.go('/settings/');
+      this.redirect('/settings/');
     }
   });
 
@@ -41,9 +38,7 @@ Router.map(function () {
         function () {
             if (Meteor.isClient) {
                 if(!Meteor.userId()) {
-                    Router.go('/');
-                    this.render('user_loggedout_content');
-                    this.stop();
+                    this.redirect('/');
                 }
             }
         },
@@ -53,7 +48,7 @@ Router.map(function () {
   this.route('chat', {
     path: /^\/chat$/,
     onBeforeAction: function () {
-      Router.go('/chat/');
+      this.redirect('/chat/');
     }
   });
   this.route('chat/', {
@@ -63,10 +58,8 @@ Router.map(function () {
       function () {
         if (Meteor.isClient) {
           if (!Meteor.userId()) {
-            Router.go('/');
-            this.render('user_loggedout_content');
+            this.redirect('/');
             GAnalytics.pageview();
-            this.stop();
           } else {
             ChatSubscribe();
           }
@@ -81,7 +74,6 @@ Router.map(function () {
               $('#server-add-btn').click();
           } else {
             NProgress.start();
-            this.stop(); // stop downstream funcs from running
           }
         }
       }
