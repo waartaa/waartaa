@@ -18,7 +18,7 @@ multiple devices of the user along with centralized logging.
 1. Go to **waartaa**'s repository directory just cloned: ``$ cd waartaa``
 1. Run setup script: ``$ ./setup.sh``
 1. Customize ``waartaa/server/settings-local.js`` as needed.
-1. Go to waartaa meteor project's directory: ``$ cd waartaa``
+1. Go to waartaa meteor project's directory: ``$ cd app``
 1. Run waartaa: ``$ meteor``
 
 
@@ -47,7 +47,13 @@ multiple devices of the user along with centralized logging.
 
 ### Deployment
 
-**Coming soon**
+1. Install ``ansible`` for your distribution.
+   - Fedora (or CentOS): ``sudo yum install ansible``
+   - Ubuntu: ``sudo apt-get install ansible``
+1. ``cd deploy``
+1. Copy ``hosts`` to say ``hosts.local`` and customize as needed.
+1. Provision and deploy: ``./bundle; ansible-playbook -i hosts.local site.yml``
+1. Only deploy: ``./bundle; ansible-playbook -i hosts.local site.yml``
 
 
 ## Contribute
