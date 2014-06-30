@@ -60,7 +60,13 @@ multiple devices of the user along with centralized logging.
 
 1. Setup and run **waartaa** locally.
 2. Report bugs or submit feature requests at https://github.com/waartaa/waartaa/issues/new.
-3. Feel free to pick up open issues from https://github.com/waartaa/waartaa/issues?milestone=1&state=open. Don't hesitate to ask for help.
+3. Feel free to pick up open issues from https://github.com/waartaa/waartaa/issues?state=open. Don't hesitate to ask for help.
+
+
+## Comunicate
+
+1. Mailing list: https://groups.google.com/forum/#!forum/waartaa
+1. IRC: **#waartaa** on Freenode
 
 
 
