@@ -1,15 +1,17 @@
-
 <template name="chat_row">
   <div class="row chatlog-row{{# unless from}} chatlog-notice{{/unless}}">
     <div class="col-md-12{{#if checkOwnNickInMsg message server_current_nick from}} highlight-mention{{/if}}">
-      <div class="pull-left chatlog-from">
-        {{# if from}}
+      {{# if from}}
+        <div class="pull-left chatlog-bookmark" data-log-id="{{_id}}" data-datetime="{{last_updated}}">
+          <icon class="glyphicon glyphicon-bookmark"></icon>
+        </div>
+        <div class="pull-left chatlog-from">
           <span class="label label-info">
             <icon class="glyphicon glyphicon-user"></icon>
             <strong>{{from}}</strong>
           </span>
-        {{/if}}
-      </div>
+        </div>
+      {{/if}}
       <div class="{{# if isToday last_updated}}col-md-10{{else}}col-md-9{{/if}} chatlog-message">
           {{# unless from}}
             <icon class="glyphicon glyphicon-info-sign"></icon>

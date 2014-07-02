@@ -296,12 +296,37 @@ body {
   border-bottom: 1px dashed #F4F2F7;
 }
 
+
 .highlight-mention{
     background-color: #eee;
     color: #000;
 }
 
+.chatlog-bookmark {
+  margin-right: 4px;
+  color: #ddd;
+  position: relative;
+  left: 1px;
+  visibility: hidden;
+}
+
+.chatlog-row:hover .chatlog-bookmark {
+  visibility: visible;
+}
+
+.chatlog-bookmark:hover {
+  color: gold;
+  visibility: visible;
+}
+
+.bookmarked {
+  color: gold;
+  visibility: visible;
+}
+
 .chatlog-from {
+  position: left;
+  left: 5px;
 }
 
 .chatlog-time {
@@ -749,5 +774,36 @@ em.hlt1 {
   @media (min-width: 768px) and (max-width: 992px) {
     margin-left: -36px !important;
   }
+}
+
+/* Bookmarking */
+.bookmark-model {
+  background-color: #d9edf7;
+  width: 100%;
+  border: #bce8f1;
+  height: 42px;
+  padding: 8px;
+  border-radius: 2px;
+  border-bottom: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  display: none;
+}
+
+#bookmark-label-label {
+  padding-top: 3px;
+  color: #31708f;
+}
+
+#bookmark-label {
+  margin-left: 5px;
+}
+
+#done-bookmark {
+  margin-left: 10px;
+}
+
+#cancel-bookmark {
+  margin-left: 10px;
 }
 
