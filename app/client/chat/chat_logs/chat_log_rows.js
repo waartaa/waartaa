@@ -36,12 +36,22 @@ UI.registerHelper('isToday', function (date_obj) {
   return false;
 });
 
+UI.registerHelper('isBookmarkable', function (from) {
+  if (from)
+    return true;
+  else
+    return false;
+});
+
+var longpressTimerId = null;
+var longpressed = false;
+
 var generateBookmarkData = function () {
   var dateObjs = [];
   var logIds = [];
   var nowBookmarks = $('.bookmarked-now');
   // no bookmarks available, so return empty
-  if (nowBookmarks.length < 0) {
+  if (nowBookmarks.length == 0) {
     return '';
   }
   // bookmarks exists, so generate data
@@ -69,6 +79,48 @@ var generateBookmarkData = function () {
   }
 };
 
+var performBookmark = function (bookmarkEl) {
+  var isBookmarked = bookmarkEl.hasClass('bookmarked');
+  var isBookmarkedNow = bookmarkEl.hasClass('bookmarked-now');
+  // this chat log was previously bookmarked, do nothing
+  if (isBookmarked && !isBookmarkedNow) {
+    return;
+  }
+  // this chat log was bookmarked now, so unbookmark it
+  else if (isBookmarked && isBookmarkedNow) {
+    bookmarkEl.removeClass('bookmarked bookmarked-now');
+  }
+  // this chat log is not bookmarked, so bookmark it
+  else if (!isBookmarked) {
+    bookmarkEl.addClass('bookmarked bookmarked-now');
+  }
+};
+
+var bookmarkLogs = function (currentEl, longpressedEl) {
+  if (longpressedEl && longpressedEl.get(0)) {
+    var count = 0;
+    var currentLogId = currentEl.data('log-id');
+    var longpressedLogId = longpressedEl.data('log-id');
+    var bookmarkEls = $('.chatlog-bookmark');
+    for (var i=0; i<bookmarkEls.length; i++) {
+      var bookmarkEl = $(bookmarkEls[i]);
+      var logId = bookmarkEl.data('log-id');
+      if (logId == currentLogId)
+        count += 1;
+      if (count > 0 && logId != longpressedLogId)
+        performBookmark(bookmarkEl);
+      if (logId == longpressedLogId)
+        count += 1;
+      if (count == 2) {
+        $('.chatlog-bookmark').removeClass('longpressed');
+        break;
+      }
+    }
+  } else {
+    performBookmark(currentEl);
+  }
+};
+
 var doneBookmarking = function (event) {
 };
 
@@ -80,28 +132,40 @@ var cancelBookmarking = function (event) {
 Template.chat_row.events = {
   'click .chatlog-bookmark': function (event) {
     var bookmarkEl = $(event.target).parent();
-    var isBookmarked = bookmarkEl.hasClass('bookmarked');
-    var isBookmarkedNow = bookmarkEl.hasClass('bookmarked-now');
-    // this chat log was previously bookmarked, do nothing
-    if (isBookmarked && !isBookmarkedNow) {
-      return false;
+    var currentEl = bookmarkEl;
+    var longpressedEl = null;
+    if(longpressed && !bookmarkEl.hasClass('longpressed')){
+      // remove class of any previous long pressed log
+      $('.chatlog-bookmark').removeClass('longpressed');
+      bookmarkEl.addClass('longpressed');
+      bookmarkLogs(currentEl, longpressedEl);
+    } else {
+      longpressedEl = $('.longpressed');
+      bookmarkLogs(currentEl, longpressedEl);
     }
-    // this chat log was bookmarked now, so unbookmark it
-    else if (isBookmarked && isBookmarkedNow) {
-      bookmarkEl.removeClass('bookmarked bookmarked-now');
-    }
-    // this chat log is not bookmarked, so bookmark it
-    else if (!isBookmarked) {
-      bookmarkEl.addClass('bookmarked bookmarked-now');
-    }
+
     var bookmarkData = generateBookmarkData();
+    console.log(bookmarkData);
     if (bookmarkData) {
-      $('#bookmark-label').val(bookmarkData.label);
+      $('#bookmark-label').attr('value', bookmarkData.label);
       $('#done-bookmark').off('click').on('click', bookmarkData, doneBookmarking);
       $('#cancel-bookmark').off('click').on('click', cancelBookmarking);
       $('.bookmark-model').show();
     } else {
       $('.bookmark-model').hide();
     }
+  },
+
+  // handles longpress logic
+  'mousedown .chatlog-bookmark': function (event) {
+    longpressed = false;
+    longpressTimerId = setTimeout(function () {
+      longpressed = true;
+      console.log('longpressed');
+    }, 1000);
+  },
+
+  'mouseup .chatlog-bookmark': function (event) {
+    clearTimeout(longpressTimerId);
   }
 };
