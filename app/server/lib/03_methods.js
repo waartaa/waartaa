@@ -537,4 +537,19 @@ Meteor.methods({
   change_email: function(userId, email) {
     Accounts.sendVerificationEmail(userId, email);
   },
+  // Save bookmarks
+  saveBookmarks: function (data) {
+    if (
+        data.label=='' ||
+        data.logIds.length==0 ||
+        !data.creator ||
+        !data.user ||
+        !data.roomType
+       )
+      return false;
+    data.created = Date();
+    data.lastUpdated = Date();
+    Bookmarks.insert(data);
+    return true;
+  }
 })

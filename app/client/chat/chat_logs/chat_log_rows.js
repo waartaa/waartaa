@@ -122,6 +122,31 @@ var bookmarkLogs = function (currentEl, longpressedEl) {
 };
 
 var doneBookmarking = function (event) {
+  var data = event.data;
+  var user = Meteor.user()
+  var roomType = 'channel';
+  data.creator = user.username;
+  data.creatorId = user._id;
+  data.user = user.username;
+  data.userId = user._id;
+  data.roomType = roomType;
+  $("#done-bookmark").prop('disabled', true);
+  Meteor.call('saveBookmarks', data, function (err, result) {
+    $("#done-bookmark").prop('disabled', false);
+    if (err || !result) {
+      $('.bookmark-done-msg').removeClass('success error');
+      $('.bookmark-done-msg').addClass('error');
+      $('.bookmark-done-msg').text('OOPS! An error occured.');
+      $('.bookmark-done-msg').show().delay(5000).hide(0);
+    } else {
+      $('.bookmark-model').hide();
+      $('.chatlog-bookmark').removeClass('bookmarked-now');
+      $('.bookmark-done-msg').removeClass('success error');
+      $('.bookmark-done-msg').addClass('success');
+      $('.bookmark-done-msg').text('Saved successfully.');
+      $('.bookmark-done-msg').show().delay(5000).hide(0);
+    }
+  });
 };
 
 var cancelBookmarking = function (event) {

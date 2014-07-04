@@ -201,3 +201,18 @@ UserPms: {
 }
 */
 UserPms = new Meteor.Collection("user_pms");
+
+/*
+Bookmarks {
+  label: String,
+  roomType: String ('channel'/'pm'/'server'),
+  logIds: List<String>,
+  user: String,
+  userId: String,
+  created: Datetime,
+  lastUpdated: Datetime,
+  creator: String,
+  creatorId: String
+}
+*/
+Bookmarks = new Meteor.Collection("bookmarks");
