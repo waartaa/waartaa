@@ -43,6 +43,18 @@ UI.registerHelper('isBookmarkable', function (from) {
     return false;
 });
 
+UI.registerHelper('isBookmarked', function (logId) {
+  var userId = Meteor.user() && Meteor.user()._id;
+  var cursor = Bookmarks.find({
+    logIds: logId,
+    userId: userId
+  });
+  if (cursor.count() > 0)
+    return 'bookmarked';
+  else
+    return '';
+});
+
 var longpressTimerId = null;
 var longpressed = false;
 

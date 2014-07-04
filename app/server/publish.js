@@ -171,6 +171,14 @@ Meteor.publish('channel_nicks', function (server_name, channel_name, from, to) {
   this.ready();
 });
 
+Meteor.publish('bookmarks', function () {
+  if (this.userId) {
+    var bookmarks = Bookmarks.find({userId: this.userId});
+    return bookmarks;
+  }
+  this.ready();
+});
+
 Meteor.publish('channel_nick_suggestions',
   function (server_name, channel_name, pattern, limit) {
     var _this = this;

@@ -2,7 +2,7 @@
   <div class="row chatlog-row{{# unless from}} chatlog-notice{{/unless}}">
     <div class="col-md-12{{#if checkOwnNickInMsg message server_current_nick from}} highlight-mention{{/if}}">
       {{# if isBookmarkable from }}
-        <div class="pull-left chatlog-bookmark" data-log-id="{{_id}}" data-datetime="{{last_updated}}">
+        <div class="pull-left chatlog-bookmark {{ isBookmarked _id}}" data-log-id="{{_id}}" data-datetime="{{last_updated}}">
           <icon class="glyphicon glyphicon-bookmark"></icon>
         </div>
       {{/if}}
