@@ -1,14 +1,6 @@
 <template name="channel_logs">
 {{#with getCurrentChannel }}
-<div class="bookmark-msg-wrap">
-  <div class="bookmark-done-msg"></div>
-</div>
-<div class="bookmark-model">
-  <label id="bookmark-label-label" for="bookmark-label" class="pull-left"> Bookmark Label:</label>
-  <input id="bookmark-label" class="pull-left" type="text"/>
-  <input id="done-bookmark" class="pull-left btn-primary" type="button" value="Done">
-  <input id="cancel-bookmark" class="btn-primary" type="button" value="Cancel">
-</div>
+{{>bookmark_model}}
 <div id="channel-chatroom-{{ _id }}" class="chatroom channel{{#if topic}} chatroom-with-topic{{/if}}">
   <div class="topic">
     <ul class="nav nav-tabs nav-stacked" style="{{# unless topic}}display:none;{{/unless}}">

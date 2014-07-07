@@ -1,5 +1,6 @@
 <template name="search">
   <div id="search-container">
+    {{>bookmark_model}}
     <div class="chatlogs-loader-msg" style="">Searching...</div>
     <div id="search-fields">
       <input id="search-message" type= "text" class="form-control" placeholder="Search message(Optional)...">
@@ -36,12 +37,22 @@
     </div>
     <div id="search-results">
       <div id="chat-logs">
-        <div class="results-count"></div>
-        <div class="logs"></div>
+        <div class="results-count">About {{totalCount}} result in {{ took }} seconds.</div>
+        <div class="logs">
+          {{#each logs}}
+            {{> chat_row}}
+          {{/each}}
+        </div>
       </div>
       <div id="search-errors">
         <strong>Your search contain error(s):</strong>
-        <div class="errors"></div>
+        <div class="errors">
+          <ul>
+            {{#each errors}}
+              <li>{{ this }}</li>
+            {{/each}}
+          </ul>
+        </div>
       </div>
     </div>
   </div>

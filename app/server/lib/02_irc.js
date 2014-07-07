@@ -250,19 +250,25 @@ function shallWriteChannelLog (nick, text, channel_name, server_name, client_nic
 
 ChannelLogsManager = function () {
   function _insert (log) {
-    ChannelLogs.insert(log, function (err, id) {});
-    OldChannelLogs.insert(log, function (err, id) {});
-    if (CONFIG.ENABLE_ELASTIC_SEARCH) {
-      var esClient = elasticsearch.Client({
+    ChannelLogs.insert(log, function (err, id) {
+      log._id = id;
+      console.log(log);
+      if (CONFIG.ENABLE_ELASTIC_SEARCH) {
+        var esClient = elasticsearch.Client({
           host: CONFIG.ELASTIC_SEARCH_HOST
-      });
-      esClient.index({
+        });
+        esClient.index({
           index: 'channel_logs',
           type: 'log',
-          body: log
-      }, function (err, resp) {
-      });
-    }
+          body: log,
+          id: id // use same id as mongo id to prevent errors https://github.com/elasticsearch/elasticsearch/issues/2638
+        }, function (err, resp) {
+          console.log('es resp');
+          console.log(resp);
+        });
+      }
+    });
+    OldChannelLogs.insert(log, function (err, id) {});
   }
   return {
     insertIfNeeded: function (log, client_nick) {

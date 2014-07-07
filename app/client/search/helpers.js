@@ -33,27 +33,14 @@ waartaa.search.helpers = {
     var data = response.data;
     if (data.status) {
       var results = data.results;
-      var chatHTML = UI.toHTML(Template.search_chat_logs.extend({
-        data: function () {
-          return results.data;
-        }
-      }));
-      // decode html trick
-      // decoded highlighted search terms
-      chatHTML = $('<textarea />').html(chatHTML).val();
+      Session.set('searchResult', results);
+      Session.set('errors', null);
       $('#search-errors').hide();
-      $('#chat-logs .logs').html(chatHTML);
-      $('#chat-logs .results-count').html('About ' + results.totalCount + ' result(s) in ' + results.took/1000 + ' seconds');
       $('#chat-logs').show();
     } else {
-      var errors = data.errors;
-      var errorHTML = UI.toHTML(Template.search_errors.extend({
-        data: function () {
-          return errors;
-        }
-      }));
+      Session.set('searchResult', null);
+      Session.set('errors', data.errors);
       $('#chat-logs').hide();
-      $('#search-errors .errors').html(errorHTML);
       $('#search-errors').show();
     }
     $('#search-results').show();
@@ -65,5 +52,44 @@ Template.search.helpers({
     if (channelName && channelName[0] == '#') {
       return channelName.substring(1, channelName.length);
     }
+  },
+
+  /*
+   * Returns search results total count.
+   */
+  totalCount: function () {
+    var result = Session.get('searchResult');
+    if (result && result.totalCount>=0) {
+      return result.totalCount;
+    }
+  },
+
+  /*
+   * Returns time taken by search in seconds.
+   */
+  took: function () {
+    var result = Session.get('searchResult');
+    if (result && result.took) {
+      return result.took/1000;
+    }
+  },
+
+  /*
+   * Returns channel logs found.
+   */
+  logs: function () {
+    var result = Session.get('searchResult');
+    if (result && result.data) {
+      return result.data;
+    }
+  },
+
+  /**
+   * Return errors in search result
+   */
+  errors: function () {
+    var errors = Session.get('errors');
+    if (errors)
+      return errors;
   }
 });

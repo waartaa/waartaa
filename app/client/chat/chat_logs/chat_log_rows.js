@@ -13,13 +13,18 @@ UI.registerHelper("decorate", function (message) {
   }
 
   function escape_chevrons (message) {
-      return message.replace(/<(.*)>/g,'&lt;$1&gt;');
+    message = message.replace(/<(.*?)>/g,'&lt;$1&gt;');
+    // beacuse search results contain html for highlighting search terms
+    message = message.replace('&lt;em class="hlt1"&gt;', '<em class="hlt1">');
+    message = message.replace('&lt;/em&gt;', '</em>');
+    return message;
   }
 
-  if (message)
+  if (message) {
     return new Spacebars.SafeString(
       linkify(escape_chevrons(message))
     );
+  }
 });
 
 UI.registerHelper('showDatetime', function (datetime_obj) {
@@ -182,7 +187,6 @@ Template.chat_row.events = {
     }
 
     var bookmarkData = generateBookmarkData();
-    console.log(bookmarkData);
     if (bookmarkData) {
       $('#bookmark-label').attr('value', bookmarkData.label);
       $('#done-bookmark').off('click').on('click', bookmarkData, doneBookmarking);
