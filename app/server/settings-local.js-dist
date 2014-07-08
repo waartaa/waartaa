@@ -4,8 +4,22 @@ GlobalServers = {
       {url: 'irc.freenode.net', port: '6667'},
       {url: 'irc.freenode.net', port: '8000'}
     ]
+  },
+  'oftc': {
+    connections: [
+      {url: 'irc.oftc.net', port: '6667'},
+      {url: 'irc.oftc.net', port: '6697'}
+    ],
+    ssl: {
+      // PATHS for SSL credential files are relative to app/private directory.
+      // Generate nick.pem as specified at
+      // http://www.oftc.net/NickServ/CertFP/#creating-a-self-signed-certificate
+      cert_file: 'certs/oftc/nick.pem',
+      // Download http://www.spi-inc.org/ca/spi-cacert.crt as CAs.pem
+      ca_file: 'certs/oftc/CAs.pem'
+    }
   }
-}
+};
 
 CONFIG = {
   'channel_who_poll_interval': 20 * 1000,
@@ -17,14 +31,18 @@ CONFIG = {
   'IDENT_FILE_PATH': '<path_to_home_dir>/.oidentd.conf',
   'LOGS_SCROLLBACK_COUNT': 500,
   'CHANNEL_LOGS_COLLECTION_LIMIT_PER_CHANNEL': 1000,
-  'CHANNEL_LOGS_CLEANUP_INTERVAL': 4 * 3600 * 1000
-}
+  'CHANNEL_LOGS_CLEANUP_INTERVAL': 4 * 3600 * 1000,
+  // PATHS for SSL credential files are relative to app/private directory
+  'SSL_DEFAULT_CA_FILE': '',
+  'SSL_DEFAULT_PRIVATE_KEY_FILE': 'certs/privatekey.pem',
+  'SSL_DEFAULT_CERT_FILE': 'certs/certificate.pem'
+};
 
-SUPER_USER = 'admin'
-SUPER_USER_EMAIL = 'admin@example.com'
-SUPER_USER_PASSWORD = '$^%fr@090B'
+SUPER_USER = 'admin';
+SUPER_USER_EMAIL = 'admin@example.com';
+SUPER_USER_PASSWORD = '$^%fr@090B';
 
-SECRET_KEY = 'some key'
+SECRET_KEY = 'some key';
 
 Meteor.AppCache.config({firefox: true});
 
