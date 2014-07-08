@@ -21,16 +21,16 @@ Template.search.rendered = function () {
 };
 
 Template.search.events = {
-  'click .advance-field-link': function () {
-    var active = $('.advance-field-link').data('active');
+  'click .advanced-options': function () {
+    var active = $('.advanced-options').data('active');
     if (active) {
-      $('.advance-field').hide();
-      $('.advance-field-link').text('Show advance search');
-      $('.advance-field-link').data('active', false);
+      $('.advance-options-field').slideUp();
+      $('.advanced-options').text('Hide Options');
+      $('.advanced-options').data('active', false);
     } else {
-      $('.advance-field').show();
-      $('.advance-field-link').text('Hide advance search');
-      $('.advance-field-link').data('active', true);
+      $('.advance-options-field').slideDown();
+      $('.advanced-options').text('More Options');
+      $('.advanced-options').data('active', true);
     }
   },
 

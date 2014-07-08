@@ -60,13 +60,17 @@ ul
 .align-dropdown-caret
     margin-right: 16px
 
+nav
+    .container
+        width: 100%
+
 // Search UI
 .search-container
     width: 900px
     margin: 0 auto
 
     .left-col
-        width: 400px
+        width: 550px
         float: left
         padding: 20px 0 0 2px
         word-wrap: break-word
@@ -83,3 +87,30 @@ ul
         top: 8px
         left: 16px
         font-size: 18px
+
+    .chzn-container,
+    .chzn-cotainer-single
+        width: 195px !important
+        position: absolute
+        top: -5px
+        right: 0
+
+        .chzn-single
+            height: 34px
+            line-height: 30px
+            border-radius: 0 15px 15px 0
+            overflow: hidden
+
+            div
+                b
+                    position:absolute
+                    top: 5px
+        .chzn-drop
+            min-width: 195px
+            white-space: nowrap
+            width: auto !important
+            border-top: 1px solid #aaa
+
+    .chzn-with-drop
+        .chzn-single
+            border-bottom-right-radius: 0

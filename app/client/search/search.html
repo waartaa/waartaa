@@ -1,41 +1,42 @@
 <template name="search">
-  <div class="search-container">
+  <div class="container search-container">
     {{>bookmark_model}}
     <div class="chatlogs-loader-msg" style="">Searching...</div>
-    <div class="left-col">
+    <div class="col-md-8">
       <div id="search-fields">
         <i class="fa fa-search"></i>
         <input id="search-message" type= "text" class="form-control search-input" placeholder="Search">
+        <select data-placeholder="Select channel" class="chosen-select" tabindex="-1" style="width: 350px; margin-left:10px">
+          <option value></option>
+          {{#each servers}}
+            <optgroup label={{ name }}>
+              {{#each channels _id}}
+               <option value={{ stripChannelHash name }}>{{ name }}</option>
+              {{/each}}
+            </optgroup>
+          {{/each}}
+        </select>
       </div>
-      <a href="#" class="margin-5 display-block"><i class="fa fa-plus"></i> More options</a>
-      <select data-placeholder="Select channel" class="chosen-select" tabindex="-1" style="width: 350px; margin-left:10px">
-        <option value></option>
-        {{#each servers}}
-          <optgroup label={{ name }}>
-            {{#each channels _id}}
-             <option value={{ stripChannelHash name }}>{{ name }}</option>
-            {{/each}}
-          </optgroup>
-        {{/each}}
-      </select>
-      <input id="search-button" type="button" value="Search">
-      <div id="advance-search">
-        <a href="#" class="advance-field-link" data-active="false">Show advance search</a>
-        <div class="advance-field advance-field-first">
-          <label>From:</label>
-          <input id="search-message-from" type="text" class="form-control">
+      <a href="#" class="advanced-options margin-10 display-block" data-active="false"><i class="fa fa-plus"></i> More options</a>
+      <div class="advance-options-field">
+        <div class="advance-field">
+          <span class="short-label">Channel</span>
         </div>
         <div class="advance-field">
-          <label>To:</label>
-          <input id="search-message-to" type="text" class="form-control">
+            <span class="short-label">FROM</span>
+            <input id="search-message-from" type="text" class="form-control">
         </div>
         <div class="advance-field">
-          <label>Date From:</label>
-          <input id="start-date" type="text" class="datepicker">
+            <span class="short-label">TO</span>
+            <input id="search-message-to" type="text" class="form-control">
         </div>
         <div class="advance-field">
-          <label>Date To:</label>
-          <input id="end-date" type="text" class="datepicker">
+            <span class="short-label">FROM DATE</span>
+            <input id="start-date" type="text" class="datepicker">
+        </div>
+        <div class="advance-field">
+            <span class="short-label">TO DATE</span>
+            <input id="end-date" type="text" class="datepicker">
         </div>
       </div>
     </div>
