@@ -278,6 +278,10 @@ Meteor.startup(function () {
     debug: CONFIG.QUEUE_DEBUG || false,
     maxProcessing: CONFIG.DELAYED_QUEUE_WORKERS_COUNT || 1
   });
+  // Reload server config
+  Servers.find({}).forEach(function (server) {
+    Servers.update({_id: server._id}, {$set: GlobalServers[server.name]});
+  });
   Meteor.users.find({}).forEach(function (user) {
     UserServers.find(
       {
