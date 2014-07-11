@@ -32,8 +32,8 @@ Template.chat_input.events({
       var user_server = UserServers.findOne({_id: room.server_id}) || {};
       var channel = UserChannels.findOne({
         user_server_id: user_server._id, _id: room.room_id});
-      if (channel)
-        ChannelLogs.insert({
+      if (channel) {
+        var log = {
             message: message,
             raw_message: '',
             from: user_server.current_nick,
@@ -48,7 +48,13 @@ Template.chat_input.events({
             created: new Date(Meteor.getServerMS()),
             last_updated: new Date(Meteor.getServerMS()),
             status: "new"
+        };
+        ChannelLogs.insert(log, function (err, id) {
+          if (!err) {
+            Meteor.call('insertChannelLogInES', log);
+          }
         });
+      }
     } else if (room.roomtype == 'pm') {
       Meteor.call('send_pm', message, room.room_id, log_options)
     } else if (room.roomtype == 'server') {
