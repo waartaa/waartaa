@@ -48,11 +48,16 @@ UI.registerHelper('isBookmarkable', function (from) {
     return false;
 });
 
-UI.registerHelper('isBookmarked', function (logId) {
+UI.registerHelper('isBookmarked', function (datetime, channel_name, server_name) {
   var userId = Meteor.user() && Meteor.user()._id;
+  var d = new Date(datetime);
+  var timestamp = d.getTime();
   var cursor = Bookmarks.find({
-    logIds: logId,
-    userId: userId
+    'logTimestamp': timestamp,
+    'userId': userId,
+    'roomInfo.roomType': 'channel',
+    'roomInfo.channel_name': channel_name,
+    'roomInfo.server_name': server_name
   });
   if (cursor.count() > 0)
     return 'bookmarked';
@@ -60,12 +65,22 @@ UI.registerHelper('isBookmarked', function (logId) {
     return '';
 });
 
+UI.registerHelper('convertToTimestamp', function (date) {
+  var d = new Date(date);
+  if (d)
+    return d.getTime();
+});
+
 var longpressTimerId = null;
 var longpressed = false;
 
 var generateBookmarkData = function () {
-  var dateObjs = [];
-  var logIds = [];
+  var timestamps = [];
+  var roomInfo = {
+    'roomType': 'channel',
+    'channel_name': null,
+    'server_name': null
+  };
   var nowBookmarks = $('.bookmarked-now');
   // no bookmarks available, so return empty
   if (nowBookmarks.length == 0) {
@@ -74,17 +89,16 @@ var generateBookmarkData = function () {
   // bookmarks exists, so generate data
   for (var i=0; i<nowBookmarks.length; i++) {
     var nowBookmark = $(nowBookmarks[i]);
-    var datetime = nowBookmark.data('datetime');
-    var logId = nowBookmark.data('log-id');
-    var dateObj = new Date(datetime);
-    dateObjs.push(dateObj);
-    logIds.push(logId);
+    roomInfo.channel_name = nowBookmark.data('channel-name');
+    roomInfo.server_name = nowBookmark.data('server-name');
+    var timestamp = nowBookmark.data('timestamp');
+    timestamps.push(timestamp);
   }
-  dateObjs.sort(function (d1, d2) {
-    return d1 - d2;
+  timestamps.sort(function (t1, t2) {
+    return t1 - t2;
   });
-  var startDate = dateObjs[0];
-  var endDate = dateObjs[dateObjs.length - 1];
+  var startDate = new Date(timestamps[0]);
+  var endDate = new Date(timestamps[timestamps.length - 1]);
   var label = moment(startDate).format('LL hh:mm A');
   var labelEnd = moment(endDate).format('LL hh:mm A');
   if (label != labelEnd) {
@@ -92,7 +106,8 @@ var generateBookmarkData = function () {
   }
   return  {
     'label': label,
-    'logIds': logIds
+    'logTimestamp': timestamps,
+    'roomInfo': roomInfo
   }
 };
 
@@ -141,12 +156,10 @@ var bookmarkLogs = function (currentEl, longpressedEl) {
 var doneBookmarking = function (event) {
   var data = event.data;
   var user = Meteor.user()
-  var roomType = 'channel';
   data.creator = user.username;
   data.creatorId = user._id;
   data.user = user.username;
   data.userId = user._id;
-  data.roomType = roomType;
   $("#done-bookmark").prop('disabled', true);
   Meteor.call('saveBookmarks', data, function (err, result) {
     $("#done-bookmark").prop('disabled', false);
@@ -202,7 +215,6 @@ Template.chat_row.events = {
     longpressed = false;
     longpressTimerId = setTimeout(function () {
       longpressed = true;
-      console.log('longpressed');
     }, 1000);
   },
 

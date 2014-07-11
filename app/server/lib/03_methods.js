@@ -258,7 +258,6 @@ _send_channel_message = function (user, user_channel_id, message, log_options) {
   return logged;
 };
 
-
 Meteor.startup(function () {
   CLIENTS = {};
   SERVER_JOIN_QUEUE = new PowerQueue({
@@ -541,15 +540,19 @@ Meteor.methods({
   saveBookmarks: function (data) {
     if (
         data.label=='' ||
-        data.logIds.length==0 ||
+        data.logTimestamp.length==0 ||
         !data.creator ||
         !data.user ||
-        !data.roomType
+        !data.roomInfo.roomType
        )
       return false;
     data.created = Date();
     data.lastUpdated = Date();
     Bookmarks.insert(data);
     return true;
+  },
+  // Inserts channel logs in Elastic Search
+  insertChannelLogInES: function (log) {
+    channelLogsManager.insertInES(log);
   }
 })

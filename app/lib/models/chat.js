@@ -205,8 +205,11 @@ UserPms = new Meteor.Collection("user_pms");
 /*
 Bookmarks {
   label: String,
-  roomType: String ('channel'/'pm'/'server'),
-  logIds: List<String>,
+  roomInfo: Object {
+    roomType: String ('channel', 'pm', 'server'),
+    channel_id, channel_name etc.
+  },
+  logTimestamp: List<Timestamp>,
   user: String,
   userId: String,
   created: Datetime,
