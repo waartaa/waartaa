@@ -49,11 +49,7 @@ Template.chat_input.events({
             last_updated: new Date(Meteor.getServerMS()),
             status: "new"
         };
-        ChannelLogs.insert(log, function (err, id) {
-          if (!err) {
-            Meteor.call('insertChannelLogInES', log);
-          }
-        });
+        ChannelLogs.insert(log, function (err, id) {});
       }
     } else if (room.roomtype == 'pm') {
       Meteor.call('send_pm', message, room.room_id, log_options)

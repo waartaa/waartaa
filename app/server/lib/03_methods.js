@@ -550,9 +550,5 @@ Meteor.methods({
     data.lastUpdated = Date();
     Bookmarks.insert(data);
     return true;
-  },
-  // Inserts channel logs in Elastic Search
-  insertChannelLogInES: function (log) {
-    channelLogsManager.insertInES(log);
   }
 })
