@@ -41,7 +41,7 @@
           </div>
         </div>
         <div id="search-results">
-          <div id="chat-logs">
+          <div id="search-chat-logs">
             <div class="results-count">About {{totalCount}} result in {{ took }} seconds.</div>
             <div class="logs">
               {{#each logs}}
@@ -53,16 +53,10 @@
             <strong>Your search contain error(s):</strong>
             <div class="errors">
               <ul>
-                {{#each errors}}
+                {{#each searchErrors}}
                   <li>{{ this }}</li>
                 {{/each}}
               </ul>
-            </div>
-          </div>
-        </div>
-        <div id="bookmark-results">
-          <div id="chat-logs">
-            <div class="logs">
             </div>
           </div>
         </div>

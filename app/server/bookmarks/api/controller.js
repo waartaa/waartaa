@@ -39,7 +39,7 @@ BookmarksController = (function () {
       }).wait();
       var data = {
         took: results.took,
-        total: results.hits.total,
+        totalCount: results.hits.total,
         logs: []
       };
       for(var i=0; i<results.hits.hits.length; i++) {
@@ -66,7 +66,7 @@ BookmarksController = (function () {
           var data = getBookmarkedLogsData(logTimestamp, channel_name, server_name);
           var resp = {
             status: true,
-            data: data
+            results: data
           }
         } else {
           resp = {

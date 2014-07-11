@@ -77,7 +77,7 @@ SearchController = (function () {
           totalCount: data.hits.total,
           perPage: CONFIG.ELASTIC_SEARCH_DATA_LIMIT,
           took: data.took,
-          data: d
+          logs: d
         }
       }
     } else {

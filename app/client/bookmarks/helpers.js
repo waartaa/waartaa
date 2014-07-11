@@ -1,6 +1,5 @@
 waartaa.bookmarks.helpers = {
   getBookmarkedItems: function (logTimestamp, channel_name, server_name) {
-    console.log(channel_name);
     var API_URL = waartaa.bookmarks.API_ENDPOINT;
     Meteor.http.post(API_URL, {
       data: {
@@ -9,14 +8,11 @@ waartaa.bookmarks.helpers = {
         server_name: server_name
       }
     }, function (err, resp) {
-      if (!err && resp.data.status) {
-        waartaa.bookmarks.helpers.renderResponse(resp.data.data);
+      if (!err) {
+        waartaa.search.helpers.renderResponse(resp);
       } else {
-        alert('An error occured while fetching data');
+        alert('OOPS! An error occured while fetching data');
       }
     });
   },
-
-  renderResponse: function (data) {
-  }
 };

@@ -34,13 +34,13 @@ waartaa.search.helpers = {
     if (data.status) {
       var results = data.results;
       Session.set('searchResult', results);
-      Session.set('errors', null);
+      Session.set('searchErrors', null);
       $('#search-errors').hide();
-      $('#chat-logs').show();
+      $('#search-chat-logs').show();
     } else {
       Session.set('searchResult', null);
-      Session.set('errors', data.errors);
-      $('#chat-logs').hide();
+      Session.set('searchErrors', data.errors);
+      $('#search-chat-logs').hide();
       $('#search-errors').show();
     }
     $('#search-results').show();
@@ -79,8 +79,8 @@ Template.search.helpers({
    */
   logs: function () {
     var result = Session.get('searchResult');
-    if (result && result.data) {
-      return result.data;
+    if (result && result.logs) {
+      return result.logs;
     }
   },
 
