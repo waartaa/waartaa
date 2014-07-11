@@ -66,3 +66,6 @@ waartaa['IRC_COMMANDS'] = {
 waartaa['search'] = {
   'API_ENDPOINT': Meteor.absoluteUrl('api/search/')
 };
+waartaa['bookmarks'] = {
+  'API_ENDPOINT': Meteor.absoluteUrl('api/bookmarks')
+};
