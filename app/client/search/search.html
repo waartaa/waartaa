@@ -1,62 +1,81 @@
 <template name="search">
+  {{>bookmark_model}}
+  <div class="chatlogs-loader-msg" style="">Searching...</div>
   <div class="container search-container">
-    {{>bookmark_model}}
-    <div class="chatlogs-loader-msg" style="">Searching...</div>
-    <div class="col-md-8">
-      <div id="search-fields">
-        <i class="fa fa-search"></i>
-        <input id="search-message" type= "text" class="form-control search-input" placeholder="Search">
-        <select data-placeholder="Select channel" class="chosen-select" tabindex="-1" style="width: 350px; margin-left:10px">
-          <option value></option>
-          {{#each servers}}
-            <optgroup label={{ name }}>
-              {{#each channels _id}}
-               <option value={{ stripChannelHash name }}>{{ name }}</option>
-              {{/each}}
-            </optgroup>
-          {{/each}}
-        </select>
-      </div>
-      <a href="#" class="advanced-options margin-10 display-block" data-active="false"><i class="fa fa-plus"></i> More options</a>
-      <div class="advance-options-field">
-        <div class="advance-field">
-          <span class="short-label">Channel</span>
-        </div>
-        <div class="advance-field">
-            <span class="short-label">FROM</span>
-            <input id="search-message-from" type="text" class="form-control">
-        </div>
-        <div class="advance-field">
-            <span class="short-label">TO</span>
-            <input id="search-message-to" type="text" class="form-control">
-        </div>
-        <div class="advance-field">
-            <span class="short-label">FROM DATE</span>
-            <input id="start-date" type="text" class="datepicker">
-        </div>
-        <div class="advance-field">
-            <span class="short-label">TO DATE</span>
-            <input id="end-date" type="text" class="datepicker">
-        </div>
-      </div>
-    </div>
-    <div id="search-results">
-      <div id="chat-logs">
-        <div class="results-count">About {{totalCount}} result in {{ took }} seconds.</div>
-        <div class="logs">
-          {{#each logs}}
-            {{> chat_row}}
-          {{/each}}
-        </div>
-      </div>
-      <div id="search-errors">
-        <strong>Your search contain error(s):</strong>
-        <div class="errors">
-          <ul>
-            {{#each errors}}
-              <li>{{ this }}</li>
+    <div class="row">
+      <div class="col-md-8">
+        <div id="search-fields">
+          <i class="fa fa-search"></i>
+          <input id="search-message" type= "text" class="form-control search-input" placeholder="Search">
+          <select data-placeholder="Select channel" class="chosen-select" tabindex="-1" style="width: 350px; margin-left:10px">
+            <option value></option>
+            {{#each servers}}
+              <optgroup label={{ name }}>
+                {{#each channels _id}}
+                 <option value={{ stripChannelHash name }}>{{ name }}</option>
+                {{/each}}
+              </optgroup>
             {{/each}}
-          </ul>
+          </select>
+        </div>
+        <a href="#" class="advanced-options margin-10 display-block" data-active="false"><i class="fa fa-plus"></i> More options</a>
+        <div class="advance-options-field">
+          <div class="advance-field">
+            <span class="short-label">Channel</span>
+          </div>
+          <div class="advance-field">
+              <span class="short-label">FROM</span>
+              <input id="search-message-from" type="text" class="form-control">
+          </div>
+          <div class="advance-field">
+              <span class="short-label">TO</span>
+              <input id="search-message-to" type="text" class="form-control">
+          </div>
+          <div class="advance-field">
+              <span class="short-label">FROM DATE</span>
+              <input id="start-date" type="text" class="datepicker">
+          </div>
+          <div class="advance-field">
+              <span class="short-label">TO DATE</span>
+              <input id="end-date" type="text" class="datepicker">
+          </div>
+        </div>
+        <div id="search-results">
+          <div id="chat-logs">
+            <div class="results-count">About {{totalCount}} result in {{ took }} seconds.</div>
+            <div class="logs">
+              {{#each logs}}
+                {{> chat_row}}
+              {{/each}}
+            </div>
+          </div>
+          <div id="search-errors">
+            <strong>Your search contain error(s):</strong>
+            <div class="errors">
+              <ul>
+                {{#each errors}}
+                  <li>{{ this }}</li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="active"><a href="#bookmarks" role="tab" data-toggle="tab">Bookmarks</a></li>
+          <li><a href="#links" role="tab" data-toggle="tab">Files</a></li>
+          <li><a href="#files" role="tab" data-toggle="tab">Links</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content nano">
+          <div class="tab-pane active" id="bookmarks">
+            {{>bookmark_labels}}
+          </div>
+          <div class="tab-pane" id="files">...</div>
+          <div class="tab-pane" id="links">...</div>
         </div>
       </div>
     </div>
