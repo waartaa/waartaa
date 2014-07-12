@@ -20,14 +20,43 @@ Template.search.rendered = function () {
   });
 };
 
+var _callbackSearch = function () {
+  var chosen = $('.chosen-select')[0];
+  var selectedIndex = chosen.selectedIndex;
+  var selectedEl = chosen.options[selectedIndex];
+  var serverName = $(selectedEl).closest('optgroup').prop('label');
+  var channelName = $('.chosen-select').val();
+  var getParams = {
+    message: $('#search-message').val(),
+    from: $('#search-message-from').val(),
+    to: $('#search-message-to').val(),
+    dateFrom: $('#start-date').val(),
+    dateTo: $('#end-date').val()
+  };
+  if(!channelName) {
+    alert('Please select a channel');
+    return;
+  }
+  Session.set('bookmarkId', null);
+  Session.set('searchOptions', {
+    serverName: serverName,
+    channelName: channelName,
+    getParams: getParams
+  });
+  waartaa.search.helpers.callAPI(serverName, channelName, getParams);
+};
+
 var _callbackNextPrev = function (page) {
   var bookmarkId = Session.get('bookmarkId');
+  var searchOptions = Session.get('searchOptions');
   if (bookmarkId) {
-    var bookmark = Bookmarks.findOne({_id: bookmarkId});
-    var channel_name = bookmark.roomInfo.channel_name;
-    var server_name = bookmark.roomInfo.server_name;
-    var logTimestamp = bookmark.logTimestamp;
-    waartaa.bookmarks.helpers.getBookmarkedItems(logTimestamp, channel_name, server_name, page);
+    waartaa.bookmarks.helpers.getBookmarkedItems(bookmarkId, page);
+  } else if (searchOptions) {
+    var serverName = searchOptions.serverName;
+    var channelName = searchOptions.channelName;
+    var getParams = searchOptions.getParams;
+    getParams.page = page;
+    waartaa.search.helpers.callAPI(serverName, channelName, getParams);
   }
 };
 
@@ -46,23 +75,13 @@ Template.search.events = {
   },
 
   'click #search-button': function () {
-    var chosen = $('.chosen-select')[0];
-    var selectedIndex = chosen.selectedIndex;
-    var selectedEl = chosen.options[selectedIndex];
-    var serverName = $(selectedEl).closest('optgroup').prop('label');
-    var channelName = $('.chosen-select').val();
-    var getParams = {
-      message: $('#search-message').val(),
-      from: $('#search-message-from').val(),
-      to: $('#search-message-to').val(),
-      dateFrom: $('#start-date').val(),
-      dateTo: $('#end-date').val()
-    };
-    if(!channelName) {
-      alert('Please select a channel');
-      return;
+    _callbackSearch();
+  },
+
+  'keyup #search-message': function (e) {
+    if (e.keyCode == 13) {
+      _callbackSearch();
     }
-    waartaa.search.helpers.callAPI(serverName, channelName, getParams);
   },
 
   'click #previous-icon': function () {

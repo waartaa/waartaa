@@ -75,6 +75,7 @@ SearchController = (function () {
         status: true,
         results: {
           totalCount: data.hits.total,
+          page: data.page,
           perPage: CONFIG.ELASTIC_SEARCH_DATA_LIMIT,
           took: data.took,
           logs: d
@@ -112,8 +113,10 @@ SearchController = (function () {
         var data = query.construct().execute();
         if(data === false)
           resp = makeResponse(false, undefined, ['Error connecting to search server.']);
-        else
+        else {
+          data.page = q.page;
           resp = makeResponse(true, data);
+        }
       } else {
         resp = makeResponse(false, undefined, paramErrs);
       }

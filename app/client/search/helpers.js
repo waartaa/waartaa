@@ -21,7 +21,7 @@ waartaa.search.helpers = {
     $('.chatlogs-loader-msg').show();
     Meteor.http.get(API_URL, function (err, body) {
       if (!err) {
-        waartaa.search.helpers.renderResponse(body);
+        waartaa.search.helpers.renderResponse(body, 'search');
       } else {
         alert('OOPS! An error occured while fetching data.');
       }
@@ -29,7 +29,10 @@ waartaa.search.helpers = {
     });
   },
 
-  renderResponse: function (response) {
+  renderResponse: function (response, type) {
+    if (type == 'search') {
+      $('.bookmark-label a').removeClass('active');
+    }
     var data = response.data;
     if (data.status) {
       var results = data.results;
