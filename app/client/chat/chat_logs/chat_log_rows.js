@@ -32,7 +32,6 @@ UI.registerHelper('showDatetime', function (datetime) {
     datetime_obj = new Date(datetime);
   else if(typeof(datetime)==="object")
     datetime_obj = datetime;
-  console.log(datetime_obj);
   var today_str = moment(new Date()).format('MM/DD/YYYY');
   if (today_str == moment(datetime_obj).format('MM/DD/YYYY'))
     return moment(datetime_obj).format('hh:mm A');

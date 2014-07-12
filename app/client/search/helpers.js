@@ -47,6 +47,27 @@ waartaa.search.helpers = {
   }
 };
 
+var _getCurrentPage = function () {
+  var result = Session.get('searchResult');
+  if (result && result.page) {
+    return result.page;
+  }
+  return 0;
+};
+
+var _getTotalPages = function () {
+  var result = Session.get('searchResult');
+  if (result && result.perPage && result.totalCount) {
+    var perPage = result.perPage;
+    var totalCount = result.totalCount;
+    var count = parseInt(totalCount / perPage);
+    if ((totalCount % perPage) > 0)
+      count += 1;
+    return count;
+  }
+  return 0;
+}
+
 Template.search.helpers({
   stripChannelHash: function (channelName) {
     if (channelName && channelName[0] == '#') {
@@ -85,11 +106,42 @@ Template.search.helpers({
   },
 
   /**
+   * Return current page in search result
+   */
+  currentPage: function () {
+    return _getCurrentPage();
+  },
+
+  /**
+   * Return total pages in search result
+   */
+  totalPages: function () {
+    return _getTotalPages();
+  },
+
+  /**
    * Return errors in search result
    */
   errors: function () {
     var errors = Session.get('errors');
     if (errors)
       return errors;
+  },
+
+  showNextButton: function () {
+    var currentPage = _getCurrentPage();
+    var totalPages = _getTotalPages();
+    if (currentPage < totalPages)
+      return true;
+    else
+      return false;
+  },
+
+  showPreviousButton: function () {
+    var currentPage = _getCurrentPage();
+    if (currentPage > 1)
+      return true;
+    else
+      return false;
   }
 });

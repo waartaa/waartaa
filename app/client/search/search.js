@@ -20,6 +20,17 @@ Template.search.rendered = function () {
   });
 };
 
+var _callbackNextPrev = function (page) {
+  var bookmarkId = Session.get('bookmarkId');
+  if (bookmarkId) {
+    var bookmark = Bookmarks.findOne({_id: bookmarkId});
+    var channel_name = bookmark.roomInfo.channel_name;
+    var server_name = bookmark.roomInfo.server_name;
+    var logTimestamp = bookmark.logTimestamp;
+    waartaa.bookmarks.helpers.getBookmarkedItems(logTimestamp, channel_name, server_name, page);
+  }
+};
+
 Template.search.events = {
   'click .advanced-options': function () {
     var active = $('.advanced-options').data('active');
@@ -52,5 +63,34 @@ Template.search.events = {
       return;
     }
     waartaa.search.helpers.callAPI(serverName, channelName, getParams);
+  },
+
+  'click #previous-icon': function () {
+    var currentPage = parseInt($('#page-no').attr('data-current-page'));
+    var totalPages = parseInt($('#page-no').attr('data-total-pages'));
+    if (currentPage > 1) {
+      var page = currentPage - 1;
+      _callbackNextPrev(page);
+    }
+  },
+
+  'click #next-icon': function () {
+    var currentPage = parseInt($('#page-no').attr('data-current-page'));
+    var totalPages = parseInt($('#page-no').attr('data-total-pages'));
+    if (currentPage < totalPages) {
+      var page = currentPage + 1;
+      _callbackNextPrev(page);
+    }
+  },
+
+  'keyup #page-no': function (e) {
+    if (e.keyCode == 13) {
+      var page = parseInt($('#page-no').val());
+      var currentPage = parseInt($('#page-no').attr('data-current-page'));
+      var totalPages = parseInt($('#page-no').attr('data-total-pages'));
+      if (page >= 1 && page <= totalPages && page!=currentPage) {
+        _callbackNextPrev(page);
+      }
+    }
   }
 };

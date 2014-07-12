@@ -1,6 +1,6 @@
 BookmarksController = (function () {
 
-  var getBookmarkedLogsData = function (logTimestamp, channel_name, server_name) {
+  var getBookmarkedLogsData = function (logTimestamp, channel_name, server_name, page) {
     var datetimeFilter = [];
     for (var i=0; i<logTimestamp.length; i++) {
       var timestamp = logTimestamp[i];
@@ -35,11 +35,15 @@ BookmarksController = (function () {
     try {
       var results = waiter({
         index: 'channel_logs',
+        from: (parseInt(page) - 1) * CONFIG.ELASTIC_SEARCH_DATA_LIMIT,
+        size: CONFIG.ELASTIC_SEARCH_DATA_LIMIT,
         body: qJSON
       }).wait();
       var data = {
         took: results.took,
         totalCount: results.hits.total,
+        page: page,
+        perPage: CONFIG.ELASTIC_SEARCH_DATA_LIMIT,
         logs: []
       };
       for(var i=0; i<results.hits.hits.length; i++) {
@@ -62,8 +66,9 @@ BookmarksController = (function () {
         var logTimestamp = body.logTimestamp || [];
         var channel_name = body.channel_name;
         var server_name = body.server_name;
+        var page = body.page || 1;
         if (logTimestamp.length > 0 && channel_name && server_name) {
-          var data = getBookmarkedLogsData(logTimestamp, channel_name, server_name);
+          var data = getBookmarkedLogsData(logTimestamp, channel_name, server_name, page);
           var resp = {
             status: true,
             results: data

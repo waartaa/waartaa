@@ -1,11 +1,12 @@
 waartaa.bookmarks.helpers = {
-  getBookmarkedItems: function (logTimestamp, channel_name, server_name) {
+  getBookmarkedItems: function (logTimestamp, channel_name, server_name, page) {
     var API_URL = waartaa.bookmarks.API_ENDPOINT;
     Meteor.http.post(API_URL, {
       data: {
         logTimestamp: logTimestamp,
         channel_name: channel_name,
-        server_name: server_name
+        server_name: server_name,
+        page: page
       }
     }, function (err, resp) {
       if (!err) {
