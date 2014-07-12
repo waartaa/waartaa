@@ -609,3 +609,55 @@ body {
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
   background-color: #999;
 }
+
+
+/* Chat drawers */
+
+#chat.drawer-container.show-drawer.show-drawer-left
+.drawer.drawer-left {
+  @media (max-width: 992px) {
+    z-index: 1;
+    display: block !important;
+  }
+}
+
+#chat.drawer-container.show-drawer.show-drawer-right
+.drawer.drawer-right {
+  @media (max-width: 768px) {
+    z-index: 1;
+    display: block !important;
+    right: -18.3%;
+  }
+}
+
+#chat.drawer-container.show-drawer .drawer.drawer-main-content {
+  @media (max-width: 768px) {
+    position: fixed;
+  }
+}
+
+.drawer-toggle {
+  cursor: pointer;
+}
+
+.drawer-toggle {
+  @media (max-width: 768px) {
+    margin-left: -15px !important;
+  }
+  @media (min-width: 768px) and (max-width: 992px) {
+    margin-left: -30px !important;
+  }
+}
+
+.drawer-toggle.active {
+  color: #ccc;
+}
+
+.drawer-toggle-left.active {
+  @media (max-width: 768px) {
+    margin-left: -24px !important;
+  }
+  @media (min-width: 768px) and (max-width: 992px) {
+    margin-left: -36px !important;
+  }
+}

@@ -19,6 +19,7 @@ Router.map(function () {
     onAfterAction: function () {
       if (Meteor.isClient)
         GAnalytics.pageview();
+      Session.set('currentPage', 'index');
     },
     fastRender: true
   });
@@ -34,6 +35,9 @@ Router.map(function () {
     path: /^\/settings\/$/,
     template: 'accountSettings',
     layoutTemplate: 'layout',
+    onAfterAction: function () {
+      Session.set('currentPage', 'account');
+    },
     onBeforeAction: [
         function () {
             if (Meteor.isClient) {
@@ -87,6 +91,7 @@ Router.map(function () {
     onAfterAction: function () {
       if (Meteor.isClient)
         GAnalytics.pageview('/chat/');
+      Session.set('currentPage', 'chat');
     },
     fastRender: true
   });

@@ -1,6 +1,6 @@
 <template name="chat_users">
 {{#unless isCurrentRoomtype "server"}}
-  <div id="info-panel" class="col-md-2 col-sm-2 hidden-xs">
+  <div id="info-panel" class="drawer drawer-right col-md-2 col-sm-3 col-xs-10 hidden-xs">
     {{#if isAnyRoomSelected}}
       <div class="panel panel-info">
           {{> info_panel_header}}
