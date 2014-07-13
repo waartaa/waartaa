@@ -1,5 +1,5 @@
 <template name="chat_main">
-<div id="chat-main" class="col-md-{{#if isCurrentRoomtype "server"}}10{{else}}8{{/if}} col-sm-9 col-xs-12">
+<div id="chat-main" class="{{#if isCurrentRoomtype "server"}}col-md-10 col-sm-12{{else}}col-md-8 col-sm-9{{/if}} col-xs-12 drawer drawer-main-content">
   {{#if isCurrentRoomtype "channel"}}
     {{> channel_logs}}
   {{else}}

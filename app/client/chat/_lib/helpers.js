@@ -118,26 +118,26 @@ waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
 
   if (obj.roomtype == 'server') {
     Session.set('room', {
-      room_id: obj.server_id,
+      room_id: obj._id,
       roomtype: obj.roomtype,
-      server_id: obj.server_id,
-      server_name: obj.server_name,
+      server_id: obj._id,
+      server_name: obj.name || obj.server_name,
     });
     // set cookie server_id
-    set_cookie('server_id', obj.server_id);
+    set_cookie('server_id', obj._id || obj.server_id);
   }
   else if (obj.roomtype == 'channel') {
     Session.set('room', {
-      room_id: obj.channel_id,
+      room_id: obj._id || obj.channel_id,
       roomtype: obj.roomtype,
       server_id: obj.server_id,
       server_name: obj.server_name,
-      channel_id: obj.channel_id,
-      channel_name: obj.channel_name
+      channel_id: obj._id || obj.channel_id,
+      channel_name: obj.name || obj.channel_name
     });
     // set cookie server_id and channel_id
     set_cookie('server_id', obj.server_id);
-    set_cookie('channel_id', obj.channel_id);
+    set_cookie('channel_id', obj._id || obj.channel_id);
   }
   else if (obj.roomtype == 'pm') {
     Session.set('room', {
