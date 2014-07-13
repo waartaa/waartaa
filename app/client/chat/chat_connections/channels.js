@@ -202,7 +202,8 @@ Template.server_channels.created = function(){
     // waartaa couldn't connect to a chat room with data from the cookies,
     // connecting to the first room availble
     try {
-      var server_id = UserServers.findOne()._id;
+      var server = UserServers.findOne();
+      var server_id = server._id;
       var channels = UserChannels.find({ user_server_id : server_id });
       var pm = UserPms.findOne({ user_server_id: server_id });
       var pm_count = 0;
@@ -212,10 +213,8 @@ Template.server_channels.created = function(){
       if(UserServers.find().count() > 0 && !session_room_exists()) {
         if ( channels.count() === 0 && pm_count === 0) {
           // no channels and no pms, connecting to server room
-          waartaa.chat.helpers.setCurrentRoom({
-            roomtype : 'server',
-            server_id : server_id
-          });
+          server.roomtype = 'server';
+          waartaa.chat.helpers.setCurrentRoom(server);
         }
         else if(channels.count() > 0 ) {
           // connect the first room
