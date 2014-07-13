@@ -4,19 +4,24 @@
   <div class="container search-container">
     <div class="row">
       <div class="col-md-8">
-        <div id="search-fields">
-          <i class="fa fa-search"></i>
-          <input id="search-message" type= "text" class="form-control search-input" placeholder="Search">
-          <select data-placeholder="Select channel" class="chosen-select" tabindex="-1" style="width: 350px; margin-left:10px">
-            <option value></option>
-            {{#each servers}}
-              <optgroup label={{ name }}>
-                {{#each channels _id}}
-                 <option value={{ stripChannelHash name }}>{{ name }}</option>
-                {{/each}}
-              </optgroup>
-            {{/each}}
-          </select>
+        <div class="row">
+          <div id="search-fields" class="col-md-10">
+            <i class="fa fa-search"></i>
+            <input id="search-message" type= "text" class="form-control search-input" placeholder="Search">
+            <select data-placeholder="Select channel" class="chosen-select" tabindex="-1" style="width: 350px; margin-left:10px">
+              <option value></option>
+              {{#each servers}}
+                <optgroup label={{ name }}>
+                  {{#each channels _id}}
+                   <option value={{ stripChannelHash name }}>{{ name }}</option>
+                  {{/each}}
+                </optgroup>
+              {{/each}}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button id="search-button" type="button" class="btn btn-primary">Search</button>
+          </div>
         </div>
         <a href="#" class="advanced-options margin-10 display-block" data-active="false"><i class="fa fa-plus"></i> More options</a>
         <div class="advance-options-field">
