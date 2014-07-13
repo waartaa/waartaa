@@ -43,6 +43,8 @@ Accounts.ui.config({
   extraSignupFields: []
 });
 
+
+/* Manage drawers */
 Template.header.events({
   'click .drawer-toggle': function (e) {
     e.preventDefault();
@@ -63,3 +65,25 @@ Template.header.events({
     }
   }
 });
+
+function hideDrawers () {
+  $('.drawer-container').removeClass('show-drawer')
+    .removeClass('show-drawer-left')
+    .removeClass('show-drawer-right');
+  $('.drawer-toggle').removeClass('active');
+}
+
+Template.chat.events({
+  'click': function (e) {
+    var $target = $(e.target);
+    if ($target.parents('.drawer-left, .drawer-right').length == 0 &&
+        !$target.hasClass('.drawer')) {
+      return hideDrawers();
+    }
+  }
+});
+
+Deps.autorun(function () {
+  var currentRoom = Session.get('room');
+  hideDrawers();
+})
