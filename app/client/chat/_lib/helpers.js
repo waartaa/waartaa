@@ -118,9 +118,9 @@ waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
 
   if (obj.roomtype == 'server') {
     Session.set('room', {
-      room_id: obj._id,
+      room_id: obj._id || obj.server_id,
       roomtype: obj.roomtype,
-      server_id: obj._id,
+      server_id: obj._id || obj.server_id,
       server_name: obj.name || obj.server_name,
     });
     // set cookie server_id

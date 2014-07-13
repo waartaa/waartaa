@@ -1,5 +1,5 @@
 <template name="server_logs">
-{{#with currentServer }}
+{{#with getCurrentServer }}
 <div id="server-chatroom-{{ _id }}" class="chatroom server">
   <div class="topic">
     <ul class="nav nav-tabs nav-stacked" style="{{# unless topic }}display:none;{{/unless}}">

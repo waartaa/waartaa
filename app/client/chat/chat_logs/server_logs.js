@@ -1,8 +1,8 @@
-UI.registerHelper('currentServer', function () {
+UI.registerHelper('getCurrentServer', function () {
   var room = Session.get('room');
   if (room.roomtype != 'server')
     return;
-  return server = UserServers.findOne(
+  return UserServers.findOne(
     {_id: room.room_id},
     {fields: {last_updated: 0, created: 0}}
   );
