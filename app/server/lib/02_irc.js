@@ -282,7 +282,8 @@ ChannelLogsManager = function () {
                 client_nick);
               rwlock.unlock();
               log.not_for_user = (UserServers.findOne(
-                {name: server_name, current_nick: nick}) || {}
+                {name: server_name, current_nick: nick,
+                 active: true, status: 'connected'}) || {}
               ).user || null;
               if (shall_write)
                 _insert(log);
