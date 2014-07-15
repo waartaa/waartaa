@@ -101,8 +101,8 @@
     <fieldset>
       <legend>Sign in</legend>
       {{# if SigninError}}
-      <div class="alert">
-        <button type="button" class="close" data-dismiss="alert" data-sessionkey="SigninFormError">&times;</button>
+      <div class="alert alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" data-sessionkey="SignupFormError"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
         <strong>Warning!</strong> {{SigninError.reason}}
       </div>
       {{/if}}
@@ -121,8 +121,8 @@
     <fieldset>
       <legend>Sign up</legend>
       {{# if SignupError}}
-      <div class="alert">
-        <button type="button" class="close" data-dismiss="alert" data-sessionkey="SignupFormError">&times;</button>
+      <div class="alert alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" data-sessionkey="SignupFormError"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
         <strong>Warning!</strong> {{SignupError.reason}}
       </div>
       {{/if}}
