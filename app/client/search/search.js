@@ -63,13 +63,14 @@ var _callbackNextPrev = function (page) {
 Template.search.events = {
   'click .advanced-options': function () {
     var active = $('.advanced-options').data('active');
+ 
     if (active) {
       $('.advance-options-field').slideUp();
-      $('.advanced-options').text('Hide Options');
+      $('.advanced-options').html('<i class="fa fa-plus"></i> More options');
       $('.advanced-options').data('active', false);
     } else {
       $('.advance-options-field').slideDown();
-      $('.advanced-options').text('More Options');
+      $('.advanced-options').html('<i class="fa fa-minus"></i> Hide options');
       $('.advanced-options').data('active', true);
     }
   },
