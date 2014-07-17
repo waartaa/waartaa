@@ -1051,6 +1051,9 @@ IRCHandler = function (user, user_server) {
   }
 
   function _partUserServerCallback (message, user_server, client) {
+    try {
+      delete LISTENERS.server['nickSet'];
+    } catch (err) {}
     Fiber(function () {
       UserServers.update(
         {_id: user_server._id},
@@ -1422,8 +1425,10 @@ IRCHandler = function (user, user_server) {
             if (user_server.name == 'local') {
               client_options = {autoConnect: false};
             }
-            client = new irc.Client(server_url, nick, client_options);
-            client_data[server.name] = client;
+            if ( !client ) {
+              client = new irc.Client(server_url, nick, client_options);
+              client_data[server.name] = client;
+            }
             UserServers.update(
               {_id: user_server._id, status: {$nin: ['user_disconnected', 'admin_disconnected']}},
               {
