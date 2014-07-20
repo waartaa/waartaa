@@ -106,10 +106,8 @@
         <strong>Warning!</strong> {{SigninError.reason}}
       </div>
       {{/if}}
-      <label for="user-signin-username">Username or email</label>
-      <input id="user-signin-username" class="span4" type="text" required="true" tabindex="1"/>
-      <label for="user-signin-password">Password <a href="#" tabindex="5">(forgot password)</a></label>
-      <input id="user-signin-password" class="span4" type="password" required="true" tabindex="2"/>
+      <input id="user-signin-username" class="span4" type="text" placeholder="Username or email" required="true" tabindex="1"/>
+      <input id="user-signin-password" class="span4" type="password" placeholder="Password" required="true" tabindex="2"/>
       <div class="row-fluid">
         <button id="signin-btn" type="submit" class="btn btn-success" tabindex="3">Sign in</button>
         <a id="signup-link" class="btn pull-right" tabindex="4">Sign up</a>
@@ -128,12 +126,9 @@
         <strong>Warning!</strong> {{SignupError.reason}}
       </div>
       {{/if}}
-      <label for="user-signup-username">Username</label>
-      <input id="user-signup-username" class="span4" type="text" required="true" tabindex="1"/>
-      <label for="user-signup-password">Password</label>
-      <input id="user-signup-password" class="span4" type="password" required="true" tabindex="2"/>
-      <label for="user-signup-email">Email</label>
-      <input id="user-signup-email" class="span4" type="email" required="true" tabindex="3"/>
+      <input id="user-signup-username" class="span4" type="text" placeholder="Username" required="true" tabindex="1"/>
+      <input id="user-signup-password" class="span4" type="password" placeholer="Password" required="true" tabindex="2"/>
+      <input id="user-signup-email" class="span4" type="email" placeholder="Email" required="true" tabindex="3"/>
       <div class="row-fluid">
         <button type="submit" id="signup-btn" class="btn btn-success" tabindex="4">Sign up</button>
         <a id="signin-link" type="submit" class="btn pull-right" tabindex="5">Sign in</a>
