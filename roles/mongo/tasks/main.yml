@@ -6,8 +6,10 @@
 
   - name: Install MongoDB packages
     sudo: yes
-    yum: name=mongodb
-    yum: name=mongodb-server
+    yum: name={{ item }}
+    with_items:
+      - mongodb
+      - mongodb-server
 
   - name: update the MongoDB conf file
     sudo: yes 

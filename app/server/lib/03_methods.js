@@ -283,6 +283,8 @@ Meteor.startup(function () {
   });
   // Reload server config
   Servers.find({}).forEach(function (server) {
+    if (!GlobalServers[server.name])
+      return;
     Servers.update({_id: server._id}, {$set: GlobalServers[server.name]});
   });
   Meteor.users.find({}).forEach(function (user) {

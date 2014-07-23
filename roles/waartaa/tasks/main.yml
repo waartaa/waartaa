@@ -1,12 +1,20 @@
 ---
   - name: install custom node deps
-    shell: npm install chdir=~/waartaa
+    shell: npm install chdir=/home/vagrant/waartaa
 
+  - name: Link local node_modules dir with /home/vagrant/node_modules
+    file: src=/home/vagrant/waartaa/node_modules dest=/home/vagrant/node_modules state=link
+
+  - name: Create local meteor build dir
+    file: path=.meteor_local state=directory
+
+  - name: Link local meteor build dir with the one inside app
+    file: src=/home/vagrant/.meteor_local dest=waartaa/app/.meteor/local state=link
 
   - name: copy conf files
-    shell: cp settings-local.js-dist settings-local.js chdir=~/waartaa/waartaa/server/
+    shell: cp settings-local.js-dist settings-local.js chdir=waartaa/app/server/
 
   - name: install meteorite deps
-    shell: mrt install chdir=~/waartaa/waartaa
+    shell: mrt install chdir=waartaa/app
     retries: 5
 
