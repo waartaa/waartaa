@@ -258,7 +258,6 @@ _send_channel_message = function (user, user_channel_id, message, log_options) {
   return logged;
 };
 
-
 Meteor.startup(function () {
   CLIENTS = {};
   SERVER_JOIN_QUEUE = new PowerQueue({
@@ -313,23 +312,29 @@ Meteor.methods({
     validate_user_server_form_data(data, user);
     _create_user_server(data, user);
   },
-  join_user_server: function (user_server_name) {
-    var user = Meteor.users.findOne({_id: this.userId});
+  join_user_server: function (user_server_name, userId) {
+    if (!userId) {
+      userId = this.userId;
+    }
+    var user = Meteor.users.findOne({_id: userId});
     UserServers.update(
       {
         name: user_server_name,
         user: user.username,
         status: 'user_disconnected'
       },
-      {$set: {status: 'disconnected'}},
+      {$set: {status: 'connecting'}},
       {multi: true}
     );
     _join_user_server(user, user_server_name);
   },
-  quit_user_server: function (user_server_name, close) {
-    var irc_handler = _get_irc_handler(user_server_name, this.userId);
+  quit_user_server: function (user_server_name, close, userId) {
+    if (!userId) {
+      userId = this.userId;
+    }
+    var irc_handler = _get_irc_handler(user_server_name, userId);
     if (irc_handler) {
-      var user = Meteor.users.findOne({_id: this.userId});
+      var user = Meteor.users.findOne({_id: userId});
       var active = close? false: true;
       UserServers.update(
         {
@@ -537,4 +542,71 @@ Meteor.methods({
   change_email: function(userId, email) {
     Accounts.sendVerificationEmail(userId, email);
   },
-})
+  // Save bookmarks
+  saveBookmarks: function (data) {
+    if (
+        data.label=='' ||
+        data.logTimestamp.length==0 ||
+        !data.creator ||
+        !data.user ||
+        !data.roomInfo.roomType
+       )
+      return false;
+    data.created = Date();
+    data.lastUpdated = Date();
+    Bookmarks.insert(data);
+    return true;
+  },
+  // Search user servers
+  getUserServersToSubscribe: function (search, pageNo, sort) {
+    if (!Roles.userIsInRole(this.userId, ['admin']))
+      return null;
+
+    var limit = CONFIG.show_last_n_user_servers || 20;
+    var query = {
+      active: true
+    }
+    var queryOptions = {
+      fields: {
+        _id: 1
+      }
+    };
+    if (search) {
+      query['nick'] = search;
+    }
+    if (pageNo) {
+      queryOptions['skip'] = (pageNo - 1) * limit;
+    } else {
+      pageNo = 1;
+    }
+    if (sort) {
+      queryOptions['sort'] = sort;
+    } else {
+      queryOptions['sort'] = {nick: 1};
+    }
+    queryOptions['limit'] = limit;
+    var user_servers = UserServers.find(query, queryOptions);
+    var data = [];
+    user_servers.forEach(function (doc) {
+      data.push(doc);
+    });
+    var totalCount = user_servers.count();
+    var result = {
+      data: data,
+      perPage: limit,
+      pageNo: pageNo,
+      totalCount: totalCount,
+      sort: queryOptions['sort']
+    }
+    return result;
+  },
+  // delete user server
+  deleteUserServer: function (id) {
+    if (Roles.userIsInRole(this.userId, ['admin'])) {
+      UserServers.remove({_id: id}, true);
+      return true;
+    } else {
+      return false;
+    }
+  }
+});

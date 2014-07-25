@@ -1,5 +1,6 @@
 <template name="channel_logs">
 {{#with getCurrentChannel }}
+{{>bookmark_model}}
 <div id="channel-chatroom-{{ _id }}" class="chatroom channel{{#if topic}} chatroom-with-topic{{/if}}">
   <div class="topic">
     <ul class="nav nav-tabs nav-stacked" style="{{# unless topic}}display:none;{{/unless}}">

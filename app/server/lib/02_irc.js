@@ -249,11 +249,35 @@ function shallWriteChannelLog (nick, text, channel_name, server_name, client_nic
 }
 
 ChannelLogsManager = function () {
+
+  function _insertInES (log) {
+    if (CONFIG.ENABLE_ELASTIC_SEARCH) {
+      var esClient = elasticsearch.Client({
+        host: CONFIG.ELASTIC_SEARCH_HOST
+      });
+      esClient.index({
+        index: 'channel_logs',
+        type: 'log',
+        body: log,
+      }, function (err, resp) {
+      });
+    }
+  };
+
   function _insert (log) {
-    ChannelLogs.insert(log, function (err, id) {});
+    ChannelLogs.insert(log, function (err, id) {
+      if (!err) {
+        _insertInES(log);
+      }
+    });
     OldChannelLogs.insert(log, function (err, id) {});
   }
+
   return {
+    insertInES: function (log) {
+      _insertInES(log);
+    },
+
     insertIfNeeded: function (log, client_nick) {
       var server_name = log.server_name;
       var channel_name = log.channel_name;

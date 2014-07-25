@@ -14,6 +14,8 @@ ChannelLogs.allow({
         log.from = null;
     } else if (log.message[0] == '/')
         return false;
+    // save log in ES too
+    channelLogsManager.insertInES(log);
     return true;
   }
 });

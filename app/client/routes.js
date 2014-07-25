@@ -24,6 +24,18 @@ Router.map(function () {
     fastRender: true
   });
 
+  this.route('index', {
+    path: '/403',
+    template: 'user_not_authorized',
+    onBeforeAction: function () {
+    },
+    onAfterAction: function () {
+      if (Meteor.isClient)
+        GAnalytics.pageview();
+    },
+    fastRender: true
+  });
+
   this.route('account', {
     path: /^\/settings$/,
     onBeforeAction: function() {
@@ -84,8 +96,10 @@ Router.map(function () {
     ],
     waitOn: function () {
       return [
-        Meteor.subscribe('servers'), Meteor.subscribe('user_servers'),
-        Meteor.subscribe('user_channels')
+        Meteor.subscribe('servers'),
+        Meteor.subscribe('user_servers'),
+        Meteor.subscribe('user_channels'),
+        Meteor.subscribe('bookmarks')
       ]
     },
     onAfterAction: function () {
@@ -95,4 +109,88 @@ Router.map(function () {
     },
     fastRender: true
   });
+  this.route('search', {
+    path: /^\/search$/,
+    onBeforeAction: function () {
+      Router.go('/search/');
+    }
+  });
+
+  this.route('search/', {
+    path: /^\/search\/$/,
+    template: 'search',
+    onBeforeAction: [
+      function (pause) {
+        if (Meteor.isClient) {
+          if (!Meteor.userId()) {
+            Router.go('/');
+            this.render('user_loggedout_content');
+            GAnalytics.pageview();
+            pause();
+          } else {
+            ChatSubscribe();
+          }
+        }
+      },
+      function (pause) {
+        if (Meteor.isClient) {
+          // we're done waiting on all subs
+          if (this.ready()) {
+            NProgress.done();
+          } else {
+            NProgress.start();
+            pause(); // stop downstream funcs from running
+          }
+        }
+      }
+    ],
+    waitOn: function () {
+      return [
+        Meteor.subscribe('user_servers'),
+        Meteor.subscribe('user_channels'),
+        Meteor.subscribe('bookmarks')
+      ]
+    },
+    onAfterAction: function () {
+      if (Meteor.isClient)
+        GAnalytics.pageview('/search/');
+    },
+    fastRender: true
+  });
+
+  this.route('admin', {
+    path: /^\/admin$/,
+    onBeforeAction: function () {
+      Router.go('/admin/');
+    }
+  });
+
+  this.route('admin/', {
+    path: /^\/admin\/$/,
+    template: 'admin',
+    onBeforeAction: [
+      function (pause) {
+        if (Meteor.isClient) {
+          if (!Meteor.userId()) {
+            Router.go('/');
+            this.render('user_loggedout_content');
+            GAnalytics.pageview();
+            pause();
+          } else if (!Roles.userIsInRole(Meteor.userId(), ['admin'])) {
+            Router.go('/403');
+            GAnalytics.pageview();
+            pause();
+          } else {
+            AdminSubscribe();
+          }
+        }
+      }
+    ],
+    waitOn: function () {
+      return [
+      ]
+    },
+    fastRender: true
+  });
+
 });

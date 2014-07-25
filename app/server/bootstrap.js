@@ -9,6 +9,9 @@ function initializeServers () {
     });
     var user = Meteor.users.findOne({username: SUPER_USER});
   }
+  if (!Roles.userIsInRole(user._id, ['admin'])) {
+    Roles.addUsersToRoles(user._id, ['admin']);
+  }
   for (server_name in GlobalServers) {
     var server = Servers.findOne({name: server_name});
     if (! server) {

@@ -1,0 +1,59 @@
+<template name="admin">
+  <div id="chatlogs-loader" style="display:none; text-align: center; left:34%">Loading...</div>
+  <div class="container nick-status-container">
+    <div class="row">
+      <div id="search-fields" class="col-md-7">
+        <i class="fa fa-search"></i>
+        <input id="search-message" type= "text" class="form-control search-input" placeholder="Search">
+      </div>
+      <div class="col-md-2">
+        <button id="search-button" type="button" class="btn btn-primary">Search</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-9">
+        <div id="nick-status">
+          <table class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th class="sortable" data-field="nick">Nick<i class="sort-icon pull-right {{ sortIcon 'nick' }}"></i></th>
+                <th class="sortable" data-field="name">Server<i class="sort-icon pull-right {{ sortIcon 'name' }}"></i></th>
+                <th class="sortable" data-field="status">Status<i class="sort-icon pull-right {{ sortIcon 'status' }}"></i></th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each data}}
+                <tr>
+                  <td>{{ nick }}</td>
+                  <td>{{ name }}</td>
+                  <td>{{ showStatus status }}</td>
+                  <td>
+                    {{#if statusOppositeAction status }}
+                      <button type="button" class="toggle-join-server btn btn-xs {{showStatusClass status}}" href="#" data-user-id="{{user_id}}" data-server-name="{{name}}" data-status="{{status}}">{{statusOppositeAction status}}</button>
+                      <span style="margin-right:10px"></span>
+                    {{/if}}
+                    <button type="button" class="delete-user-server btn btn-xs btn-danger" href="#" data-id="{{_id}}">Delete</button>
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+          <div class="paginator">
+            {{#if showPreviousButton }}
+              <a href="#" id="previous-icon" class="next-prev-icon"><icon class="glyphicon glyphicon-chevron-left"></icon></a>
+            {{/if}}
+            <input id="page-no" type="text" value="{{currentPage}}" data-current-page="{{currentPage}}" data-total-pages="{{totalPages}}"/>
+            <span class="total-count"> / {{totalPages}}</span>
+            {{#if showNextButton }}
+              <a href="#" id="next-icon" class="next-prev-icon"><icon class="glyphicon glyphicon-chevron-right"></icon></a>
+            {{/if }}
+          </div>
+        </div>
+        <div id="nick-status-error">
+          <h3>{{errors}}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

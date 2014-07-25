@@ -328,3 +328,14 @@ ChatSubscribe = function () {
     }
   });
 };
+
+AdminSubscribe = function () {
+  subscribe_nick_status = function () {
+    var user_server_collection_ids = Session.get('user_server_collection_ids');
+    if (user_server_collection_ids && user_server_collection_ids.length) {
+      Meteor.subscribe('nick_status', user_server_collection_ids);
+    }
+  };
+
+  Deps.autorun(subscribe_nick_status);
+};

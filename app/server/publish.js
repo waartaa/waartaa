@@ -171,6 +171,14 @@ Meteor.publish('channel_nicks', function (server_name, channel_name, from, to) {
   this.ready();
 });
 
+Meteor.publish('bookmarks', function () {
+  if (this.userId) {
+    var bookmarks = Bookmarks.find({userId: this.userId});
+    return bookmarks;
+  }
+  this.ready();
+});
+
 Meteor.publish('channel_nick_suggestions',
   function (server_name, channel_name, pattern, limit) {
     var _this = this;
@@ -191,6 +199,14 @@ Meteor.publish('channel_nick_suggestions',
     });
     _this.ready();
   });
+
+Meteor.publish('nick_status', function (user_server_collection_ids) {
+  if (Roles.userIsInRole(this.userId, ['admin'])) {
+    var user_servers = UserServers.find({_id: {$in: user_server_collection_ids}});
+    return user_servers;
+  }
+  this.ready();
+});
 
 Meteor.methods({
   say: function(message, id, roomtype) {
