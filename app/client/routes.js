@@ -49,6 +49,7 @@ Router.map(function () {
     ],
   });
 
+  /*
   this.route('chat', {
     path: /^\/chat$/,
     onBeforeAction: function () {
@@ -144,4 +145,5 @@ Router.map(function () {
     },
     fastRender: true
   });
+  */
 });

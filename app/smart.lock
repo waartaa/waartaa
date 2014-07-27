@@ -23,7 +23,8 @@
       "crypto-md5": {},
       "jquery-titlealert": {},
       "accounts-ui-bootstrap-3": {},
-      "chosen-package": {}
+      "chosen-package": {},
+      "subs-manager": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -135,6 +136,11 @@
         "git": "https://github.com/Ore4444/chosen-package.git",
         "tag": "v0.11.1",
         "commit": "8d1a748bafaae8b6005a979ab7261ac14ff38052"
+      },
+      "subs-manager": {
+        "git": "https://github.com/meteorhacks/subs-manager.git",
+        "tag": "v1.0.1",
+        "commit": "38317052d1601002d4dff537e4e0f61d1aa36e6d"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

@@ -21,6 +21,7 @@
     "crypto-md5": {},
     "jquery-titlealert": {},
     "accounts-ui-bootstrap-3": {},
-    "chosen-package": {}
+    "chosen-package": {},
+    "subs-manager": {}
   }
 }
