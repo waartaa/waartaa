@@ -12,5 +12,4 @@
 1. Show server logs/messages
 1. Integrate PM
 1. Fetch basic (WHOIS) info for all nicks in all channels.
-1. Alert on mentions
 1. Enable all server/channel control buttons.
