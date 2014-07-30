@@ -173,6 +173,10 @@ function _create_user_server(data, user) {
     }
   }
   UserChannels.update(
+    {user: user.username, user_server_name: user_server.name},
+    {$set: {active: true}}, {multi: true}
+  );
+  UserChannels.update(
     {
       name: {$in: user_server.channels}, user: user.username,
       user_server_name: user_server.name
@@ -262,7 +266,7 @@ Meteor.startup(function () {
   CLIENTS = {};
   SERVER_JOIN_QUEUE = new PowerQueue({
     name: "join_server",
-    debug: CONFIG.QUEUE_DEBUG || false,
+    debug: CONFIG.QUEUE_D_EBUG || false,
     maxProcessing: 1
   });
   CHANNEL_JOIN_QUEUE = new PowerQueue({
@@ -334,6 +338,11 @@ Meteor.methods({
         {
           user: user.username, name: user_server_name,
         }, {$set: {active: active, status: 'disconnecting'}}, {multi: true});
+      if (!active)
+        UserChannels.update(
+          {user: user.username, user_server_name: user_server_name},
+          {$set: {server_active: false}}, {multi: true}
+        );
       irc_handler.partUserServer();
     }
   },

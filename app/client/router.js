@@ -1,10 +1,61 @@
 /* Routers */
 
-Router.configure({
-  layoutTemplate: 'layout'
+//Router.before(mustBeSignedIn, {except: ['index']});
+
+
+/* Subscription Managers */
+
+var chatRoomSubs = new SubsManager({
+  cacheLimit: 1,
+  expireIn: 9999
 });
 
-//Router.before(mustBeSignedIn, {except: ['index']});
+var chatLogSubs = new SubsManager({
+  cacheLimit: 5,
+  expireIn: 9999
+});
+/* End Subscription Managers */
+
+
+/* Configure */
+preloadSubscriptions = [];
+preloadSubscriptions.push('currentUser');
+
+Router.configure({
+  layoutTemplate: 'layout',
+  //loadingTemplate: 'loading',
+  //notFoundTemplate: 'not_found',
+  waitOn: function () {
+    return _.map(preloadSubscriptions, function(sub){
+      // can either pass strings or objects with subName and subArguments properties
+      if (typeof sub === 'object'){
+        Meteor.subscribe(sub.subName, sub.subArguments);
+      }else{
+        Meteor.subscribe(sub);
+      }
+    });
+  }
+});
+/* End configure */
+
+
+/* Controllers */
+
+BaseController = RouteController.extend({
+  layoutTemplate: 'layout',
+  waitOn: function () {
+
+  }
+});
+
+BaseChatController = BaseController.extend({
+  template: 'chat',
+  waitOn: function () {
+    return chatRoomSubs.subscribe('chatRooms');
+  }
+});
+/* End controllers */
+
 
 Router.map(function () {
   this.route('index', {
@@ -13,7 +64,8 @@ Router.map(function () {
     onBeforeAction: function () {
       if (Meteor.isClient)
         if (Meteor.userId()) {
-          this.redirect('/chat/');
+          Router.go('/chat/', {replaceState: true});
+          pause();
         }
     },
     onAfterAction: function () {
@@ -27,7 +79,8 @@ Router.map(function () {
   this.route('account', {
     path: /^\/settings$/,
     onBeforeAction: function() {
-      this.redirect('/settings/');
+      Router.go('/settings/', {replaceState: true});
+      pause();
     }
   });
 
@@ -49,11 +102,11 @@ Router.map(function () {
     ],
   });
 
-  /*
   this.route('chat', {
     path: /^\/chat$/,
     onBeforeAction: function () {
-      this.redirect('/chat/');
+      Router.go('/chat/', {replaceState: true});
+      pause();
     }
   });
   this.route('chat/', {
@@ -66,7 +119,7 @@ Router.map(function () {
             this.redirect('/');
             GAnalytics.pageview();
           } else {
-            ChatSubscribe();
+            //ChatSubscribe();
           }
         }
       },
@@ -91,6 +144,7 @@ Router.map(function () {
         Meteor.subscribe('bookmarks')
       ]
     },
+    controller: 'BaseChatController',
     onAfterAction: function () {
       if (Meteor.isClient)
         GAnalytics.pageview('/chat/');
@@ -145,5 +199,4 @@ Router.map(function () {
     },
     fastRender: true
   });
-  */
 });

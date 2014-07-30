@@ -1,3 +1,32 @@
+// Publish the current user
+
+Meteor.publish('currentUser', function() {
+  var user = Meteor.users.find({_id: this.userId});
+  return user;
+});
+
+
+// Publish chat rooms
+
+Meteor.publish('chatRooms', function () {
+  if (!this.userId) {
+    this.ready();
+    return;
+  }
+  return [
+    Servers.find(),
+    UserServers.find(
+      {user_id: this.userId, active: true},
+      {created: 0, last_updated: 0}
+    ),
+    UserChannels.find(
+      {user_id: this.userId, active: true, server_active: true},
+      {last_updated: 0, created: 0}
+    ),
+    UserPms.find({user_id: this.userId})
+  ];
+});
+
 Meteor.publish('servers', function () {
   if (this.userId)
     return Servers.find();
