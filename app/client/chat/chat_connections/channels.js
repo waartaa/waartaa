@@ -15,6 +15,10 @@ Template.server_channels.channels = function (server_id) {
     });
 }
 
+Template.server_channel_item.channelNameWithoutHash = function () {
+  return this.name.slice(1);
+}
+
 function serverChannelsCreatedCallback () {
   updateHeight();
 }

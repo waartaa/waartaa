@@ -199,4 +199,103 @@ Router.map(function () {
     },
     fastRender: true
   });
+
+  /* Router for channel chat room */
+  this.route('chatRoomChannel', {
+    path: '/chat/server/:serverName/channel/:channelName',
+    controller: BaseChatController,
+    onBeforeAction: function (pause) {
+      var channel = UserChannels.findOne(
+        {
+          user_server_name: this.params.serverName,
+          name: '#' + this.params.channelName
+        }
+      );
+      if (!channel) {
+        pause();
+        return;
+      }
+      waartaa.chat.helpers.setCurrentRoom({
+        roomtype: 'channel', server_id: channel.user_server_id,
+        channel_id: channel._id, channel_name: channel.name,
+        server_name: channel.user_server_name
+      });
+    },
+    onRun: function () {
+      $('#chatlogs-loader').show();
+    },
+    onStop: function () {
+      $('#chatlogs-loader').fadeOut();
+    },
+    waitOn: function () {
+      var channel = UserChannels.findOne({
+        user_server_name: this.params.serverName,
+        name: '#' + this.params.channelName
+      });
+      if (!channel) {
+        pause();
+        return;
+      }
+      return [
+        chatLogSubs.subscribe(
+          'channel_logs', '#' + this.params.channelName,
+          Session.get('user_channel_log_count_' + channel._id),
+          function () {
+            var channel = UserChannels.findOne(
+              {
+                user_server_name: this.params.serverName,
+                name: '#' + this.params.channelName
+              }
+            ) || {};
+            waartaa.chat.helpers.roomAccessedTimestamp.initialize(
+              'channel', {
+                server_name: channel.user_server_name,
+                channel_name: channel.name
+              }
+            );
+          }
+        ),
+        chatLogSubs.subscribe(
+          'channel_nicks', channel.user_server_name, channel.name,
+          Session.get('lastNick-' + channel.user_server_name +
+                      '_' + channel.name),
+          Session.get('startNick-' + channel.user_server_name +
+                      '_' + channel.name),
+          function () {
+            $('.channel-nicks-loader').fadeOut(1000);
+            var last_nick = ChannelNicks.findOne(
+              {
+                channel_name: channel.name,
+                server_name: channel.user_server_name,
+              },
+              {
+                sort: {nick: -1}
+              }
+            );
+            var start_nick = ChannelNicks.findOne(
+              {
+                channel_name: channel.name,
+                server_name: channel.user_server_name,
+              },
+              {
+                sort: {nick: 1}
+              }
+            );
+            Session.set(
+              'currentLastNick-' + channel.user_server_name +
+              '_' + channel.name,
+              (last_nick || {}).nick);
+            Session.set(
+              'currentStartNick-' + channel.user_server_name +
+              '_' + channel.name,
+              (start_nick || {}).nick);
+            if (Session.get(
+              'startNick-' + channel.user_server_name + '_' + channel.name))
+              $('#info-panel .nano').nanoScroller();
+              $('#info-panel .nano').nanoScroller({scrollTop: 30});
+          }
+        )
+      ];
+    }
+  });
 });

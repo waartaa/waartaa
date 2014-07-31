@@ -2,13 +2,13 @@
 Data subscription code.
 */
 
-ChatSubscribe = function () {
-  /*
-  Default initial chat log count to load for each room.
-  A room may be a channel, server or PM room.
-  */
-  DEFAULT_LOGS_COUNT = 30;
+/*
+Default initial chat log count to load for each room.
+A room may be a channel, server or PM room.
+*/
+DEFAULT_LOGS_COUNT = 30;
 
+ChatSubscribe = function () {
   /*
   Function to subscribe to UserServerLogs for active UserServers.
   */
