@@ -61,7 +61,7 @@ Router.map(function () {
   this.route('index', {
     path: '/',
     template: 'user_loggedout_content',
-    onBeforeAction: function () {
+    onBeforeAction: function (pause) {
       if (Meteor.isClient)
         if (Meteor.userId()) {
           Router.go('/chat/', {replaceState: true});
@@ -78,7 +78,7 @@ Router.map(function () {
 
   this.route('account', {
     path: /^\/settings$/,
-    onBeforeAction: function() {
+    onBeforeAction: function(pause) {
       Router.go('/settings/', {replaceState: true});
       pause();
     }
@@ -104,7 +104,7 @@ Router.map(function () {
 
   this.route('chat', {
     path: /^\/chat$/,
-    onBeforeAction: function () {
+    onBeforeAction: function (pause) {
       Router.go('/chat/', {replaceState: true});
       pause();
     }
@@ -231,11 +231,7 @@ Router.map(function () {
       var channel = UserChannels.findOne({
         user_server_name: this.params.serverName,
         name: '#' + this.params.channelName
-      });
-      if (!channel) {
-        pause();
-        return;
-      }
+      }) || {};
       return [
         chatLogSubs.subscribe(
           'channel_logs', '#' + this.params.channelName,
