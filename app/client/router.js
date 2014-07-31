@@ -200,6 +200,44 @@ Router.map(function () {
     fastRender: true
   });
 
+
+  /* Router for server chat room */
+  this.route('chatRoomServer', {
+    path: '/chat/server/:serverName',
+    controller: BaseChatController,
+    onBeforeAction: function (pause) {
+      var server = UserServers.findOne({name: this.params.serverName});
+      if (!server) {
+        pause();
+        return;
+      }
+      waartaa.chat.helpers.setCurrentRoom({
+        roomtype: 'server', server_id: server._id, server_name: server.name
+      });
+    },
+    onRun: function () {
+      $('#chatlogs-loader').show();
+    },
+    onStop: function () {
+      $('#chatlogs-loader').fadeOut();
+    },
+    waitOn: function () {
+      var userServer = UserServers.findOne(
+        {name: this.params.serverName});
+      if (!userServer)
+        return;
+      return [
+        chatLogSubs.subscribe(
+          "user_server_logs", userServer.name,
+          Session.get('user_server_log_count_' + userServer._id),
+          function () {
+            $('.chatlogs-loader-msg').fadeOut(1000);
+          }
+        )
+      ];
+    }
+  });
+
   /* Router for channel chat room */
   this.route('chatRoomChannel', {
     path: '/chat/server/:serverName/channel/:channelName',
