@@ -14,6 +14,11 @@ var chatLogSubs = new SubsManager({
   cacheLimit: 5,
   expireIn: 9999
 });
+
+var serverNickSubs = new SubsManager({
+  cacheLimit: 5,
+  expireIn: 9999
+});
 /* End Subscription Managers */
 
 
@@ -328,6 +333,59 @@ Router.map(function () {
               $('#info-panel .nano').nanoScroller();
               $('#info-panel .nano').nanoScroller({scrollTop: 30});
           }
+        )
+      ];
+    }
+  });
+
+  /* Router for PM chat room */
+  this.route('chatRoomPM', {
+    path: '/chat/server/:serverName/nick/:nick',
+    controller: BaseChatController,
+    onBeforeAction: function (pause) {
+      var server = UserServers.findOne({name: this.params.serverName});
+      if (!server) {
+        pause();
+        return;
+      }
+      var nick = this.params.nick;
+      Meteor.call('toggle_pm', server._id, nick, 'create', function () {
+        waartaa.chat.helpers.setCurrentRoom({
+          roomtype: 'pm', server_id: server._id,
+          room_id: server._id + '_' + nick,
+          server_name: server.name, nick: nick
+        });
+      });
+      Meteor.call('send_command', server.name, '/WHOIS ' + nick, {});
+    },
+    onRun: function () {
+      $('#chatlogs-loader').show();
+    },
+    onStop: function () {
+      $('#chatlogs-loader').fadeOut();
+    },
+    waitOn: function () {
+      var userServer = UserServers.findOne(
+        {name: this.params.serverName});
+      if (!userServer)
+        return;
+      var nick = this.params.nick;
+      var room_id = userServer._id + '_' + nick;
+      return [
+        chatLogSubs.subscribe(
+          'pm_logs', room_id,
+          Session.get('pmLogCount-' + room_id),
+          function () {
+            waartaa.chat.helpers.roomAccessedTimestamp.initialize(
+              'pm', {
+                server_name: userServer.name,
+                nick: nick
+              }
+            );
+          }
+        ),
+        serverNickSubs.subscribe(
+          'server_nicks', userServer.name, [nick]
         )
       ];
     }

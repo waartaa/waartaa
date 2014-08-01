@@ -37,7 +37,10 @@ UI.registerHelper('pms', function (id) {
   } catch (err) {}
   var return_pms = [];
   for (nick in pms)
-    return_pms.push({name: nick, server_id: server._id, room_id: server._id + '_' + nick});
+    return_pms.push({
+      name: nick, server_id: server._id, room_id: server._id + '_' + nick,
+      server_name: server.name
+    });
   return return_pms;
 });
 

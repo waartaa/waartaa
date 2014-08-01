@@ -1,39 +1,4 @@
-function chatUserClickHandler (event) {
-    if ($(event.target).hasClass('btn-group') || $(event.target).parent().hasClass('btn-group'))
-      return;
-    event.stopPropagation();
-    //$('.channel-user').parent().removeClass('active');
-    $('.dropdown.open, .btn-group.open').removeClass('open');
-    //$(event.target).parent().addClass('active');
-}
-
-Template.chat_users.events = {
-  'click .channel-user': chatUserClickHandler,
-};
-
 Template.user_menu.events = {
-  'click .pm-user': function (event) {
-    var $target = $(event.target);
-    var nick = $target.data('user-nick');
-    var user = Meteor.user();
-    var server_id = $target.parents('.info-panel-item').data('server-id');
-    var profile = user.profile;
-    var server = UserServers.findOne({_id: server_id});
-    if (server) {
-      var server_name = server.name;
-      Meteor.call('toggle_pm', server_id, nick, 'create', function () {
-        $('.info-panel-item.active').removeClass('active');
-        waartaa.chat.helpers.setCurrentRoom({
-          nick: nick,
-          server_id: server._id,
-          server_name: server.name,
-          roomtype: 'pm'
-        });
-        Meteor.call(
-          'send_command', server.name, '/WHOIS ' + nick, {});
-      });
-    }
-  },
   'click .whois-user': function (event) {
     var $target = $(event.target);
     var nick = $target.data('user-nick');
