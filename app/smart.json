@@ -12,7 +12,6 @@
     "nprogress": {},
     "GAnalytics": {},
     "fast-render": {},
-    "iron-router": {},
     "power-queue": {},
     "cron-tick": {},
     "npm": {},
@@ -22,6 +21,10 @@
     "jquery-titlealert": {},
     "accounts-ui-bootstrap-3": {},
     "chosen-package": {},
-    "subs-manager": {}
+    "subs-manager": {},
+    "iron-router": {
+      "git": "https://github.com/EventedMind/iron-router.git",
+      "branch": "devel"
+    }
   }
 }
