@@ -27,7 +27,8 @@
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
         "branch": "devel"
-      }
+      },
+      "jquery-scrollTo": {}
     },
     "packages": {
       "jquery-ui-bootstrap": {
@@ -144,6 +145,11 @@
         "git": "https://github.com/EventedMind/iron-router.git",
         "branch": "devel",
         "commit": "05415a8891ea87a00fb1e2388585f2ca5a38e0da"
+      },
+      "jquery-scrollTo": {
+        "git": "https://github.com/nate-strauser/meteor-jquery.scrollTo.git",
+        "tag": "v1.4.6",
+        "commit": "ab6f05c43e2a54fc7711e5a2ff8daa45e5ff4322"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

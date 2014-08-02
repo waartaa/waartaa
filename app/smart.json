@@ -25,6 +25,7 @@
     "iron-router": {
       "git": "https://github.com/EventedMind/iron-router.git",
       "branch": "devel"
-    }
+    },
+    "jquery-scrollTo": {}
   }
 }
