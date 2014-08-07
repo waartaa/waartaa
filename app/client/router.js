@@ -275,10 +275,13 @@ Router.map(function () {
         user_server_name: this.params.serverName,
         name: '#' + this.params.channelName
       }) || {};
+      var from = this.params.from || null;
+      var direction = this.params.direction || 'down';
+      var limit = this.params.limit || DEFAULT_LOGS_COUNT;
       return [
         chatLogSubs.subscribe(
           'channel_logs', '#' + this.params.channelName,
-          Session.get('user_channel_log_count_' + channel._id),
+          from, direction, limit,
           function () {
             var channel = UserChannels.findOne(
               {

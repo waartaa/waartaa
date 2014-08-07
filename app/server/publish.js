@@ -72,27 +72,49 @@ Meteor.publish('user_channels', function () {
   this.ready();
 });
 
-Meteor.publish('channel_logs', function (channel_name, n) {
+Meteor.publish('channel_logs', function (
+    channel_name, from, direction, limit) {
   var user = Meteor.users.findOne({_id: this.userId}) || {};
   console.log(user);
   var channel = UserChannels.findOne({name: channel_name, user: user.username});
   console.log('CHANNEL');
   console.log(channel);
+  direction = direction || 'down';
   if (channel) {
+    var filter = {
+      channel_name: channel.name,
+      $or: [
+        {global: true, not_for_user: {$ne: user.username}},
+        {from_user: user.username},
+        {user: user.username}
+      ]
+    };
+    if (from) {
+      try {
+        from = moment(from).toDate();
+        if (direction == 'down') {
+          filter['created'] = {$gte: from};
+        } else if (direction == 'up') {
+          filter['created'] = {$lte: from};
+        }
+      } catch (err) {}
+    }
+    if (limit) {
+      try {
+        limit = parseInt(limit);
+        limit = typeof(limit) == 'number'? (
+          limit > 20? 20: limit): 20;
+      } catch (err) {
+        limit = 20;
+      }
+    }
     console.log(
       'Publishing logs for channel: ' + channel.name + ', ' + user.username);
-    var N = n || CONFIG.show_last_n_logs;
+    console.log(filter, limit);
     var cursor = ChannelLogs.find(
+      filter,
       {
-        channel_name: channel.name,
-        $or: [
-          {global: true, not_for_user: {$ne: user.username}},
-          {from_user: user.username},
-          {user: user.username}
-        ]
-      },
-      {
-        sort: {created: -1}, limit: N
+        sort: {created: -1}, limit: limit
       }
     );
     return cursor;
