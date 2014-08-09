@@ -266,6 +266,12 @@ Router.map(function () {
     },
     onRun: function () {
       $('#chatlogs-loader').show();
+      Session.set('oldest_log_in_room');
+    },
+    onAfterAction: function () {
+      Meteor.setTimeout(function () {
+        waartaa.chat.helpers.chatLogsWaypointHandler();
+      }, 2000);
     },
     onStop: function () {
       $('#chatlogs-loader').fadeOut();

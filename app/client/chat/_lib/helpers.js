@@ -3,7 +3,9 @@
  */
 waartaa.chat.helpers = {};
 
-waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
+waartaa.chat.helpers.chatLogsContainerScrollCallback = function (direction) {
+  return;
+  /*
   var $target = $(event.target);
   var scroll_top = $target.scrollTop();
   Session.set('scrollAtBottom', (
@@ -12,6 +14,8 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
       '.chat-logs-container .chatlogs-table').height() - 50? true: false);
   if (scroll_top != 0)
     return;
+  */
+
   $target.off('scroll');
   var $target = $(event.target);
   var $table = $target.find('.chatlogs-table');

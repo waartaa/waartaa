@@ -28,4 +28,4 @@ Template.channel_logs.events = {
 Template.channel_logs.rendered = waartaa.chat.helpers.chatLogsContainerRendered;
 Template.chat_row.created = waartaa.chat.helpers.chatLogRowCreateHandler;
 Template.chat_row.rendered = waartaa.chat.helpers.chatLogRowRenderedHandler;
-
+Template.chat_row.destroyed = waartaa.chat.helpers.chatLogRowDestroyedHandler;

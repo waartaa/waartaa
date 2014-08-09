@@ -16,11 +16,18 @@
 
 <template name="channel_chat_logs_table">
 <div id="channel-chat-logs-{{ _id }}" class="chatlogs-table channel chatlogrows">
-  <div class="row chatlogs-loader-msg" style="display: none;">
-    Loading...
+  <div class="chatlogs-scroll-up">
+    <div class="row chatlogs-loader-msg" style="display: none;">
+      Loading...
+    </div>
   </div>
   {{#each channelChatLogs _id}}
     {{> chat_row}}
   {{/each}}
+  <div class="chatlogs-scroll-down">
+    <div class="row chatlogs-loader-msg" style="display: none;">
+      Loading...
+    </div>
+  </div>
 </div>
 </template>
