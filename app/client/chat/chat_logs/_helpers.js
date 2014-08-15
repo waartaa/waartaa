@@ -4,6 +4,14 @@ waartaa.chat.helpers.chatLogRowCreateHandler = function () {
       Session.set('shallUpdateHeight');
     }
     var current_oldest_log_id_in_room = Session.get('oldest_log_id_in_room');
+    var from = Router.current().params.from;
+    if (from) {
+      var fromTimestamp = new Date(moment(from));
+      if (fromTimestamp > this.data.last_updated) {
+        $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
+          /:/gi, '_').replace('+', 'plus'), 0);
+      }
+    }
 };
 
 waartaa.chat.helpers.chatLogsTableCreateHandler = function () {
@@ -13,6 +21,25 @@ waartaa.chat.helpers.chatLogsTableCreateHandler = function () {
 waartaa.chat.helpers.chatLogsWaypointHandler = function () {
   var $scrollUpElem = null;
   var $scrollDownElem = null;
+
+  function fetchOlderLogs () {
+    var room = Session.get('room');
+    var oldestLog = ChannelLogs.findOne(
+      {channel_name: room.channel_name}, {sort: {created: 1}});
+    var currentPath = Router.current();
+    var path = Router.routes['chatRoomChannel'].path({
+      serverName: room.server_name,
+      channelName: room.channel_name.substr(1)
+    }, {
+      query: {
+        from: moment(oldestLog.created).format(),
+        direction: 'up',
+        limit: DEFAULT_LOGS_COUNT
+      }
+    });
+    console.log(path);
+    Router.go(path);
+  }
   return function () {
     if ($scrollUpElem)
       $scrollUpElem.waypoint('destroy');
@@ -20,7 +47,9 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       $scrollDownElem.waypoint('destroy');
     $scrollUpElem = $('.chatlogs-scroll-up')
       .waypoint(function (direction) {
-        console.log(direction);
+        if (direction == 'up') {
+          fetchOlderLogs();
+        }
       }, {
         context: '.chat-logs-container',
         offset: -10

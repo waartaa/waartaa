@@ -15,6 +15,11 @@ var chatLogSubs = new SubsManager({
   expireIn: 9999
 });
 
+var chatLogPaginationSubs = new SubsManager({
+  cacheLimit: 2,
+  expireIn: 9999
+});
+
 var serverNickSubs = new SubsManager({
   cacheLimit: 5,
   expireIn: 9999
@@ -271,21 +276,26 @@ Router.map(function () {
     onAfterAction: function () {
       Meteor.setTimeout(function () {
         waartaa.chat.helpers.chatLogsWaypointHandler();
-      }, 2000);
+      }, 1000);
     },
-    onStop: function () {
+    onData: function () {
+    },
+    data: function () {
       $('#chatlogs-loader').fadeOut();
+      console.log('data');
     },
     waitOn: function () {
       var channel = UserChannels.findOne({
         user_server_name: this.params.serverName,
         name: '#' + this.params.channelName
       }) || {};
+      var subsManager = this.params.direction?
+        chatLogPaginationSubs: chatLogSubs;
       var from = this.params.from || null;
       var direction = this.params.direction || 'down';
       var limit = this.params.limit || DEFAULT_LOGS_COUNT;
       return [
-        chatLogSubs.subscribe(
+        subsManager.subscribe(
           'channel_logs', '#' + this.params.channelName,
           from, direction, limit,
           function () {

@@ -188,6 +188,13 @@ var cancelBookmarking = function (event) {
   $('.bookmark-model').hide();
 };
 
+Template.chat_row.helpers({
+  chatlogTimestampStr: function (datetime) {
+    console.log(moment(datetime).format());
+    return moment(datetime).format().replace(/:/gi, '_').replace('+', 'plus');
+  }
+});
+
 Template.chat_row.events = {
   'click .chatlog-bookmark': function (event) {
     var bookmarkEl = $(event.target).parent();
