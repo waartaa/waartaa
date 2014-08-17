@@ -4,14 +4,6 @@ waartaa.chat.helpers.chatLogRowCreateHandler = function () {
       Session.set('shallUpdateHeight');
     }
     var current_oldest_log_id_in_room = Session.get('oldest_log_id_in_room');
-    var from = Router.current().params.from;
-    if (from) {
-      var fromTimestamp = new Date(moment(from));
-      if (fromTimestamp > this.data.last_updated) {
-        $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
-          /:/gi, '_').replace('+', 'plus'), 0);
-      }
-    }
 };
 
 waartaa.chat.helpers.chatLogsTableCreateHandler = function () {
@@ -73,6 +65,14 @@ waartaa.chat.helpers.chatLogRowRenderedHandler = function () {
     updateHeight();
     if ( Session.get('scrollAtBottom') != false )
       $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
+  }
+  var from = Router.current().params.from;
+  if (from) {
+    var fromTimestamp = new Date(moment(from));
+    if (fromTimestamp > this.data.last_updated) {
+      $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
+        /:/gi, '_').replace('+', 'plus'), 0);
+    }
   }
 }
 
