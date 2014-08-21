@@ -103,9 +103,10 @@ Meteor.publish('channel_logs', function (
       try {
         limit = parseInt(limit);
         limit = typeof(limit) == 'number'? (
-          limit > 20? 20: limit): 20;
+          limit > DEFAULT_LOGS_COUNT?
+            DEFAULT_LOGS_COUNT: limit): DEFAULT_LOGS_COUNT;
       } catch (err) {
-        limit = 20;
+        limit = DEFAULT_LOGS_COUNT;
       }
     }
     console.log(

@@ -284,6 +284,12 @@ Router.map(function () {
       $('#chatlogs-loader').fadeOut();
       console.log('data');
     },
+    load: function () {
+      console.log('load', Router.current().path);
+    },
+    unload: function () {
+      console.log('unload', Router.current().path);
+    },
     waitOn: function () {
       var channel = UserChannels.findOne({
         user_server_name: this.params.serverName,

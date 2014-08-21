@@ -14,20 +14,32 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
   var $scrollUpElem = null;
   var $scrollDownElem = null;
 
-  function fetchOlderLogs () {
+  function fetchOlderLogs (options) {
     var room = Session.get('room');
+    options = options || {};
+    var createdSortOrder = 1;
+    if (options.currentPage) {
+      createdSortOrder = -1;
+    }
     var oldestLog = ChannelLogs.findOne(
-      {channel_name: room.channel_name}, {sort: {created: 1}});
+      {channel_name: room.channel_name},
+      {sort: {created: createdSortOrder}}
+    );
+    if (options.currentPage)
+      Session.set('paginationStartLog', oldestLog);
     var currentPath = Router.current();
+    var params = {
+      from: moment(oldestLog.created).format(),
+      direction: 'up',
+      limit: DEFAULT_LOGS_COUNT,
+    };
+    if (currentPath.params.realtime)
+      params.realtime = currentPath.params.realtime;
     var path = Router.routes['chatRoomChannel'].path({
       serverName: room.server_name,
       channelName: room.channel_name.substr(1)
     }, {
-      query: {
-        from: moment(oldestLog.created).format(),
-        direction: 'up',
-        limit: DEFAULT_LOGS_COUNT
-      }
+      query: params
     });
     console.log(path);
     Router.go(path);
@@ -49,6 +61,12 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
     $scrollDownElem = $('.chatlogs-scroll-down')
       .waypoint(function (direction) {
         console.log(direction);
+        if (direction == 'up') {
+          var currentPath = Router.current();
+          if (!currentPath.params.from) {
+            fetchOlderLogs({currentPage: true});
+          }
+        }
       }, {
         context: '.chat-logs-container',
         offset: $('.chat-logs-container').outerHeight()
@@ -74,6 +92,46 @@ waartaa.chat.helpers.chatLogRowRenderedHandler = function () {
         /:/gi, '_').replace('+', 'plus'), 0);
     }
   }
+}
+
+function _getOldestRealtimeLogForCurrentRoom () {
+  var room = Session.get('room');
+  if (room.roomtype == 'channel') {
+    return ChannelLogs.findOne(
+      {
+        channel_name: room.channel_name,
+        server_name: room.server_name
+      }, {
+        sort: {created: -1}, limit: 1,
+        skip: DEFAULT_LOGS_COUNT - 1
+      }
+    );
+  }
+}
+
+waartaa.chat.helpers.chatLogRowDestroyedHandler = function () {
+  var room = Session.get('room');
+  var paginationStartLog = Session.get('paginationStartLog');
+  if (!paginationStartLog)
+    return;
+  var oldestRealtimeLog = _getOldestRealtimeLogForCurrentRoom();
+  if (oldestRealtimeLog &&
+      paginationStartLog.last_updated < oldestRealtimeLog.last_updated) {
+    var currentPath = Router.current();
+    var path = Router.routes['chatRoomChannel'].path({
+      serverName: room.server_name,
+      channelName: room.channel_name.substr(1)
+    }, {
+      query: {
+        from: currentPath.params.from,
+        direction: currentPath.params.direction,
+        limit: currentPath.params.limit,
+        realtime: false
+      }
+    });
+    Router.go(path);
+  }
+
 }
 
 waartaa.chat.helpers.chatLogsContainerRendered = function () {
