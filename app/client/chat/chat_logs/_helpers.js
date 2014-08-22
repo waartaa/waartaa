@@ -25,8 +25,28 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       {channel_name: room.channel_name},
       {sort: {created: createdSortOrder}}
     );
-    if (options.currentPage)
+    if (options.currentPage && oldestLog) {
       Session.set('paginationStartLog', oldestLog);
+      Session.set('newRealtimeLogsSincePaginationStart', 0);
+      waartaa.chat.ChatRoomRealtimeLogObserver = ChannelLogs.find(
+        {
+          channel_name: room.channel_name, server_name: room.server_name,
+          created: {$gt: oldestLog.created}}).observeChanges({
+            added: function (id, fields) {
+              var newLogs = Session.get('newRealtimeLogsSincePaginationStart');
+              if (newLogs == undefined || newLogs >= DEFAULT_LOGS_COUNT) {
+                waartaa.chat.ChatRoomRealtimeLogObserver &&
+                  waartaa.chat.ChatRoomRealtimeLogObserver.stop();
+                if (typeof(newLogs) == "number") {
+                  Session.set('newRealtimeLogsSincePaginationStart');
+                  Session.set('showRealtimeLogs', false);
+                }
+                return;
+              }
+              Session.set('newRealtimeLogsSincePaginationStart', newLogs + 1);
+            },
+          });
+    }
     var currentPath = Router.current();
     var params = {
       from: moment(oldestLog.created).format(),
@@ -107,31 +127,6 @@ function _getOldestRealtimeLogForCurrentRoom () {
       }
     );
   }
-}
-
-waartaa.chat.helpers.chatLogRowDestroyedHandler = function () {
-  var room = Session.get('room');
-  var paginationStartLog = Session.get('paginationStartLog');
-  if (!paginationStartLog)
-    return;
-  var oldestRealtimeLog = _getOldestRealtimeLogForCurrentRoom();
-  if (oldestRealtimeLog &&
-      paginationStartLog.last_updated < oldestRealtimeLog.last_updated) {
-    var currentPath = Router.current();
-    var path = Router.routes['chatRoomChannel'].path({
-      serverName: room.server_name,
-      channelName: room.channel_name.substr(1)
-    }, {
-      query: {
-        from: currentPath.params.from,
-        direction: currentPath.params.direction,
-        limit: currentPath.params.limit,
-        realtime: false
-      }
-    });
-    Router.go(path);
-  }
-
 }
 
 waartaa.chat.helpers.chatLogsContainerRendered = function () {

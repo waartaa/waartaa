@@ -288,6 +288,7 @@ Router.map(function () {
       console.log('load', Router.current().path);
     },
     unload: function () {
+      Session.set('pageUnloading', true);
       console.log('unload', Router.current().path);
     },
     waitOn: function () {

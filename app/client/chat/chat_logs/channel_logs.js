@@ -14,7 +14,7 @@ UI.registerHelper("channelChatLogs", function (channel_id) {
     var currentPath = Router.current();
     var paginationStartLog = Session.get('paginationStartLog');
     var query = {channel_name: channel.name};
-    if (currentPath.params.realtime == "false" && paginationStartLog) {
+    if (Session.get('showRealtimeLogs') == false && paginationStartLog) {
       query.last_updated = {
         $lte: paginationStartLog.last_updated
       };
