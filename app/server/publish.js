@@ -79,7 +79,6 @@ Meteor.publish('channel_logs', function (
   var channel = UserChannels.findOne({name: channel_name, user: user.username});
   console.log('CHANNEL');
   console.log(channel);
-  direction = direction || 'down';
   if (channel) {
     var filter = {
       channel_name: channel.name,
@@ -89,11 +88,13 @@ Meteor.publish('channel_logs', function (
         {user: user.username}
       ]
     };
+    var sortOrder = {created: -1};
     if (from) {
       try {
         from = moment(from).toDate();
         if (direction == 'down') {
           filter['created'] = {$gte: from};
+          sortOrder = {created: 1};
         } else if (direction == 'up') {
           filter['created'] = {$lte: from};
         }
@@ -111,11 +112,11 @@ Meteor.publish('channel_logs', function (
     }
     console.log(
       'Publishing logs for channel: ' + channel.name + ', ' + user.username);
-    console.log(filter, limit);
+    console.log(filter, limit, sortOrder);
     var cursor = ChannelLogs.find(
       filter,
       {
-        sort: {created: -1}, limit: limit
+        sort: sortOrder, limit: limit
       }
     );
     return cursor;

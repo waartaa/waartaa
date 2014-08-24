@@ -13,8 +13,28 @@ waartaa.chat.helpers.chatLogsTableCreateHandler = function () {
 waartaa.chat.helpers.chatLogsWaypointHandler = function () {
   var $scrollUpElem = null;
   var $scrollDownElem = null;
-  pageStack = null;
+  pageStack = [];
   pageStackLength = 3;
+
+  function fetchNewerLogs (options) {
+    var room = Session.get('room');
+    var currentPath = Router.current();
+    if (!(pageStack.length > 0))
+      return;
+    var params = {
+      from: moment(pageStack[0]).format(),
+      direction: 'down',
+      limit: DEFAULT_LOGS_COUNT,
+    };
+    var path = Router.routes['chatRoomChannel'].path({
+      serverName: room.server_name,
+      channelName: room.channel_name.substr(1)
+    }, {
+      query: params
+    });
+    console.log(path);
+    Router.go(path);
+  }
 
   function fetchOlderLogs (options) {
     var room = Session.get('room');
@@ -101,11 +121,15 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       });
     $scrollDownElem = $('.chatlogs-scroll-down')
       .waypoint(function (direction) {
+        var currentPath = Router.current();
         console.log(direction);
         if (direction == 'up') {
-          var currentPath = Router.current();
           if (!currentPath.params.from) {
             fetchOlderLogs({currentPage: true});
+          }
+        } else if (direction == 'down') {
+          if (currentPath.params.from) {
+            fetchNewerLogs();
           }
         }
       }, {

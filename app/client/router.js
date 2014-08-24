@@ -268,6 +268,39 @@ Router.map(function () {
         channel_id: channel._id, channel_name: channel.name,
         server_name: channel.user_server_name
       });
+      if (this.ready()) {
+        if (this.params.direction == 'down' && this.params.from) {
+          var fromTimestamp = new Date(this.params.from);
+          var newestPaginatedLog = ChannelLogs.findOne(
+            {
+              server_name: this.params.serverName,
+              channel_name: '#' + this.params.channelName,
+              created: {$gt: fromTimestamp}
+            },
+            {
+              limit: parseInt(this.params.limit) || DEFAULT_LOGS_COUNT,
+              sort: {created: 1},
+              skip: (parseInt(this.params.limit) || DEFAULT_LOGS_COUNT) - 1
+            }
+          );
+          if (!newestPaginatedLog) {
+            var path = Router.routes['chatRoomChannel'].path({
+              serverName: this.params.serverName,
+              channelName: this.params.channelName
+            });
+            //pageStack = [];
+            Router.go(path);
+            pause();
+            return;
+          }
+          if (pageStack.length > 0 && pageStack[0].toString() != newestPaginatedLog.created.toString()) {
+            if (pageStack.length == 3)
+              pageStack.pop();
+            pageStack.unshift(newestPaginatedLog.created);
+            Session.set('paginationStartTimestamp', pageStack[0]);
+          }
+        }
+      }
     },
     onRun: function () {
       $('#chatlogs-loader').show();
@@ -280,7 +313,7 @@ Router.map(function () {
     },
     onData: function () {
     },
-    data: function () {
+    data: function (pause) {
       $('#chatlogs-loader').fadeOut();
       console.log('data');
     },
