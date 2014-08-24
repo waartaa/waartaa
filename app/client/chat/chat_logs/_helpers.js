@@ -13,6 +13,8 @@ waartaa.chat.helpers.chatLogsTableCreateHandler = function () {
 waartaa.chat.helpers.chatLogsWaypointHandler = function () {
   var $scrollUpElem = null;
   var $scrollDownElem = null;
+  pageStack = null;
+  pageStackLength = 3;
 
   function fetchOlderLogs (options) {
     var room = Session.get('room');
@@ -25,8 +27,12 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       {channel_name: room.channel_name},
       {sort: {created: createdSortOrder}}
     );
+    if (!oldestLog)
+      return;
     if (options.currentPage && oldestLog) {
-      Session.set('paginationStartLog', oldestLog);
+      pageStack = new Array();
+      pageStack.push(oldestLog.created);
+      Session.set('paginationStartTimestamp', oldestLog.created);
       Session.set('newRealtimeLogsSincePaginationStart', 0);
       waartaa.chat.ChatRoomRealtimeLogObserver = ChannelLogs.find(
         {
@@ -46,6 +52,18 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
               Session.set('newRealtimeLogsSincePaginationStart', newLogs + 1);
             },
           });
+    } else {
+      pageStack = pageStack || new Array;
+      if (pageStack.length > 0 &&
+          oldestLog.created.toString() !=
+          pageStack[pageStack.length - 1].toString()) {
+        if (pageStack.length == pageStackLength) {
+          pageStack.shift();
+          Session.set('showRealtimeLogs', false);
+        }
+        pageStack.push(oldestLog.created);
+        Session.set('paginationStartTimestamp', pageStack[0]);
+      }
     }
     var currentPath = Router.current();
     var params = {
@@ -53,8 +71,6 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       direction: 'up',
       limit: DEFAULT_LOGS_COUNT,
     };
-    if (currentPath.params.realtime)
-      params.realtime = currentPath.params.realtime;
     var path = Router.routes['chatRoomChannel'].path({
       serverName: room.server_name,
       channelName: room.channel_name.substr(1)
@@ -65,6 +81,11 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
     Router.go(path);
   }
   return function () {
+    var currentPath = Router.current();
+    if (currentPath && !currentPath.params.from) {
+      Session.set('paginationStartTimestamp');
+      Session.set('showRealtimeLogs');
+    }
     if ($scrollUpElem)
       $scrollUpElem.waypoint('destroy');
     if ($scrollDownElem)

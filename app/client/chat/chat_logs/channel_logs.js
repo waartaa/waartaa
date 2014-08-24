@@ -12,11 +12,11 @@ UI.registerHelper("channelChatLogs", function (channel_id) {
   var channel = UserChannels.findOne({_id: channel_id});
   if (channel) {
     var currentPath = Router.current();
-    var paginationStartLog = Session.get('paginationStartLog');
+    var paginationStartTimestamp = Session.get('paginationStartTimestamp');
     var query = {channel_name: channel.name};
-    if (Session.get('showRealtimeLogs') == false && paginationStartLog) {
-      query.last_updated = {
-        $lte: paginationStartLog.last_updated
+    if (Session.get('showRealtimeLogs') == false && paginationStartTimestamp) {
+      query.created = {
+        $lte: paginationStartTimestamp
       };
     }
     return ChannelLogs.find(query, {sort: {created: 1}});

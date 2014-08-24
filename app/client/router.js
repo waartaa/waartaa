@@ -16,7 +16,7 @@ var chatLogSubs = new SubsManager({
 });
 
 var chatLogPaginationSubs = new SubsManager({
-  cacheLimit: 2,
+  cacheLimit: 3,
   expireIn: 9999
 });
 
@@ -283,13 +283,6 @@ Router.map(function () {
     data: function () {
       $('#chatlogs-loader').fadeOut();
       console.log('data');
-    },
-    load: function () {
-      console.log('load', Router.current().path);
-    },
-    unload: function () {
-      Session.set('pageUnloading', true);
-      console.log('unload', Router.current().path);
     },
     waitOn: function () {
       var channel = UserChannels.findOne({

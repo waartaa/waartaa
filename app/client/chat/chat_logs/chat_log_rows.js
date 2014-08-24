@@ -190,7 +190,6 @@ var cancelBookmarking = function (event) {
 
 Template.chat_row.helpers({
   chatlogTimestampStr: function (datetime) {
-    console.log(moment(datetime).format());
     return moment(datetime).format().replace(/:/gi, '_').replace('+', 'plus');
   }
 });
