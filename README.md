@@ -6,21 +6,24 @@ multiple devices of the user along with centralized logging.
 
 ## Setup
 
-1. Install system dependencies: ``node``, ``npm`` for your system. For example:
-    1. For Fedora, you can do: ``$ sudo yum install nodejs npm -y``
-    1. For Mac OS X, you can install them via brew: ``$ brew install node npm``
-    1. For Debian/Ubuntu install only node.js and it will include npm as: 
+- Install system dependencies: ``node``, ``npm`` for your system. For example:
+    - For Fedora, you can do: ``$ sudo yum install nodejs npm -y``
+    - For Mac OS X, you can install them via brew: ``$ brew install node npm``
+    - For Debian/Ubuntu install only node.js and it will include npm as: 
                                            ``sudo add-apt-repository ppa:chris-lea/node.js
                                              sudo apt-get update
                                              sudo apt-get install nodejs``
-    1. Else, you can always compile from source.
-1. Get the source: ``$ git clone --recursive https://github.com/waartaa/waartaa.git``
-1. Go to **waartaa**'s repository directory just cloned: ``$ cd waartaa``
-1. Run setup script: ``$ ./setup.sh``
-1. Customize ``waartaa/server/settings-local.js`` as needed.
-1. Go to waartaa meteor project's directory: ``$ cd app``
-1. Run waartaa: ``$ meteor``
-
+    - Else, you can always compile from source.
+- Get the source: ``$ git clone --recursive https://github.com/waartaa/waartaa.git``
+- Go to **waartaa**'s repository directory just cloned: ``$ cd waartaa``
+- Run setup script: ``$ ./setup.sh``
+- Customize ``waartaa/app/server/settings-local.js`` as needed.
+  - disable elasticsearch (set to ``false``) if its not setup.
+- Go to waartaa meteor project's directory: ``$ cd app``
+- update the app ``$ mrt update && meteor update``
+- Add kadira to meteor ``$ mrt add kadira``
+- Run waartaa: ``$ meteor``
+- If you get a "blaze" error, run ``$ mrt uninstall blaze`` and re run the above step.
 
 ## Advanced
 
