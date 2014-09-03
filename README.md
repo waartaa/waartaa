@@ -55,6 +55,19 @@ multiple devices of the user along with centralized logging.
 1. Provision and deploy: ``./bundle; ansible-playbook -i hosts.local site.yml``
 1. Only deploy: ``./bundle; ansible-playbook -i hosts.local site.yml``
 
+### Vagrant
+
+1. Install Vagrant from https://www.vagrantup.com/downloads.html.
+1. Install ``VirtualBox`` for your distribution.
+    - Fedora (or CentOS): ``sudo yum install VirtualBox``
+    - Ubuntu: ``sudo apt-get install VirtualBox``
+1. ``cd waartaa``
+1. ``vagrant up``
+1. ``vagrant provision`` (Run this command only first time after vagrant up)
+1. ``vagrant ssh``
+1. ``cd waartaa/app``
+1. Run waartaa: ``mrt``
+
 
 ## Contribute
 
