@@ -41,17 +41,26 @@ Meteor.publish('user_servers', function () {
   this.ready();
 });
 
-Meteor.publish('user_server_logs', function (user_server_name, n) {
+Meteor.publish('user_server_logs', function (
+    user_server_name, from, direction, limit) {
   if (this.userId) {
     var user = Meteor.users.findOne({_id: this.userId});
-    var N = n || CONFIG.show_last_n_logs;
-    var cursor = UserServerLogs.find(
-      {server_name: user_server_name, user: user.username},
-      {
-        sort: {created: -1}, limit: N
-      }
-    );
-    return cursor;
+    var server = UserServers.findOne({
+      name: user_server_name, user: user.username});
+    var query = {};
+    if (server) {
+      query.filter = {
+        server_name: server.name,
+        user: user.username
+      };
+      query = updateChatlogsQuery(query, from, direction, limit);
+      console.log(query.filter, query.extraOptions);
+      var cursor = UserServerLogs.find(
+        query.filter,
+        query.extraOptions
+      );
+      return cursor;
+    }
   }
   this.ready();
 });
@@ -72,6 +81,36 @@ Meteor.publish('user_channels', function () {
   this.ready();
 });
 
+function updateChatlogsQuery (query, from, direction, limit) {
+  var sortOrder = {created: -1};
+  if (from) {
+    try {
+      from = moment(from).toDate();
+      if (direction == 'down') {
+        query.filter['created'] = {$gte: from};
+        sortOrder = {created: 1};
+      } else if (direction == 'up') {
+        query.filter['created'] = {$lte: from};
+      }
+    } catch (err) {}
+  }
+  if (limit) {
+    try {
+      limit = parseInt(limit);
+      limit = typeof(limit) == 'number'? (
+        limit > DEFAULT_LOGS_COUNT?
+          DEFAULT_LOGS_COUNT: limit): DEFAULT_LOGS_COUNT;
+    } catch (err) {
+      limit = DEFAULT_LOGS_COUNT;
+    }
+  }
+  query.extraOptions = {
+    limit: limit,
+    sort: sortOrder
+  };
+  return query;
+}
+
 Meteor.publish('channel_logs', function (
     channel_name, from, direction, limit) {
   var user = Meteor.users.findOne({_id: this.userId}) || {};
@@ -79,8 +118,9 @@ Meteor.publish('channel_logs', function (
   var channel = UserChannels.findOne({name: channel_name, user: user.username});
   console.log('CHANNEL');
   console.log(channel);
+  var query = {};
   if (channel) {
-    var filter = {
+    query.filter = {
       channel_name: channel.name,
       $or: [
         {global: true, not_for_user: {$ne: user.username}},
@@ -88,36 +128,13 @@ Meteor.publish('channel_logs', function (
         {user: user.username}
       ]
     };
-    var sortOrder = {created: -1};
-    if (from) {
-      try {
-        from = moment(from).toDate();
-        if (direction == 'down') {
-          filter['created'] = {$gte: from};
-          sortOrder = {created: 1};
-        } else if (direction == 'up') {
-          filter['created'] = {$lte: from};
-        }
-      } catch (err) {}
-    }
-    if (limit) {
-      try {
-        limit = parseInt(limit);
-        limit = typeof(limit) == 'number'? (
-          limit > DEFAULT_LOGS_COUNT?
-            DEFAULT_LOGS_COUNT: limit): DEFAULT_LOGS_COUNT;
-      } catch (err) {
-        limit = DEFAULT_LOGS_COUNT;
-      }
-    }
+    query = updateChatlogsQuery(query, from, direction, limit);
     console.log(
       'Publishing logs for channel: ' + channel.name + ', ' + user.username);
-    console.log(filter, limit, sortOrder);
+    console.log(query.filter, query.extraOptions);
     var cursor = ChannelLogs.find(
-      filter,
-      {
-        sort: sortOrder, limit: limit
-      }
+      query.filter,
+      query.extraOptions
     );
     return cursor;
   }
@@ -125,18 +142,22 @@ Meteor.publish('channel_logs', function (
 });
 
 Meteor.publish(
-  'pm_logs', function (room_id, n) {
+  'pm_logs', function (room_id, from, direction, limit) {
     var user = Meteor.users.findOne({_id: this.userId});
     if (room_id && user) {
       console.log('publishing PMLogs');
       var nick = room_id.slice(room_id.search('_') + 1);
-      var N = n || CONFIG.show_last_n_logs;
-      var cursor = PMLogs.find({
-        $or: [
-          {from: nick},
-          {to_nick: nick}
-        ], user: user.username
-      }, {sort: {created: -1}, limit: N});
+      var query = {
+        filter: {
+          $or: [
+            {from: nick},
+            {to_nick: nick}
+          ], user: user.username
+        }
+      };
+      query = updateChatlogsQuery(query, from, direction, limit);
+      console.log(query.filter, query.extraOptions);
+      var cursor = PMLogs.find(query.filter, query.extraOptions);
       return cursor;
     }
     this.ready();

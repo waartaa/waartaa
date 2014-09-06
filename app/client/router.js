@@ -224,6 +224,12 @@ Router.map(function () {
       waartaa.chat.helpers.setCurrentRoom({
         roomtype: 'server', server_id: server._id, server_name: server.name
       });
+      if (this.ready()) {
+        var redirect = waartaa.chat.helpers.chatLogsWaypointHandler
+                      .handleScrolldownResponse(this.params);
+        if (redirect)
+          pause();
+      }
     },
     onRun: function () {
       $('#chatlogs-loader').show();
@@ -231,15 +237,25 @@ Router.map(function () {
     onStop: function () {
       $('#chatlogs-loader').fadeOut();
     },
+    onAfterAction: function () {
+      Meteor.setTimeout(function () {
+        waartaa.chat.helpers.chatLogsWaypointHandler.bind();
+      }, 2000);
+    },
     waitOn: function () {
       var userServer = UserServers.findOne(
         {name: this.params.serverName});
       if (!userServer)
         return;
+      var subsManager = this.params.direction?
+        chatLogPaginationSubs: chatLogSubs;
+      var from = this.params.from || null;
+      var direction = this.params.direction || 'down';
+      var limit = this.params.limit || DEFAULT_LOGS_COUNT;
       return [
-        chatLogSubs.subscribe(
+        subsManager.subscribe(
           "user_server_logs", userServer.name,
-          Session.get('user_server_log_count_' + userServer._id),
+          from, direction, limit,
           function () {
             $('.chatlogs-loader-msg').fadeOut(1000);
           }
@@ -269,37 +285,10 @@ Router.map(function () {
         server_name: channel.user_server_name
       });
       if (this.ready()) {
-        if (this.params.direction == 'down' && this.params.from) {
-          var fromTimestamp = new Date(this.params.from);
-          var newestPaginatedLog = ChannelLogs.findOne(
-            {
-              server_name: this.params.serverName,
-              channel_name: '#' + this.params.channelName,
-              created: {$gt: fromTimestamp}
-            },
-            {
-              limit: parseInt(this.params.limit) || DEFAULT_LOGS_COUNT,
-              sort: {created: 1},
-              skip: (parseInt(this.params.limit) || DEFAULT_LOGS_COUNT) - 1
-            }
-          );
-          if (!newestPaginatedLog) {
-            var path = Router.routes['chatRoomChannel'].path({
-              serverName: this.params.serverName,
-              channelName: this.params.channelName
-            });
-            //pageStack = [];
-            Router.go(path);
-            pause();
-            return;
-          }
-          if (pageStack.length > 0 && pageStack[0].toString() != newestPaginatedLog.created.toString()) {
-            if (pageStack.length == 3)
-              pageStack.pop();
-            pageStack.unshift(newestPaginatedLog.created);
-            Session.set('paginationStartTimestamp', pageStack[0]);
-          }
-        }
+        var redirect = waartaa.chat.helpers.chatLogsWaypointHandler
+                      .handleScrolldownResponse(this.params);
+        if (redirect)
+          pause();
       }
     },
     onRun: function () {
@@ -308,8 +297,10 @@ Router.map(function () {
     },
     onAfterAction: function () {
       Meteor.setTimeout(function () {
-        waartaa.chat.helpers.chatLogsWaypointHandler();
-      }, 1000);
+        waartaa.chat.helpers.chatLogsWaypointHandler.bind();
+      }, 2000);
+    },
+    onStop: function () {
     },
     onData: function () {
     },
@@ -409,6 +400,12 @@ Router.map(function () {
         });
       });
       Meteor.call('send_command', server.name, '/WHOIS ' + nick, {});
+      if (this.ready()) {
+        var redirect = waartaa.chat.helpers.chatLogsWaypointHandler
+                      .handleScrolldownResponse(this.params);
+        if (redirect)
+          pause();
+      }
     },
     onRun: function () {
       $('#chatlogs-loader').show();
@@ -423,10 +420,14 @@ Router.map(function () {
         return;
       var nick = this.params.nick;
       var room_id = userServer._id + '_' + nick;
+      var subsManager = this.params.direction?
+        chatLogPaginationSubs: chatLogSubs;
+      var from = this.params.from || null;
+      var direction = this.params.direction || 'down';
+      var limit = this.params.limit || DEFAULT_LOGS_COUNT;
       return [
-        chatLogSubs.subscribe(
-          'pm_logs', room_id,
-          Session.get('pmLogCount-' + room_id),
+        subsManager.subscribe(
+          'pm_logs', room_id, from, direction, limit,
           function () {
             waartaa.chat.helpers.roomAccessedTimestamp.initialize(
               'pm', {
@@ -440,6 +441,11 @@ Router.map(function () {
           'server_nicks', userServer.name, [nick]
         )
       ];
+    },
+    onAfterAction: function () {
+      Meteor.setTimeout(function () {
+        waartaa.chat.helpers.chatLogsWaypointHandler.bind();
+      }, 2000);
     }
   });
 });

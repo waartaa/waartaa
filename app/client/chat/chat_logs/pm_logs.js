@@ -1,4 +1,4 @@
-Template.pm_logs.events = {
+Template.pm_chat_logs.events = {
   'scroll .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
 

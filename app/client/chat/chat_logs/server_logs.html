@@ -1,25 +1,9 @@
-<template name="server_logs">
-{{#with getCurrentServer }}
-<div id="server-chatroom-{{ _id }}" class="chatroom server">
-  <div class="topic">
-    <ul class="nav nav-tabs nav-stacked" style="{{# unless topic }}display:none;{{/unless}}">
-      <li><p class="ellipsis">{{topic}}</p></li>
-    </ul>
-  </div>
-  <div class="chat-logs-container server scroller-container" data-server-id="{{ _id }}">
-    {{> server_chat_logs_table}}
-  </div>
-</div>
-{{/with}}
-</template>
-
-<template name="server_chat_logs_table">
-  <div id="server-chat-logs-{{ _id }}" class="chatlogs-table server chatlogrows">
-    <div class="row chatlogs-loader-msg" style="display: none;">
-      Loading...
+<template name="server_chat_logs">
+  {{#with getCurrentServer}}
+    <div class="chatlogs">
+      {{#each serverChatLogs _id}}
+        {{> chat_row}}
+      {{/each}}
     </div>
-    {{#each serverChatLogs _id}}
-      {{> chat_row}}
-    {{/each}}
-  </div>
+  {{/with}}
 </template>
