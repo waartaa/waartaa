@@ -284,7 +284,7 @@ waartaa.chat.helpers.chatLogRowRenderedHandler = function () {
   }
   var from = Router.current().params.from;
   if (from) {
-    var fromTimestamp = new Date(moment(from));
+    var fromTimestamp = moment(from).toDate();
     if (fromTimestamp > this.data.last_updated) {
       $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
         /:/gi, '_').replace('+', 'plus'), 0);

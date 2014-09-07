@@ -70,7 +70,7 @@ BaseChatController = BaseController.extend({
   onAfterAction: function () {
     Meteor.setTimeout(function () {
       waartaa.chat.helpers.chatLogsWaypointHandler.bind();
-    }, 1000);
+    }, 2000);
   },
   data: function (pause) {
     $('#chatlogs-loader').fadeOut();

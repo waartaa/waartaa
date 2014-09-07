@@ -35,7 +35,7 @@
 </template>
 
 <template name="pm_chat_row">
-  <div class="row chatlog-row{{# unless display_from}} chatlog-notice{{/unless}}">
+  <div id="chatlog-{{ chatlogTimestampStr last_updated}}" class="row chatlog-row{{# unless display_from}} chatlog-notice{{/unless}}">
     <div class="col-md-12">
       <div class="pull-left chatlog-from">
         {{# if display_from}}
