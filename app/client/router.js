@@ -62,6 +62,18 @@ BaseChatController = BaseController.extend({
   template: 'chat',
   waitOn: function () {
     return chatRoomSubs.subscribe('chatRooms');
+  },
+  onRun: function () {
+    $('#chatlogs-loader').show();
+    Session.set('oldest_log_in_room');
+  },
+  onAfterAction: function () {
+    Meteor.setTimeout(function () {
+      waartaa.chat.helpers.chatLogsWaypointHandler.bind();
+    }, 1000);
+  },
+  data: function (pause) {
+    $('#chatlogs-loader').fadeOut();
   }
 });
 /* End controllers */
@@ -231,17 +243,6 @@ Router.map(function () {
           pause();
       }
     },
-    onRun: function () {
-      $('#chatlogs-loader').show();
-    },
-    onStop: function () {
-      $('#chatlogs-loader').fadeOut();
-    },
-    onAfterAction: function () {
-      Meteor.setTimeout(function () {
-        waartaa.chat.helpers.chatLogsWaypointHandler.bind();
-      }, 2000);
-    },
     waitOn: function () {
       var userServer = UserServers.findOne(
         {name: this.params.serverName});
@@ -290,23 +291,6 @@ Router.map(function () {
         if (redirect)
           pause();
       }
-    },
-    onRun: function () {
-      $('#chatlogs-loader').show();
-      Session.set('oldest_log_in_room');
-    },
-    onAfterAction: function () {
-      Meteor.setTimeout(function () {
-        waartaa.chat.helpers.chatLogsWaypointHandler.bind();
-      }, 2000);
-    },
-    onStop: function () {
-    },
-    onData: function () {
-    },
-    data: function (pause) {
-      $('#chatlogs-loader').fadeOut();
-      console.log('data');
     },
     waitOn: function () {
       var channel = UserChannels.findOne({
@@ -407,12 +391,6 @@ Router.map(function () {
           pause();
       }
     },
-    onRun: function () {
-      $('#chatlogs-loader').show();
-    },
-    onStop: function () {
-      $('#chatlogs-loader').fadeOut();
-    },
     waitOn: function () {
       var userServer = UserServers.findOne(
         {name: this.params.serverName});
@@ -441,11 +419,6 @@ Router.map(function () {
           'server_nicks', userServer.name, [nick]
         )
       ];
-    },
-    onAfterAction: function () {
-      Meteor.setTimeout(function () {
-        waartaa.chat.helpers.chatLogsWaypointHandler.bind();
-      }, 2000);
     }
   });
 });
