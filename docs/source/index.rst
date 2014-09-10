@@ -13,3 +13,4 @@ release. The code is open-source, and `available on github
 
    setting_up_the_environment
    installing_waartaa
+   roadmap
