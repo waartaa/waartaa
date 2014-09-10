@@ -68,7 +68,6 @@ waartaa.chat.helpers.chatLogsContainerScrollCallback = function (direction) {
  * [Reactive] Higlight currently selected server room.
  */
 waartaa.chat.helpers.highlightServerRoom = function () {
-  Session.set('scrollAtBottom', true);
   var room = Session.get('room') || {};
   $('li.server').removeClass('active');
   $('.server-room').parent().removeClass('active');

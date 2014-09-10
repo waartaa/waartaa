@@ -275,13 +275,15 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
 waartaa.chat.helpers.chatLogRowRenderedHandler = function () {
   var last_log_id = Session.get('chatroom_last_log_id');
   var current_oldest_log_in_room = Session.get('oldest_log_in_room');
+  if (!Router.current().params.from)
+    $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
+  /*
   if (last_log_id && last_log_id == this.data._id) {
     $('#chatlogs-loader:visible').fadeOut();
     Session.set('chatroom_last_log_id');
     updateHeight();
-    if ( Session.get('scrollAtBottom') != false )
-      $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
   }
+  */
   var from = Router.current().params.from;
   if (from) {
     var fromTimestamp = moment(from).toDate();
