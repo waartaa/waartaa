@@ -1,22 +1,27 @@
-waartaa.chat.helpers.chatLogRowCreateHandler = function () {
-    if (Session.get('shallUpdateHeight')) {
-      Meteor.setTimeout(updateHeight, 0);
-      Session.set('shallUpdateHeight');
-    }
-    var current_oldest_log_id_in_room = Session.get('oldest_log_id_in_room');
-};
-
 waartaa.chat.helpers.chatLogsTableCreateHandler = function () {
   Meteor.setTimeout(updateHeight, 0);
+};
+
+waartaa.chat.helpers.isSameChatRoom = function (oldPath, newPath) {
+  if (oldPath && oldPath.route.name == newPath.route.name) {
+    if (oldPath.params.serverName != newPath.params.serverName)
+      return false;
+    if (oldPath.params.channelName != newPath.params.channelName)
+      return false;
+    if (oldPath.params.nick != newPath.params.nick)
+      return false;
+    return true;
+  }
+  return false;
 };
 
 waartaa.chat.helpers.chatLogsWaypointHandler = function () {
   var $scrollUpElem;
   var $scrollDownElem;
-  pageStack = [];
+  var pageStack = [];
   var routerPath;
   var _reatimeChatlogsObserver;
-  pageStackLength = 3;
+  var pageStackLength = 3;
 
   function fetchNewerLogs (options) {
     var room = Session.get('room');
@@ -30,7 +35,7 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
     };
     var path = _getChatroomPath(room, params);
     console.log(path);
-    Router.go(path);
+    Router.go(path, {replaceState: true});
   }
 
   function _getOldestLogInRoom(room, createdSortOrder) {
@@ -131,7 +136,7 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       pageStack.push(oldestLog.created);
       Session.set('paginationStartTimestamp', oldestLog.created);
       Session.set('newRealtimeLogsSincePaginationStart', 0);
-      if (!_isSameChatRoom(routerPath, currentPath))
+      if (!waartaa.chat.helpers.isSameChatRoom(routerPath, currentPath))
         _observeRealtimeChatlogs(room, oldestLog);
     } else {
       pageStack = pageStack || new Array;
@@ -153,25 +158,13 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
     };
     var path = _getChatroomPath(room, params);
     console.log(path);
-    Router.go(path);
+    Router.go(path, {replaceState: true});
   }
 
-  function _isSameChatRoom (oldPath, newPath) {
-    if (oldPath && oldPath.route.name == newPath.route.name) {
-      if (oldPath.params.serverName != newPath.params.serverName)
-        return false;
-      if (oldPath.params.channelName != newPath.params.channelName)
-        return false;
-      if (oldPath.params.nick != newPath.params.nick)
-        return false;
-      return true;
-    }
-    return false;
-  }
   return {
     bind: function () {
       var newRouterPath = Router.current();
-      if (!_isSameChatRoom) {
+      if (!waartaa.chat.helpers.isSameChatRoom(routerPath, newRouterPath)) {
         pageStack = [];
       }
       if (newRouterPath && !newRouterPath.params.from) {
@@ -255,7 +248,7 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
               pageStack && pageStack.length > 0 && pageStack[0].toString())) {
             var path = _getChatroomPath(Session.get('room'), {});
             //pageStack = [];
-            Router.go(path);
+            Router.go(path, {replaceState: true});
             return true;
           }
           return;
@@ -272,26 +265,54 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
   }
 }();
 
+var _displayLogs = function () {
+  var timeoutIds = [];
+  return function (template) {
+    var currentPath = Router.current();
+    var from = currentPath.params.from;
+    if (currentPath.params.from) {
+      var fromTimestamp = moment(from).toDate();
+      if (template.data.last_updated < fromTimestamp) {
+        $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
+          /:/gi, '_').replace('+', 'plus'), 0,
+          {offset: {top: -200}});
+      } else {
+        template.$('.chatlog-row').show();
+        return;
+      }
+      if (timeoutIds.length) {
+        while (timeoutIds.length > 0) {
+          Meteor.clearTimeout(timeoutIds.pop());
+        }
+      }
+      timeoutIds.push(
+        Meteor.setTimeout(function () {
+          timeoutIds = [];
+          $('.chatlog-row:hidden').fadeIn(200, function () {
+            if (from) {
+              var fromTimestamp = moment(from).toDate();
+              if (fromTimestamp > template.data.last_updated) {
+                $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
+                  /:/gi, '_').replace('+', 'plus'), 0,
+                  {offset: {top: -200}});
+              }
+            }
+          });
+        }, 300)
+      );
+    } else {
+      template.$('.chatlog-row').show();
+    }
+  };
+}();
+
 waartaa.chat.helpers.chatLogRowRenderedHandler = function () {
+  var currentPath = Router.current();
   var last_log_id = Session.get('chatroom_last_log_id');
   var current_oldest_log_in_room = Session.get('oldest_log_in_room');
-  if (!Router.current().params.from)
+  _displayLogs(this);
+  if (!currentPath.params.from)
     $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
-  /*
-  if (last_log_id && last_log_id == this.data._id) {
-    $('#chatlogs-loader:visible').fadeOut();
-    Session.set('chatroom_last_log_id');
-    updateHeight();
-  }
-  */
-  var from = Router.current().params.from;
-  if (from) {
-    var fromTimestamp = moment(from).toDate();
-    if (fromTimestamp > this.data.last_updated) {
-      $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
-        /:/gi, '_').replace('+', 'plus'), 0);
-    }
-  }
 }
 
 function _getOldestRealtimeLogForCurrentRoom () {

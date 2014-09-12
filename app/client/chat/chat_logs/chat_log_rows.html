@@ -1,5 +1,5 @@
 <template name="chat_row">
-  <div id="chatlog-{{ chatlogTimestampStr last_updated}}" class="row chatlog-row{{# unless from}} chatlog-notice{{/unless}}">
+  <div id="chatlog-{{ chatlogTimestampStr last_updated}}" class="row chatlog-row{{# unless from}} chatlog-notice{{/unless}}" style="display: none;">
     <div class="col-md-12{{#if checkOwnNickInMsg message server_current_nick from}} highlight-mention{{/if}}">
       {{# if isBookmarkable from }}
         <div class="pull-left chatlog-bookmark {{ isBookmarked this.created channel_name server_name}}" data-log-id="{{_id}}" data-timestamp="{{convertToTimestamp this.created}}" data-channel-name="{{channel_name}}" data-server-name="{{server_name}}">
@@ -35,7 +35,7 @@
 </template>
 
 <template name="pm_chat_row">
-  <div id="chatlog-{{ chatlogTimestampStr last_updated}}" class="row chatlog-row{{# unless display_from}} chatlog-notice{{/unless}}">
+  <div id="chatlog-{{ chatlogTimestampStr last_updated}}" class="row chatlog-row{{# unless display_from}} chatlog-notice{{/unless}}" style="display: none;">
     <div class="col-md-12">
       <div class="pull-left chatlog-from">
         {{# if display_from}}
