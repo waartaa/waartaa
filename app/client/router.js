@@ -76,9 +76,14 @@ BaseChatController = BaseController.extend({
   },
   onRun: function () {
     if (navManager.isSamePage(Router.current())) {
+      var pageStack = waartaa.chat.helpers.chatLogsWaypointHandler.getPageStack();
+      if (pageStack.length > 0 && this.params.from &&
+          moment(this.params.from).toDate().toString() ==
+          pageStack[0].toString())
+        waartaa.chat.helpers.chatLogsWaypointHandler.bind();
       if (this.params.direction == 'down')
         $('.chatlogs-scroll-down .chatlogs-loader-msg').show();
-      else if (this.params.direction == 'up')
+      else if (this.params.direction == 'up' && pageStack.length > 1)
         $('.chatlogs-scroll-up .chatlogs-loader-msg').show();
     } else {
       $('#chatlogs-loader').show();
@@ -86,15 +91,20 @@ BaseChatController = BaseController.extend({
     }
   },
   onAfterAction: function () {
-    Meteor.setTimeout(function () {
-      waartaa.chat.helpers.chatLogsWaypointHandler.bind();
-    }, 2000);
+    if (this.ready()) {
+      Meteor.setTimeout(function () {
+        waartaa.chat.helpers.chatLogsWaypointHandler.bind();
+      }, 1000);
+    }
   },
   data: function (pause) {
     Meteor.setTimeout(function () {
       $('.chatlogs-loader-msg').fadeOut();
     }, 2000);
     $('#chatlogs-loader').fadeOut();
+  },
+  onStop: function () {
+    waartaa.chat.helpers.chatLogsWaypointHandler.unbind();
   }
 });
 /* End controllers */
