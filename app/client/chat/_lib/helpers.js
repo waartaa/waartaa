@@ -3,68 +3,10 @@
  */
 waartaa.chat.helpers = {};
 
-waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
-  var $target = $(event.target);
-  var scroll_top = $target.scrollTop();
-  Session.set('scrollAtBottom', (
-    $('.chat-logs-container').scrollTop() +
-    $('.chat-logs-container').height()) == $(
-      '.chat-logs-container .chatlogs-table').height() - 50? true: false);
-  if (scroll_top != 0)
-    return;
-  $target.off('scroll');
-  var $target = $(event.target);
-  var $table = $target.find('.chatlogs-table');
-  var prevHeight = $table.height();
-  $('.chatlogs-loader-msg').show();
-  Meteor.setTimeout(function () {
-    $('.chatlogs-loader-msg').fadeOut(1000);
-    $target.on('scroll', waartaa.chat.helpers.chatLogsContainerScrollCallback);
-    var currentHeight = $table.height();
-    $target.scrollTop(currentHeight - prevHeight);
-  }, 3000);
-  var key = '';
-  if ($table.hasClass('channel'))
-    key = "user_channel_log_count_" + $target.attr('data-channel-id');
-  else if ($table.hasClass('server'))
-    key = "user_server_log_count_" + $target.attr('data-server-id');
-  else if ($table.hasClass('pm'))
-    key = "pmLogCount-" + $target.attr('data-server-id') + '_' + $target.attr('data-nick');
-  var current_count = Session.get(key, 0);
-  Session.set('height-' + $table.attr('id'), $table.find('.chatlogrows').height());
-  var room = Session.get('room');
-  if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
-    scroll_top = null;
-  var oldest_log_in_room = null;
-  if (room.roomtype == 'channel') {
-    oldest_log_in_room = ChannelLogs.findOne(
-      {channel_name: room.channel_name}, {sort: {created: 1}});
-    Session.set('scroll_height_channel-' + room.room_id,
-      scroll_top);
-  } else if (room.roomtype == 'server') {
-    oldest_log_in_room = UserServerLogs.findOne(
-    {server_id: room.room_id}, {sort: {created: 1}});
-    Session.set('scroll_height_' + room.room_id,
-      scroll_top);
-  } else if (room.roomtype == 'pm') {
-    oldest_log_in_room = PMLogs.find(
-    {
-      $or: [{from: room.nick}, {to_nick: room.nick}],
-      server_id: room.server_id
-    }, {sort: {created: 1}},
-    {fields: {created: 0, last_updated: 0}});
-    Session.set('scroll_height_server-' + room.server_id,
-      scroll_top);
-  }
-  Session.set('oldest_log_in_room', oldest_log_in_room);
-  Session.set(key, current_count + DEFAULT_LOGS_COUNT);
-}
-
 /**
  * [Reactive] Higlight currently selected server room.
  */
 waartaa.chat.helpers.highlightServerRoom = function () {
-  Session.set('scrollAtBottom', true);
   var room = Session.get('room') || {};
   $('li.server').removeClass('active');
   $('.server-room').parent().removeClass('active');
@@ -385,6 +327,7 @@ updateHeight = function () {
   $('.chat-logs-container').height(
     finalHeight - $('.chatroom .topic').height()
   );
+  $('.chatlogs').css('min-height', $('.chat-logs-container').height());
 };
 
 UI.registerHelper('current_server_id', function () {

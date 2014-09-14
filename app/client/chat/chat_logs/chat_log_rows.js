@@ -188,6 +188,10 @@ var cancelBookmarking = function (event) {
   $('.bookmark-model').hide();
 };
 
+UI.registerHelper('chatlogTimestampStr', function (datetime) {
+  return moment(datetime).format().replace(/:/gi, '_').replace('+', 'plus');
+});
+
 Template.chat_row.events = {
   'click .chatlog-bookmark': function (event) {
     var bookmarkEl = $(event.target).parent();

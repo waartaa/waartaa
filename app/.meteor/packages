@@ -29,7 +29,6 @@ GAnalytics
 email
 
 spiderable
-iron-router
 
 fast-render
 power-queue
@@ -39,7 +38,6 @@ reactive-list
 cron-tick
 npm
 crypto-md5
-blaze-layout
 accounts-ui-bootstrap-3
 jquery-titlealert
 oauth-encryption
@@ -47,3 +45,7 @@ kadira
 less
 chosen-package
 http
+subs-manager
+iron-router
+jquery-waypoints
+jquery-scrollTo

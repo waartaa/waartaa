@@ -21,7 +21,7 @@
 <template name="user_menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ nick }}" style="min-width: 80px; width: 80px;">
     <li>
-      <a class="pm-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ nick }}"><i class="glyphicon glyphicon-envelope"></i> PM</a>
+      <a class="pm-user" href="{{pathFor "chatRoomPM" serverName="Freenode" nick=nick}}" style="padding: 3px 5px;" data-user-nick="{{ nick }}"><i class="glyphicon glyphicon-envelope"></i> PM</a>
       <a class="whois-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ nick }}"><i class="glyphicon glyphicon-info-sign"></i> WHOIS</a>
     </li>
   </ul>

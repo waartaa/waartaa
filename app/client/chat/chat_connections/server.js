@@ -1,4 +1,5 @@
 function serverRoomSelectHandler (event) {
+    return;
     var $target = $(event.target);
     // Return if clicked on a server menu item
     if ($target.parents('.btn-group').length > 0)
@@ -46,6 +47,9 @@ function serverRoomSelectHandler (event) {
           roomtype: 'channel', server_id: server_id, channel_id: channel_id,
           channel_name: channel.name, server_name: channel.user_server_name
         });
+        Router.go(
+          '/chat/server/' + channel.user_server_name + '/channel/'
+          + channel.name.slice(1), {replaceState: true});
       } else if ($target.data('roomtype') == 'pm') {
         var server_id = $target.parents('.server').data('server-id');
         var nick = $target.data('nick');
