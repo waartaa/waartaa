@@ -2,6 +2,15 @@
 
 //Router.before(mustBeSignedIn, {except: ['index']});
 
+/* Reset SubsManager */
+SubsManager.prototype.reset = function() {
+  var self = this;
+  _.each(self._cacheList, function(sub) {
+    delete self._cacheMap[sub.hash];
+  });
+  self._cacheList = [];
+};
+
 /* Subscription Managers */
 
 var chatRoomSubs = new SubsManager({
@@ -73,6 +82,7 @@ BaseChatController = BaseController.extend({
         $('.chatlogs-scroll-up .chatlogs-loader-msg').show();
     } else {
       $('#chatlogs-loader').show();
+      chatLogPaginationSubs.reset();
     }
   },
   onAfterAction: function () {
