@@ -139,10 +139,10 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       if (!waartaa.chat.helpers.isSameChatRoom(routerPath, currentPath))
         _observeRealtimeChatlogs(room, oldestLog);
     } else {
-      pageStack = pageStack || new Array;
-      if (pageStack.length > 0 &&
+      pageStack = pageStack || new Array();
+      if (pageStack.length == 0 || (pageStack.length > 0 &&
           oldestLog.created.toString() !=
-          pageStack[pageStack.length - 1].toString()) {
+          pageStack[pageStack.length - 1].toString())) {
         if (pageStack.length == pageStackLength) {
           pageStack.shift();
           Session.set('showRealtimeLogs', false);
@@ -266,6 +266,9 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
             newestPaginatedLog && newestPaginatedLog.created.toString())) {
           if (pageStack.length == 3)
             pageStack.pop();
+          if (pageStack.length > 0 &&
+              pageStack[0].toString() == newestPaginatedLog.created.toString())
+            return;
           pageStack.unshift(newestPaginatedLog.created);
           Session.set('paginationStartTimestamp', pageStack[0]);
         }
