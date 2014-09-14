@@ -2,7 +2,6 @@
 
 //Router.before(mustBeSignedIn, {except: ['index']});
 
-
 /* Subscription Managers */
 
 var chatRoomSubs = new SubsManager({
@@ -55,6 +54,9 @@ BaseController = RouteController.extend({
   layoutTemplate: 'layout',
   waitOn: function () {
 
+  },
+  onAfterAction: function () {
+    navManager.set();
   }
 });
 
@@ -64,7 +66,14 @@ BaseChatController = BaseController.extend({
     return chatRoomSubs.subscribe('chatRooms');
   },
   onRun: function () {
-    $('#chatlogs-loader').show();
+    if (navManager.isSamePage(Router.current())) {
+      if (this.params.direction == 'down')
+        $('.chatlogs-scroll-down .chatlogs-loader-msg').show();
+      else if (this.params.direction == 'up')
+        $('.chatlogs-scroll-up .chatlogs-loader-msg').show();
+    } else {
+      $('#chatlogs-loader').show();
+    }
   },
   onAfterAction: function () {
     Meteor.setTimeout(function () {
@@ -72,6 +81,9 @@ BaseChatController = BaseController.extend({
     }, 2000);
   },
   data: function (pause) {
+    Meteor.setTimeout(function () {
+      $('.chatlogs-loader-msg').fadeOut();
+    }, 2000);
     $('#chatlogs-loader').fadeOut();
   }
 });

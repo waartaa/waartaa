@@ -288,16 +288,16 @@ var _displayLogs = function () {
       timeoutIds.push(
         Meteor.setTimeout(function () {
           timeoutIds = [];
-          $('.chatlog-row:hidden').fadeIn(200, function () {
-            if (from) {
-              var fromTimestamp = moment(from).toDate();
-              if (fromTimestamp > template.data.last_updated) {
-                $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
-                  /:/gi, '_').replace('+', 'plus'), 0,
-                  {offset: {top: -200}});
-              }
+          $('.chatlogs-loader-msg').fadeOut();
+          $('.chatlog-row:hidden').show();
+          if (from) {
+            var fromTimestamp = moment(from).toDate();
+            if (fromTimestamp > template.data.last_updated) {
+              $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
+                /:/gi, '_').replace('+', 'plus'), 0,
+                {offset: {top: -200}});
             }
-          });
+          }
         }, 300)
       );
     } else {
