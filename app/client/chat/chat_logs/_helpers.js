@@ -165,6 +165,12 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
     getPageStack: function () {
       return pageStack;
     },
+    unbind: function () {
+      if ($scrollUpElem)
+        $scrollUpElem.waypoint('destroy');
+      if ($scrollDownElem)
+        $scrollDownElem.waypoint('destroy');
+    },
     bind: function () {
       var newRouterPath = Router.current();
       if (!waartaa.chat.helpers.isSameChatRoom(routerPath, newRouterPath)) {
