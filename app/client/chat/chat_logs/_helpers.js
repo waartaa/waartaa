@@ -34,7 +34,6 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       limit: DEFAULT_LOGS_COUNT,
     };
     var path = _getChatroomPath(room, params);
-    console.log(path);
     Router.go(path, {replaceState: true});
   }
 
@@ -157,7 +156,6 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       limit: DEFAULT_LOGS_COUNT,
     };
     var path = _getChatroomPath(room, params);
-    console.log(path);
     Router.go(path, {replaceState: true});
   }
 
@@ -196,7 +194,6 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       $scrollDownElem = $('.chatlogs-scroll-down')
         .waypoint(function (direction) {
           var newRouterPath = Router.current();
-          console.log(direction);
           if (direction == 'up') {
             if (!newRouterPath.params.from) {
               fetchOlderLogs({currentPage: true});
@@ -282,39 +279,35 @@ var _displayLogs = function () {
   return function (template) {
     var currentPath = Router.current();
     var from = currentPath.params.from;
-    if (currentPath.params.from) {
-      var fromTimestamp = moment(from).toDate();
-      if (template.data.last_updated > fromTimestamp) {
-        template.$('.chatlog-row').show();
-        return;
+    if (timeoutIds.length) {
+      while (timeoutIds.length > 0) {
+        Meteor.clearTimeout(timeoutIds.pop());
       }
-      if (timeoutIds.length) {
-        while (timeoutIds.length > 0) {
-          Meteor.clearTimeout(timeoutIds.pop());
-        }
-      }
-      timeoutIds.push(
-        Meteor.setTimeout(function () {
-          timeoutIds = [];
-          $('.chatlogs-loader-msg').fadeOut();
-          $('.chatlog-row:hidden').show();
-          if (from) {
-            var pageStack = waartaa.chat.helpers.chatLogsWaypointHandler.getPageStack();
-            var fromTimestamp = moment(from).toDate();
-            if (pageStack.length > 0 &&
-              pageStack[0].toString() == fromTimestamp.toString())
-              return;
-            if (fromTimestamp > template.data.last_updated) {
-              $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
-                /:/gi, '_').replace('+', 'plus'), 0,
-                {offset: {top: -200}});
-            }
-          }
-        }, 300)
-      );
-    } else {
-      template.$('.chatlog-row').show();
     }
+    timeoutIds.push(
+      Meteor.setTimeout(function () {
+        timeoutIds = [];
+        $('.chatlogs-loader-msg').hide();
+        $('.chatlog-row:hidden').fadeIn(from? 1000: 0);
+        if (from) {
+          var pageStack = waartaa.chat.helpers.chatLogsWaypointHandler.getPageStack();
+          var fromTimestamp = moment(from).toDate();
+          if (pageStack.length > 0 &&
+            pageStack[0].toString() == fromTimestamp.toString()) {
+            return;
+          }
+          if (fromTimestamp > template.data.last_updated) {
+            $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
+              /:/gi, '_').replace('+', 'plus'),
+              {offset: {top: -200}});
+          }
+        } else
+          $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
+        Meteor.setTimeout(function () {
+          waartaa.chat.helpers.chatLogsWaypointHandler.bind();
+        }, navManager.isFirstPage()? 2000: 200);
+      }, 50)
+    );
   };
 }();
 
@@ -323,8 +316,6 @@ waartaa.chat.helpers.chatLogRowRenderedHandler = function () {
   var last_log_id = Session.get('chatroom_last_log_id');
   var current_oldest_log_in_room = Session.get('oldest_log_in_room');
   _displayLogs(this);
-  if (!currentPath.params.from)
-    $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
 }
 
 function _getOldestRealtimeLogForCurrentRoom () {
@@ -344,5 +335,4 @@ function _getOldestRealtimeLogForCurrentRoom () {
 
 waartaa.chat.helpers.chatLogsContainerRendered = function () {
   updateHeight();
-  $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
 }
