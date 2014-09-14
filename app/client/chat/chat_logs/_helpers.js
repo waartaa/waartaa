@@ -162,6 +162,9 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
   }
 
   return {
+    getPageStack: function () {
+      return pageStack;
+    },
     bind: function () {
       var newRouterPath = Router.current();
       if (!waartaa.chat.helpers.isSameChatRoom(routerPath, newRouterPath)) {
@@ -272,11 +275,7 @@ var _displayLogs = function () {
     var from = currentPath.params.from;
     if (currentPath.params.from) {
       var fromTimestamp = moment(from).toDate();
-      if (template.data.last_updated < fromTimestamp) {
-        $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
-          /:/gi, '_').replace('+', 'plus'), 0,
-          {offset: {top: -200}});
-      } else {
+      if (template.data.last_updated > fromTimestamp) {
         template.$('.chatlog-row').show();
         return;
       }
@@ -291,7 +290,11 @@ var _displayLogs = function () {
           $('.chatlogs-loader-msg').fadeOut();
           $('.chatlog-row:hidden').show();
           if (from) {
+            var pageStack = waartaa.chat.helpers.chatLogsWaypointHandler.getPageStack();
             var fromTimestamp = moment(from).toDate();
+            if (pageStack.length > 0 &&
+              pageStack[0].toString() == fromTimestamp.toString())
+              return;
             if (fromTimestamp > template.data.last_updated) {
               $('.chat-logs-container').scrollTo('#chatlog-' + from.replace(
                 /:/gi, '_').replace('+', 'plus'), 0,
