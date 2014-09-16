@@ -182,6 +182,8 @@ Router.map(function () {
             this.redirect('/');
             GAnalytics.pageview();
           } else {
+            if (!this.ready() && !UserChannels.findOne())
+              return;
             var path = Meteor.user() && window && window.localStorage &&
               window.localStorage.getItem(
                 Meteor.user().username + ':lastChatPath');
