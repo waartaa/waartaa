@@ -75,6 +75,9 @@ BaseChatController = BaseController.extend({
     return chatRoomSubs.subscribe('chatRooms');
   },
   onRun: function () {
+    if (!this.ready()) {
+      NProgress.start();
+    }
     if (navManager.isSamePage(Router.current())) {
       var pageStack = waartaa.chat.helpers.chatLogsWaypointHandler.getPageStack();
       if (pageStack.length > 0 && this.params.from &&
@@ -90,12 +93,19 @@ BaseChatController = BaseController.extend({
       chatLogPaginationSubs.reset();
     }
   },
+  onBeforeAction: function () {
+  },
   onAfterAction: function () {
     if (this.ready()) {
       Meteor.setTimeout(function () {
         waartaa.chat.helpers.chatLogsWaypointHandler.bind();
       }, 1000);
     }
+    if (Router.current().path != '/chat/' && Meteor.user())
+      window.localStorage.setItem(
+        Meteor.user().username + ':lastChatPath', Router.current().path);
+    if (this.ready())
+      NProgress.done();
   },
   data: function (pause) {
     Meteor.setTimeout(function () {
@@ -166,26 +176,33 @@ Router.map(function () {
     path: /^\/chat\/$/,
     template: 'chat',
     onBeforeAction: [
-      function () {
+      function (pause) {
         if (Meteor.isClient) {
           if (!Meteor.userId()) {
             this.redirect('/');
             GAnalytics.pageview();
           } else {
-            //ChatSubscribe();
+            var path = Meteor.user() && window && window.localStorage &&
+              window.localStorage.getItem(
+                Meteor.user().username + ':lastChatPath');
+            if (!path) {
+              var userServer = UserServers.findOne();
+              if (userServer)
+                path = Router.routes['chatRoomServer'].path({
+                  serverName: userServer.name
+                });
+            }
+            if (path) {
+              Router.go(path, replaceState=true);
+              pause();
+            }
           }
         }
       },
       function () {
-        if (Meteor.isClient) {
-          // we're done waiting on all subs
-          if (this.ready()) {
-            NProgress.done();
-            if (UserServers.find().count() == 0)
-              $('#server-add-btn').click();
-          } else {
-            NProgress.start();
-          }
+        if (Meteor.isClient && this.ready()) {
+          if (UserServers.find().count() == 0)
+            $('#server-add-btn').click();
         }
       }
     ],

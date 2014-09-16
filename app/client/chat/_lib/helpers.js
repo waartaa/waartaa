@@ -47,17 +47,7 @@ waartaa.chat.helpers.highlightServerRoom = function () {
  *     currently selected room.
  */
 waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
-  var set_cookie = function(key, value) {
-    document.cookie = key + '=' + value;
-  };
-
-  Session.set('oldest_log_id_in_room');
-
-  set_cookie('userId', Meteor.userId());
-  set_cookie('roomtype', obj.roomtype);
-
   var prevRoom = Session.get('room');
-
   if (obj.roomtype == 'server') {
     Session.set('room', {
       room_id: obj._id || obj.server_id,
@@ -65,8 +55,6 @@ waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
       server_id: obj._id || obj.server_id,
       server_name: obj.name || obj.server_name,
     });
-    // set cookie server_id
-    set_cookie('server_id', obj._id || obj.server_id);
   }
   else if (obj.roomtype == 'channel') {
     Session.set('room', {
@@ -77,9 +65,6 @@ waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
       channel_id: obj._id || obj.channel_id,
       channel_name: obj.name || obj.channel_name
     });
-    // set cookie server_id and channel_id
-    set_cookie('server_id', obj.server_id);
-    set_cookie('channel_id', obj._id || obj.channel_id);
   }
   else if (obj.roomtype == 'pm') {
     Session.set('room', {
@@ -89,10 +74,6 @@ waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
       server_name: obj.server_name,
       nick: obj.nick
     });
-    // set cookie pm_nick
-    set_cookie('server_id', obj.server_id);
-    set_cookie('pm_nick', obj.nick);
-
   }
   else
     Session.set('room', {});
