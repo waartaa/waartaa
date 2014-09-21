@@ -30,4 +30,5 @@ function initializeServers () {
 
 Meteor.startup(function () {
   initializeServers();
+  chatRoomLogCount = new ChatRoomLogCountManager();
 });

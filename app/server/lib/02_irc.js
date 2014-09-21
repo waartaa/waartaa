@@ -271,6 +271,8 @@ ChannelLogsManager = function () {
       }
     });
     OldChannelLogs.insert(log, function (err, id) {});
+    if (log.global)
+      chatRoomLogCount.increment(log.server_name + '::' + log.channel_name);
   }
 
   return {

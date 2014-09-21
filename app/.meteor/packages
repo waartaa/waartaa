@@ -19,6 +19,7 @@ jquery-waypoints
 
 # local packages
 jquery-titlealert
+analytics
 
 # New atmosphere packages
 tmeasday:html5-history-api@4.1.2
