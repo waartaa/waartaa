@@ -40,6 +40,7 @@ meteorhacks:kadira
 meteorhacks:subs-manager
 iron:router
 natestrauser:jquery-scrollto@1.4.6
+aldeed:scheduled-tasks
 
 # mrt packages
 mrt:jquery-ui-bootstrap
@@ -50,4 +51,3 @@ mrt:moment@2.8.1
 mrt:assert
 mrt:cron-tick
 mrt:chosen-package@0.11.1
-
