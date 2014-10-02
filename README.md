@@ -17,8 +17,8 @@ multiple devices of the user along with centralized logging.
 1. Get the source: ``$ git clone --recursive https://github.com/waartaa/waartaa.git``
 1. Go to **waartaa**'s repository directory just cloned: ``$ cd waartaa``
 1. Run setup script: ``$ ./setup.sh``
-1. Customize ``waartaa/server/settings-local.js`` as needed.
 1. Go to waartaa meteor project's directory: ``$ cd app``
+1. Customize ``server/settings-local.js`` as needed.
 1. Run waartaa: ``$ meteor``
 
 
