@@ -262,11 +262,15 @@ UI.registerHelper('isAnyRoomSelected', function () {
 UI.registerHelper("unread_logs_count", function (
     room_type, room_id, nick) {
   var room = {};
+  var currentRouter = Router.current();
   if (room_type == 'server') {
     var server = UserServers.findOne({_id: room_id});
     room.server_name = server.name;
   } else if (room_type == 'channel') {
     var channel = UserChannels.findOne({_id: room_id});
+    if (currentRouter.params.serverName == channel.user_server_name &&
+        currentRouter.params.channelName == channel.name)
+      return '';
     return localChatRoomLogCount.unreadLogsCount(
       channel.user_server_name + '::' + channel.name) || '';
   } else if (room_type == 'pm') {
@@ -335,3 +339,24 @@ $(window).focus(function() {
 }).blur(function() {
   window_focus = false;
 });
+
+
+waartaa.chat.helpers.getChatRoomSignatureFromRouteParams = function  (params) {
+  if (!params.serverName)
+    return;
+  var signature = params.serverName;
+  if (params.channelName)
+    signature += '::#' + params.channelName;
+  else if (params.nick)
+    signature += '::' + params.nick;
+  return signature;
+}
+
+waartaa.chat.helpers.resetUnreadLogsCountForChatroom = function (params) {
+  var chatRoomSignature = (
+    waartaa.chat.helpers.getChatRoomSignatureFromRouteParams(params));
+  if (chatRoomSignature) {
+    Meteor.call('resetUnreadLogCount', chatRoomSignature, function (err) {});
+    localChatRoomLogCount.reset(chatRoomSignature);
+  }
+}

@@ -106,6 +106,7 @@ BaseChatController = BaseController.extend({
         Meteor.user().username + ':lastChatPath', Router.current().path);
     if (this.ready())
       NProgress.done();
+    waartaa.chat.helpers.resetUnreadLogsCountForChatroom(this.params);
   },
   data: function (pause) {
     Meteor.setTimeout(function () {
@@ -115,6 +116,7 @@ BaseChatController = BaseController.extend({
   },
   onStop: function () {
     waartaa.chat.helpers.chatLogsWaypointHandler.unbind();
+    waartaa.chat.helpers.resetUnreadLogsCountForChatroom(this.params);
   }
 });
 /* End controllers */

@@ -21,6 +21,7 @@ Package.onUse(function(api) {
   api.addFiles('server/publish.js', 'server');
   api.addFiles('client/subscribe.js', 'client');
   api.addFiles('client/stats.js', 'client');
+  api.addFiles('server/methods.js', 'server');
   api.export('ChatRoomLogCountManager', 'server');
   api.export('ChatLogStats', 'server');
   api.export('UnreadLogsCount', ['server', 'client']);
