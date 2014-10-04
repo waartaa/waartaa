@@ -308,7 +308,6 @@ Meteor.methods({
 
 
 Meteor.publish('latest_channel_log', function (serverName, channelName) {
-  console.log(serverName, channelName);
   var channel = UserChannels.findOne({
     user_server_name: serverName, name: channelName,
     user_id: this.userId
@@ -317,12 +316,6 @@ Meteor.publish('latest_channel_log', function (serverName, channelName) {
     this.ready();
     return;
   }
-  console.log(ChannelLogs.find(
-    {
-      channel_name: channelName, server_name: serverName, global: true
-    },
-    {sort: {created: -1}, limit: 1}
-  ).fetch());
   return ChannelLogs.find(
     {
       channel_name: channelName, server_name: serverName, global: true

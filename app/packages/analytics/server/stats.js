@@ -26,7 +26,10 @@ ChatRoomLogCountManager = function () {
     });
   }
   //var schedule = later.parse.recur().on(0).minute();
-  var schedule = later.parse.text('every 10 seconds');
+  var intervalText = (
+    (Meteor.settings || {}).chat || {}).roomLogCountSaveInterval ||
+    'every 30 minutes';
+  var schedule = later.parse.text(intervalText);
   var hourlyLogCountSaver = new ScheduledTask(schedule, _saveChatroomLogCount);
   hourlyLogCountSaver.start();
 };
@@ -78,7 +81,7 @@ ChatRoomLogCountManager.prototype.increment = function (chatRoomSignature) {
   var self = this;
   self._lock.timedReadLock(5000, function () {
     var chatRoomLogCountData = self._data[chatRoomSignature] || {};
-    console.log(chatRoomLogCountData);
+    console.log(chatRoomSignature, chatRoomLogCountData);
     chatRoomLogCountData.currentCount = (
       chatRoomLogCountData.currentCount || 0) + 1;
     self._data[chatRoomSignature] = chatRoomLogCountData;
@@ -103,7 +106,7 @@ ChatRoomLogCountManager.prototype.timestampToHour = function (timestamp) {
 ChatRoomLogCountManager.prototype.getChatRoomLogsCountSince = function (
     roomSignature, timestamp, offset) {
   var self = this;
-  timestamp = self.timestampToHour(timestamp);
+  //timestamp = self.timestampToHour(timestamp);
   var roomInfo = self._getRoomInfoFromSignature(roomSignature);
   var chatRoomLogCountData = self._data[roomSignature] || {};
   var count = chatRoomLogCountData.currentCount || 0;

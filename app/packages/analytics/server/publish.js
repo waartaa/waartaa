@@ -22,16 +22,18 @@ Meteor.startup(function () {
         var chatRoomUnreadLogCount = UnreadLogsCount.findOne({
           room_signature: roomSignature, user: user.username
         }) || {};
-        var timestamp = chatRoomLogCount.last_updated_at || item.last_updated;
+        var timestamp = chatRoomUnreadLogCount.last_updated_at || item.last_updated;
         var count = chatRoomUnreadLogCount.count || 0;
+        var offset = chatRoomUnreadLogCount.offset || 0;
+        var currentIntervalCount = (
+          chatRoomLogCount.getCurrentLogCountForInterval(roomSignature) || 0);
         count += chatRoomLogCount.getChatRoomLogsCountSince(
-          roomSignature, item.last_updated, item.offset);
+          roomSignature, timestamp, offset);
         UnreadLogsCount.upsert(
           {room_signature: roomSignature, user: user.username},
           {$set: {
             count: count,
-            offset: chatRoomLogCount.getCurrentLogCountForInterval(
-              roomSignature),
+            offset: currentIntervalCount,
             last_updated_at: new Date()
           }});
       });
