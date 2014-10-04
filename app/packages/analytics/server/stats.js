@@ -5,7 +5,7 @@ ChatRoomLogCountManager = function () {
   self._lock = locks.createReadWriteLock();
   self._queue = new PowerQueue({
     name: "chat_room_log_count_save_queue",
-    debug: CONFIG.QUEUE_DEBUG || false,
+    debug: true,
     maxProcessing: 1
   });
 
@@ -26,9 +26,8 @@ ChatRoomLogCountManager = function () {
     });
   }
   //var schedule = later.parse.recur().on(0).minute();
-  var schedule = later.parse.text('every 15 seconds');
-  var hourlyLogCountSaver = new ScheduledTask(
-    schedule, _saveChatroomLogCount);
+  var schedule = later.parse.text('every 10 seconds');
+  var hourlyLogCountSaver = new ScheduledTask(schedule, _saveChatroomLogCount);
   hourlyLogCountSaver.start();
 };
 
@@ -60,12 +59,16 @@ ChatRoomLogCountManager.prototype._saveChatroomLogCountToDb = function (
     chatRoomSignature, chatRoomLogCount, timestamp) {
   var self = this;
   var roomInfo = self._getRoomInfoFromSignature(chatRoomSignature);
-  ChatLogStats.upsert(
-    {
-      room_type: roomInfo.roomType, room_name: roomInfo.roomName,
-      room_server_name: roomInfo.serverName, timestamp: timestamp
-    }, {
-      $set: {logs_count: chatRoomLogCount.prevCount || 0}
+  var selector = {
+    room_type: roomInfo.roomType, room_name: roomInfo.roomName,
+    room_server_name: roomInfo.serverName, timestamp: timestamp
+  };
+  var chatLogStat = ChatLogStats.findOne(selector) || {};
+  ChatLogStats.upsert(selector, {
+      $set: {
+        logs_count: (chatLogStat.logs_count || 0) + (
+          chatRoomLogCount.prevCount || 0)
+      }
     }
   );
 };
@@ -83,3 +86,42 @@ ChatRoomLogCountManager.prototype.increment = function (chatRoomSignature) {
     console.log(chatRoomLogCountData);
   });
 };
+
+ChatRoomLogCountManager.prototype.getCurrentLogCountForInterval = function (
+    roomSignature) {
+  var self = this;
+  return (self._data[roomSignature] || {}).currentCount || 0;
+};
+
+ChatRoomLogCountManager.prototype.timestampToHour = function (timestamp) {
+  timestamp.setMilliseconds(0);
+  timestamp.setSeconds(0);
+  timestamp.setMinutes(0);
+  return timestamp;
+};
+
+ChatRoomLogCountManager.prototype.getChatRoomLogsCountSince = function (
+    roomSignature, timestamp, offset) {
+  var self = this;
+  timestamp = self.timestampToHour(timestamp);
+  var roomInfo = self._getRoomInfoFromSignature(roomSignature);
+  var chatRoomLogCountData = self._data[roomSignature] || {};
+  var count = chatRoomLogCountData.currentCount || 0;
+  console.log({
+    room_type: roomInfo.roomType, room_name: roomInfo.roomName,
+    room_server_name: roomInfo.serverName, timestamp: {$gt: timestamp},
+    offset: offset,
+  });
+  ChatLogStats.find({
+    room_type: roomInfo.roomType, room_name: roomInfo.roomName,
+    room_server_name: roomInfo.serverName, timestamp: {$gte: timestamp}
+  }).forEach(function (item) {
+    count += item.logs_count || 0;
+  });
+  count = count - (offset || 0);
+  count = count > 0? count: 0;
+  console.log('getChatRoomLogsCountSince', count);
+  return count;
+};
+
+chatRoomLogCount = new ChatRoomLogCountManager();

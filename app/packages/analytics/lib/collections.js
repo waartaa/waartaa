@@ -1,11 +1,11 @@
 /*
-ChatLogStats: {
-  _id: String,
-  room_type: String,
-  room_name: String,
-  room_server_name: String,
-  logs_count: Integer,
-  timestamp: Datetime
+UnreadLogsCount: {
+  room_signature: String,
+  count: Integer,
+  active: Boolean,
+  username: String
+  last_updated_at: Date,
+  offset: Integer
 }
 */
-ChatLogStats = new Meteor.Collection('chat_log_stats');
+UnreadLogsCount = new Meteor.Collection('unread_logs_count');
