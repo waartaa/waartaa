@@ -322,3 +322,46 @@ ChatSubscribe = function () {
     }
   });
 };
+
+
+function subscribeToLatestChatroomLog () {
+  var _subscriptions = {
+    'channels': {},
+    'servers': {},
+    'pms': {}
+  };
+  var subs = new SubsManager({
+    cacheLimit: 1000,
+    expireIn: 9999
+  });
+  UserChannels.find().observeChanges({
+    added: function (id, channel) {
+      var loadTime = new Date();
+      _subscriptions['channels'][id] = subs.subscribe(
+          'latest_channel_log', channel.user_server_name, channel.name);
+
+      localChatRoomLogCount.reset(channel.user_server_name + '::' + channel.name);
+      ChannelLogs.find(
+        {
+          server_name: channel.user_server_name,
+          channel_name: channel.name,
+          created: {$gt: loadTime},
+          global: true
+        }
+      ).observeChanges({
+        added: function (id, fields) {
+          localChatRoomLogCount.increment(
+            channel.user_server_name + '::' + channel.name);
+        }
+      });
+    },
+    removed: function (id) {
+      if (_subscriptions['channels'][id])
+        delete _subscriptions['channels'][id];
+    }
+  });
+}
+
+Meteor.startup(function () {
+  subscribeToLatestChatroomLog();
+});

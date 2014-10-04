@@ -267,17 +267,13 @@ UI.registerHelper("unread_logs_count", function (
     room.server_name = server.name;
   } else if (room_type == 'channel') {
     var channel = UserChannels.findOne({_id: room_id});
-    room.server_name = channel.user_server_name;
-    room.channel_name = channel.name;
+    return localChatRoomLogCount.unreadLogsCount(
+      channel.user_server_name + '::' + channel.name) || '';
   } else if (room_type == 'pm') {
     var server = UserServers.findOne({_id: room_id});
     room.server_name = server.name;
     room.nick = nick;
   }
-  count = waartaa.chat.helpers.unreadLogsCount.get(room_type, room);
-  if (count > 0)
-    return count;
-  return '';
 });
 
 UI.registerHelper("unread_mentions_count", function (

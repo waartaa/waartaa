@@ -54,6 +54,8 @@ UserChannels: {
   server_name: String,
   //nicks: Dictionary,
   password: String,
+  unread_logs_count: Integer,
+  mentions_count: Integer,
   creator: String,
   creator_id: String,
   last_updater: String,
