@@ -347,6 +347,8 @@ Router.map(function () {
         user_server_name: this.params.serverName,
         name: '#' + this.params.channelName
       }) || {};
+      var channelName = '#' + this.params.channelName;
+      var serverName = this.params.serverName;
       var subsManager = this.params.direction?
         chatLogPaginationSubs: chatLogSubs;
       var from = this.params.from || null;
@@ -354,35 +356,33 @@ Router.map(function () {
       var limit = this.params.limit || DEFAULT_LOGS_COUNT;
       return [
         subsManager.subscribe(
-          'channel_logs', '#' + this.params.channelName,
+          'channel_logs', channelName,
           from, direction, limit,
           function () {
             var channel = UserChannels.findOne(
               {
-                user_server_name: this.params.serverName,
-                name: '#' + this.params.channelName
+                user_server_name: serverName,
+                name: channelName
               }
             ) || {};
             waartaa.chat.helpers.roomAccessedTimestamp.initialize(
               'channel', {
-                server_name: channel.user_server_name,
-                channel_name: channel.name
+                server_name: serverName,
+                channel_name: channelName
               }
             );
           }
         ),
         chatLogSubs.subscribe(
-          'channel_nicks', channel.user_server_name, channel.name,
-          Session.get('lastNick-' + channel.user_server_name +
-                      '_' + channel.name),
-          Session.get('startNick-' + channel.user_server_name +
-                      '_' + channel.name),
+          'channel_nicks', serverName, channelName,
+          Session.get('lastNick-' + serverName + '_' + channelName),
+          Session.get('startNick-' + serverName + '_' + channelName),
           function () {
             $('.channel-nicks-loader').fadeOut(1000);
             var last_nick = ChannelNicks.findOne(
               {
-                channel_name: channel.name,
-                server_name: channel.user_server_name,
+                channel_name: channelName,
+                server_name: serverName,
               },
               {
                 sort: {nick: -1}
@@ -390,23 +390,23 @@ Router.map(function () {
             );
             var start_nick = ChannelNicks.findOne(
               {
-                channel_name: channel.name,
-                server_name: channel.user_server_name,
+                channel_name: channelName,
+                server_name: serverName,
               },
               {
                 sort: {nick: 1}
               }
             );
             Session.set(
-              'currentLastNick-' + channel.user_server_name +
-              '_' + channel.name,
+              'currentLastNick-' + serverName +
+              '_' + channelName,
               (last_nick || {}).nick);
             Session.set(
-              'currentStartNick-' + channel.user_server_name +
-              '_' + channel.name,
+              'currentStartNick-' + serverName +
+              '_' + channelName,
               (start_nick || {}).nick);
             if (Session.get(
-              'startNick-' + channel.user_server_name + '_' + channel.name))
+              'startNick-' + serverName + '_' + channelName))
               $('#info-panel .nano').nanoScroller();
               $('#info-panel .nano').nanoScroller({scrollTop: 30});
           }
