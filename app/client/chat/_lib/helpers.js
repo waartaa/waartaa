@@ -269,7 +269,7 @@ UI.registerHelper("unread_logs_count", function (
   } else if (room_type == 'channel') {
     var channel = UserChannels.findOne({_id: room_id});
     if (currentRouter.params.serverName == channel.user_server_name &&
-        currentRouter.params.channelName == channel.name)
+        '#' + currentRouter.params.channelName == channel.name)
       return '';
     return localChatRoomLogCount.unreadLogsCount(
       channel.user_server_name + '::' + channel.name) || '';
