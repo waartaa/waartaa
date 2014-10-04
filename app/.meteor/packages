@@ -30,7 +30,7 @@ infinitedg:winston
 infinitedg:winston-loggly
 datariot:ganalytics@0.2.0
 meteorhacks:fast-render@1.0.0
-cfs:power-queue
+cfs:power-queue@0.0.1
 cfs:reactive-property
 cfs:micro-queue
 cfs:reactive-list
