@@ -585,7 +585,7 @@ IRCHandler = function (user, user_server) {
             user_server, {name: channel});
           if (nick == client.nick) {
             UserChannels.update(
-              {_id: user_channel._id}, {$set: {active: true,server_active:true}},
+              {_id: user_channel._id}, {$set: {active: true, server_active: true}},
               {multi: true}, function (err, updated) {});
             _addChannelJoinListener(user_channel.name);
             _addChannelPartListener(user_channel.name);
