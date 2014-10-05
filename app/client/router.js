@@ -106,7 +106,11 @@ BaseChatController = BaseController.extend({
         Meteor.user().username + ':lastChatPath', Router.current().path);
     if (this.ready())
       NProgress.done();
-    waartaa.chat.helpers.resetUnreadLogsCountForChatroom(this.params);
+    var params = this.params;
+    if (this.ready())
+      Tracker.nonreactive(function () {
+        waartaa.chat.helpers.resetUnreadLogsCountForChatroom(params);
+      });
   },
   data: function (pause) {
     Meteor.setTimeout(function () {
@@ -116,7 +120,10 @@ BaseChatController = BaseController.extend({
   },
   onStop: function () {
     waartaa.chat.helpers.chatLogsWaypointHandler.unbind();
-    waartaa.chat.helpers.resetUnreadLogsCountForChatroom(this.params);
+    var params = this.params;
+    Tracker.nonreactive(function () {
+      waartaa.chat.helpers.resetUnreadLogsCountForChatroom(params);
+    });
   }
 });
 /* End controllers */
