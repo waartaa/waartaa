@@ -37,36 +37,6 @@ Meteor.publish('chatRooms', function () {
         }
       });
     });
-    userServersCursor.observeChanges({
-      changed: function (id, fields) {
-        var userServer = UserServers.findOne({_id: id});
-        var roomSignature = userServer.name;
-        if (fields.status && fields.status == 'connected')
-          UnreadLogsCount.upsert({
-            room_signature: roomSignature,
-            user: user.username
-          }, {
-            $set: {
-              last_updated_at: new Date(),
-              offset: chatRoomLogCount.getCurrentLogCountForInterval(
-                roomSignature)
-            }
-          });
-        else if (fields.status && fields.status.search('disconnected') >= 0)
-          UnreadLogsCount.remove({
-            room_signature: userServer.name,
-            user: user.username
-          });
-      },
-      removed: function (id) {
-        var userServer = UserServers.findOne({_id: id});
-        if (userServer)
-          UnreadLogsCount.remove({
-            room_signature: userServer.name,
-            user: user.username
-          });
-      }
-    });
     userChannelsCursor.forEach(function (fields) {
       if (fields.status != 'connected')
         return;
@@ -81,40 +51,7 @@ Meteor.publish('chatRooms', function () {
         }
       });
     });
-    userChannelsCursor.observeChanges({
-      changed: function (id, fields) {
-        var userChannel = UserChannels.findOne({_id: id});
-        var roomSignature = userChannel.user_server_name + '::' +
-          userChannel.name;
-        if (fields.status && fields.status == 'connected') {
-          UnreadLogsCount.upsert({
-            room_signature: roomSignature,
-            user: user.username
-          }, {
-            $set: {
-              last_updated_at: new Date(),
-              offset: chatRoomLogCount.getCurrentLogCountForInterval(
-                roomSignature)
-            }
-          });
-        } else if (fields.status && fields.status.search('disconnected') >= 0)
-          UnreadLogsCount.remove({
-            room_signature: userChannel.user_server_name + '::' +
-              userChannel.name,
-            user: user.username
-          });
-      },
-      removed: function (id) {
-        var userChannel = UserChannels.findOne({_id: id});
-        if (userChannel) {
-          UnreadLogsCount.remove({
-            room_signature: userChannel.user_server_name + '::' +
-              userChannel.name,
-            user: user.username
-          });
-      }
-      }
-    });
+    
   }, 100);
   var userPmsCursor = UserPms.find(
     {user_id: this.userId}

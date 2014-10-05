@@ -1,7 +1,7 @@
 Meteor.startup(function () {
-  function updateUnreadLogsCountForChatRoom (roomSignature, user) {
+  function updateUnreadLogsCountForChatRoom (roomSignature, username) {
     var chatRoomUnreadLogCount = UnreadLogsCount.findOne({
-      room_signature: roomSignature, user: user.username
+      room_signature: roomSignature, user: username
     }) || {};
     var timestamp = chatRoomUnreadLogCount.last_updated_at ||
       new Date();
@@ -12,7 +12,7 @@ Meteor.startup(function () {
     count += chatRoomLogCount.getChatRoomLogsCountSince(
       roomSignature, timestamp, offset);
     UnreadLogsCount.upsert(
-      {room_signature: roomSignature, user: user.username},
+      {room_signature: roomSignature, user: username},
       {
         $set: {
           count: count,
@@ -33,16 +33,25 @@ Meteor.startup(function () {
       user: user.username});
     Meteor.setTimeout(function () {
       cursor.forEach(function (fields) {
-        updateUnreadLogsCountForChatRoom(fields.room_signature, user);
-      });
-      cursor.observeChanges({
-        added: function (id, fields) {
-          updateUnreadLogsCountForChatRoom(fields.room_signature, user);
-        }
+        updateUnreadLogsCountForChatRoom(fields.room_signature, user.username);
       });
     }, 100);
     if (!cursor.count())
       this.ready();
     return cursor;
   });
+
+  UnreadLogsCount.find().observeChanges({
+    added: function (id, fields) {
+      updateUnreadLogsCountForChatRoom(fields.room_signature, fields.user);
+    }
+  });
+
+  UnreadLogsCount._ensureIndex({
+    room_signature: 1,
+    user: 1
+  });
+  UnreadLogsCount._ensureIndex({
+    user: 1
+  })
 });
