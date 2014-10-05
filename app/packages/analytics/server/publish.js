@@ -1,4 +1,27 @@
 Meteor.startup(function () {
+  function updateUnreadLogsCountForChatRoom (roomSignature, user) {
+    var chatRoomUnreadLogCount = UnreadLogsCount.findOne({
+      room_signature: roomSignature, user: user.username
+    }) || {};
+    var timestamp = chatRoomUnreadLogCount.last_updated_at ||
+      new Date();
+    var count = chatRoomUnreadLogCount.count || 0;
+    var offset = chatRoomUnreadLogCount.offset || 0;
+    var currentIntervalCount = (
+      chatRoomLogCount.getCurrentLogCountForInterval(roomSignature) || 0);
+    count += chatRoomLogCount.getChatRoomLogsCountSince(
+      roomSignature, timestamp, offset);
+    UnreadLogsCount.upsert(
+      {room_signature: roomSignature, user: user.username},
+      {
+        $set: {
+          count: count,
+          offset: currentIntervalCount,
+          last_updated_at: new Date()
+        }
+      }
+    );
+  }
 
   Meteor.publish('unread_logs_count', function () {
     user = Meteor.users.findOne({_id: this.userId});
@@ -6,36 +29,16 @@ Meteor.startup(function () {
       this.ready();
       return;
     }
-    cursor = UnreadLogsCount.find({
+    var cursor = UnreadLogsCount.find({
       user: user.username});
     Meteor.setTimeout(function () {
-      console.log('UNREAD_LOGS_COUNT');
-      UserChannels.find({
-        user: user.username, active: true
-      }).forEach(function (item) {
-        var UNREAD_LOGS_COUNT_UPPER_LIMIT = 100;
-        // FIXME
-        // Meteor.settings.public.UREAD_LOGS_COUNT_UPPER_LIMIT
-        //if (item.count > UNREAD_LOGS_COUNT_UPPER_LIMIT)
-        //  return;
-        var roomSignature = item.user_server_name + '::' + item.name;
-        var chatRoomUnreadLogCount = UnreadLogsCount.findOne({
-          room_signature: roomSignature, user: user.username
-        }) || {};
-        var timestamp = chatRoomUnreadLogCount.last_updated_at || item.last_updated;
-        var count = chatRoomUnreadLogCount.count || 0;
-        var offset = chatRoomUnreadLogCount.offset || 0;
-        var currentIntervalCount = (
-          chatRoomLogCount.getCurrentLogCountForInterval(roomSignature) || 0);
-        count += chatRoomLogCount.getChatRoomLogsCountSince(
-          roomSignature, timestamp, offset);
-        UnreadLogsCount.upsert(
-          {room_signature: roomSignature, user: user.username},
-          {$set: {
-            count: count,
-            offset: currentIntervalCount,
-            last_updated_at: new Date()
-          }});
+      cursor.forEach(function (fields) {
+        updateUnreadLogsCountForChatRoom(fields.room_signature, user);
+      });
+      cursor.observeChanges({
+        added: function (id, fields) {
+          updateUnreadLogsCountForChatRoom(fields.room_signature, user);
+        }
       });
     }, 100);
     if (!cursor.count())

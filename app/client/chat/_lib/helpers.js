@@ -265,12 +265,19 @@ UI.registerHelper("unread_logs_count", function (
   var currentRouter = Router.current();
   if (room_type == 'server') {
     var server = UserServers.findOne({_id: room_id});
-    room.server_name = server.name;
+    if (currentRouter.params.serverName == server.name) {
+      localChatRoomLogCount.reset(server.name);
+      return '';
+    }
+    return localChatRoomLogCount.unreadLogsCount(server.name) || '';
   } else if (room_type == 'channel') {
     var channel = UserChannels.findOne({_id: room_id});
     if (currentRouter.params.serverName == channel.user_server_name &&
-        '#' + currentRouter.params.channelName == channel.name)
+        '#' + currentRouter.params.channelName == channel.name) {
+      localChatRoomLogCount.reset(
+        channel.user_server_name + '::' + channel.name);
       return '';
+    }
     return localChatRoomLogCount.unreadLogsCount(
       channel.user_server_name + '::' + channel.name) || '';
   } else if (room_type == 'pm') {
