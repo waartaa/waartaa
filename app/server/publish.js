@@ -26,7 +26,7 @@ Meteor.publish('chatRooms', function () {
     userServersCursor.forEach(function (fields) {
       if (fields.status != 'connected')
         return;
-      var roomSignature = fields.name;
+      var roomSignature = fields.user + '||' + fields.name;
       UnreadLogsCount.upsert({
         room_signature: roomSignature,
         user: user.username
@@ -359,4 +359,24 @@ Meteor.publish('latest_channel_log', function (serverName, channelName) {
     },
     {sort: {created: -1}, limit: 1}
   );
+});
+
+
+Meteor.publish('latest_server_log', function (serverName) {
+  if (!this.userId) {
+    this.ready();
+    return;
+  }
+  var userServer = UserServers.findOne({
+    name: serverName,
+    user_id: this.userId
+  });
+  if (!userServer) {
+    this.ready();
+    return;
+  }
+  return UserServerLogs.find({
+    server_name: serverName,
+    user_id: this.userId
+  }, {sort: {created: -1}, limit: 1});
 });

@@ -265,11 +265,14 @@ UI.registerHelper("unread_logs_count", function (
   var currentRouter = Router.current();
   if (room_type == 'server') {
     var server = UserServers.findOne({_id: room_id});
-    if (currentRouter.params.serverName == server.name) {
-      localChatRoomLogCount.reset(server.name);
+    if (currentRouter.params.serverName == server.name && !(
+        currentRouter.params.channelName ||
+        currentRouter.params.nick)) {
+      localChatRoomLogCount.reset(server.user + '||' + server.name);
       return '';
     }
-    return localChatRoomLogCount.unreadLogsCount(server.name) || '';
+    return localChatRoomLogCount.unreadLogsCount(
+      server.user + '||' + server.name) || '';
   } else if (room_type == 'channel') {
     var channel = UserChannels.findOne({_id: room_id});
     if (currentRouter.params.serverName == channel.user_server_name &&
@@ -354,8 +357,11 @@ waartaa.chat.helpers.getChatRoomSignatureFromRouteParams = function  (params) {
   var signature = params.serverName;
   if (params.channelName)
     signature += '::#' + params.channelName;
-  else if (params.nick)
-    signature += '::' + params.nick;
+  else if (params.nick) {
+    signature = Meteor.user().username + '||' + signature + '::' + params.nick;
+  }
+  if (signature.split('::').length == 1)
+    signature = Meteor.user().username + '||' + signature;
   return signature;
 }
 

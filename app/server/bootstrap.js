@@ -40,7 +40,7 @@ function observeChatrooms () {
   userServersCursor.observeChanges({
     added: function (id, fields) {
       var userServer = UserServers.findOne({_id: id});
-      var roomSignature = userServer.name;
+      var roomSignature = userServer.user + '||' + userServer.name;
       UnreadLogsCount.upsert({
         room_signature: roomSignature,
         user: userServer.user
@@ -56,7 +56,7 @@ function observeChatrooms () {
       var userServer = UserServers.findOne({_id: id});
       if (userServer)
         UnreadLogsCount.remove({
-          room_signature: userServer.name,
+          room_signature: userServer.user + '||' + userServer.name,
           user: userServer.user
         });
     }
@@ -91,7 +91,17 @@ function observeChatrooms () {
   });
 }
 
+function observeChatLogs () {
+  UserServerLogs.find({from_user: null}).observeChanges({
+    added: function (id, fields) {
+      chatRoomLogCount.increment(
+        fields.user + '||' + fields.server_name);
+    }
+  });
+}
+
 Meteor.startup(function () {
   initializeServers();
   observeChatrooms();
+  observeChatLogs();
 });

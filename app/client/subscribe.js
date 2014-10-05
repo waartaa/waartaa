@@ -360,6 +360,32 @@ function subscribeToLatestChatroomLog () {
         delete _subscriptions['channels'][id];
     }
   });
+  UserServers.find().observeChanges({
+    added: function (id, server) {
+      var loadTime = new Date();
+      var user = Meteor.user();
+      if (!user)
+        return;
+      _subscriptions['servers'][id] = subs.subscribe(
+          'latest_server_log', server.name);
+      localChatRoomLogCount.reset(user.username + '||' + server.name);
+      UserServerLogs.find(
+        {
+          server_name: server.name,
+          created: {$gt: loadTime}
+        }
+      ).observeChanges({
+        added: function (id, fields) {
+          localChatRoomLogCount.increment(
+            user.username + '||' + server.name);
+        }
+      });
+    },
+    removed: function (id) {
+      if (_subscriptions['servers'][id])
+        delete _subscriptions['servers'][id];
+    }
+  });
 }
 
 Meteor.startup(function () {

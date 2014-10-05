@@ -28,7 +28,7 @@ ChatRoomLogCountManager = function () {
   //var schedule = later.parse.recur().on(0).minute();
   var intervalText = (
     (Meteor.settings || {}).chat || {}).roomLogCountSaveInterval ||
-    'every 30 minutes';
+    'every 10 seconds';
   var schedule = later.parse.text(intervalText);
   var hourlyLogCountSaver = new ScheduledTask(schedule, _saveChatroomLogCount);
   hourlyLogCountSaver.start();
@@ -41,11 +41,17 @@ ChatRoomLogCountManager.prototype._getRoomInfoFromSignature = function (
   var roomInfo = {
     roomType: null,
     roomName: null,
-    serverName: null
+    serverName: null,
+    user: null
   }
   if (items.length == 1) {
     roomInfo.roomType = 'server';
-    roomInfo.serverName = roomInfo.roomName = items[0];
+    var tmp = items[0].split('||');
+    if (tmp.length > 1) {
+      roomInfo.user = tmp[0];
+      roomInfo.serverName = roomInfo.roomName = tmp[1];
+    } else
+      roomInfo.serverName = roomInfo.roomName = items[0];
   } else if (items.length == 2) {
     roomInfo.serverName = items[0];
     if (items[1].search('#') == 0)
@@ -64,7 +70,8 @@ ChatRoomLogCountManager.prototype._saveChatroomLogCountToDb = function (
   var roomInfo = self._getRoomInfoFromSignature(chatRoomSignature);
   var selector = {
     room_type: roomInfo.roomType, room_name: roomInfo.roomName,
-    room_server_name: roomInfo.serverName, timestamp: timestamp
+    room_server_name: roomInfo.serverName, timestamp: timestamp,
+    user: roomInfo.user
   };
   var chatLogStat = ChatLogStats.findOne(selector) || {};
   ChatLogStats.upsert(selector, {
@@ -115,10 +122,13 @@ ChatRoomLogCountManager.prototype.getChatRoomLogsCountSince = function (
     room_server_name: roomInfo.serverName, timestamp: {$gt: timestamp},
     offset: offset,
   });
-  ChatLogStats.find({
+  var selector = {
     room_type: roomInfo.roomType, room_name: roomInfo.roomName,
     room_server_name: roomInfo.serverName, timestamp: {$gte: timestamp}
-  }).forEach(function (item) {
+  };
+  if (roomInfo.user)
+    selector.user = roomInfo.user
+  ChatLogStats.find(selector).forEach(function (item) {
     count += item.logs_count || 0;
   });
   count = count - (offset || 0);
