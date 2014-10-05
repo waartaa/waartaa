@@ -392,7 +392,8 @@ IRCHandler = function (user, user_server) {
         last_updater: user.username,
         last_updater_id: user._id,
         last_updated: new Date(),
-        active: true
+        active: true,
+        server_active: true
       });
       var channel = UserChannels.findOne({_id: user_channel_id});
     }
@@ -584,7 +585,7 @@ IRCHandler = function (user, user_server) {
             user_server, {name: channel});
           if (nick == client.nick) {
             UserChannels.update(
-              {_id: user_channel._id}, {$set: {active: true}},
+              {_id: user_channel._id}, {$set: {active: true, server_active: true}},
               {multi: true}, function (err, updated) {});
             _addChannelJoinListener(user_channel.name);
             _addChannelPartListener(user_channel.name);
