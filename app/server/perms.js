@@ -19,3 +19,27 @@ ChannelLogs.allow({
     return true;
   }
 });
+
+UserPms.allow({
+    insert: function (userId, doc) {
+        var user = Meteor.users.findOne({_id: userId});
+        if (doc.user_id != userId || doc.user != user.username)
+            return false;
+        return true;
+    },
+    update: function (userId, doc, fieldNames, modifier) {
+        var userFieldsInFieldNames = _.find(fieldNames, function (fieldName) {
+            if (fieldName == 'user' || fieldName == 'user_id')
+                return true;
+            return false;
+        });
+        if (userFieldsInFieldNames)
+            return false;
+        return true;
+    },
+    remove: function (userId, doc) {
+        if (doc.user_id == userId)
+            return true;
+        return false;
+    }
+})

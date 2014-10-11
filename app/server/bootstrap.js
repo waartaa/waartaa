@@ -37,6 +37,7 @@ function observeChatrooms () {
     {active: true, server_active: true, status: 'connected'},
     {last_updated: 0, created: 0}
   );
+  var userPmsCursor = UserPms.find({});
   userServersCursor.observeChanges({
     added: function (id, fields) {
       var userServer = UserServers.findOne({_id: id});
@@ -89,6 +90,24 @@ function observeChatrooms () {
     }
     }
   });
+  userPmsCursor.observeChanges({
+    added: function (id, fields) {
+      console.log('User PM ADDED', id, fields);
+      var roomSignature = fields.user + '||' + fields.user_server_name + '::' +
+        fields.name;
+      UnreadLogsCount.upsert({
+        room_signature: roomSignature,
+        user: fields.user
+      }, {
+        $set: {
+          last_updated_at: new Date(),
+          offset: chatRoomLogCount.getCurrentLogCountForInterval(
+            roomSignature)
+        }
+      });
+    },
+    removed: function (id) {}
+  })
 }
 
 function observeChatLogs () {
@@ -96,6 +115,14 @@ function observeChatLogs () {
     added: function (id, fields) {
       chatRoomLogCount.increment(
         fields.user + '||' + fields.server_name);
+    }
+  });
+  PMLogs.find({}).observeChanges({
+    added: function (id, fields) {
+      console.log('PM', fields);
+      if (fields.from_user != fields.user)
+        chatRoomLogCount.increment(
+          fields.user + '||' + fields.server_name + '::' + fields.from);
     }
   });
 }

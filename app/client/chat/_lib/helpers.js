@@ -68,11 +68,11 @@ waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
   }
   else if (obj.roomtype == 'pm') {
     Session.set('room', {
-      room_id: obj.server_id + '_' + obj.nick,
+      room_id: obj.room_id || (obj.server_id + '_' + obj.nick),
       roomtype: 'pm',
-      server_id: obj.server_id,
-      server_name: obj.server_name,
-      nick: obj.nick
+      server_id: obj.user_server_id || obj.server_id,
+      server_name: obj.user_server_name || obj.user_server_id,
+      nick: obj.name || obj.nick
     });
   }
   else
@@ -284,9 +284,17 @@ UI.registerHelper("unread_logs_count", function (
     return localChatRoomLogCount.unreadLogsCount(
       channel.user_server_name + '::' + channel.name) || '';
   } else if (room_type == 'pm') {
-    var server = UserServers.findOne({_id: room_id});
-    room.server_name = server.name;
-    room.nick = nick;
+    var userPm = UserPms.findOne({_id: room_id});
+    if (!userPm)
+      return '';
+    if (currentRouter.params.serverName == userPm.user_server_name &&
+        currentRouter.params.nick == userPm.name) {
+      localChatRoomLogCount.reset(
+        userPm.user + '||' + userPm.user_server_name + '::' + userPm.name);
+      return '';
+    }
+    return localChatRoomLogCount.unreadLogsCount(
+      userPm.user + '||' + userPm.user_server_name + '::' + userPm.name) || '';
   }
 });
 

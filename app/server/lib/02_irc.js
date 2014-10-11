@@ -814,24 +814,25 @@ IRCHandler = function (user, user_server) {
         Fiber(function () {
           if (to == client.nick) {
             var profile = user.profile;
-            var userpms = UserPms.findOne({user_id: user._id}) || {pms: {}};
-            userpms.pms[nick] = "";
-            UserPms.upsert(
-              {user_id: user._id, 
-               user_server_id: user_server._id,
-               user_server_name: user_server.name,
-               user: user.username}, 
-               {$set: {pms: userpms.pms}});
-
-            var from_user = Meteor.users.findOne({username: nick}) || {};
+            UserPms.upsert({
+              user_id: user._id,
+              user_server_id: user_server._id,
+              user_server_name: user_server.name,
+              user: user.username,
+              name: nick
+            }, {$set: {}});
+            var from_user_server = UserServers.findOne({
+              status: 'connected', current_nick: nick},{
+                sort: {last_updated: -1}
+            }) || {};
             var to_user = user;
             PMLogs.insert({
               message: text,
               raw_message: message,
               from: nick,
               display_from: nick,
-              from_user: from_user.username,
-              from_user_id: from_user._id,
+              from_user: from_user_server.user,
+              from_user_id: from_user_server.user_id,
               to_nick: to,
               to_user: to_user.username,
               to_user_id: to_user._id,
@@ -1656,15 +1657,13 @@ IRCHandler = function (user, user_server) {
           if (args[1].toLowerCase() == 'nickserv') {
             client.say('NickServ', args.slice(2).join(' '));
           } else {
-            var userpms = UserPms.findOne(
-              {user_id: user._id}) || {pms: {}};
-            userpms.pms[args[1]] = "";
             UserPms.upsert(
               {user_id: user._id,
                user_server_id: user_server._id,
                user_server_name: user_server.name,
-               user: user.username},
-               {$set: {pms: userpms.pms}});
+               user: user.username,
+               name: args[1]
+            }, {$set: {}});
             _sendPMMessage(args[1], args.slice(2).join(' '));
           }
         } else

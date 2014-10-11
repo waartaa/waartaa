@@ -429,19 +429,31 @@ Router.map(function () {
     path: '/chat/server/:serverName/nick/:nick',
     controller: BaseChatController,
     onBeforeAction: function (pause) {
+      var user = Meteor.user();
       var server = UserServers.findOne({name: this.params.serverName});
       if (!server) {
         pause();
         return;
       }
       var nick = this.params.nick;
-      Meteor.call('toggle_pm', server._id, nick, 'create', function () {
+      var userPm = UserPms.findOne({
+        user_server_name: server.name, name: nick});
+      if (!userPm) {
+        UserPms.insert({
+          user_server_id: server._id, user_server_name: server.name,
+          user: user.username, user_id: user._id,
+          name: nick
+        });
+      }
+      Meteor.setTimeout(function () {
+        var userPm = UserPms.findOne({
+          user_server_name: server.name, name: nick});
         waartaa.chat.helpers.setCurrentRoom({
           roomtype: 'pm', server_id: server._id,
-          room_id: server._id + '_' + nick,
+          room_id: userPm._id,
           server_name: server.name, nick: nick
         });
-      });
+      }, 100);
       Meteor.call('send_command', server.name, '/WHOIS ' + nick, {});
       if (this.ready()) {
         var redirect = waartaa.chat.helpers.chatLogsWaypointHandler

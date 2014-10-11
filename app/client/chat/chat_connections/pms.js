@@ -7,11 +7,12 @@ Template.server_pm_item.events = {
     e.preventDefault();
     e.stopPropagation();
     var $target = $(e.target).parent('a');
-    var pm_id = $(e.target).parents('li').find(
-      '.pm.server-room').attr('id');
-    var user_server_id = $target.data('server-id');
-    var nick = $target.data('user-nick');
-    Meteor.call('toggle_pm', user_server_id, nick, 'delete');
+    var roomId = $(e.target).parents('li').first().find(
+      '.pm.server-room').attr('data-roomid');
+    var userPm = UserPms.findOne({_id: roomId});
+    var path = '/chat/server/' + userPm.user_server_name;
+    Router.go(path, {replaceState: true});
+    UserPms.remove({_id: roomId});
   }
 }
 
@@ -30,18 +31,16 @@ UI.registerHelper('pms', function (id) {
   if (!server || !user)
     return [];
   var pms = [];
-   var userpms = UserPms.findOne(
-    {user_id: user._id, user_server_id: server._id});
-  try {
-    var pms = userpms.pms;
-  } catch (err) {}
-  var return_pms = [];
-  for (nick in pms)
-    return_pms.push({
-      name: nick, server_id: server._id, room_id: server._id + '_' + nick,
-      server_name: server.name
+  UserPms.find({
+    user_server_name: server.name, user: user.username
+  }).forEach(function (pm) {
+    pms.push({
+      name: pm.name, server_id: server._id,
+      room_id: pm._id,
+      server_name: server.name,
     });
-  return return_pms;
+  });
+  return pms;
 });
 
 UI.registerHelper('currentPM', function () {

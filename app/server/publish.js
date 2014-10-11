@@ -22,6 +22,9 @@ Meteor.publish('chatRooms', function () {
     {user_id: this.userId, active: true, server_active: true},
     {last_updated: 0, created: 0}
   );
+  var userPmsCursor = UserPms.find(
+    {user_id: this.userId}
+  );
   Meteor.setTimeout(function () {
     userServersCursor.forEach(function (fields) {
       if (fields.status != 'connected')
@@ -51,11 +54,20 @@ Meteor.publish('chatRooms', function () {
         }
       });
     });
-    
+    userPmsCursor.forEach(function (fields) {
+      var roomSignature = fields.user + '||' + fields.user_server_name +
+        '::' + fields.name;
+      UnreadLogsCount.upsert({
+        room_signature: roomSignature,
+        user: user.username
+      }, {
+        $set: {
+          last_updated_at: new Date(),
+          offset: chatRoomLogCount.getCurrentLogCountForInterval(roomSignature)
+        }
+      });
+    });
   }, 100);
-  var userPmsCursor = UserPms.find(
-    {user_id: this.userId}
-  );
   return [
     Servers.find(),
     userServersCursor,
@@ -378,5 +390,27 @@ Meteor.publish('latest_server_log', function (serverName) {
   return UserServerLogs.find({
     server_name: serverName,
     user_id: this.userId
+  }, {sort: {created: -1}, limit: 1});
+});
+
+Meteor.publish('latest_pm_log', function (serverName, nick) {
+  console.log('latest_pm_log', serverName, nick);
+  if (!this.userId) {
+    this.ready();
+    return;
+  }
+  var userServer = UserServers.findOne({
+    name: serverName,
+    user_id: this.userId
+  });
+  if (!userServer) {
+    this.ready();
+    return;
+  }
+  return PMLogs.find({
+    $or: [
+      {from: nick},
+      {to_nick: nick}
+    ], user_id: this.userId
   }, {sort: {created: -1}, limit: 1});
 });

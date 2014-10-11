@@ -199,7 +199,7 @@ UserPms: {
   user_id: String,
   user_server_name: String,
   user_server_id: String,
-  pms: List,
+  name: String
 }
 */
 UserPms = new Meteor.Collection("user_pms");

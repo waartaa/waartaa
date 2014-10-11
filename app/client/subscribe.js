@@ -360,6 +360,33 @@ function subscribeToLatestChatroomLog () {
         delete _subscriptions['channels'][id];
     }
   });
+
+  UserPms.find().observeChanges({
+    added: function (id, pm) {
+      var loadTime = new Date();
+      _subscriptions['pms'][id] = subs.subscribe(
+          'latest_pm_log', pm.user_server_name, pm.name);
+      localChatRoomLogCount.reset(
+        pm.user + '||' + pm.user_server_name + '::' + pm.name);
+      PMLogs.find(
+        {
+          server_name: pm.user_server_name,
+          from: pm.name,
+          created: {$gt: loadTime}
+        }
+      ).observeChanges({
+        added: function (id, fields) {
+          localChatRoomLogCount.increment(
+            pm.user + '||' + pm.user_server_name + '::' + pm.name);
+        }
+      });
+    },
+    removed: function (id) {
+      if (_subscriptions['channels'][id])
+        delete _subscriptions['pms'][id];
+    }
+  });
+
   UserServers.find().observeChanges({
     added: function (id, server) {
       var loadTime = new Date();
