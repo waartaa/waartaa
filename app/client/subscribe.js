@@ -352,6 +352,32 @@ function subscribeToLatestChatroomLog () {
         added: function (id, fields) {
           localChatRoomLogCount.increment(
             channel.user_server_name + '::' + channel.name);
+          var currentRouter = Router.current();
+          var userServer = UserServers.findOne({
+            name: channel.user_server_name});
+          // Alert user on mention on unfocussed chat room
+          if (
+            userServer &&
+            (fields.created > loadTime || !window_focus) &&
+            fields.from &&
+            messageContainsNick(fields.message, userServer.current_nick) &&
+            (
+              !(
+                currentRouter.params.serverName = userServer.name &&
+                '#' + currentRouter.params.channelName == channel.name
+              ) || !window_focus
+            )
+          ) {
+              var alert_message = fields.server_name + fields.channel_name
+                + ': ' + fields.message;
+              $.titleAlert(alert_message, {
+                requireBlur:true,
+                stopOnFocus:true,
+                duration:10000,
+                interval:500
+              });
+            $('#audio-notification')[0].play();
+          }
         }
       });
     },
@@ -376,8 +402,27 @@ function subscribeToLatestChatroomLog () {
         }
       ).observeChanges({
         added: function (id, fields) {
+          var currentRouter = Router.current();
+          var userServer = UserServers.findOne({
+            name: pm.user_server_name}) || {};
           localChatRoomLogCount.increment(
             pm.user + '||' + pm.user_server_name + '::' + pm.name);
+          if (
+              (fields.created > loadTime || !window_focus) &&
+              (
+                !(currentRouter.params.serverName == pm.user_server_name &&
+                  currentRouter.params.nick == pm.name) || !window_focus
+              )
+            ) {
+            var alert_message = pm.name + ' messaged you: ' + fields.message;
+            $.titleAlert(alert_message, {
+              requireBlur:true,
+              stopOnFocus:true,
+              duration:10000,
+              interval:500
+            });
+            $('#audio-notification')[0].play();
+          }
         }
       });
     },
