@@ -233,6 +233,7 @@ Router.map(function () {
     },
     fastRender: true
   });
+  /*
   this.route('search', {
     path: /^\/search$/,
     onBeforeAction: function () {
@@ -280,6 +281,7 @@ Router.map(function () {
     },
     fastRender: true
   });
+  */
 
 
   /* Router for server chat room */
