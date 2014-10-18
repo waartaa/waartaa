@@ -365,7 +365,7 @@ Router.map(function () {
       var limit = this.params.limit || DEFAULT_LOGS_COUNT;
       return [
         subsManager.subscribe(
-          'channel_logs', channelName,
+          'channel_logs', serverName, channelName,
           from, direction, limit,
           function () {
             var channel = UserChannels.findOne(

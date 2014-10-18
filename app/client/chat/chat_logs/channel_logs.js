@@ -13,7 +13,10 @@ UI.registerHelper("channelChatLogs", function (channel_id) {
   if (channel) {
     var currentPath = Router.current();
     var paginationStartTimestamp = Session.get('paginationStartTimestamp');
-    var query = {channel_name: channel.name};
+    var query = {
+      channel_name: channel.name,
+      server_name: channel.user_server_name
+    };
     if (Session.get('showRealtimeLogs') == false && paginationStartTimestamp) {
       query.created = {
         $lte: paginationStartTimestamp

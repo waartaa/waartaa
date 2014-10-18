@@ -25,8 +25,10 @@ Package.onUse(function(api) {
   api.export('ChatRoomLogCountManager', 'server');
   api.export('ChatLogStats', 'server');
   api.export('UnreadLogsCount', ['server', 'client']);
+  api.export('UnreadMentionsCount', ['server', 'client']);
   api.export('UnreadLogsDelta', 'client');
   api.export('chatRoomLogCount', 'server');
+  api.export('chatRoomMentionsCount', 'server');
   api.export('localChatRoomLogCount', 'client');
 });
 
