@@ -287,8 +287,6 @@ Meteor.publish('channel_nicks', function (server_name, channel_name, from, to) {
       query_or.push(query_dict);
       console.log(query_dict.channel_name);
     });
-    console.log('publishing channel nicks');
-    console.log(query_or);
     if (query_or.length > 0)
       return ChannelNicks.find({$or: query_or},
         {fields: {created: 0, last_updated: 0}});

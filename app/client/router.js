@@ -326,6 +326,40 @@ Router.map(function () {
     }
   });
 
+  function channelNicksSubscriptionCallback (serverName, channelName) {
+    $('.channel-nicks-loader').fadeOut(1000);
+    var last_nick = ChannelNicks.findOne(
+      {
+        channel_name: channelName,
+        server_name: serverName,
+      },
+      {
+        sort: {nick: -1}
+      }
+    );
+    var start_nick = ChannelNicks.findOne(
+      {
+        channel_name: channelName,
+        server_name: serverName,
+      },
+      {
+        sort: {nick: 1}
+      }
+    );
+    Session.set(
+      'currentLastNick-' + serverName +
+      '_' + channelName,
+      (last_nick || {}).nick);
+    Session.set(
+      'currentStartNick-' + serverName +
+      '_' + channelName,
+      (start_nick || {}).nick);
+    if (Session.get(
+      'startNick-' + serverName + '_' + channelName))
+      $('#info-panel .nano').nanoScroller();
+      $('#info-panel .nano').nanoScroller({scrollTop: 30});
+  }
+
   /* Router for channel chat room */
   this.route('chatRoomChannel', {
     path: '/chat/server/:serverName/channel/:channelName',
@@ -365,6 +399,16 @@ Router.map(function () {
       var from = this.params.from || null;
       var direction = this.params.direction || 'down';
       var limit = this.params.limit || DEFAULT_LOGS_COUNT;
+      Tracker.autorun(function () {
+        Meteor.subscribe(
+          'channel_nicks', serverName, channelName,
+          Session.get('lastNick-' + serverName + '_' + channelName),
+          Session.get('startNick-' + serverName + '_' + channelName),
+          function () {
+            channelNicksSubscriptionCallback(serverName, channelName);
+          }
+        );
+      });
       return [
         subsManager.subscribe(
           'channel_logs', serverName, channelName,
@@ -382,44 +426,6 @@ Router.map(function () {
                 channel_name: channelName
               }
             );
-          }
-        ),
-        chatLogSubs.subscribe(
-          'channel_nicks', serverName, channelName,
-          Session.get('lastNick-' + serverName + '_' + channelName),
-          Session.get('startNick-' + serverName + '_' + channelName),
-          function () {
-            $('.channel-nicks-loader').fadeOut(1000);
-            var last_nick = ChannelNicks.findOne(
-              {
-                channel_name: channelName,
-                server_name: serverName,
-              },
-              {
-                sort: {nick: -1}
-              }
-            );
-            var start_nick = ChannelNicks.findOne(
-              {
-                channel_name: channelName,
-                server_name: serverName,
-              },
-              {
-                sort: {nick: 1}
-              }
-            );
-            Session.set(
-              'currentLastNick-' + serverName +
-              '_' + channelName,
-              (last_nick || {}).nick);
-            Session.set(
-              'currentStartNick-' + serverName +
-              '_' + channelName,
-              (start_nick || {}).nick);
-            if (Session.get(
-              'startNick-' + serverName + '_' + channelName))
-              $('#info-panel .nano').nanoScroller();
-              $('#info-panel .nano').nanoScroller({scrollTop: 30});
           }
         )
       ];
