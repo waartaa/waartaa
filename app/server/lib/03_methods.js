@@ -431,11 +431,12 @@ Meteor.methods({
   },
   send_pm: function (message, room_id, log_options) {
     var user_server_id = room_id.split('_')[0];
-    var nick = room_id.slice(room_id.search('_') + 1);
+    var userPm = UserPms.findOne({_id: room_id, user_id: this.userId});
+    if (!userPm)
+      return;
+    var nick = userPm.name;
     var user = Meteor.users.findOne({_id: this.userId});
-    var user_server = UserServers.findOne({
-      _id: user_server_id, user: user.username});
-    var irc_handler = (CLIENTS[user.username] || {})[user_server.name];
+    var irc_handler = (CLIENTS[user.username] || {})[userPm.user_server_name];
     if (!irc_handler)
       return;
     var send = true;
