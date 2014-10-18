@@ -161,16 +161,18 @@ function updateChatlogsQuery (query, from, direction, limit) {
 }
 
 Meteor.publish('channel_logs', function (
-    channel_name, from, direction, limit) {
+    server_name, channel_name, from, direction, limit) {
   var user = Meteor.users.findOne({_id: this.userId}) || {};
   console.log(user);
-  var channel = UserChannels.findOne({name: channel_name, user: user.username});
+  var channel = UserChannels.findOne({
+    name: channel_name, user: user.username, user_server_name: server_name});
   console.log('CHANNEL');
   console.log(channel);
   var query = {};
   if (channel) {
     query.filter = {
       channel_name: channel.name,
+      server_name: channel.user_server_name,
       $or: [
         {global: true, not_for_user: {$ne: user.username}},
         {from_user: user.username},
