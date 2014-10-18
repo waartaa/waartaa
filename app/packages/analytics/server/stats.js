@@ -138,3 +138,42 @@ ChatRoomLogCountManager.prototype.getChatRoomLogsCountSince = function (
 };
 
 chatRoomLogCount = new ChatRoomLogCountManager();
+
+
+ChatRoomMentionCountManager = function () {};
+
+ChatRoomMentionCountManager.prototype.increment = function (
+    chatRoomSignature, nick, username) {
+  UnreadMentionsCount.upsert({
+    room_signature: chatRoomSignature,
+    nick: nick,
+    username: username
+  }, {
+    $set: {
+      last_updated_at: new Date()
+    },
+    $inc: {count: 1}
+  });
+}
+
+ChatRoomMentionCountManager.prototype.activate = function (
+    chatRoomSignature, username) {
+  UnreadMentionsCount.upsert({
+    room_signature: chatRoomSignature,
+    username: username
+  }, {
+    $set: {active: true, last_updated_at: new Date()},
+  });
+}
+
+ChatRoomMentionCountManager.prototype.deactivate = function (
+    chatRoomSignature, username) {
+  UnreadMentionsCount.upsert({
+    room_signature: chatRoomSignature,
+    username: username
+  }, {
+    $set: {active: false, last_updated_at: new Date()},
+  });
+}
+
+chatRoomMentionsCount = new ChatRoomMentionCountManager();

@@ -300,15 +300,16 @@ UI.registerHelper("unread_logs_count", function (
 
 UI.registerHelper("unread_mentions_count", function (
     channel_id, nick) {
+  var currentRouter = Router.current();
   var channel = UserChannels.findOne({_id: channel_id});
-  count = waartaa.chat.helpers.unreadLogsCount.get(
-    'channel', {
-      server_name: channel.user_server_name,
-      channel_name: channel.name
-    }, {mention: true});
-  if (count > 0)
-    return count;
-  return '';
+  if (!channel)
+    return '';
+  if (currentRouter.params.serverName == channel.user_server_name &&
+      '#' + currentRouter.params.channelName == channel.name)
+    return '';
+  return (UnreadMentionsCount.findOne({
+    room_signature: channel.user_server_name + '::' + channel.name}) || {}
+  ).count || '';
 });
 
 updateHeight = function () {
@@ -379,5 +380,12 @@ waartaa.chat.helpers.resetUnreadLogsCountForChatroom = function (params) {
   if (chatRoomSignature) {
     Meteor.call('resetUnreadLogCount', chatRoomSignature, function (err) {});
     localChatRoomLogCount.reset(chatRoomSignature);
+    var unreadMentionCountId = (UnreadMentionsCount.findOne({
+      room_signature: chatRoomSignature
+    }) || {})._id;
+    if (unreadMentionCountId)
+      UnreadMentionsCount.update({
+        _id: unreadMentionCountId
+      }, {$set: {count: 0}});
   }
 }

@@ -41,6 +41,15 @@ Meteor.startup(function () {
     return cursor;
   });
 
+  Meteor.publish('unread_mentions_count', function () {
+    var user = Meteor.users.findOne({_id: this.userId});
+    if (!user) {
+      this.ready();
+      return;
+    }
+    return UnreadMentionsCount.find({username: user.username});
+  })
+
   UnreadLogsCount.find().observeChanges({
     added: function (id, fields) {
       updateUnreadLogsCountForChatRoom(fields.room_signature, fields.user);
@@ -54,4 +63,11 @@ Meteor.startup(function () {
   UnreadLogsCount._ensureIndex({
     user: 1
   })
+  UnreadMentionsCount._ensureIndex({
+    room_signature: 1,
+    user: 1
+  });
+  UnreadMentionsCount._ensureIndex({
+    user: 1
+  });
 });
