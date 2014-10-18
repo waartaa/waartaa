@@ -101,6 +101,7 @@ BaseChatController = BaseController.extend({
         waartaa.chat.helpers.chatLogsWaypointHandler.bind();
       }, 1000);
     }
+    Session.set('currentPage', 'chat');
     if (Router.current().path != '/chat/' && Meteor.user())
       window.localStorage.setItem(
         Meteor.user().username + ':lastChatPath', Router.current().path);
@@ -229,7 +230,6 @@ Router.map(function () {
     onAfterAction: function () {
       if (Meteor.isClient)
         GAnalytics.pageview('/chat/');
-      Session.set('currentPage', 'chat');
     },
     fastRender: true
   });
