@@ -22,7 +22,9 @@ ChatRoomLogCountManager = function () {
         self._data[key] = value;
         self._saveChatroomLogCountToDb(key, value, timestamp);
       });
-      self._lock.unlock();
+      try {
+        self._lock.unlock();
+      } catch (err) {}
     });
   }
   //var schedule = later.parse.recur().on(0).minute();
@@ -92,7 +94,9 @@ ChatRoomLogCountManager.prototype.increment = function (chatRoomSignature) {
     chatRoomLogCountData.currentCount = (
       chatRoomLogCountData.currentCount || 0) + 1;
     self._data[chatRoomSignature] = chatRoomLogCountData;
-    self._lock.unlock();
+    try {
+      self._lock.unlock();
+    } catch (err) {}
     console.log(chatRoomLogCountData);
   });
 };
