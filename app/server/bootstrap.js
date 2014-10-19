@@ -111,13 +111,15 @@ function observeChatrooms () {
 }
 
 function observeChatLogs () {
-  UserServerLogs.find({from_user: null}).observeChanges({
+  var currentTime = new Date();
+  UserServerLogs.find({
+      from_user: null, created: {$gte: currentTime}}).observeChanges({
     added: function (id, fields) {
       chatRoomLogCount.increment(
         fields.user + '||' + fields.server_name);
     }
   });
-  PMLogs.find({}).observeChanges({
+  PMLogs.find({created: {$gte: currentTime}}).observeChanges({
     added: function (id, fields) {
       console.log('PM', fields);
       if (fields.from_user != fields.user)
