@@ -59,7 +59,7 @@ Template.chat_input.events({
     }
     var selfMsgKey = 'selfMsg-' + room.roomtype + '-' + 'chat-logs-' + room.room_id;
     Session.set(selfMsgKey, true);
-    $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
+    Router.go(Router.current().path.split('?')[0], {replaceState: true});
   }
 });
 
