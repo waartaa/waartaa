@@ -25,34 +25,25 @@ def bundle_waartaa():
         print "Cleaning up existing distribution directory."
         shutil.rmtree(BUNDLE_PATH)
     os.chdir(os.path.join(PROJECT_PATH, 'app'))
-    exec_command('demeteorizer -n 0.10.26 -o %s' % BUNDLE_PATH)
+    exec_command('meteor build %s --directory' % BUNDLE_PATH)
 
 
 def customize_package_json():
-    f = open(os.path.join(
-        PROJECT_PATH, 'deploy/extra_node_deps.json'))
-    extra_deps = json.load(f)
-    f.close()
-    f = open(os.path.join(
-        BUNDLE_PATH, 'package.json'))
-    package_json = json.load(f)
-    f.close()
-    package_json['dependencies'].update(extra_deps)
-    f = open(os.path.join(
-        BUNDLE_PATH, 'package.json'), 'w')
-    json.dump(package_json, f, indent=2)
-    f.close()
     if 'newrelic' in extra_deps:
         f = open(os.path.join(
-            BUNDLE_PATH, 'main.js'))
+            BUNDLE_PATH, 'bundle/main.js'))
         content = 'require("newrelic");\n' + f.read()
         f.close()
+        exec_command('chmod u+w %s' % (
+            os.path.join(BUNDLE_PATH, 'bundle/main.js')))
         f = open(os.path.join(
             BUNDLE_PATH, 'main.js'), 'w')
         f.write(content)
         f.close()
+        exec_command('chmod u-w %s' % (
+            os.path.join(BUNDLE_PATH, 'bundle/main.js')))
 
 
 if __name__ == '__main__':
     bundle_waartaa()
-    customize_package_json()
+    #customize_package_json()

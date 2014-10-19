@@ -34,7 +34,8 @@ CONFIG = {
   'CHANNEL_LOGS_CLEANUP_INTERVAL': {{ waartaa_channel_logs_cleanup_interval }},
   'SSL_DEFAULT_CA_FILE': '',
   'SSL_DEFAULT_PRIVATE_KEY_FILE': 'certs/privatekey.pem',
-  'SSL_DEFAULT_CERT_FILE': 'certs/certificate.pem'
+  'SSL_DEFAULT_CERT_FILE': 'certs/certificate.pem',
+  'ENABLE_ELASTIC_SEARCH': false
 }
 
 SUPER_USER = '{{ waartaa_super_user }}'

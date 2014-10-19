@@ -1,6 +1,6 @@
 ---
   - name: "Push waartaa bundle to app servers"
-    synchronize: src=./dist/current dest={{ deploy_dir }} recursive=yes
+    synchronize: src=./dist/current/bundle dest={{ deploy_dir }} recursive=yes
 
 
   - name: "Copy waartaa upstart file"
@@ -18,8 +18,11 @@
 
 
   - name: "Install npm deps"
-    shell: npm install chdir={{ app_dir }}
+    shell: npm install chdir={{ app_dir }}/programs/server
 
+  - name: "Install npm collections package"
+    shell: npm install -g collections
+    sudo: yes
 
   - name: "Start oidentd service"
     shell: /usr/local/sbin/oidentd
