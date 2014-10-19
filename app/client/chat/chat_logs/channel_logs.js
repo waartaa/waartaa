@@ -15,7 +15,8 @@ UI.registerHelper("channelChatLogs", function (channel_id) {
     var paginationStartTimestamp = Session.get('paginationStartTimestamp');
     var query = {
       channel_name: channel.name,
-      server_name: channel.user_server_name
+      server_name: channel.user_server_name,
+      not_for_user: {$ne: Meteor.user().username}
     };
     if (Session.get('showRealtimeLogs') == false && paginationStartTimestamp) {
       query.created = {
