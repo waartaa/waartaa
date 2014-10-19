@@ -11,7 +11,6 @@ underscore
 appcache
 email
 spiderable
-npm-container
 oauth-encryption
 less
 http
@@ -34,7 +33,6 @@ cfs:power-queue@0.0.1
 cfs:reactive-property
 cfs:micro-queue
 cfs:reactive-list
-meteorhacks:npm
 jparker:crypto-md5
 ian:accounts-ui-bootstrap-3
 meteorhacks:kadira
@@ -52,3 +50,7 @@ mrt:moment@2.8.1
 mrt:assert
 mrt:cron-tick
 mrt:chosen-package@0.11.1
+npm-container
+meteorhacks:npm
+force-ssl
+
