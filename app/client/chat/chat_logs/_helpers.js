@@ -288,7 +288,9 @@ var _displayLogs = function () {
       Meteor.setTimeout(function () {
         timeoutIds = [];
         $('.chatlogs-loader-msg').hide();
-        $('.chatlog-row:hidden').fadeIn(from? 1000: 0);
+        $('.chatlog-row:hidden').fadeIn(from? 500: 0, function () {
+          waartaa.chat.helpers.chatLogsWaypointHandler.bind();
+        });
         if (from) {
           var pageStack = waartaa.chat.helpers.chatLogsWaypointHandler.getPageStack();
           var fromTimestamp = moment(from).toDate();
@@ -303,9 +305,6 @@ var _displayLogs = function () {
           }
         } else
           $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
-        Meteor.setTimeout(function () {
-          waartaa.chat.helpers.chatLogsWaypointHandler.bind();
-        }, navManager.isFirstPage()? 2000: 200);
       }, 50)
     );
   };

@@ -71,7 +71,7 @@ waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
       room_id: obj.room_id || (obj.server_id + '_' + obj.nick),
       roomtype: 'pm',
       server_id: obj.user_server_id || obj.server_id,
-      server_name: obj.user_server_name || obj.user_server_id,
+      server_name: obj.user_server_name || obj.server_name,
       nick: obj.name || obj.nick
     });
   }
