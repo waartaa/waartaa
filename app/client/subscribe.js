@@ -40,7 +40,7 @@ function subscribeToLatestChatroomLog () {
             messageContainsNick(fields.message, userServer.current_nick) &&
             (
               !(
-                currentRouter.params.serverName = userServer.name &&
+                currentRouter.params.serverName == userServer.name &&
                 '#' + currentRouter.params.channelName == channel.name
               ) || !window_focus
             )
