@@ -30,7 +30,9 @@ waartaa.chat.helpers.highlightServerRoom = function () {
       waartaa.chat.helpers.roomAccessedTimestamp.reset('server', room);
       waartaa.chat.helpers.unreadLogsCount.clear('server', room);
   }
-  $('#chat-input').focus();
+  if (Meteor.Device.isDesktop() || Meteor.Device.isTV()){
+    $('#chat-input').focus();
+  }
   //refreshAutocompleteNicksSource();
   Meteor.setTimeout(function () {
     $('.chat-logs-container')
