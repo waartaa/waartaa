@@ -40,6 +40,7 @@ meteorhacks:subs-manager
 iron:router
 natestrauser:jquery-scrollto@1.4.6
 aldeed:scheduled-tasks
+mystor:device-detection
 
 # mrt packages
 mrt:jquery-ui-bootstrap
@@ -53,5 +54,3 @@ mrt:chosen-package@0.11.1
 npm-container
 meteorhacks:npm
 force-ssl
-device-detection
-
