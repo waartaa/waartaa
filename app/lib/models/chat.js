@@ -13,26 +13,6 @@ Severs: {
 Servers = new Meteor.Collection("servers");
 
 /*
-UserServers: {
-  name: String,
-  server_id: String,
-  nick: String,
-  password: String,
-  channels: A list of strings,
-  user: String,
-  user_id: String,
-  created: Date,
-  creator: String <username>,
-  creator_id: Sring <user_id>,
-  last_updated: Date,
-  last_updater: String <username>,
-  last_updater_id: String <user_id>,
-  status: String (online/offline/connecting)
-}
-*/
-UserServers = new Meteor.Collection("user_servers");
-
-/*
 ServerConnections: {
   server_id: String,
   url: String,

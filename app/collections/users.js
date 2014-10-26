@@ -1,35 +1,42 @@
-var Schema = {};
-
-Schema.UserServer = new SimpleSchema({
+UserServerSchema = new SimpleSchema({
+    _id: {
+        type: String,
+        optional: true,
+    },
     name: {
         type: String,
         label: "Name",
         max: 255
     },
-    serverId: {
+    server_id: {
         type: String,
         label: "Server Id",
     },
     nick: {
         type: String,
-        label: "Nick"
+        label: "Nick",
         max: 255
     },
     password: {
         type: String,
         label: "Password",
+        optional: true
+    },
+    channels: {
+        type: [String],
+        label: "Channels",
     },
     user: {
         type: String,
         label: "User",
     },
-    userId: {
+    user_id: {
         type: String,
         label: "User Id",
     },
     created: {
         type: Date,
-        label: "Created At"
+        label: "Created At",
     },
     creator: {
         type: String,
@@ -50,9 +57,13 @@ Schema.UserServer = new SimpleSchema({
     last_updater_id: {
         type: String,
         label: "User id of Last Updater"
-    }.
+    },
     status: {
         type: String,
-        label: "Status of User (online/offline/connecting)"
+        label: "Status of User (online/offline/connecting)",
+        optional: true
     }
-}
+});
+
+UserServers = new Meteor.Collection("user_servers");
+UserServers.attachSchema(UserServerSchema);

@@ -95,16 +95,18 @@ function decrypt(text){
 
 function _create_user_server(data, user) {
   var server = Servers.findOne({_id: data.server_id});
+
   if (! server)
     throw new Meteor.Error(400, "Missing server info.");
+
   if (data.user_server_id) {
     var user_server = UserServers.findOne(
       {_id: data.user_server_id});
-  }
-  else {
+  } else {
     var user_server = UserServers.findOne(
       {name: server.name, user: user.username});
   }
+
   var channels = [];
   var now = new Date();
   var splitted_channels = data.channels.split(',');
