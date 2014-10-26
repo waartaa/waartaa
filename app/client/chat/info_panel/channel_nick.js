@@ -16,6 +16,18 @@ Template.user_menu.events = {
   }
 };
 
+Template.chat_user.events = {
+  'click .user-nicks': function(event){
+    var nick = $(event.target).attr("title");
+    if( !$('#chat-input').val() ){
+      $('#chat-input').val(nick + ', ');
+    }
+    else{
+      $('#chat-input').val($('#chat-input').val() + ' ' + nick + ', ');
+    }
+  }
+};
+
 UI.registerHelper('is_user_away', function (nick, server_name) {
   var server_id = (UserServers.findOne({name: server_name}, {_id: 1}) || {})._id || "";
   var whois_data = _get_nick_whois_data(nick, server_id);
