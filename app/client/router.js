@@ -397,18 +397,16 @@ Router.map(function () {
         return;
       var channelName = '#' + this.params.channelName;
       var serverName = this.params.serverName;
-      Meteor.setTimeout(function () {
-        Tracker.autorun(function () {
-          Meteor.subscribe(
-            'channel_nicks', serverName, channelName,
-            Session.get('lastNick-' + serverName + '_' + channelName),
-            Session.get('startNick-' + serverName + '_' + channelName),
-            function () {
-              channelNicksSubscriptionCallback(serverName, channelName);
-            }
-          );
-        });
-      }, 500);
+      Tracker.autorun(function () {
+        Meteor.subscribe(
+          'channel_nicks', serverName, channelName,
+          Session.get('lastNick-' + serverName + '_' + channelName),
+          Session.get('startNick-' + serverName + '_' + channelName),
+          function () {
+            channelNicksSubscriptionCallback(serverName, channelName);
+          }
+        );
+      });
     },
     waitOn: function () {
       var channel = UserChannels.findOne({
