@@ -35,7 +35,7 @@ cfs:micro-queue
 cfs:reactive-list
 jparker:crypto-md5
 ian:accounts-ui-bootstrap-3
-meteorhacks:kadira
+meteorhacks:kadira@2.11.13
 meteorhacks:subs-manager
 iron:router
 natestrauser:jquery-scrollto@1.4.6
