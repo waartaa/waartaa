@@ -400,5 +400,8 @@ waartaa.chat.helpers.onNickClickHandler = function (event) {
   } else {
     $('#chat-input').val($('#chat-input').val() + ' ' + nick + ', ');
   }
+  if (Meteor.Device.isDesktop() || Meteor.Device.isTV()){
+    $('#chat-input').focus();
+  }
 };
 
