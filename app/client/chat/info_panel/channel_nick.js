@@ -17,15 +17,7 @@ Template.user_menu.events = {
 };
 
 Template.chat_user.events = {
-  'click .user-nicks': function(event){
-    var nick = $(event.target).attr("title");
-    if( !$('#chat-input').val() ){
-      $('#chat-input').val(nick + ', ');
-    }
-    else{
-      $('#chat-input').val($('#chat-input').val() + ' ' + nick + ', ');
-    }
-  }
+  'click .user-nicks': waartaa.chat.helpers.onNickClickHandler
 };
 
 UI.registerHelper('is_user_away', function (nick, server_name) {

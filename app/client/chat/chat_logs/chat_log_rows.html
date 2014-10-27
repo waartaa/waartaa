@@ -8,10 +8,10 @@
       {{/if}}-->
       {{# if from}}
         <div class="pull-left chatlog-from">
-          <span class="label label-info">
+          <a href="#" class="label label-info chat-log-nick" title="{{ from }}">
             <icon class="glyphicon glyphicon-user"></icon>
             <strong>{{from}}</strong>
-          </span>
+          </a>
         </div>
       {{/if}}
       <div class="{{# if isToday last_updated}}col-md-10{{else}}col-md-9{{/if}} chatlog-message">

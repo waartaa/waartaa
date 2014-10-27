@@ -193,6 +193,7 @@ UI.registerHelper('chatlogTimestampStr', function (datetime) {
 });
 
 Template.chat_row.events = {
+  'click .chat-log-nick': waartaa.chat.helpers.onNickClickHandler,
   'click .chatlog-bookmark': function (event) {
     var bookmarkEl = $(event.target).parent();
     var currentEl = bookmarkEl;

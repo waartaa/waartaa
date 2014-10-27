@@ -390,4 +390,15 @@ waartaa.chat.helpers.resetUnreadLogsCountForChatroom = function (params) {
         _id: unreadMentionCountId
       }, {$set: {count: 0}});
   }
-}
+};
+
+waartaa.chat.helpers.onNickClickHandler = function (event) {
+  event.preventDefault();
+  var nick = $(event.currentTarget).attr("title");
+  if (!$('#chat-input').val()) {
+    $('#chat-input').val(nick + ', ');
+  } else {
+    $('#chat-input').val($('#chat-input').val() + ' ' + nick + ', ');
+  }
+};
+
