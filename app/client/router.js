@@ -32,6 +32,11 @@ var serverNickSubs = new SubsManager({
   cacheLimit: 5,
   expireIn: 9999
 });
+
+var channelNicksSubs = new SubsManager({
+  cacheLimit: 5,
+  expireIn: 9999
+});
 /* End Subscription Managers */
 
 
@@ -387,6 +392,24 @@ Router.map(function () {
           pause();
       }
     },
+    onAfterAction: function () {
+      if (!this.ready())
+        return;
+      var channelName = '#' + this.params.channelName;
+      var serverName = this.params.serverName;
+      Meteor.setTimeout(function () {
+        Tracker.autorun(function () {
+          Meteor.subscribe(
+            'channel_nicks', serverName, channelName,
+            Session.get('lastNick-' + serverName + '_' + channelName),
+            Session.get('startNick-' + serverName + '_' + channelName),
+            function () {
+              channelNicksSubscriptionCallback(serverName, channelName);
+            }
+          );
+        });
+      }, 500);
+    },
     waitOn: function () {
       var channel = UserChannels.findOne({
         user_server_name: this.params.serverName,
@@ -399,16 +422,6 @@ Router.map(function () {
       var from = this.params.from || null;
       var direction = this.params.direction || 'down';
       var limit = this.params.limit || DEFAULT_LOGS_COUNT;
-      Tracker.autorun(function () {
-        Meteor.subscribe(
-          'channel_nicks', serverName, channelName,
-          Session.get('lastNick-' + serverName + '_' + channelName),
-          Session.get('startNick-' + serverName + '_' + channelName),
-          function () {
-            channelNicksSubscriptionCallback(serverName, channelName);
-          }
-        );
-      });
       return [
         subsManager.subscribe(
           'channel_logs', serverName, channelName,
