@@ -1,0 +1,99 @@
+{
+    // == Enforcing Options ===============================================
+    "bitwise": true,        // Prohibit bitwise operators (&, |, ^, etc.).
+    "camelcase": true,      // Variable names either camelCase style or UPPER_CASE with underscores.
+    "curly": true,          // Require {} for every new block or scope.
+    "eqeqeq": true,         // Require triple equals i.e. `===`.
+    "es3": true,            // Enforce ECMAScript 3 specification.
+    "forin": true,          // Tolerate `for in` loops without `hasOwnPrototype`.
+    "freeze": true,         // Prohibits overwriting prototypes of native objects such as Array, Date and so on.
+    "immed": true,          // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
+    "indent": 4,            // Specify indentation spacing.
+    "latedef": true,        // Prohibit variable use before definition.
+    "newcap": true,         // Require capitalization of all constructor functions e.g. `new F()`.
+    "noarg": true,          // Prohibit use of `arguments.caller` and `arguments.callee`.
+    "noempty": true,        // Prohibit use of empty blocks.
+    "nonbsp": true,         // Warns about "non-breaking whitespace" characters.
+    "nonew": true,          // Prohibit use of constructors for side-effects.
+    "plusplus": true,       // Prohibit use of `++` & `--`.
+    "quotmark": "single",   // Allow only single quotes.
+    "undef": true,          // Require all non-global variables be declared before they are used.
+    "unused": true,         // Warns when you define and never use your variables.
+    "strict": false,        // Deactivated to allow easier use of globals in meteor
+    "trailing": true,       // Prohibit trailing whitespaces.
+    "maxparams": 4,         // This option lets you set the max number of formal parameters allowed per function.
+    "maxdepth": 4,          // This option lets you control how nested do you want your blocks to be.
+    "maxstatements": 20,    // This option lets you set the max number of statements allowed per function.
+    "maxcomplexity": 6,     // This option lets you control cyclomatic complexity throughout your code.
+ 
+    // == Relaxing Options ================================================
+    "asi": false,           // Tolerate Automatic Semicolon Insertion (no semicolons).
+    "boss": false,          // Tolerate assignments inside if, for & while. Usually conditions & loops are for comparison, not assignments.
+    "debug": false,         // Allow debugger statements e.g. browser breakpoints.
+    "eqnull": false,        // Tolerate use of `== null`.
+    "esnext": false,        // Allow ES.next specific features such as `const` and `let`.
+    "evil": false,          // Tolerate use of `eval`.
+    "expr": false,          // Tolerate `ExpressionStatement` as Programs.
+    "funcscope": false,     // Tolerate declarations of variables inside of control structures while accessing them later from the outside.
+    "gcl": false,           // This option makes JSHint compatible with Google Closure Compiler.
+    "globalstrict": false,  // Allow global "use strict" (also enables 'strict').
+    "iterator": false,      // Allow usage of __iterator__ property.
+    "lastsemic": false,     // Tolerat missing semicolons when the it is omitted for the last statement in a one-line block.
+    "laxbreak": false,      // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
+    "laxcomma": false,      // Suppress warnings about comma-first coding style.
+    "loopfunc": false,      // Allow functions to be defined within loops.
+    "maxerr": 100,          // Maximum errors before stopping.
+    "moz": false,           // This options tells JSHint that your code uses Mozilla JavaScript extensions.
+    "multistr": false,      // Tolerate multi-line strings.
+    "notypeof": false,      // This option suppresses warnings about invalid typeof operator values.
+    "proto": false,         // Tolerate __proto__ property. This property is deprecated.
+    "scripturl": false,     // Tolerate script-targeted URLs.
+    "smarttabs": false,     // Tolerate mixed tabs and spaces when the latter are used for alignmnent only.
+    "shadow": false,        // Allows re-define variables later in code e.g. `var x=1; x=2;`.
+    "sub": false,           // Tolerate all forms of subscript notation besides dot notation e.g. `dict['key']` instead of `dict.key`.
+    "supernew": false,      // Tolerate `new function () { ... };` and `new Object;`.
+    "validthis": false,     // Tolerate strict violations when the code is running in strict mode and you use this in a non-constructor function.
+    "noyield": false,       // This option suppresses warnings about generator functions with no yield statement in them.
+ 
+    // == Environments ====================================================
+    "browser": true,        // Standard browser globals e.g. `window`, `document`.
+    "couch": false,         // Enable globals exposed by CouchDB.
+    "devel": true,          // Allow development statements e.g. `console.log();`.
+    "dojo": false,          // Enable globals exposed by Dojo Toolkit.
+    "jquery": true,         // Enable globals exposed by jQuery JavaScript library.
+    "mootools": false,      // Enable globals exposed by MooTools JavaScript framework.
+    "node": false,          // Enable globals available when code is running inside of the NodeJS runtime environment.
+    "nonstandard": false,   // Define non-standard but widely adopted globals such as escape and unescape.
+    "phantom": false,       // Enable globals available when your core is running inside of the PhantomJS runtime environment.
+    "prototypejs": false,   // Enable globals exposed by Prototype JavaScript framework.
+    "rhino": false,         // eEnable globals available when your code is running inside of the Rhino runtime environment.
+    "worker": false,        // Enable globals available when your code is running inside of a Web Worker.
+    "wsh": false,           // Enable globals available when your code is running as a script for the Windows Script Host.
+    "yui": false,           // Enable globals exposed by the YUI JavaScript framework.
+ 
+    // == Globals ============================================
+    "globals": {
+        // Meteor core globals
+        "Meteor": false,
+        "Template": false,
+        "Session": false,
+        "UI": false,
+        "_": false,
+        "Deps": false,
+        // Atmosphere packages
+        "SimpleSchema": false,
+        "AccountsEntry": false,
+        "BrowserObserver": false,
+        "i18n": false,
+        "moment": false,
+        "Accounts": false,
+        "Router": false,
+        "Toast": false,
+        // Laika testing
+        "require": false,
+        "suite": false,
+        "test": false,
+        "emit": false
+        // App specific globals
+    }
+}
