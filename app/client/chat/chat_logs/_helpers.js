@@ -305,7 +305,10 @@ var _displayLogs = function () {
           }
         } else
           $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
-      }, 50)
+        Meteor.setTimeout(function () {
+          waartaa.chat.helpers.chatLogsWaypointHandler.bind();
+        }, 2000);
+      }, 200)
     );
   };
 }();
