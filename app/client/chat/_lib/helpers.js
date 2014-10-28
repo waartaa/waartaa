@@ -330,6 +330,10 @@ updateHeight = function () {
     finalHeight - $('.chatroom .topic').height()
   );
   $('.chatlogs').css('min-height', $('.chat-logs-container').height());
+  try {
+    if (!Router.current().params.from)
+      $('.chat-logs-container').scrollTop($('.chatlogs').height());
+  } catch (err) {}
 };
 
 UI.registerHelper('current_server_id', function () {
