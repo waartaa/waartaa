@@ -34,7 +34,7 @@ var serverNickSubs = new SubsManager({
 });
 
 var channelNicksSubs = new SubsManager({
-  cacheLimit: 5,
+  cacheLimit: 1,
   expireIn: 9999
 });
 /* End Subscription Managers */
@@ -393,17 +393,17 @@ Router.map(function () {
       }
     },
     onAfterAction: function () {
-      if (!this.ready())
-        return;
       var channelName = '#' + this.params.channelName;
       var serverName = this.params.serverName;
       Tracker.autorun(function () {
-        Meteor.subscribe(
+        channelNicksSubs.subscribe(
           'channel_nicks', serverName, channelName,
           Session.get('lastNick-' + serverName + '_' + channelName),
           Session.get('startNick-' + serverName + '_' + channelName),
           function () {
-            channelNicksSubscriptionCallback(serverName, channelName);
+            Meteor.setTimeout(function () {
+              channelNicksSubscriptionCallback(serverName, channelName);
+            }, 300);
           }
         );
       });
