@@ -296,7 +296,7 @@ Router.map(function () {
     onBeforeAction: function (pause) {
       var server = UserServers.findOne({name: this.params.serverName});
       if (!server) {
-        pause();
+        waartaa.chat.helpers.setCurrentRoom();
         return;
       }
       waartaa.chat.helpers.setCurrentRoom({
@@ -377,7 +377,7 @@ Router.map(function () {
         }
       );
       if (!channel) {
-        pause();
+        waartaa.chat.helpers.setCurrentRoom();
         return;
       }
       waartaa.chat.helpers.setCurrentRoom({
@@ -451,7 +451,7 @@ Router.map(function () {
       var user = Meteor.user();
       var server = UserServers.findOne({name: this.params.serverName});
       if (!server) {
-        pause();
+        waartaa.chat.helpers.setCurrentRoom();
         return;
       }
       var nick = this.params.nick;

@@ -49,40 +49,44 @@ waartaa.chat.helpers.highlightServerRoom = function () {
  *     currently selected room.
  */
 waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
-  var prevRoom = Session.get('room');
-  if (obj.roomtype == 'server') {
-    Session.set('room', {
-      room_id: obj._id || obj.server_id,
-      roomtype: obj.roomtype,
-      server_id: obj._id || obj.server_id,
-      server_name: obj.name || obj.server_name,
-    });
+  if (!obj) {
+    Session.set('room');
+  } else {
+    var prevRoom = Session.get('room') || {};
+    if (obj.roomtype == 'server') {
+      Session.set('room', {
+        room_id: obj._id || obj.server_id,
+        roomtype: obj.roomtype,
+        server_id: obj._id || obj.server_id,
+        server_name: obj.name || obj.server_name,
+      });
+    }
+    else if (obj.roomtype == 'channel') {
+      Session.set('room', {
+        room_id: obj._id || obj.channel_id,
+        roomtype: obj.roomtype,
+        server_id: obj.server_id,
+        server_name: obj.server_name,
+        channel_id: obj._id || obj.channel_id,
+        channel_name: obj.name || obj.channel_name
+      });
+    }
+    else if (obj.roomtype == 'pm') {
+      Session.set('room', {
+        room_id: obj.room_id || (obj.server_id + '_' + obj.nick),
+        roomtype: 'pm',
+        server_id: obj.user_server_id || obj.server_id,
+        server_name: obj.user_server_name || obj.server_name,
+        nick: obj.name || obj.nick
+      });
+    }
+    else
+      Session.set('room');
+    if (prevRoom && JSON.stringify(prevRoom.toString()) !=
+        JSON.stringify(Session.get('room')))
+      waartaa.chat.helpers.roomAccessedTimestamp.update(
+        prevRoom.roomtype, prevRoom);
   }
-  else if (obj.roomtype == 'channel') {
-    Session.set('room', {
-      room_id: obj._id || obj.channel_id,
-      roomtype: obj.roomtype,
-      server_id: obj.server_id,
-      server_name: obj.server_name,
-      channel_id: obj._id || obj.channel_id,
-      channel_name: obj.name || obj.channel_name
-    });
-  }
-  else if (obj.roomtype == 'pm') {
-    Session.set('room', {
-      room_id: obj.room_id || (obj.server_id + '_' + obj.nick),
-      roomtype: 'pm',
-      server_id: obj.user_server_id || obj.server_id,
-      server_name: obj.user_server_name || obj.server_name,
-      nick: obj.name || obj.nick
-    });
-  }
-  else
-    Session.set('room', {});
-  if (prevRoom && JSON.stringify(prevRoom.toString()) !=
-      JSON.stringify(Session.get('room')))
-    waartaa.chat.helpers.roomAccessedTimestamp.update(
-      prevRoom.roomtype, prevRoom);
   if (callback)
     callback();
 };
