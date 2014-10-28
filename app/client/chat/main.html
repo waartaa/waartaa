@@ -4,8 +4,12 @@
       Loading...
     </div>
     {{> chat_connections}}
-    {{> chat_main}}
-    {{> chat_users}}
+    {{#if isChatRoomSelected }}
+      {{> chat_main}}
+      {{> chat_users}}
+    {{else}}
+      {{> notFound}}
+    {{/if}}
   </div>
   {{> chat_input}}
   <audio id="audio-notification">
