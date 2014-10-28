@@ -47,7 +47,7 @@ preloadSubscriptions.push('currentUser');
 Router.configure({
   layoutTemplate: 'layout',
   //loadingTemplate: 'loading',
-  //notFoundTemplate: 'not_found',
+  notFoundTemplate: 'notFound',
   waitOn: function () {
     return _.map(preloadSubscriptions, function(sub){
       // can either pass strings or objects with subName and subArguments properties
