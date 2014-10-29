@@ -1,0 +1,51 @@
+0.2-beta
+========
+* Bug fixes:
+  - Reset chat room page's scroll to bottom when user sends a message
+  - Reset unread logs count when leaving a chat room
+  - Fix infinite scroll in PM chat logs
+  - Don't autofocus on chat input when a chatroom is selected
+    for mobile devices
+* Autocomplete nick in chat input box by clicking on a sender nick in
+  a chat log message or any nick from the list of channel nicks
+* Lazy rendering of channel nicks
+
+0.2-alpha
+=========
+* Improved client side routes
+* Mobile optimized UI
+* Server side tracking of unread logs count and unread mentions count
+* Lazy loading of chat logs, only when needed.
+* Cache subscriptions across routes using subs-manager
+* Infinite bidirectional scrolling of chat logs using client side routes,
+  maintaining only a window on N (configurable) pages of logs
+  at a time
+* Permalink for each chat log
+* Update to Meteor 0.9.3
+* Updated deployment scripts
+
+0.1
+===
+* Backend optimizations
+  - OPLOG support
+  - Rate limit tasks using queues
+  - Async calls to database
+  - Improve MongoDB performance with low RAM
+  - Reduce storage complexity for channel logs
+* Client side optimizations and improvements
+  - Better rendering of chat logs
+  - Use latency compensation
+  - Reduce client side memory usage
+* Upgrade to Meteor 0.8.1
+* Server provisioning using Ansible
+* Vagrant script for easy setup of dev sandbox
+
+0.1-rc1
+=======
+* Basic IRC functionalities
+* Support for some common RAW commands
+* 24x7 idling
+* Mail notifications when away
+* Centralized logging
+* Uniform access across multiple environments
+
