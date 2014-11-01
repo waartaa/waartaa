@@ -13,7 +13,7 @@
 
   - name: update the MongoDB conf file
     sudo: yes 
-    template: src=mongodb.conf.j2 dest=/etc/mongodb.conf owner=root group=root
+    template: src={{ mongo_confTemplate }} dest={{ mongo_confFile }} owner=root group=root
 
   - name: ensure MongoDB is running
     sudo: yes

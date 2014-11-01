@@ -1,7 +1,7 @@
 # mongo.conf
 
 #where to log
-logpath=/var/log/mongodb/mongodb.log
+logpath={{ mongo_logpath }}
 
 logappend=true
 
@@ -10,10 +10,10 @@ fork = true
 
 #port = 27017
 
-dbpath=/var/lib/mongodb
+dbpath={{ mongo_dbpath }}
 
 # location of pidfile
-pidfilepath = /var/run/mongodb/mongodb.pid
+pidfilepath = {{ mongo_pidfilepath }}
 
 # Disables write-ahead journaling
 # nojournal = true
@@ -81,7 +81,7 @@ pidfilepath = /var/run/mongodb/mongodb.pid
 # or
 #master = true
 #source = slave.example.com
-smallfiles = true
+smallfiles = {{ mongo_smallfiles }}
 nohttpinterface = true
-oplogSize = 8
-replSet = meteor
+oplogSize = {{ mongo_oplogSize }}
+replSet = {{ mongo_replSet }}

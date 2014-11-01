@@ -2,3 +2,11 @@
 mongo_port: 27017
 mongo_bind_ips: 127.0.0.1
 mongo_version: 2.4.8
+mongo_dbpath: /var/lib/mongodb
+mongo_logpath: /var/log/mongodb/mongodb.log
+mongo_pidfilepath: /var/run/mongodb/mongodb.pid
+mongo_replSet: waartaa
+mongo_oplogSize: 8
+mongo_smallfiles: true
+mongo_confFile: /etc/mongodb.conf
+mongo_confTemplate: mongodb.conf.j2
