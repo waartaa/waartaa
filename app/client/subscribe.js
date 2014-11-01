@@ -27,8 +27,10 @@ function subscribeToLatestChatroomLog () {
         }
       ).observeChanges({
         added: function (id, fields) {
-          localChatRoomLogCount.increment(
-            channel.user_server_name + '::' + channel.name);
+          if (fields.type != 'ChannelJoin' && fields.type != 'ChannelPart' && fields.type != 'QUITIRC') {
+            localChatRoomLogCount.increment(
+              channel.user_server_name + '::' + channel.name);
+          }
           var currentRouter = Router.current();
           var userServer = UserServers.findOne({
             name: channel.user_server_name});

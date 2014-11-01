@@ -273,18 +273,20 @@ ChannelLogsManager = function () {
     OldChannelLogs.insert(log, function (err, id) {});
     if (log.global) {
       chatRoomLogCount.increment(log.server_name + '::' + log.channel_name);
-      Meteor.setTimeout(function () {
-        var words = log.message.match(/(?:\w+\:\/\/)?[\w^@\.`]+/g);
-        UserServers.find({
-          active: true,
-          status: 'connected',
-          current_nick: {$in: words}
-        }).forEach(function (user_server) {
-          chatRoomMentionsCount.increment(
-            log.server_name + '::' + log.channel_name,
-            user_server.current_nick, user_server.user);
-        });
-      }, 5);
+      if (log.type != 'ChannelJoin' && log.type != 'ChannelPart') {
+        Meteor.setTimeout(function () {
+          var words = log.message.match(/(?:\w+\:\/\/)?[\w^@\.`]+/g);
+          UserServers.find({
+            active: true,
+            status: 'connected',
+            current_nick: {$in: words}
+          }).forEach(function (user_server) {
+            chatRoomMentionsCount.increment(
+              log.server_name + '::' + log.channel_name,
+              user_server.current_nick, user_server.user);
+          });
+        }, 5);
+      }
     }
   }
 
