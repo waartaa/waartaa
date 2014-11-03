@@ -93,7 +93,7 @@ function decrypt(text){
   return dec;
 }
 
-function _create_user_server(data, user) {
+function _createUserServer(data, user) {
   var server = Servers.findOne({_id: data.server_id});
 
   if (! server)
@@ -109,13 +109,15 @@ function _create_user_server(data, user) {
 
   var channels = [];
   var now = new Date();
-  var splitted_channels = data.channels.split(',');
-  for (i in splitted_channels) {
-    var channel = splitted_channels[i];
+  var splittedChannels = data.channels.split(',');
+
+  for (i in splittedChannels) {
+    var channel = splittedChannels[i];
     if (channel.trim())
       channels.push(channel.trim());
   }
-  user_server_data = {
+
+  userServerData = {
     channels: channels,
     nick: data.nick,
     real_name: data.real_name,
@@ -130,29 +132,32 @@ function _create_user_server(data, user) {
     last_updater: user.username,
     last_updater_id: user._id
   };
+
   if (user_server) {
     //var password = data.password;
     //if (data.password != user_server.password)
-    //  password: user_server_data.password;
+    //  password: userServerData.password;
+    console.log(user_server);
     UserServers.update({_id: user_server._id}, {
       $set: {
         nick: data.nick,
         //password: password,
         real_name: data.real_name,
-        channels: user_server_data.channels,
-        last_updated: user_server_data.last_updated,
-        last_updater: user_server_data.last_updater,
-        last_updater_id: user_server_data.last_updater_id,
-        active: user_server_data.active
+        channels: userServerData.channels,
+        last_updated: userServerData.last_updated,
+        last_updater: userServerData.last_updater,
+        last_updater_id: userServerData.last_updater_id,
+        active: userServerData.active
       }
     });
     var user_server = UserServers.findOne({_id: user_server._id});
   } else {
-    user_server_data["name"] = server.name;
-    user_server_data["server_id"] = server._id;
-    var user_server_id = UserServers.insert(user_server_data);
+    userServerData["name"] = server.name;
+    userServerData["server_id"] = server._id;
+    var user_server_id = UserServers.insert(userServerData);
     var user_server = UserServers.findOne({_id: user_server_id});
   }
+
   for (i in user_server.channels) {
     var channel_name = user_server.channels[i];
     var channel = UserChannels.findOne(
@@ -316,7 +321,7 @@ Meteor.methods({
   user_server_create: function (data) {
     var user = Meteor.users.findOne({_id: this.userId});
     validate_user_server_form_data(data, user);
-    _create_user_server(data, user);
+    _createUserServer(data, user);
   },
   join_user_server: function (user_server_name) {
     var user = Meteor.users.findOne({_id: this.userId});
