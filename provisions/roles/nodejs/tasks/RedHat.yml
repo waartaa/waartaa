@@ -7,3 +7,5 @@
     - curl
     - gcc-c++
     - gcc
+    - nodejs
+    - npm
