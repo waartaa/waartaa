@@ -2,9 +2,30 @@
   - name: Install nginx
     sudo: yes
     yum: name=nginx state=present
+    tags:
+      - nginx
+
+  - name: Copy SSL certificate
+    sudo: yes
+    template: src={{ waartaa_ssl_certificate_template }} dest={{ waartaa_ssl_certificate_path }}
+    tags:
+      - nginx
+
+  - name: Copy SSL key
+    sudo: yes
+    template: src={{ waartaa_ssl_key_template }} dest={{ waartaa_ssl_key_path }}
+    tags:
+      - nginx
+
+  - name: Copy nginx conf
+    sudo: yes
+    template: src=waartaa.conf.j2 dest=/etc/nginx/conf.d/waartaa.conf
+    tags:
+      - nginx
 
   - name: restart nginx
     sudo: yes
     service: name=nginx state=restarted enabled=yes
     tags:
       - nginx
+

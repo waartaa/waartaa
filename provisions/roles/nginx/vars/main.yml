@@ -1,5 +1,9 @@
 ---
-nginx_user: www-data
+nginx_user: nginx
 nginx_pid: /var/run/nginx.pid
 nginx_worker_processes: 2
 nginx_worker_connections: 1024
+waartaa_ssl_certificate_path: /etc/nginx/ssl/waartaa_ssl.crt
+waartaa_ssl_key_path: /etc/nginx/ssl/waartaa_ssl.key
+waartaa_ssl_certificate_template: ssl_nginx.crt
+waartaa_ssl_key_template: ssl_nginx.key
