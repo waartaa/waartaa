@@ -1,0 +1,15 @@
+---
+- name: Bundle waartaa
+  hosts: localhost
+  connection: local
+  roles:
+    - bundle_waartaa
+
+- name: Setup Waartaa
+  hosts: all
+  roles:
+    - common
+    - nodejs
+    - mongo
+    - app_deploy
+    - nginx
