@@ -5,21 +5,25 @@
     tags:
       - nginx
 
+  - name: Ensur SSL dir exists in nginx conf
+    sudo: yes
+    file: path={{ waartaa_ssl_dir }} state=directory
+
   - name: Copy SSL certificate
     sudo: yes
-    template: src={{ waartaa_ssl_certificate_template }} dest={{ waartaa_ssl_certificate_path }}
+    template: src={{ waartaa_ssl_certificate_template }} dest={{ waartaa_ssl_dir }}/{{ waartaa_ssl_certificate_filename }}
     tags:
       - nginx
 
   - name: Copy SSL key
     sudo: yes
-    template: src={{ waartaa_ssl_key_template }} dest={{ waartaa_ssl_key_path }}
+    template: src={{ waartaa_ssl_key_template }} dest={{ waartaa_ssl_dir }}/{{ waartaa_ssl_key_filename }}
     tags:
       - nginx
 
   - name: Copy nginx conf
     sudo: yes
-    template: src=waartaa.conf.j2 dest=/etc/nginx/conf.d/waartaa.conf
+    template: src={{ waartaa_nginx_conf_template }} dest=/etc/nginx/conf.d/{{ waartaa_nginx_conf_filename }}
     tags:
       - nginx
 
