@@ -1,15 +1,24 @@
 ---
+- name: Setup Waartaa webserver
+  hosts: webservers
+  roles:
+    - common
+    - nodejs
+    - nginx
+
+- name: Setup Waartaa dbserver
+  hosts: dbservers
+  roles:
+    - mongo
+
 - name: Bundle waartaa
   hosts: localhost
   connection: local
   roles:
     - bundle_waartaa
 
-- name: Setup Waartaa
-  hosts: all
+- name: Deploy app
+  hosts: webservers
   roles:
-    - common
-    - nodejs
-    - mongo
     - app_deploy
-    - nginx
+
