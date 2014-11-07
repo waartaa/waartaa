@@ -1,7 +1,9 @@
 ---
-  - name: "Push waartaa bundle to app servers"
-    synchronize: src=../dist/bundle dest={{ waartaa_deploy_path }} recursive=yes
+  - name: "Ensure deployment path exists"
+    file: path={{ waartaa_deploy_path }} state=directory
 
+  - name: "Push waartaa bundle to app servers"
+    synchronize: src=../dist/bundle/ dest={{ waartaa_deploy_path }}/ recursive=yes
 
   - name: "Copy waartaa upstart file"
     template: src=waartaa.conf.j2 dest=/etc/init/waartaa.conf mode=644
