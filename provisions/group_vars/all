@@ -1,0 +1,10 @@
+---
+waartaa_deploy_path: "{{ ansible_env.HOME }}/bundle"
+waartaa_log_file_path: "{{ ansible_env.HOME }}/waartaa/waartaa.log"
+waartaa_app_port: 3000
+waartaa_mongo_url: mongodb://localhost:27017/waartaa
+waartaa_mongo_oplog_url: mongodb://localhost:27017/local
+waartaa_mail_url: ""
+waartaa_meteor_settings: "{}"
+waartaa_root_url: "https://waartaa.local"
+waartaa_server_name: "waartaa.local"
