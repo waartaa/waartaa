@@ -62,14 +62,17 @@ pidfilepath = {{ mongo_pidfilepath }}
 # Specify .ns file size for new databases.
 # nssize = <size>
 
-# Accout token for Mongo monitoring server.
-#mms-token = <token>
+{% if mongo_mms %}
+# Account token for Mongo monitoring server.
+#mms-token = {{ mongo_mms_token }}
 
 # Server name for Mongo monitoring server.
-#mms-name = <server-name>
+mms-name = {{ mongo_mms_name }}
 
 # Ping interval for Mongo monitoring server.
-#mms-interval = <seconds>
+mms-interval = {{ mongo_mms_interval }}
+
+{% endif %}
 
 # Replication Options
 

@@ -10,3 +10,7 @@ mongo_oplogSize: 8
 mongo_smallfiles: true
 mongo_confFile: /etc/mongodb.conf
 mongo_confTemplate: mongodb.conf.j2
+mongo_mms: false
+mongo_mms_token: blah
+mongo_mms_name: server_name
+mongo_mms_interval: 120

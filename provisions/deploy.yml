@@ -9,6 +9,7 @@
 - name: Setup Waartaa dbserver
   hosts: dbservers
   roles:
+    - common
     - mongo
 
 - name: Bundle waartaa
