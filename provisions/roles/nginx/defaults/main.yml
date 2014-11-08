@@ -6,7 +6,7 @@ nginx_worker_connections: 1024
 waartaa_ssl_dir: /etc/nginx/ssl
 waartaa_ssl_certificate_filename: waartaa_ssl.crt
 waartaa_ssl_key_filename: waartaa_ssl.key
-waartaa_ssl_certificate_template: ssl_nginx.crt
-waartaa_ssl_key_template: ssl_nginx.key
+waartaa_ssl_certificate_template: ssl_nginx.crt.j2
+waartaa_ssl_key_template: ssl_nginx.key.j2
 waartaa_nginx_conf_template: waartaa.conf.j2
 waartaa_nginx_conf_filename: waartaa_dev.conf
