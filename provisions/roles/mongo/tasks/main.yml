@@ -28,6 +28,3 @@
   - name: Initialize the replication set
     shell: /usr/bin/mongo --port 27017 /tmp/repset_init.js
 
-  - name: Setup env variables
-    shell: echo -e "export MONGO_URL=mongodb://127.0.0.1:27017/waartaa\nexport MONGO_OPLOG_URL=mongodb://127.0.0.1:27017/local" >> .bashrc
-

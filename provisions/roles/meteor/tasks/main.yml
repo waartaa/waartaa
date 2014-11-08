@@ -6,8 +6,7 @@
   - name: install meteor npm modules
     sudo: yes
     environment:
-      PATH: $PATH:/usr/local/bin/
+      PATH: $PATH:/usr/bin/
     npm: name={{ item }} global=yes state=present
     with_items:
-      - meteorite
       - forever

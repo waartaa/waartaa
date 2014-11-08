@@ -63,7 +63,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Ansible playbook in project directory
     # ansible.playbook = "server-meteor-gridkick.yml"
     
-    ansible.playbook = "provisions/waartaa_playbook.yml"
+    ansible.playbook = "provisions/vagrant_playbook.yml"
     
     # Inventory file
     ansible.inventory_path = "provisions/vagrant_inventory"
