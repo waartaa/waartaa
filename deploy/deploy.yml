@@ -1,5 +1,0 @@
----
-- hosts: waartaa_app_servers
-  roles:
-   - app_deploy
-
