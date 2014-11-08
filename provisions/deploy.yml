@@ -5,21 +5,31 @@
     - common
     - nodejs
     - nginx
+  tags:
+    - server_setup
+    - webserver_setup
 
 - name: Setup Waartaa dbserver
   hosts: dbservers
   roles:
     - common
     - mongo
+  tags:
+    - server_setup
+    - dbserver_setup
 
 - name: Bundle waartaa
   hosts: localhost
   connection: local
   roles:
     - bundle_waartaa
+  tags:
+    - build
 
 - name: Deploy app
   hosts: webservers
   roles:
+    - app_deploy
+  tags:
     - app_deploy
 
