@@ -3,6 +3,8 @@
 00_monitor.js
 *.pem
 *.csr
+*.crt
+*.key
 node_modules
 *~
 build
