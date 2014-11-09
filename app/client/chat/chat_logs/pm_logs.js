@@ -1,4 +1,4 @@
-Template.pm_logs.events = {
+Template.pm_chat_logs.events = {
   'scroll .chat-logs-container': waartaa.chat.helpers.chatLogsContainerScrollCallback
 };
 
@@ -18,10 +18,9 @@ UI.registerHelper("pmChatLogs", function (server_id, nick) {
     {
       $or: [{from: nick}, {to_nick: nick}],
       server_id: server_id
-    }, {sort: {created: 1}},
-    {fields: {created: 0, last_updated: 0}});
+    }, {sort: {created: 1}});
 });
 
-Template.pm_chat_row.created = waartaa.chat.helpers.chatLogRowCreateHandler;
+Template.pm_chat_logs.rendered = waartaa.chat.helpers.chatLogsContainerRendered;
 Template.pm_chat_row.rendered = waartaa.chat.helpers.chatLogRowRenderedHandler;
 

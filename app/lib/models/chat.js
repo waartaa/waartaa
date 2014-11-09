@@ -54,6 +54,8 @@ UserChannels: {
   server_name: String,
   //nicks: Dictionary,
   password: String,
+  unread_logs_count: Integer,
+  mentions_count: Integer,
   creator: String,
   creator_id: String,
   last_updater: String,
@@ -197,7 +199,25 @@ UserPms: {
   user_id: String,
   user_server_name: String,
   user_server_id: String,
-  pms: List,
+  name: String
 }
 */
 UserPms = new Meteor.Collection("user_pms");
+
+/*
+Bookmarks {
+  label: String,
+  roomInfo: Object {
+    roomType: String ('channel', 'pm', 'server'),
+    channel_id, channel_name etc.
+  },
+  logTimestamp: List<Timestamp>,
+  user: String,
+  userId: String,
+  created: Datetime,
+  lastUpdated: Datetime,
+  creator: String,
+  creatorId: String
+}
+*/
+Bookmarks = new Meteor.Collection("bookmarks");

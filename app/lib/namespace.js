@@ -63,3 +63,9 @@ waartaa['IRC_COMMANDS'] = {
   'WHOIS': '',
   'WHOWAS': '',
 };
+waartaa['search'] = {
+  'API_ENDPOINT': Meteor.absoluteUrl('api/search/')
+};
+waartaa['bookmarks'] = {
+  'API_ENDPOINT': Meteor.absoluteUrl('api/bookmarks')
+};

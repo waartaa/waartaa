@@ -128,23 +128,12 @@ div.dropdown a {
     background-image: none !important;
 }
 
-/*.brand {
-    font-family: 'Oleo Script', cursive;
-    font-size: 27px !important;
-    color: black !important;
-    text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff !important;
+.navbar-toggle.collapsed .icon-bar {
+  background-color: #bbb;
 }
-*/
 
-/*.bitter {
-    font-family: 'Bitter', serif;
-    font-weight: bold !important;
-    text-shadow: none !important;
-}
-*/
-
-.navbar .nav > li > a:hover {
-    color: #A7A7A7;
+.navbar-toggle .icon-bar {
+  background-color: #eee;
 }
 
 .user-away .dropdown-toggle {
@@ -163,19 +152,6 @@ body {
     background-color: #F8F8F8 !important;
 }
 
-.global-navbar {
-  background-color: #2F4279;
-}
-
-.container {
-  width: 100%;
-}
-
-.global-navbar .navbar-brand {
-  font-weight: 500;
-  color: #ffffff;
-}
-
 .global-navbar.navbar-inverse .navbar-nav > .active > a,
 .navbar-inverse .navbar-nav > .open > a,
 .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover {
@@ -184,10 +160,6 @@ body {
 
 #signout {
   margin-top: 5px;
-}
-
-.container {
-  width: 100%;
 }
 
 .bs-sidebar .nav > .active > a, .bs-sidebar .nav > .active:hover > a, .bs-sidebar .nav > .active:focus > a {
@@ -301,7 +273,31 @@ body {
     color: #000;
 }
 
+.chatlog-bookmark {
+  margin-right: 4px;
+  color: #ddd;
+  position: relative;
+  left: 1px;
+  visibility: hidden;
+}
+
+.chatlog-row:hover .chatlog-bookmark {
+  visibility: visible;
+}
+
+.chatlog-bookmark:hover {
+  color: gold;
+  visibility: visible;
+}
+
+.bookmarked {
+  color: gold;
+  visibility: visible;
+}
+
 .chatlog-from {
+  position: left;
+  left: 5px;
 }
 
 .chatlog-time {
@@ -403,8 +399,13 @@ body {
   }
 }
 
-.channel-nicks-loader, .chatlogs-loader-msg {
+.channel-nicks-loader {
   background-color: #E4F2FD;
+  text-align: center;
+}
+
+.chatlogs-loader-msg {
+  background-color: #ffffff;
   text-align: center;
 }
 
@@ -614,6 +615,75 @@ body {
   background-color: #999;
 }
 
+/*** Search UI ***/
+#search-fields {
+  display: block;
+  position: relative;
+}
+
+.chzn-container {
+  margin-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 1px;
+
+}
+
+#search-button {
+  width: 85px;
+  margin-left: 10px;
+  height: 30px;
+  float: left;
+  border: #fff;
+  border-radius: 3px;
+}
+
+#search-message-from {
+  clear:both;
+}
+
+#search-results {
+  clear: both;
+  margin-top: 20px;
+  display: none;
+}
+
+#advance-search {
+  position: relative;
+  top: 10px;
+  clear: both;
+}
+
+.advance-field {
+  clear: both;
+  width: 350px;
+  margin-top: 5px;
+}
+
+.advance-field-first {
+  top: 10px;
+}
+
+.advance-field input {
+  margin-right: 10px;
+  width: 200px;
+  height: 25px;
+}
+
+#chat-logs .logs {
+  margin-top: 5px;
+}
+
+.search-errors {
+  display: none;
+}
+
+.search-errors ul {
+  margin-left: -10px;
+}
+
+em.hlt1 {
+  font-weight: bold;
+}
 
 /* Chat drawers */
 
@@ -642,6 +712,11 @@ body {
 
 .drawer-toggle {
   cursor: pointer;
+  color: #bbb;
+}
+
+.drawer-toggle:hover {
+  color: white;
 }
 
 .drawer-toggle {
@@ -665,3 +740,68 @@ body {
     margin-left: -36px !important;
   }
 }
+
+/* Bookmarking */
+.bookmark-model {
+  background-color: #d9edf7;
+  width: 100%;
+  border: #bce8f1;
+  height: 42px;
+  padding: 8px;
+  border-radius: 2px;
+  border-bottom: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  display: none;
+}
+
+#bookmark-label-label {
+  padding-top: 3px;
+  color: #31708f;
+}
+
+#bookmark-label {
+  margin-left: 5px;
+  width: 300px;
+}
+
+#done-bookmark {
+  margin-left: 10px;
+}
+
+#cancel-bookmark {
+  margin-left: 10px;
+}
+
+.bookmark-msg-wrap {
+  text-align: center;
+  width: 100%;
+  z-index: 10;
+}
+
+.bookmark-done-msg {
+  width: 330px;
+  margin: 0 auto;
+  border: 1px solid;
+  border-radius: 5px;
+  font-weight: 700;
+  text-align: center;
+  display: none;
+}
+
+.success {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+}
+
+.error {
+  color: #D8000C;
+  background-color: #FFBABA;
+}
+
+/* 404 template */
+.notFound {
+  font-size: 24px;
+  text-align: center;
+}
+

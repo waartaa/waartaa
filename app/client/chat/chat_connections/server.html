@@ -1,10 +1,11 @@
 <template name="chat_connection_server">
   <li id='server-{{ _id }}' class='server' data-server-id='{{ _id }}'>
-    <a id='serverLink-{{ _id }}' class='server-link' data-server-id='{{ _id }}' data-roomtype="server" href="#" title="{{ name }}">
+    <a id='serverLink-{{ _id }}' class='server-link' data-server-id='{{ _id }}' data-roomtype="server" href="{{pathFor "chatRoomServer" serverName=name}}" title="{{ name }}">
       {{ showStatusIcon status }}
       {{ limitStr name 12 }}
       <span class="pull-right">
-        <div class="btn-group">
+        <span class="badge">{{ unread_logs_count "server" _id }}</span>
+        <div class="btn-group align-dropdown-caret">
           <button type="button" class="server-room-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>

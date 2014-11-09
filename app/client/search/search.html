@@ -1,0 +1,91 @@
+<template name="search">
+  {{>bookmark_model}}
+  <div class="chatlogs-loader-msg" style="">Searching...</div>
+  <div class="container search-container">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="row">
+          <div id="search-fields" class="col-md-10">
+            <i class="fa fa-search"></i>
+            <input id="search-message" type="text" class="form-control search-input" placeholder="Search">
+            <select data-placeholder="Select channel" class="chosen-select" tabindex="-1" style="width: 350px; margin-left:10px">
+              <option value></option>
+              {{#each servers}}
+                <optgroup label={{ name }}>
+                  {{#each channels _id}}
+                   <option value={{ stripChannelHash name }}>{{ name }}</option>
+                  {{/each}}
+                </optgroup>
+              {{/each}}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button id="search-button" type="button" class="btn btn-primary">Search</button>
+          </div>
+        </div>
+        <a href="#" class="advanced-options margin-10 display-block" data-active="false"><i class="fa fa-plus"></i> More options</a>
+        <div class="advance-options-field">
+          <div class="advance-field">
+              <span class="short-label">From @username</span>
+              <input id="search-message-from" type="text" class="form-control">
+          </div>
+          <div class="advance-field">
+              <span class="short-label">To @username</span>
+              <input id="search-message-to" type="text" class="form-control">
+          </div>
+          <div class="advance-field">
+              <span class="short-label">From Date</span>
+              <input id="start-date" type="text" class="datepicker">
+          </div>
+          <div class="advance-field">
+              <span class="short-label">To Date</span>
+              <input id="end-date" type="text" class="datepicker">
+          </div>
+        </div>
+        <div id="search-results">
+          <div id="search-chat-logs">
+            <div class="results-count">About {{totalCount}} result  ({{ took }} seconds).</div>
+            <div class="logs">
+              {{#each logs}}
+                {{> chat_row}}
+              {{/each}}
+            </div>
+            <div class="paginator">
+              {{#if showPreviousButton}}
+                <a href="#" id="previous-icon" class="next-prev-icon"><icon class="glyphicon glyphicon-chevron-left"></icon></a>
+              {{/if}}
+              <input id="page-no" type="text" value="{{currentPage}}" data-current-page="{{currentPage}}" data-total-pages="{{totalPages}}"/>
+              <span class="total-count"> / {{totalPages}}</span>
+              {{#if showNextButton}}
+                <a href="#" id="next-icon" class="next-prev-icon"><icon class="glyphicon glyphicon-chevron-right"></icon></a>
+              {{/if}}
+            </div>
+          </div>
+          <div id="search-errors">
+            <strong>Your search contain error(s):</strong>
+            <div class="errors">
+              <ul>
+                {{#each searchErrors}}
+                  <li>{{ this }}</li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="active"><a href="#bookmarks" role="tab" data-toggle="tab">Bookmarks</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content nano">
+          <div class="tab-pane active" id="bookmarks">
+            {{>bookmark_labels}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

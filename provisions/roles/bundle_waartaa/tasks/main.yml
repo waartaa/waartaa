@@ -1,0 +1,6 @@
+---
+- name: Bundle waartaa
+  command: meteor build ../dist --directory
+  args:
+    chdir: ../app
+

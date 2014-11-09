@@ -1,7 +1,7 @@
 <template name="chat_user">
   <li class="dropdown{{#if is_user_away nick server_name}} user-away{{/if}}">
     <a id="{{ nick }}" class="channel-user" href="#" title="{{ nick }}">
-      {{>channel_user_icon}} {{ limitStr nick 15 }}
+      {{>channel_user_icon}} <span class="user-nicks" title="{{ nick }}">{{ limitStr nick 15 }}</span>
       <span class="pull-right">
         <div class="btn-group">
           <button type="button" class="channel-user-menu-btn btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -21,7 +21,7 @@
 <template name="user_menu">
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ nick }}" style="min-width: 80px; width: 80px;">
     <li>
-      <a class="pm-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ nick }}"><i class="glyphicon glyphicon-envelope"></i> PM</a>
+      <a class="pm-user" href="{{pathFor "chatRoomPM" serverName=server_name nick=nick}}" style="padding: 3px 5px;" data-user-nick="{{ nick }}"><i class="glyphicon glyphicon-envelope"></i> PM</a>
       <a class="whois-user" href="#" style="padding: 3px 5px;" data-user-nick="{{ nick }}"><i class="glyphicon glyphicon-info-sign"></i> WHOIS</a>
     </li>
   </ul>

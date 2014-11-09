@@ -44,7 +44,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Waartaa'
-copyright = u'2014, Ratnadeep Debnath, Sayan Chowdhury'
+copyright = u'2014, Ratnadeep Debnath'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -197,7 +197,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'Waartaa.tex', u'Waartaa Documentation',
-   u'Ratnadeep Debnath, Sayan Chowdhury', 'manual'),
+   u'Ratnadeep Debnath', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -227,7 +227,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'waartaa', u'Waartaa Documentation',
-     [u'Ratnadeep Debnath, Sayan Chowdhury'], 1)
+     [u'Ratnadeep Debnath'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -241,7 +241,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'Waartaa', u'Waartaa Documentation',
-   u'Ratnadeep Debnath, Sayan Chowdhury', 'Waartaa', 'One line description of project.',
+   u'Ratnadeep Debnath', 'Waartaa', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -262,9 +262,9 @@ texinfo_documents = [
 
 # Bibliographic Dublin Core info.
 epub_title = u'Waartaa'
-epub_author = u'Ratnadeep Debnath, Sayan Chowdhury'
-epub_publisher = u'Ratnadeep Debnath, Sayan Chowdhury'
-epub_copyright = u'2014, Ratnadeep Debnath, Sayan Chowdhury'
+epub_author = u'Ratnadeep Debnath'
+epub_publisher = u'Ratnadeep Debnath'
+epub_copyright = u'2014, Ratnadeep Debnath'
 
 # The basename for the epub file. It defaults to the project name.
 #epub_basename = u'Waartaa'

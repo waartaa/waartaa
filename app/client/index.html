@@ -1,14 +1,13 @@
 <head>
   <title>Waartaa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link href='https://fonts.googleapis.com/css?family=Oleo+Script:700' rel='stylesheet' type='text/css'>
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-  <link href='https://fonts.googleapis.com/css?family=Bitter:400,700,400italic' rel='stylesheet' type='text/css'>
+  <link href='//fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
 </head>
 
 <template name="layout">
   {{> header}}
-  <div class="container">
+  <div class="container width-100">
     <div class="content">
       <div class="wrapper">
         <div class="proper-content">
@@ -21,7 +20,7 @@
 </template>
 
 <template name="header">
-  <nav id="global-navbar" class="navbar navbar-inverse navbar-fixed-top global-navbar" role="navigation">
+  <nav id="global-navbar" class="navbar navbar-fixed-top waartaa-navbar" role="navigation">
     <div class="container">
       <div class="navbar-header">
         {{#if currentUser}}
@@ -38,7 +37,14 @@
           </div>
         {{/if}}
         {{# if currentUser}}
-          <a class="navbar-brand hidden-sm hidden-xs" href="/chat/">Waartaa <span style="color: #ACA9EB;"><sup><strong>β</strong></sup></span></a>
+          <a class="waartaa-logo no-decoration no-decoration-hover margin-10 display-block hidden-sm hidden-xs" href="{{# if currentUser }}/chat/{{else}}/{{/if}}">
+              Waartaa
+              <span style="color: #ACA9EB;">
+                  <sup>
+                      <strong>β</strong>
+                  </sup>
+              </span>
+          </a><!-- waartaa-logo -->
           {{#if isCurrentPage 'chat'}}
             <a class="navbar-brand hidden-md hidden-lg drawer-toggle drawer-toggle-left" data-target-drawer-type="left" href="javascript:void(0)">
               <span class="fa fa-bars fa-inverted"></span>
@@ -89,7 +95,6 @@
 </template>
 
 <template name="account_settings">
-
 </template>
 
 <template name="user_loggedout_content">
@@ -101,8 +106,8 @@
     <fieldset>
       <legend>Sign in</legend>
       {{# if SigninError}}
-      <div class="alert">
-        <button type="button" class="close" data-dismiss="alert" data-sessionkey="SigninFormError">&times;</button>
+      <div class="alert alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" data-sessionkey="SignupFormError"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
         <strong>Warning!</strong> {{SigninError.reason}}
       </div>
       {{/if}}
@@ -121,8 +126,8 @@
     <fieldset>
       <legend>Sign up</legend>
       {{# if SignupError}}
-      <div class="alert">
-        <button type="button" class="close" data-dismiss="alert" data-sessionkey="SignupFormError">&times;</button>
+      <div class="alert alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" data-sessionkey="SignupFormError"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
         <strong>Warning!</strong> {{SignupError.reason}}
       </div>
       {{/if}}
@@ -139,4 +144,10 @@
 </template>
 <template name="footer">
 
+</template>
+
+<template name="notFound">
+  <div class="notFound">
+    <i class="fa fa-exclamation-triangle"> Not found!</i>
+  </div>
 </template>

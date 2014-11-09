@@ -1,0 +1,11 @@
+---
+- name: Install RedHat packages
+  sudo: yes
+  yum: name={{item}} state=present
+  with_items:
+    - wget
+    - curl
+    - gcc-c++
+    - gcc
+    - nodejs
+    - npm

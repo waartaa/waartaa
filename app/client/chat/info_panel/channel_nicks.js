@@ -11,7 +11,7 @@ UI.registerHelper('channel_users', function (id) {
     query['nick'] = {$gt: last_nick};
   return ChannelNicks.find(
     query,
-    {fields: {nick: 1}, sort: {nick: 1}});
+    {fields: {nick: 1, server_name: 1}, sort: {nick: 1}});
 });
 
 function infoPanelScrollendHandler (e) {

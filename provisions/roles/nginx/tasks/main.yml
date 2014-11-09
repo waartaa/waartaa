@@ -1,0 +1,35 @@
+---
+  - name: Install nginx
+    sudo: yes
+    yum: name=nginx state=present
+    tags:
+      - nginx
+
+  - name: Ensur SSL dir exists in nginx conf
+    sudo: yes
+    file: path={{ waartaa_ssl_dir }} state=directory
+
+  - name: Copy SSL certificate
+    sudo: yes
+    template: src={{ waartaa_ssl_certificate_template }} dest={{ waartaa_ssl_dir }}/{{ waartaa_ssl_certificate_filename }}
+    tags:
+      - nginx
+
+  - name: Copy SSL key
+    sudo: yes
+    template: src={{ waartaa_ssl_key_template }} dest={{ waartaa_ssl_dir }}/{{ waartaa_ssl_key_filename }}
+    tags:
+      - nginx
+
+  - name: Copy nginx conf
+    sudo: yes
+    template: src={{ waartaa_nginx_conf_template }} dest=/etc/nginx/conf.d/{{ waartaa_nginx_conf_filename }}
+    tags:
+      - nginx
+
+  - name: restart nginx
+    sudo: yes
+    service: name=nginx state=restarted enabled=yes
+    tags:
+      - nginx
+

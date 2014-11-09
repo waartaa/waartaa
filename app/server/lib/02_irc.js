@@ -249,11 +249,52 @@ function shallWriteChannelLog (nick, text, channel_name, server_name, client_nic
 }
 
 ChannelLogsManager = function () {
+
+  function _insertInES (log) {
+    if (CONFIG.ENABLE_ELASTIC_SEARCH) {
+      var esClient = elasticsearch.Client({
+        host: CONFIG.ELASTIC_SEARCH_HOST
+      });
+      esClient.index({
+        index: 'channel_logs',
+        type: 'log',
+        body: log,
+      }, function (err, resp) {
+      });
+    }
+  };
+
   function _insert (log) {
-    ChannelLogs.insert(log, function (err, id) {});
+    ChannelLogs.insert(log, function (err, id) {
+      if (!err) {
+        _insertInES(log);
+      }
+    });
     OldChannelLogs.insert(log, function (err, id) {});
+    if (log.global) {
+      chatRoomLogCount.increment(log.server_name + '::' + log.channel_name);
+      if (log.type != 'ChannelJoin' && log.type != 'ChannelPart') {
+        Meteor.setTimeout(function () {
+          var words = log.message.match(/(?:\w+\:\/\/)?[\w^@\.`]+/g);
+          UserServers.find({
+            active: true,
+            status: 'connected',
+            current_nick: {$in: words}
+          }).forEach(function (user_server) {
+            chatRoomMentionsCount.increment(
+              log.server_name + '::' + log.channel_name,
+              user_server.current_nick, user_server.user);
+          });
+        }, 5);
+      }
+    }
   }
+
   return {
+    insertInES: function (log) {
+      _insertInES(log);
+    },
+
     insertIfNeeded: function (log, client_nick) {
       var server_name = log.server_name;
       var channel_name = log.channel_name;
@@ -368,7 +409,8 @@ IRCHandler = function (user, user_server) {
         last_updater: user.username,
         last_updater_id: user._id,
         last_updated: new Date(),
-        active: true
+        active: true,
+        server_active: true
       });
       var channel = UserChannels.findOne({_id: user_channel_id});
     }
@@ -560,7 +602,7 @@ IRCHandler = function (user, user_server) {
             user_server, {name: channel});
           if (nick == client.nick) {
             UserChannels.update(
-              {_id: user_channel._id}, {$set: {active: true}},
+              {_id: user_channel._id}, {$set: {active: true, server_active: true}},
               {multi: true}, function (err, updated) {});
             _addChannelJoinListener(user_channel.name);
             _addChannelPartListener(user_channel.name);
@@ -787,24 +829,25 @@ IRCHandler = function (user, user_server) {
         Fiber(function () {
           if (to == client.nick) {
             var profile = user.profile;
-            var userpms = UserPms.findOne({user_id: user._id}) || {pms: {}};
-            userpms.pms[nick] = "";
-            UserPms.upsert(
-              {user_id: user._id, 
-               user_server_id: user_server._id,
-               user_server_name: user_server.name,
-               user: user.username}, 
-               {$set: {pms: userpms.pms}});
-
-            var from_user = Meteor.users.findOne({username: nick}) || {};
+            UserPms.upsert({
+              user_id: user._id,
+              user_server_id: user_server._id,
+              user_server_name: user_server.name,
+              user: user.username,
+              name: nick
+            }, {$set: {}});
+            var from_user_server = UserServers.findOne({
+              status: 'connected', current_nick: nick},{
+                sort: {last_updated: -1}
+            }) || {};
             var to_user = user;
             PMLogs.insert({
               message: text,
               raw_message: message,
               from: nick,
               display_from: nick,
-              from_user: from_user.username,
-              from_user_id: from_user._id,
+              from_user: from_user_server.user,
+              from_user_id: from_user_server.user_id,
               to_nick: to,
               to_user: to_user.username,
               to_user_id: to_user._id,
@@ -1629,15 +1672,13 @@ IRCHandler = function (user, user_server) {
           if (args[1].toLowerCase() == 'nickserv') {
             client.say('NickServ', args.slice(2).join(' '));
           } else {
-            var userpms = UserPms.findOne(
-              {user_id: user._id}) || {pms: {}};
-            userpms.pms[args[1]] = "";
             UserPms.upsert(
               {user_id: user._id,
                user_server_id: user_server._id,
                user_server_name: user_server.name,
-               user: user.username},
-               {$set: {pms: userpms.pms}});
+               user: user.username,
+               name: args[1]
+            }, {$set: {}});
             _sendPMMessage(args[1], args.slice(2).join(' '));
           }
         } else

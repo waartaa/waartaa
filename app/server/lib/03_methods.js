@@ -173,6 +173,10 @@ function _create_user_server(data, user) {
     }
   }
   UserChannels.update(
+    {user: user.username, user_server_name: user_server.name},
+    {$set: {active: true}}, {multi: true}
+  );
+  UserChannels.update(
     {
       name: {$in: user_server.channels}, user: user.username,
       user_server_name: user_server.name
@@ -258,12 +262,11 @@ _send_channel_message = function (user, user_channel_id, message, log_options) {
   return logged;
 };
 
-
 Meteor.startup(function () {
   CLIENTS = {};
   SERVER_JOIN_QUEUE = new PowerQueue({
     name: "join_server",
-    debug: CONFIG.QUEUE_DEBUG || false,
+    debug: CONFIG.QUEUE_D_EBUG || false,
     maxProcessing: 1
   });
   CHANNEL_JOIN_QUEUE = new PowerQueue({
@@ -335,6 +338,11 @@ Meteor.methods({
         {
           user: user.username, name: user_server_name,
         }, {$set: {active: active, status: 'disconnecting'}}, {multi: true});
+      if (!active)
+        UserChannels.update(
+          {user: user.username, user_server_name: user_server_name},
+          {$set: {server_active: false}}, {multi: true}
+        );
       irc_handler.partUserServer();
     }
   },
@@ -421,44 +429,14 @@ Meteor.methods({
   log_clients: function () {
     logger.debug('ircClient: %s', CLIENTS);
   },
-  toggle_pm: function (user_server_id, nick, action) {
-    var user = Meteor.users.findOne({_id: this.userId});
-    if (!user)
-      return;
-    var user_server = UserServers.findOne(
-      {_id: user_server_id, user: user.username});
-    if (!user_server)
-      return;
-    var pms = {};
-    var userPm = UserPms.findOne(
-      {user: user.username, user_server_name: user_server.name});
-    if (userPm)
-      pms = userPm.pms;
-    if (action == 'create')
-      pms[nick] = '';
-    else if (action == 'delete') {
-      try {
-        delete pms[nick];
-      } catch (err) {}
-    }
-    UserPms.update(
-      {
-      user_id: user._id,
-      user_server_id: user_server._id,
-      user_server_name: user_server.name,
-      user: user.username
-      },
-      {$set: {pms: pms}},
-      {upsert: true}
-    );
-  },
   send_pm: function (message, room_id, log_options) {
     var user_server_id = room_id.split('_')[0];
-    var nick = room_id.slice(room_id.search('_') + 1);
+    var userPm = UserPms.findOne({_id: room_id, user_id: this.userId});
+    if (!userPm)
+      return;
+    var nick = userPm.name;
     var user = Meteor.users.findOne({_id: this.userId});
-    var user_server = UserServers.findOne({
-      _id: user_server_id, user: user.username});
-    var irc_handler = (CLIENTS[user.username] || {})[user_server.name];
+    var irc_handler = (CLIENTS[user.username] || {})[userPm.user_server_name];
     if (!irc_handler)
       return;
     var send = true;
@@ -537,4 +515,19 @@ Meteor.methods({
   change_email: function(userId, email) {
     Accounts.sendVerificationEmail(userId, email);
   },
+  // Save bookmarks
+  saveBookmarks: function (data) {
+    if (
+        data.label=='' ||
+        data.logTimestamp.length==0 ||
+        !data.creator ||
+        !data.user ||
+        !data.roomInfo.roomType
+       )
+      return false;
+    data.created = Date();
+    data.lastUpdated = Date();
+    Bookmarks.insert(data);
+    return true;
+  }
 })

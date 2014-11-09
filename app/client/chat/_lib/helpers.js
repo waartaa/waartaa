@@ -3,68 +3,10 @@
  */
 waartaa.chat.helpers = {};
 
-waartaa.chat.helpers.chatLogsContainerScrollCallback = function (event) {
-  var $target = $(event.target);
-  var scroll_top = $target.scrollTop();
-  Session.set('scrollAtBottom', (
-    $('.chat-logs-container').scrollTop() +
-    $('.chat-logs-container').height()) == $(
-      '.chat-logs-container .chatlogs-table').height() - 50? true: false);
-  if (scroll_top != 0)
-    return;
-  $target.off('scroll');
-  var $target = $(event.target);
-  var $table = $target.find('.chatlogs-table');
-  var prevHeight = $table.height();
-  $('.chatlogs-loader-msg').show();
-  Meteor.setTimeout(function () {
-    $('.chatlogs-loader-msg').fadeOut(1000);
-    $target.on('scroll', waartaa.chat.helpers.chatLogsContainerScrollCallback);
-    var currentHeight = $table.height();
-    $target.scrollTop(currentHeight - prevHeight);
-  }, 3000);
-  var key = '';
-  if ($table.hasClass('channel'))
-    key = "user_channel_log_count_" + $target.attr('data-channel-id');
-  else if ($table.hasClass('server'))
-    key = "user_server_log_count_" + $target.attr('data-server-id');
-  else if ($table.hasClass('pm'))
-    key = "pmLogCount-" + $target.attr('data-server-id') + '_' + $target.attr('data-nick');
-  var current_count = Session.get(key, 0);
-  Session.set('height-' + $table.attr('id'), $table.find('.chatlogrows').height());
-  var room = Session.get('room');
-  if ((event.target.scrollHeight - scroll_top) <= $(event.target).outerHeight())
-    scroll_top = null;
-  var oldest_log_in_room = null;
-  if (room.roomtype == 'channel') {
-    oldest_log_in_room = ChannelLogs.findOne(
-      {channel_name: room.channel_name}, {sort: {created: 1}});
-    Session.set('scroll_height_channel-' + room.room_id,
-      scroll_top);
-  } else if (room.roomtype == 'server') {
-    oldest_log_in_room = UserServerLogs.findOne(
-    {server_id: room.room_id}, {sort: {created: 1}});
-    Session.set('scroll_height_' + room.room_id,
-      scroll_top);
-  } else if (room.roomtype == 'pm') {
-    oldest_log_in_room = PMLogs.find(
-    {
-      $or: [{from: room.nick}, {to_nick: room.nick}],
-      server_id: room.server_id
-    }, {sort: {created: 1}},
-    {fields: {created: 0, last_updated: 0}});
-    Session.set('scroll_height_server-' + room.server_id,
-      scroll_top);
-  }
-  Session.set('oldest_log_in_room', oldest_log_in_room);
-  Session.set(key, current_count + DEFAULT_LOGS_COUNT);
-}
-
 /**
  * [Reactive] Higlight currently selected server room.
  */
 waartaa.chat.helpers.highlightServerRoom = function () {
-  Session.set('scrollAtBottom', true);
   var room = Session.get('room') || {};
   $('li.server').removeClass('active');
   $('.server-room').parent().removeClass('active');
@@ -88,7 +30,9 @@ waartaa.chat.helpers.highlightServerRoom = function () {
       waartaa.chat.helpers.roomAccessedTimestamp.reset('server', room);
       waartaa.chat.helpers.unreadLogsCount.clear('server', room);
   }
-  $('#chat-input').focus();
+  if (Meteor.Device.isDesktop() || Meteor.Device.isTV()){
+    $('#chat-input').focus();
+  }
   //refreshAutocompleteNicksSource();
   Meteor.setTimeout(function () {
     $('.chat-logs-container')
@@ -105,59 +49,44 @@ waartaa.chat.helpers.highlightServerRoom = function () {
  *     currently selected room.
  */
 waartaa.chat.helpers.setCurrentRoom = function (obj, callback) {
-  var set_cookie = function(key, value) {
-    document.cookie = key + '=' + value;
-  };
-
-  Session.set('oldest_log_id_in_room');
-
-  set_cookie('userId', Meteor.userId());
-  set_cookie('roomtype', obj.roomtype);
-
-  var prevRoom = Session.get('room');
-
-  if (obj.roomtype == 'server') {
-    Session.set('room', {
-      room_id: obj._id || obj.server_id,
-      roomtype: obj.roomtype,
-      server_id: obj._id || obj.server_id,
-      server_name: obj.name || obj.server_name,
-    });
-    // set cookie server_id
-    set_cookie('server_id', obj._id || obj.server_id);
+  if (!obj) {
+    Session.set('room');
+  } else {
+    var prevRoom = Session.get('room') || {};
+    if (obj.roomtype == 'server') {
+      Session.set('room', {
+        room_id: obj._id || obj.server_id,
+        roomtype: obj.roomtype,
+        server_id: obj._id || obj.server_id,
+        server_name: obj.name || obj.server_name,
+      });
+    }
+    else if (obj.roomtype == 'channel') {
+      Session.set('room', {
+        room_id: obj._id || obj.channel_id,
+        roomtype: obj.roomtype,
+        server_id: obj.server_id,
+        server_name: obj.server_name,
+        channel_id: obj._id || obj.channel_id,
+        channel_name: obj.name || obj.channel_name
+      });
+    }
+    else if (obj.roomtype == 'pm') {
+      Session.set('room', {
+        room_id: obj.room_id || (obj.server_id + '_' + obj.nick),
+        roomtype: 'pm',
+        server_id: obj.user_server_id || obj.server_id,
+        server_name: obj.user_server_name || obj.server_name,
+        nick: obj.name || obj.nick
+      });
+    }
+    else
+      Session.set('room');
+    if (prevRoom && JSON.stringify(prevRoom.toString()) !=
+        JSON.stringify(Session.get('room')))
+      waartaa.chat.helpers.roomAccessedTimestamp.update(
+        prevRoom.roomtype, prevRoom);
   }
-  else if (obj.roomtype == 'channel') {
-    Session.set('room', {
-      room_id: obj._id || obj.channel_id,
-      roomtype: obj.roomtype,
-      server_id: obj.server_id,
-      server_name: obj.server_name,
-      channel_id: obj._id || obj.channel_id,
-      channel_name: obj.name || obj.channel_name
-    });
-    // set cookie server_id and channel_id
-    set_cookie('server_id', obj.server_id);
-    set_cookie('channel_id', obj._id || obj.channel_id);
-  }
-  else if (obj.roomtype == 'pm') {
-    Session.set('room', {
-      room_id: obj.server_id + '_' + obj.nick,
-      roomtype: 'pm',
-      server_id: obj.server_id,
-      server_name: obj.server_name,
-      nick: obj.nick
-    });
-    // set cookie pm_nick
-    set_cookie('server_id', obj.server_id);
-    set_cookie('pm_nick', obj.nick);
-
-  }
-  else
-    Session.set('room', {});
-  if (prevRoom && JSON.stringify(prevRoom.toString()) !=
-      JSON.stringify(Session.get('room')))
-    waartaa.chat.helpers.roomAccessedTimestamp.update(
-      prevRoom.roomtype, prevRoom);
   if (callback)
     callback();
 };
@@ -339,35 +268,54 @@ UI.registerHelper('isAnyRoomSelected', function () {
 UI.registerHelper("unread_logs_count", function (
     room_type, room_id, nick) {
   var room = {};
+  var currentRouter = Router.current();
   if (room_type == 'server') {
     var server = UserServers.findOne({_id: room_id});
-    room.server_name = server.name;
+    if (currentRouter.params.serverName == server.name && !(
+        currentRouter.params.channelName ||
+        currentRouter.params.nick)) {
+      localChatRoomLogCount.reset(server.user + '||' + server.name);
+      return '';
+    }
+    return localChatRoomLogCount.unreadLogsCount(
+      server.user + '||' + server.name) || '';
   } else if (room_type == 'channel') {
     var channel = UserChannels.findOne({_id: room_id});
-    room.server_name = channel.user_server_name;
-    room.channel_name = channel.name;
+    if (currentRouter.params.serverName == channel.user_server_name &&
+        '#' + currentRouter.params.channelName == channel.name) {
+      localChatRoomLogCount.reset(
+        channel.user_server_name + '::' + channel.name);
+      return '';
+    }
+    return localChatRoomLogCount.unreadLogsCount(
+      channel.user_server_name + '::' + channel.name) || '';
   } else if (room_type == 'pm') {
-    var server = UserServers.findOne({_id: room_id});
-    room.server_name = server.name;
-    room.nick = nick;
+    var userPm = UserPms.findOne({_id: room_id});
+    if (!userPm)
+      return '';
+    if (currentRouter.params.serverName == userPm.user_server_name &&
+        currentRouter.params.nick == userPm.name) {
+      localChatRoomLogCount.reset(
+        userPm.user + '||' + userPm.user_server_name + '::' + userPm.name);
+      return '';
+    }
+    return localChatRoomLogCount.unreadLogsCount(
+      userPm.user + '||' + userPm.user_server_name + '::' + userPm.name) || '';
   }
-  count = waartaa.chat.helpers.unreadLogsCount.get(room_type, room);
-  if (count > 0)
-    return count;
-  return '';
 });
 
 UI.registerHelper("unread_mentions_count", function (
     channel_id, nick) {
+  var currentRouter = Router.current();
   var channel = UserChannels.findOne({_id: channel_id});
-  count = waartaa.chat.helpers.unreadLogsCount.get(
-    'channel', {
-      server_name: channel.user_server_name,
-      channel_name: channel.name
-    }, {mention: true});
-  if (count > 0)
-    return count;
-  return '';
+  if (!channel)
+    return '';
+  if (currentRouter.params.serverName == channel.user_server_name &&
+      '#' + currentRouter.params.channelName == channel.name)
+    return '';
+  return (UnreadMentionsCount.findOne({
+    room_signature: channel.user_server_name + '::' + channel.name}) || {}
+  ).count || '';
 });
 
 updateHeight = function () {
@@ -385,6 +333,11 @@ updateHeight = function () {
   $('.chat-logs-container').height(
     finalHeight - $('.chatroom .topic').height()
   );
+  $('.chatlogs').css('min-height', $('.chat-logs-container').height());
+  try {
+    if (!Router.current().params.from)
+      $('.chat-logs-container').scrollTop($('.chatlogs').height());
+  } catch (err) {}
 };
 
 UI.registerHelper('current_server_id', function () {
@@ -415,3 +368,46 @@ $(window).focus(function() {
 }).blur(function() {
   window_focus = false;
 });
+
+
+waartaa.chat.helpers.getChatRoomSignatureFromRouteParams = function  (params) {
+  if (!params.serverName)
+    return;
+  var signature = params.serverName;
+  if (params.channelName)
+    signature += '::#' + params.channelName;
+  else if (params.nick) {
+    signature = Meteor.user().username + '||' + signature + '::' + params.nick;
+  }
+  if (signature.split('::').length == 1)
+    signature = Meteor.user().username + '||' + signature;
+  return signature;
+}
+
+waartaa.chat.helpers.resetUnreadLogsCountForChatroom = function (params) {
+  var chatRoomSignature = (
+    waartaa.chat.helpers.getChatRoomSignatureFromRouteParams(params));
+  if (chatRoomSignature) {
+    Meteor.call('resetUnreadLogCount', chatRoomSignature, function (err) {});
+    localChatRoomLogCount.reset(chatRoomSignature);
+    var unreadMentionCountId = (UnreadMentionsCount.findOne({
+      room_signature: chatRoomSignature
+    }) || {})._id;
+    if (unreadMentionCountId)
+      UnreadMentionsCount.update({
+        _id: unreadMentionCountId
+      }, {$set: {count: 0}});
+  }
+};
+
+waartaa.chat.helpers.onNickClickHandler = function (event) {
+  event.preventDefault();
+  var nick = $(event.currentTarget).attr("title");
+  if (!$('#chat-input').val()) {
+    $('#chat-input').val(nick + ', ');
+  } else {
+    $('#chat-input').val($('#chat-input').val() + ' ' + nick + ', ');
+  }
+  $('#chat-input').focus();
+};
+

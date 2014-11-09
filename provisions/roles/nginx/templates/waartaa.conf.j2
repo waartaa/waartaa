@@ -1,0 +1,107 @@
+# HTTPS server
+
+#user {{ nginx_user }};
+#worker_processes {{ nginx_worker_processes }};
+#pid {{ nginx_pid }};
+
+#events {
+#    worker_connections {{ nginx_worker_connections }};
+#}
+
+upstream nodejs {
+  server 127.0.0.1:3000 max_fails=0;
+}
+
+server {
+    listen      80;
+    server_name {{ waartaa_server_name }};
+    rewrite ^ {{ waartaa_root_url }}$request_uri? permanent;
+}
+
+
+server {
+    listen       443 ssl;
+    server_name  {{ waartaa_server_name }};
+
+    ssl_certificate   	 {{ waartaa_ssl_dir }}/{{ waartaa_ssl_certificate_filename }};
+    ssl_certificate_key  {{ waartaa_ssl_dir }}/{{ waartaa_ssl_key_filename }};
+
+    ssl_session_cache shared:SSL:1m;
+    ssl_session_timeout  5m;
+
+    ssl_ciphers  HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers   on;
+
+    add_header Strict-Transport-Security max-age=500;
+
+    gzip on;
+	gzip_disable "msie6";
+	gzip_vary on;
+	gzip_proxied any;
+	gzip_comp_level 6;
+	gzip_types text/plain text/css application/json
+		application/x-javascript text/xml application/xml application/xml+rss
+		text/javascript;
+
+	location = /favicon.ico {
+		root {{ waartaa_deploy_path }}/programs/web.browser/app;
+		access_log off;
+		expires 1w;
+	}
+
+	location ~* "^/[a-z0-9]{40}\.(css|js|html)$" {
+		root {{ waartaa_deploy_path }}/programs/web.browser;
+		access_log off;
+		expires max;
+	}
+
+	location ~ "^/packages" {
+		root {{ waartaa_deploy_path }}/programs/web.browser;
+		access_log off;
+	}
+
+	location ~* "^/gallery/" {
+		root {{ waartaa_deploy_path }}/programs/web.browser/app;
+		access_log off;
+		expires max;
+	}
+
+	location ~* "^/fonts/" {
+		root {{ waartaa_deploy_path }}/programs/web.browser/app/packages/bootstrap-3/bootstrap-3;
+		access_log off;
+		expires max;
+	}
+
+	location ~* "^/images/" {
+		root {{ waartaa_deploy_path }}/programs/web.browser/app/packages/jquery-ui-bootstrap/css;
+		access_log off;
+		expires max;
+	}
+
+	location = /github-btn.html {
+		root {{ waartaa_deploy_path }}/programs/web.browser/app;
+		access_log off;
+		expires 1w;
+	}
+
+	location ~* "^/.+\.(ogg|txt|gif|mp3)" {
+		root {{ waartaa_deploy_path }}/programs/web.browser/app;
+		access_log off;
+		expires max;
+	}
+
+     location / {
+        proxy_pass  http://nodejs;
+        root {{ waartaa_deploy_path }}/programs/web.browser;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host ;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr ;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for ;
+        proxy_set_header X-Forwarded-Proto https;
+      }
+      #rewrite ^/app\.manifest$ /alpha/app.manifest last;
+       #rewrite ^/packages/(.*)$ /alpha/packages/$1 last;
+}

@@ -61,7 +61,8 @@ Template.header.events({
         'show-drawer-' + drawerType).removeClass(
         'show-drawer-' + revDrawerType);
       $('.drawer-toggle-' + revDrawerType).removeClass('active');
-      $this.addClass('active'); 
+      $this.addClass('active');
+      updateHeight();
     }
   }
 });

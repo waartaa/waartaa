@@ -1,0 +1,16 @@
+---
+  - name: Install node collections
+    shell: npm install collections chdir={{ ansible_env.HOME }}/waartaa
+
+  - name: Link local node_modules dir with /home/vagrant/node_modules
+    file: src={{ ansible_env.HOME }}/waartaa/node_modules dest={{ ansible_env.HOME }}/node_modules state=link
+
+  - name: Create local meteor build dir
+    file: path={{ ansible_env.HOME }}/.meteor_local state=directory
+
+  - name: Link local meteor build dir with the one inside app
+    file: src={{ ansible_env.HOME }}/.meteor_local dest={{ ansible_env.HOME }}/waartaa/app/.meteor/local state=link
+
+  - name: copy conf files
+    shell: cp settings-local.js-dist settings-local.js chdir={{ ansible_env.HOME }}/waartaa/app/server/
+

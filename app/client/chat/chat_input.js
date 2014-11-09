@@ -32,8 +32,8 @@ Template.chat_input.events({
       var user_server = UserServers.findOne({_id: room.server_id}) || {};
       var channel = UserChannels.findOne({
         user_server_id: user_server._id, _id: room.room_id});
-      if (channel)
-        ChannelLogs.insert({
+      if (channel) {
+        var log = {
             message: message,
             raw_message: '',
             from: user_server.current_nick,
@@ -48,7 +48,9 @@ Template.chat_input.events({
             created: new Date(Meteor.getServerMS()),
             last_updated: new Date(Meteor.getServerMS()),
             status: "new"
-        });
+        };
+        ChannelLogs.insert(log, function (err, id) {});
+      }
     } else if (room.roomtype == 'pm') {
       Meteor.call('send_pm', message, room.room_id, log_options)
     } else if (room.roomtype == 'server') {
@@ -57,7 +59,7 @@ Template.chat_input.events({
     }
     var selfMsgKey = 'selfMsg-' + room.roomtype + '-' + 'chat-logs-' + room.room_id;
     Session.set(selfMsgKey, true);
-    $('.chat-logs-container').scrollTop($('.chatlogs-table').height());
+    Router.go(Router.current().path.split('?')[0], {replaceState: true});
   }
 });
 
