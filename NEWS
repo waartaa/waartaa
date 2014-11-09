@@ -1,3 +1,8 @@
+0.2
+===
+* Improved Ansible scripts for setting up servers and deploying Waartaa
+* Bugfixes and UI polishing
+
 0.2-beta
 ========
 * Bug fixes:
