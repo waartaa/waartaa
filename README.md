@@ -9,7 +9,7 @@ multiple devices of the user along with centralized logging.
 1. Install system dependencies: ``node``, ``npm`` for your system. For example:
     1. For Fedora, you can do: ``$ sudo yum install nodejs npm -y``
     1. For Mac OS X, you can install them via brew: ``$ brew install node npm``
-    1. For Debian/Ubuntu install only node.js and it will include npm as: 
+    1. For Debian/Ubuntu install only node.js and it will include npm as:
                                            ``sudo add-apt-repository ppa:chris-lea/node.js
                                              sudo apt-get update
                                              sudo apt-get install nodejs``
@@ -22,38 +22,30 @@ multiple devices of the user along with centralized logging.
 1. Run waartaa: ``$ meteor``
 
 
-## Advanced
+## Deploy
 
-### Running with OPLOG database driver of Meteor 0.7
+*The following steps assumes that you have already run the above mentioned
+setup process.*
 
-1. ``meteor update``
-1. ``mongod [--dbpath <path_to_db>] --replSet meteor``
-1. Open mongo shell by typing ``mongo`` in your shell and then enter the
-   following:
+1. Install ansible:
 
-   ```
-   var config = {_id: "meteor", members: [{_id: 0, host: "127.0.0.1:27017"}]}
-   rs.initiate(config)
-   ```
-
-1. Then export the following variables:
-
-   ```
-   export MONGO_URL=mongodb://localhost:27017/meteor
-   export MONGO_OPLOG_URL=mongodb://localhost:27017/local
-   ```
-
-1. Run meteor as usual: ``meteor``
-
-### Deployment
-
-1. Install ``ansible`` for your distribution.
-   - Fedora (or CentOS): ``sudo yum install ansible``
+   - Fedora/CentOS: ``sudo yum install ansible``
    - Ubuntu: ``sudo apt-get install ansible``
-1. ``cd deploy``
-1. Copy ``hosts`` to say ``hosts.local`` and customize as needed.
-1. Provision and deploy: ``./bundle; ansible-playbook -i hosts.local site.yml``
-1. Only deploy: ``./bundle; ansible-playbook -i hosts.local site.yml``
+   - Python pip: ``sudo pip install ansible``
+1. Copy the sample inventory file ``provisions/hosts.sample`` to
+   say ``provisions/hosts`` and customize as needed. You can override
+   the default variables for various ansible roles in the inventory
+   file.
+1. Setup and configure SSH, firewall in your servers as needed.
+1. Deploy waartaa: ``ansible-playbook -i provisions/hosts provisions/deploy.yml``
+
+This will setup a working instance of waartaa in your servers. The nodejs
+app deployed in your application servers and mongodb in your database servers.
+
+If you want to do a quick deployment of only the app, you can do this
+using:
+
+``ansible-playbook -i provisions/hosts deploy.yml --tags "app_deploy"``
 
 
 ## Contribute
