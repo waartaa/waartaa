@@ -1,3 +1,4 @@
+/*
 UserChannels: {
   name: String,
   server_id: String,
