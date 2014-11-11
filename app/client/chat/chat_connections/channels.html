@@ -33,11 +33,11 @@
     <li>
       <a href="#" class="toggleJoinChannel" style="padding: 3px 5px;" data-channel-id="{{ _id }}"
           data-status="{{ status }}">
-        <i class="glyphicon {{# if isConnected status}}glyphicon-log-out{{ else }}glyphicon-log-in{{/if}}"></i>
+        <i class="fa {{# if isConnected status}}fa-sign-out{{ else }}fa-sign-in{{/if}}"></i>
         {{# if isConnected status}}Part{{ else }}Join{{/if}}</a>
     </li>
     <li>
-      <a href="#" class="channel-remove" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="glyphicon glyphicon-remove"></i> Close</a>
+      <a href="#" class="channel-remove" style="padding: 3px 5px;" data-channel-id="{{ _id }}"><i class="fa fa-remove"></i> Close</a>
     </li>
   </ul>
 </template>

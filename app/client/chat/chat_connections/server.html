@@ -23,17 +23,17 @@
     <li>
       <a href="#" class="toggleJoinServer" style="padding: 3px 5px;" data-server-id="{{ _id }}"
           data-status="{{ status }}">
-        <i class="glyphicon {{# if isConnected status}}glyphicon-log-out{{ else }}glyphicon-log-in{{/if}}"></i>
+        <i class="fa {{# if isConnected status}}fa-sign-out{{ else }}fa-sign-in{{/if}}"></i>
         {{# if isConnected status}}Quit{{ else }}Join{{/if}}</a>
     </li>
     <li>
-      <a class="addChannelLink" data-toggle="modal" data-target="#addServerChannel-{{ _id }}" href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-plus"></i> Channel</a>
+      <a class="addChannelLink" data-toggle="modal" data-target="#addServerChannel-{{ _id }}" href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="fa fa-plus"></i> Channel</a>
     </li>
     <li>
-      <a class="serverEditLink" href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}" data-toggle="modal" data-target="#editServerModal-{{ _id }}"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+      <a class="serverEditLink" href="#" style="padding: 3px 5px;" data-server-id="{{ _id }}" data-toggle="modal" data-target="#editServerModal-{{ _id }}"><i class="fa fa-pencil"></i> Edit</a>
     </li>
     <li>
-      <a href="#" class="server-remove" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="glyphicon glyphicon-remove"></i> Close</a>
+      <a href="#" class="server-remove" style="padding: 3px 5px;" data-server-id="{{ _id }}"><i class="fa fa-times"></i> Close</a>
     </li>
   </ul>
 </template>
