@@ -1,33 +1,3 @@
-/*
-Severs: {
-  name: String,
-  creator: String <username>,
-  creator_id: String <user_id>,
-  last_updater: String,
-  last_updater_id: String,
-  created: Date,
-  last_updated: Date,
-  connections: List of items like {url: 'irc.freenode.net', port: '6667'}
-}
-*/
-Servers = new Meteor.Collection("servers");
-
-/*
-ServerConnections: {
-  server_id: String,
-  url: String,
-  port: String,
-  creator: String,
-  creator_id: String,
-  last_updater: String,
-  last_updater_id: String,
-  created: Date,
-  last_updated: Date
-}
-*/
-ServerConnections = new Meteor.Collection("server_connections");
-
-/*
 UserChannels: {
   name: String,
   server_id: String,
