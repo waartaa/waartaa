@@ -99,6 +99,11 @@ BaseChatController = BaseController.extend({
     }
   },
   onBeforeAction: function () {
+    if (Meteor.isClient) {
+        if(!Meteor.userId()) {
+            this.redirect('/');
+        }
+    }
   },
   onAfterAction: function () {
     if (this.ready()) {
