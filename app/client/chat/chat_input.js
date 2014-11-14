@@ -1,5 +1,6 @@
 Template.chat_input.events({
   'keydown #chat-input': function (e) {
+    var $chat_input = {keyCode:'message'}
     var keyCode = e.keyCode || e.which;
     if (keyCode == 9)
       e.preventDefault();
@@ -10,6 +11,7 @@ Template.chat_input.events({
     var $chat_input = $form.find('#chat-input');
     var message = $chat_input.val();
     var room = Session.get('room');
+    delete $chat_input.keyCode;
     if (!room)
       return;
     try {
@@ -33,7 +35,9 @@ Template.chat_input.events({
       var channel = UserChannels.findOne({
         user_server_id: user_server._id, _id: room.room_id});
       if (channel) {
-        var log = {
+        if (keyCode != undefined){
+            
+        }var log = {
             message: message,
             raw_message: '',
             from: user_server.current_nick,
