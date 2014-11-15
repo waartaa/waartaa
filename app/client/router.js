@@ -57,7 +57,8 @@ Router.configure({
         Meteor.subscribe(sub);
       }
     });
-  }
+  },
+  trackPageView: true
 });
 /* End configure */
 
@@ -152,8 +153,6 @@ Router.map(function () {
         }
     },
     onAfterAction: function () {
-      if (Meteor.isClient)
-        GAnalytics.pageview();
       Session.set('currentPage', 'index');
     },
     fastRender: true

@@ -54,3 +54,5 @@ mrt:chosen-package@0.11.1
 npm-container
 meteorhacks:npm
 force-ssl
+reywood:iron-router-ga
+
