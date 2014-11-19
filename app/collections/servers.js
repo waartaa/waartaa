@@ -39,10 +39,9 @@ ServerSchema = new SimpleSchema({
         label: "Last Updated Timestamp"
     },
     connections: {
-        connections: [Object],
+        type: [Object],
         optional: true,
-        label: 'List of items like {url: "irc.freenode.net', port:
-            "6667"
+        label: 'List of items like {url: "irc.freenode.net',
     },
 });
 
