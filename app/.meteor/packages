@@ -19,11 +19,12 @@ jquery-waypoints
 # local packages
 jquery-titlealert
 analytics
+presence-local
 
 # New atmosphere packages
 tmeasday:html5-history-api@4.1.2
 tmeasday:page-js-ie-support@1.3.5
-tmeasday:presence
+#tmeasday:presence
 mizzao:bootstrap-3
 infinitedg:winston
 infinitedg:winston-loggly
