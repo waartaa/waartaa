@@ -60,6 +60,7 @@ Router.configure({
   },
   trackPageView: true
 });
+
 /* End configure */
 
 
@@ -67,9 +68,7 @@ Router.configure({
 
 BaseController = RouteController.extend({
   layoutTemplate: 'layout',
-  waitOn: function () {
-
-  },
+  notFoundTemplate: 'notFound',
   onAfterAction: function () {
     navManager.set();
   }
@@ -77,33 +76,38 @@ BaseController = RouteController.extend({
 
 BaseChatController = BaseController.extend({
   template: 'chat',
+  loadingTemplate: 'chat',
   waitOn: function () {
     return chatRoomSubs.subscribe('chatRooms');
   },
-  onRun: function () {
+  onRerun: function () {
     if (!this.ready()) {
       NProgress.start();
     }
     if (navManager.isSamePage(Router.current())) {
       var pageStack = waartaa.chat.helpers.chatLogsWaypointHandler.getPageStack();
-      if (pageStack.length > 0 && this.params.from &&
-          moment(this.params.from).toDate().toString() ==
+      if (pageStack.length > 0 && this.params.query.from &&
+          moment(this.params.query.from).toDate().toString() ==
           pageStack[0].toString())
         waartaa.chat.helpers.chatLogsWaypointHandler.bind();
-      if (this.params.direction == 'down')
+      if (this.params.query.direction == 'down')
         $('.chatlogs-scroll-down .chatlogs-loader-msg').show();
-      else if (this.params.direction == 'up' && pageStack.length > 1)
+      else if (this.params.query.direction == 'up' && pageStack.length > 1)
         $('.chatlogs-scroll-up .chatlogs-loader-msg').show();
     } else {
       $('#chatlogs-loader').show();
       chatLogPaginationSubs.reset();
     }
+    this.next();
   },
   onBeforeAction: function () {
     if (Meteor.isClient) {
         if(!Meteor.userId()) {
-            this.redirect('/');
+          this.redirect('/');
         }
+        this.next();
+    } else {
+      this.next();
     }
   },
   onAfterAction: function () {
@@ -113,9 +117,9 @@ BaseChatController = BaseController.extend({
       }, 1000);
     }
     Session.set('currentPage', 'chat');
-    if (Router.current().path != '/chat/' && Meteor.user())
+    if (Router.current().url != '/chat' && Meteor.user())
       window.localStorage.setItem(
-        Meteor.user().username + ':lastChatPath', Router.current().path);
+        Meteor.user().username + ':lastChatPath', Router.current().url);
     if (this.ready())
       NProgress.done();
     var params = this.params;
@@ -124,7 +128,7 @@ BaseChatController = BaseController.extend({
         waartaa.chat.helpers.resetUnreadLogsCountForChatroom(params);
       });
   },
-  data: function (pause) {
+  data: function () {
     Meteor.setTimeout(function () {
       $('.chatlogs-loader-msg').fadeOut();
     }, 2000);
@@ -141,61 +145,39 @@ BaseChatController = BaseController.extend({
 /* End controllers */
 
 
-Router.map(function () {
-  this.route('index', {
-    path: '/',
-    template: 'user_loggedout_content',
-    onBeforeAction: function (pause) {
-      if (Meteor.isClient)
-        if (Meteor.userId()) {
-          Router.go('/chat/', {replaceState: true});
-          pause();
-        }
-    },
-    onAfterAction: function () {
-      Session.set('currentPage', 'index');
-    },
-    fastRender: true
-  });
 
-  this.route('account', {
-    path: /^\/settings$/,
-    onBeforeAction: function(pause) {
-      Router.go('/settings/', {replaceState: true});
-      pause();
-    }
-  });
+Router.route('/', {
+  name: 'index',
+  controller: 'BaseController',
+  template: 'user_loggedout_content',
+  onBeforeAction: function () {
+    if (Meteor.isClient)
+      if (Meteor.userId()) {
+        Router.go('/chat', {replaceState: true});
+        return;
+      }
+    this.next();
+  },
+  onAfterAction: function () {
+    Session.set('currentPage', 'index');
+  },
+  fastRender: true
+});
 
-  this.route('account/', {
-    path: /^\/settings\/$/,
-    template: 'accountSettings',
-    layoutTemplate: 'layout',
-    onAfterAction: function () {
-      Session.set('currentPage', 'account');
-    },
-    onBeforeAction: [
-        function () {
-            if (Meteor.isClient) {
-                if(!Meteor.userId()) {
-                    this.redirect('/');
-                }
-            }
-        },
-    ],
-  });
+Router.route('/foo', function () {
+  this.render('foo');
+});
 
-  this.route('chat', {
-    path: /^\/chat$/,
-    onBeforeAction: function (pause) {
-      Router.go('/chat/', {replaceState: true});
-      pause();
-    }
-  });
-  this.route('chat/', {
-    path: /^\/chat\/$/,
+Router.route('/settings', {
+  name: 'account',
+  template: 'accountSettings',
+  layoutTemplate: 'layout'
+});
+
+  Router.route('/chat', {
     template: 'chat',
-    onBeforeAction: [
-      function (pause) {
+    onBeforeAction: //[
+      function () {
         if (Meteor.isClient) {
           if (!Meteor.userId()) {
             this.redirect('/');
@@ -215,18 +197,21 @@ Router.map(function () {
             }
             if (path) {
               Router.go(path, replaceState=true);
-              pause();
+              return;
             }
           }
         }
-      },
+        this.next();
+      }/*,
       function () {
         if (Meteor.isClient && this.ready()) {
           if (UserServers.find().count() == 0)
             $('#server-add-btn').click();
+            return;
         }
-      }
-    ],
+        this.next();
+      }*/
+    ,//],
     waitOn: function () {
       return [
         Meteor.subscribe('servers'),
@@ -242,69 +227,19 @@ Router.map(function () {
     },
     fastRender: true
   });
-  /*
-  this.route('search', {
-    path: /^\/search$/,
-    onBeforeAction: function () {
-      Router.go('/search/');
-    }
-  });
-  this.route('search/', {
-    path: /^\/search\/$/,
-    template: 'search',
-    onBeforeAction: [
-      function (pause) {
-        if (Meteor.isClient) {
-          if (!Meteor.userId()) {
-            Router.go('/');
-            this.render('user_loggedout_content');
-            GAnalytics.pageview();
-            pause();
-          } else {
-            ChatSubscribe();
-          }
-        }
-      },
-      function (pause) {
-        if (Meteor.isClient) {
-          // we're done waiting on all subs
-          if (this.ready()) {
-            NProgress.done();
-          } else {
-            NProgress.start();
-            pause(); // stop downstream funcs from running
-          }
-        }
-      }
-    ],
-    waitOn: function () {
-      return [
-        Meteor.subscribe('user_servers'),
-        Meteor.subscribe('user_channels'),
-        Meteor.subscribe('bookmarks')
-      ]
-    },
-    onAfterAction: function () {
-      if (Meteor.isClient)
-        GAnalytics.pageview('/search/');
-    },
-    fastRender: true
-  });
-  */
-
 
   /* Router for server chat room */
-  this.route('chatRoomServer', {
-    path: '/chat/server/:serverName',
+  Router.route('/chat/server/:serverName', {
+    name: 'chatRoomServer',
     controller: BaseChatController,
-    onBeforeAction: function (pause) {
+    onBeforeAction: function () {
       var server = UserServers.findOne({name: this.params.serverName});
       if (!server) {
         if (this.ready())
           waartaa.chat.helpers.setCurrentRoom();
-        else
-          pause();
-        return;
+        else {
+          return;
+        }
       }
       waartaa.chat.helpers.setCurrentRoom({
         roomtype: 'server', server_id: server._id, server_name: server.name
@@ -313,8 +248,9 @@ Router.map(function () {
         var redirect = waartaa.chat.helpers.chatLogsWaypointHandler
                       .handleScrolldownResponse(this.params);
         if (redirect)
-          pause();
+          return;
       }
+      this.next();
     },
     waitOn: function () {
       var userServer = UserServers.findOne(
@@ -323,9 +259,9 @@ Router.map(function () {
         return;
       var subsManager = this.params.direction?
         chatLogPaginationSubs: chatLogSubs;
-      var from = this.params.from || null;
-      var direction = this.params.direction || 'down';
-      var limit = this.params.limit || DEFAULT_LOGS_COUNT;
+      var from = this.params.query.from || null;
+      var direction = this.params.query.direction || 'down';
+      var limit = this.params.query.limit || DEFAULT_LOGS_COUNT;
       return [
         subsManager.subscribe(
           "user_server_logs", userServer.name,
@@ -373,10 +309,10 @@ Router.map(function () {
   }
 
   /* Router for channel chat room */
-  this.route('chatRoomChannel', {
+  Router.route('chatRoomChannel', {
     path: '/chat/server/:serverName/channel/:channelName',
     controller: BaseChatController,
-    onBeforeAction: function (pause) {
+    onBeforeAction: function () {
       var channel = UserChannels.findOne(
         {
           user_server_name: this.params.serverName,
@@ -387,8 +323,7 @@ Router.map(function () {
         if (this.ready())
           waartaa.chat.helpers.setCurrentRoom();
         else
-          pause();
-        return;
+          return;
       }
       waartaa.chat.helpers.setCurrentRoom({
         roomtype: 'channel', server_id: channel.user_server_id,
@@ -399,8 +334,9 @@ Router.map(function () {
         var redirect = waartaa.chat.helpers.chatLogsWaypointHandler
                       .handleScrolldownResponse(this.params);
         if (redirect)
-          pause();
+          return;
       }
+      this.next();
     },
     onAfterAction: function () {
       var channelName = '#' + this.params.channelName;
@@ -425,11 +361,11 @@ Router.map(function () {
       }) || {};
       var channelName = '#' + this.params.channelName;
       var serverName = this.params.serverName;
-      var subsManager = this.params.direction?
+      var subsManager = this.params.query.direction?
         chatLogPaginationSubs: chatLogSubs;
-      var from = this.params.from || null;
-      var direction = this.params.direction || 'down';
-      var limit = this.params.limit || DEFAULT_LOGS_COUNT;
+      var from = this.params.query.from || null;
+      var direction = this.params.query.direction || 'down';
+      var limit = this.params.query.limit || DEFAULT_LOGS_COUNT;
       return [
         subsManager.subscribe(
           'channel_logs', serverName, channelName,
@@ -454,18 +390,17 @@ Router.map(function () {
   });
 
   /* Router for PM chat room */
-  this.route('chatRoomPM', {
+  Router.route('chatRoomPM', {
     path: '/chat/server/:serverName/nick/:nick',
     controller: BaseChatController,
-    onBeforeAction: function (pause) {
+    onBeforeAction: function () {
       var user = Meteor.user();
       var server = UserServers.findOne({name: this.params.serverName});
       if (!server) {
         if (this.ready())
           waartaa.chat.helpers.setCurrentRoom();
         else
-          pause();
-        return;
+          return;
       }
       var nick = this.params.nick;
       var userPm = UserPms.findOne({
@@ -491,8 +426,9 @@ Router.map(function () {
         var redirect = waartaa.chat.helpers.chatLogsWaypointHandler
                       .handleScrolldownResponse(this.params);
         if (redirect)
-          pause();
+          return;
       }
+      this.next();
     },
     waitOn: function () {
       var userServer = UserServers.findOne(
@@ -501,11 +437,11 @@ Router.map(function () {
         return;
       var nick = this.params.nick;
       var room_id = userServer._id + '_' + nick;
-      var subsManager = this.params.direction?
+      var subsManager = this.params.query.direction?
         chatLogPaginationSubs: chatLogSubs;
-      var from = this.params.from || null;
-      var direction = this.params.direction || 'down';
-      var limit = this.params.limit || DEFAULT_LOGS_COUNT;
+      var from = this.params.query.from || null;
+      var direction = this.params.query.direction || 'down';
+      var limit = this.params.query.limit || DEFAULT_LOGS_COUNT;
       return [
         subsManager.subscribe(
           'pm_logs', room_id, from, direction, limit,
@@ -524,4 +460,3 @@ Router.map(function () {
       ];
     }
   });
-});

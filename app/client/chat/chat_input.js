@@ -59,7 +59,7 @@ Template.chat_input.events({
     }
     var selfMsgKey = 'selfMsg-' + room.roomtype + '-' + 'chat-logs-' + room.room_id;
     Session.set(selfMsgKey, true);
-    Router.go(Router.current().path.split('?')[0], {replaceState: true});
+    Router.go(Router.current().url.split('?')[0], {replaceState: true});
   }
 });
 

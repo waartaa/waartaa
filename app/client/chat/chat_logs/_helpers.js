@@ -31,7 +31,7 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
     var params = {
       from: moment(pageStack[0]).format(),
       direction: 'down',
-      limit: DEFAULT_LOGS_COUNT,
+      limit: DEFAULT_LOGS_COUNT
     };
     var path = _getChatroomPath(room, params);
     Router.go(path, {replaceState: true});
@@ -174,7 +174,7 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
       if (!waartaa.chat.helpers.isSameChatRoom(routerPath, newRouterPath)) {
         pageStack = [];
       }
-      if (newRouterPath && !newRouterPath.params.from) {
+      if (newRouterPath && !newRouterPath.params.query.from) {
         Session.set('paginationStartTimestamp');
         Session.set('showRealtimeLogs');
       }
@@ -195,11 +195,11 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
         .waypoint(function (direction) {
           var newRouterPath = Router.current();
           if (direction == 'up') {
-            if (!newRouterPath.params.from) {
+            if (!newRouterPath.params.query.from) {
               fetchOlderLogs({currentPage: true});
             }
           } else if (direction == 'down') {
-            if (newRouterPath.params.from) {
+            if (newRouterPath.params.query.from) {
               fetchNewerLogs();
             }
           }
@@ -216,9 +216,9 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
         if (!room)
           return;
         var extraQueryOptions = {
-          limit: parseInt(params.limit) || DEFAULT_LOGS_COUNT,
+          limit: parseInt(params.query.limit) || DEFAULT_LOGS_COUNT,
           sort: {created: 1},
-          skip: (parseInt(params.limit) || DEFAULT_LOGS_COUNT) - 1
+          skip: (parseInt(params.query.limit) || DEFAULT_LOGS_COUNT) - 1
         };
         if (room.roomtype == 'channel')
           return ChannelLogs.findOne(
@@ -246,8 +246,8 @@ waartaa.chat.helpers.chatLogsWaypointHandler = function () {
           )
       }
 
-      if (params.direction == 'down' && params.from) {
-        var fromTimestamp = new Date(params.from);
+      if (params.query.direction == 'down' && params.query.from) {
+        var fromTimestamp = new Date(params.query.from);
         var newestPaginatedLog = _getNewestPaginatedLog(params);
         if (!newestPaginatedLog) {
           if (fromTimestamp.toString() == (
@@ -278,7 +278,7 @@ var _displayLogs = function () {
   var timeoutIds = [];
   return function (template) {
     var currentPath = Router.current();
-    var from = currentPath.params.from;
+    var from = currentPath.params.query.from;
     if (timeoutIds.length) {
       while (timeoutIds.length > 0) {
         Meteor.clearTimeout(timeoutIds.pop());
