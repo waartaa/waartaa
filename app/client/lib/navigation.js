@@ -2,8 +2,8 @@ navManager = function () {
   var prevRouter, currentRouter;
 
   function _isSamePage(newRouter, oldRouter) {
-      var newPagePath = newRouter && newRouter.path.split('?')[0];
-      var oldPagePath = oldRouter && oldRouter.path.split('?')[0];
+      var newPagePath = newRouter && newRouter.url.split('?')[0];
+      var oldPagePath = oldRouter && oldRouter.url.split('?')[0];
       if (newPagePath == oldPagePath)
         return true;
       return false;
@@ -11,7 +11,7 @@ navManager = function () {
 
   return {
     set: function () {
-      if (!currentRouter || currentRouter.path != Router.current().path) {
+      if (!currentRouter || currentRouter.url != Router.current().url) {
         prevRouter = currentRouter;
         currentRouter = Router.current();
       }

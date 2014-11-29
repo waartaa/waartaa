@@ -4,7 +4,7 @@
 # but you can also edit it by hand.
 
 # meteor packages
-standard-app-packages
+meteor-platform
 accounts-password
 accounts-github
 underscore
@@ -21,30 +21,26 @@ jquery-titlealert
 analytics
 
 # New atmosphere packages
-tmeasday:html5-history-api@4.1.2
-tmeasday:page-js-ie-support@1.3.5
 tmeasday:presence
 mizzao:bootstrap-3
 infinitedg:winston
 infinitedg:winston-loggly
 datariot:ganalytics@0.2.0
-meteorhacks:fast-render@1.0.0
+#meteorhacks:fast-render@1.0.0
 cfs:power-queue@0.0.1
 cfs:reactive-property
 cfs:micro-queue
 cfs:reactive-list
 jparker:crypto-md5
-ian:accounts-ui-bootstrap-3
 meteorhacks:kadira@2.11.13
 meteorhacks:subs-manager
-iron:router
 natestrauser:jquery-scrollto@1.4.6
 aldeed:scheduled-tasks
 mystor:device-detection
 
 # mrt packages
 mrt:jquery-ui-bootstrap
-mrt:jquery-ui
+mizzao:jquery-ui
 mrt:require
 mrt:nprogress@0.0.5
 mrt:moment@2.8.1
@@ -54,3 +50,6 @@ mrt:chosen-package@0.11.1
 npm-container
 meteorhacks:npm
 force-ssl
+reywood:iron-router-ga
+iron:router@1.0.3
+hpx7:accounts-ui-bootstrap-3

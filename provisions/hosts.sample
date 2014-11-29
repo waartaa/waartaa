@@ -26,7 +26,7 @@ newrelic=true
 newrelic_app_name=XXXXXX
 newrelic_license_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 newrelic_logging_level=trace
-waartaa_meteor_settings="'{\"public\":{\"ga\":{\"account\":\"UA-XXXXXXXX-X\"}},\"presenceTimeout\":30000,\"DEBUG\":false}'"
+waartaa_meteor_settings="'{\"public\":{\"ga\":{\"id\":\"UA-XXXXXXXX-X\"}},\"presenceTimeout\":30000,\"DEBUG\":false}'"
 
 [dbservers:vars]
 mongo_logpath=/var/log/mongo/mongod.log
