@@ -1,6 +1,6 @@
 ---
 - name: Bundle waartaa
-  command: meteor build ../dist --directory
+  command: meteor build ../dist --directory --server={{ waartaa_root_url }}:443
   args:
     chdir: ../app
 
