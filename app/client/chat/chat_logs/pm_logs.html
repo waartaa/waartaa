@@ -1,9 +1,0 @@
-<template name="pm_chat_logs">
-  {{#with currentPM}}
-    <div class="chatlogs">
-      {{#each pmChatLogs server_id name }}
-        {{> pm_chat_row}}
-      {{/each}}
-    </div>
-  {{/with}}
-</template>

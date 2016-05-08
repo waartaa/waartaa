@@ -1,9 +1,0 @@
-<template name="server_chat_logs">
-  {{#with getCurrentServer}}
-    <div class="chatlogs">
-      {{#each serverChatLogs _id}}
-        {{> chat_row}}
-      {{/each}}
-    </div>
-  {{/with}}
-</template>
