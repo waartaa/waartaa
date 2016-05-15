@@ -8,3 +8,7 @@
 node_modules
 *~
 build
+static/js/waartaa.js
+__pycache__/
+*.egg-info/
+waartaa/static/js/*hot-update*
