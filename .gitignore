@@ -12,3 +12,4 @@ static/js/waartaa.js
 __pycache__/
 *.egg-info/
 waartaa/static/js/*hot-update*
+waartaa/static/js/waartaa.js
