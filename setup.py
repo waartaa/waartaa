@@ -17,7 +17,7 @@ def parse_requirements(requirements_file):
 REQUIREMENTS_PATH = 'requirements.txt'
 
 setup(
-    nae='waartaa',
+    name='waartaa',
     version='0.1.1',
     description='waartaa',
     long_description=README + '\n\n' + CHANGES,
