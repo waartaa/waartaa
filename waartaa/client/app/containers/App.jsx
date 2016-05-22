@@ -6,6 +6,8 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import baseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 
+import DrawerFooter from '../components/Footer.jsx';
+
 export default class App extends Component {
     constructor(props, context) {
         super(props, context);
@@ -20,8 +22,7 @@ export default class App extends Component {
         return (
             <div>
                 <Drawer open={this.state.open}>
-                  <MenuItem>Menu Item</MenuItem>
-                  <MenuItem>Menu Item 2</MenuItem>
+                    <DrawerFooter />
                 </Drawer>
             </div>
         );

@@ -2,8 +2,6 @@ const path = require('path');
 const merge = require('webpack-merge');
 const webpack = require('webpack');
 
-const NpmInstallPlugin = require('npm-install-webpack-plugin');
-
 const TARGET = process.env.npm_lifecycle_event;
 const PATHS = {
   app: path.join(__dirname, 'app'),
@@ -11,6 +9,8 @@ const PATHS = {
 };
 
 process.env.BABEL_ENV = TARGET;
+
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const common = {
   entry: {
@@ -26,11 +26,6 @@ const common = {
   module: {
     loaders: [
       {
-        test: /\.css$/,
-        loaders: ['style', 'css'],
-        include: PATHS.app
-      },
-      {
         test: /\.jsx?$/,
         loader: 'babel',
         query: {
@@ -38,6 +33,18 @@ const common = {
           presets: ['react', 'es2015']
         },
         include: PATHS.app
+      },
+      {
+        test: /\.css$/,
+        loader: "style!css!less"
+      },
+      {
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: 'url-loader?limit=10000&mimetype=application/font-woff'
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: 'file-loader'
       }
     ]
   }
@@ -61,9 +68,6 @@ if (TARGET === 'start' || !TARGET) {
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      new NpmInstallPlugin({
-        save: true
-      })
     ]
   });
 }
