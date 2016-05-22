@@ -36,7 +36,11 @@ const common = {
       },
       {
         test: /\.css$/,
-        loader: "style!css!less"
+        loaders: ['style', 'css', 'less'],
+      },
+      {
+        test: /\.less$/,
+        loaders: ['style', 'css', 'less'],
       },
       {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
