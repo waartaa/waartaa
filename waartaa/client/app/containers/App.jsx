@@ -38,4 +38,3 @@ const MaterialApp = () => (
         <App />
     </MuiThemeProvider>
 );
-

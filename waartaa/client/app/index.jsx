@@ -1,12 +1,16 @@
+import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { browserHistory, Router, Route, Link, Redirect } from 'react-router';
-import MaterialApp from './containers/App.jsx';
-import Chat from './containers/Chat.jsx';
+import { syncHistoryWithStore } from 'react-router-redux'
 
-ReactDOM.render((
-  <Router history={browserHistory}>
-    <Route path="/" component={MaterialApp} />
-    <Route path="/chat" component={Chat} />
-  </Router>
-), document.getElementById('app'));
+import Root from './containers/Root'
+import configureStore from './stores/configureStore'
+
+const store = configureStore()
+const history = syncHistoryWithStore(browserHistory, store)
+
+ReactDOM.render(
+  <Root store={store} history={history} />,
+  document.getElementById('app')
+);
