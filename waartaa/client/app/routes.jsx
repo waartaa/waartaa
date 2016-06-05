@@ -5,7 +5,6 @@ import MaterialApp from './containers/App.jsx';
 import Chat from './containers/Chat.jsx';
 
 export default (
-  <Route path="/" component={MaterialApp} >
-    <Route path="/chat" component={Chat} />
-  </Route>
+  <Route path="/" component={MaterialApp} />,
+  <Route path="/chat" component={Chat} />
 )
