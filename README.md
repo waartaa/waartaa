@@ -1,7 +1,27 @@
 # waartaa
 
-A web IRC client written in Meteor JS. It is aimed towards being an intuitive, collaborative IRC client across
+A web IRC client written on top of React and Pyramid. It is aimed towards being an intuitive, collaborative IRC client across
 multiple devices of the user along with centralized logging.
+
+## Development
+
+1. Install the virtualenvwrapper package  
+``sudo dnf install python-virtualenvwrapper``
+
+2. Create a virtualenv  
+``mkvirtualenv hubs``
+
+3. Install the required packages  
+``pip install -r dev_requirements.txt``
+
+4. Run the pyramid development server  
+``pserve development.ini``
+
+5. Move to the waartaa client folder in another window  
+``cd waartaa/client/``
+
+6. Start the server  
+``npm start``
 
 ## Contribute
 
