@@ -30,7 +30,7 @@ const common = {
         loader: 'babel',
         query: {
           cacheDirectory: true,
-          presets: ['react', 'es2015']
+          presets: ['react', 'es2015', 'stage-0']
         },
         include: PATHS.app
       },

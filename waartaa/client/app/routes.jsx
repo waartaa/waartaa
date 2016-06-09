@@ -4,7 +4,7 @@ import { Route } from 'react-router';
 import MaterialApp from './containers/App.jsx';
 import Chat from './containers/Chat.jsx';
 
-import CallbackPage from './components/App.jsx';
+import CallbackPage from './components/CallbackPage.jsx';
 
 export default (
   <Route>
