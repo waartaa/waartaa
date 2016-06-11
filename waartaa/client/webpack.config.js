@@ -5,7 +5,7 @@ const webpack = require('webpack');
 const TARGET = process.env.npm_lifecycle_event;
 const PATHS = {
   app: path.join(__dirname, 'app'),
-  build: path.join(__dirname, '../static/js')
+  build: path.join(__dirname, './static/js')
 };
 
 process.env.BABEL_ENV = TARGET;

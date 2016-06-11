@@ -8,10 +8,10 @@
 node_modules
 *~
 build
-static/js/waartaa.js
 __pycache__/
 *.egg-info/
-waartaa/static/js/
+waartaa/client/static/js/
 npm-debug.log
-env
+*hot-update.js*
 dist
+env
