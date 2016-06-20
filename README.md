@@ -9,7 +9,7 @@ multiple devices of the user along with centralized logging.
 ``sudo dnf install python-virtualenvwrapper``
 
 2. Create a virtualenv  
-``mkvirtualenv hubs``
+``mkvirtualenv waartaa``
 
 3. Install the required packages  
 ``pip install -r dev_requirements.txt``
