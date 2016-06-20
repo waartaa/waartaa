@@ -1,0 +1,26 @@
+import React, {Component, PropTypes} from 'react';
+
+import ActionAndroid from 'material-ui/svg-icons/action/android';
+import RaisedButton from 'material-ui/RaisedButton';
+
+import userManager from '../../helpers/oidcHelpers.jsx';
+
+export default class LoginController extends Component {
+  onFASLoginButtonClick = (event) => {
+    event.preventDefault();
+    console.log(userManager.signinRedirect);
+    userManager.signinRedirect();
+  };
+
+  render() {
+    return (
+      <div>
+        <RaisedButton
+          label="Login with FAS"
+          icon={<ActionAndroid/>}
+          onMouseUp={this.onFASLoginButtonClick}
+        />
+      </div>
+    );
+  }
+}

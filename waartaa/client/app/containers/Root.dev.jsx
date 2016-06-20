@@ -4,6 +4,7 @@ import { OidcProvider} from 'redux-oidc';
 import { Router } from 'react-router';
 
 import routes from '../routes';
+import userManager from '../helpers/oidcHelpers.jsx';
 
 export default class Root extends Component {
   render() {

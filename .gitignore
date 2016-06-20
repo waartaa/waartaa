@@ -15,3 +15,5 @@ npm-debug.log
 *hot-update.js*
 dist
 env
+*oidcHelpers.jsx
+client_secrets.json
