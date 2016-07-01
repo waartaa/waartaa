@@ -2,3 +2,4 @@ pyramid
 pyramid_chameleon
 waitress
 crossbar
+-e git+https://github.com/waartaa/ircb.git@develop#egg=ircb
