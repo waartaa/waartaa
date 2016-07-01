@@ -3,6 +3,13 @@
 A web IRC client written on top of React and Pyramid. It is aimed towards being an intuitive, collaborative IRC client across
 multiple devices of the user along with centralized logging.
 
+## System dependencies
+
+```
+# Dependency for crossbar
+sudo dnf install -y libsodium libsodium-devel
+```
+
 ## Development
 
 1. Install the virtualenvwrapper package  
