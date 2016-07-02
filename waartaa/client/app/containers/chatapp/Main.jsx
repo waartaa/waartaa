@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { Component } from 'react';
+
+import withWidth, {MEDIUM, LARGE} from 'material-ui/utils/withWidth';
+
 import ChatMenu from './ChatMenu';
 import ChatRoom from './ChatRoom';
 
-var ChatApp = React.createClass({
-    render: function() {
-        return <div>
-            <ChatMenu />
-            <ChatRoom />
-        </div>
-    }
-})
+class ChatApp extends Component {
+  render() {
+    return (
+      <div>
+        <ChatMenu />
+        <ChatRoom />
+      </div>
+    )
+  }
+}
 
-module.exports = ChatApp;
+export default withWidth()(ChatApp)
