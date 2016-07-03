@@ -86,7 +86,7 @@ var ChatRoom = React.createClass({
         <Title render="Waartaa" />
         <AppBar
           onLeftIconButtonTouchTap={this.handleonLeftIconButtonTouchTap}
-          title='Hello'
+          title={this.props.appBarTitle}
           zDepth={0}
           styles={styles.appBar}
           iconElementRight={
