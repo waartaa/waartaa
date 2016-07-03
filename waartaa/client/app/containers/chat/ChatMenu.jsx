@@ -1,8 +1,9 @@
 import React, { Component }from 'react';
+
 import Drawer from 'material-ui/Drawer';
-import {List, ListItem, MakeSelectable} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
-import { LARGE } from 'material-ui/utils/withWidth';
+import {List, ListItem, MakeSelectable} from 'material-ui/List';
+import {LARGE} from 'material-ui/utils/withWidth';
 
 const SelectableList = MakeSelectable(List);
 
@@ -13,9 +14,7 @@ class ChatMenu extends Component {
   }
 
   handleListChangeRequest = (event, value) => {
-    this.props.appBarTitle = value
   }
-
   render () {
     if (this.props.width === LARGE) {
       this.state.open = true;
@@ -24,8 +23,12 @@ class ChatMenu extends Component {
     }
 
     return (
-      <Drawer open={this.state.open} zDepth={1}>
+      <Drawer
+        open={this.state.open}
+        zDepth={1}
+      >
         <SelectableList
+          value=""
           onChange={this.handleListChangeRequest}
         >
           <ListItem
@@ -33,19 +36,11 @@ class ChatMenu extends Component {
             primaryText="Freenode"
             primaryTogglesNestedList={true}
             nestedItems={[
-              <ListItem
-                className="channel"
-                primaryText="#waartaa"
-                value="freenode"
-              />,
-              <ListItem
-                className="channel"
-                primaryText="#fedora"
-                value="freenode"
-              />
+              <ListItem className="channel" primaryText="#waartaa" />,
+              <ListItem className="channel" primaryText="#fedora" />,
             ]}
           />
-          <Divider />
+          <Divider/>
         </SelectableList>
       </Drawer>
     )

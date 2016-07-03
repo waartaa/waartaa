@@ -12,6 +12,8 @@ import IconButton from 'material-ui/IconButton';
 import ContentSend from 'material-ui/svg-icons/content/send';
 import withWidth, {MEDIUM, LARGE} from 'material-ui/utils/withWidth';
 
+import ChannelChatContainer from './ChannelChatContainer.jsx';
+
 
 var ChatRoom = React.createClass({
   getInitialState: function() {
@@ -96,6 +98,7 @@ var ChatRoom = React.createClass({
             />
           }
         />
+        <ChannelChatContainer {...this.props}/>
       </div>
     );
   }
