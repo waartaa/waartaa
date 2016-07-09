@@ -14,7 +14,6 @@ import withWidth, {MEDIUM, LARGE} from 'material-ui/utils/withWidth';
 
 import ChannelChatContainer from './ChannelChatContainer.jsx';
 
-
 var ChatRoom = React.createClass({
   getInitialState: function() {
       return {

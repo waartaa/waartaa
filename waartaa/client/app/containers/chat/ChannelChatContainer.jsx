@@ -16,40 +16,50 @@ class ChannelChatContainer extends Component {
   getStyles = () => {
     const styles = {
       secondaryDrawer: {
-        'top': '56px',
+        top: '56px',
+      },
+      chatContainer: {
+        minHeight: 400,
+        paddingLeft: 20,
       }
     };
-
     return styles;
   }
 
   render = () => {
+    const muiTheme = this.props.muiTheme;
+
     const styles = this.getStyles();
 
     if (this.props.width === LARGE) {
       this.state.secondaryDrawerOpen = true;
+      styles.chatContainer.paddingLeft = 280;
     } else {
       this.state.secondaryDrawerOpen = false;
     }
 
     return (
-      <ChannelChatLogContainer {...this.props}/>
-      <Drawer
-        width={200}
-        openSecondary={true}
-        open={this.state.secondaryDrawerOpen}
-        containerStyle={styles.secondaryDrawer}
-      >
-        <List>
-          <Subheader>Users</Subheader>
-            <ListItem
-              primaryText="Brendan Lim"
-            />
-            <ListItem
-              primaryText="Harley Davidson"
-            />
-        </List>
-      </Drawer>
+      <div>
+        <div style={styles.chatContainer}>
+          <ChannelChatLogContainer {...this.props} />
+        </div>
+        <Drawer
+          width={200}
+          openSecondary={true}
+          open={this.state.secondaryDrawerOpen}
+          containerStyle={styles.secondaryDrawer}
+        >
+          <List>
+            <Subheader>Users</Subheader>
+              <ListItem
+                primaryText="Brendan Lim"
+              />
+              <ListItem
+                primaryText="Harley Davidson"
+              />
+          </List>
+        </Drawer>
+      </div>
     )
   }
 }
