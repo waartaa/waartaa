@@ -1,0 +1,55 @@
+# -*- coding: utf-8 -*-
+
+import asyncio
+import json
+import os
+
+from autobahn.asyncio.websocket import (WebSocketClientProtocol,
+                                        WebSocketClientFactory)
+
+
+class ClientProtocol(WebSocketClientProtocol):
+
+    def onConnect(self, response):
+        print("Server connected to: {0}".format(response.peer))
+
+    def onOpen(self):
+        self.login()
+
+    def login(self):
+        user = os.environ.get('USER')
+        password = os.environ.get('PASSWORD')
+        action = {
+            'type': 'login',
+            'data': {
+                'username': user,
+                'password': password
+            }
+        }
+        self.sendMessage(json.dumps(action).encode('utf-8'))
+
+    def onMessage(self, payload, isBinary):
+        if isBinary:
+            return
+        action = json.loads(payload.decode('utf-8'))
+
+        callback = getattr(self, 'on_' + action['type'], None)
+        if callback:
+            callback(action['data'])
+        else:
+            print('No callback found for type: {0}'.format(
+                  action['type']))
+
+    def on_loggedin(self, data):
+        print("Logged in: {0}".format(data))
+
+
+if __name__ == '__main__':
+    factory = WebSocketClientFactory('ws://127.0.0.1:9999')
+    factory.protocol = ClientProtocol
+
+    loop = asyncio.get_event_loop()
+    coro = loop.create_connection(factory, '127.0.0.1', 9999)
+    loop.run_until_complete(coro)
+    loop.run_forever()
+    loop.close()
