@@ -8,7 +8,7 @@ import baseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 
 import DrawerFooter from '../components/Footer.jsx';
 
-import container from '../stylesheets/base/common.less'
+import container from '../stylesheets/base/common.less';
 
 export default class App extends Component {
     constructor(props, context) {
