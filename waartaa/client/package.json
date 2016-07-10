@@ -14,7 +14,7 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "babel-core": "^6.8.0",
     "babel-loader": "^6.2.4",
     "babel-polyfill": "^6.9.0",
@@ -41,9 +41,7 @@
     "url-loader": "^0.5.7",
     "webpack": "~1.13.1",
     "webpack-dev-server": "~1.14.1",
-    "webpack-merge": "~0.12.0"
-  },
-  "dependencies": {
+    "webpack-merge": "~0.12.0",
     "less": "^2.7.1",
     "react": "^15.0.2",
     "react-dom": "^15.0.2",

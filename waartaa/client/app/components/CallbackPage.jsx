@@ -2,25 +2,14 @@ import React, {Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { CallbackComponent } from 'redux-oidc';
 import { bindActionCreators } from 'redux';
+import { push } from 'react-router-redux';
 
 import * as actions from '../actions/actions';
 import {createTokenManager, createTokenManagerConfig} from '../helpers/oidcHelpers';
 
 class CallbackPage extends Component {
-//   static propTypes: {
-//     actions: PropTypes.shape({
-//       authenticationError  : PropTypes.func.isRequired,
-//       authenticationSuccess: PropTypes.func.isRequired
-//     }).isRequired,
-//   }
-
-  // this method gets called when the token validation fails
-  onTokenValidationError = (error) => {
-    this.props.actions.authenticationError(error);
-  };
-
   successCallback = () => {
-    this.props.actions.authenticationSuccess(createTokenManager().profile);
+    this.props.dispatch(push('/'))
   };
 
   // pass in custom content to render in the CallbackComponent
@@ -33,10 +22,7 @@ class CallbackPage extends Component {
   render() {
     return (
       <CallbackComponent
-        redirectOnSuccess={false}
-        config={createTokenManagerConfig()}
-        successCallback={this.successCallback}
-        errorCallback={this.onTokenValidationError}
+        successCallback={this.successCallback.bind(this)}
       >
         { this.customContent }
       </CallbackComponent>

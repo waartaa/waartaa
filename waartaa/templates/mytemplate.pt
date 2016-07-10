@@ -10,7 +10,7 @@
     <title>Waartaa</title>
   </head>
 
-  <body>
+  <body style="margin: -8px">
     <div id="app"></div>
 
     <script src="${request.static_url('waartaa:static/js/waartaa.js')}"></script>

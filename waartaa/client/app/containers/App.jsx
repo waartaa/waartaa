@@ -1,4 +1,4 @@
-import React, {Component, PropTypes } from 'react';
+import React, {Component, PropTypes} from 'react';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -7,6 +7,8 @@ import MenuItem from 'material-ui/MenuItem';
 import baseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 
 import DrawerFooter from '../components/Footer.jsx';
+
+import container from '../stylesheets/base/common.less';
 
 export default class App extends Component {
     constructor(props, context) {
@@ -19,13 +21,16 @@ export default class App extends Component {
     }
 
     render() {
-        return (
-            <div>
-                <Drawer open={this.state.open}>
-                    <DrawerFooter />
-                </Drawer>
-            </div>
-        );
+      return (
+        <div>
+          <Drawer open={this.state.open}>
+            <DrawerFooter/>
+          </Drawer>
+          <div className="container">
+            {this.props.children}
+          </div>
+        </div>
+      );
     }
 }
 
@@ -35,6 +40,6 @@ App.childContextTypes = {
 
 const MaterialApp = () => (
     <MuiThemeProvider muiTheme={getMuiTheme()}>
-        <App />
+        <App/>
     </MuiThemeProvider>
 );
