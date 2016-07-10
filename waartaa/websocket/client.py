@@ -42,6 +42,23 @@ class ClientProtocol(WebSocketClientProtocol):
 
     def on_loggedin(self, data):
         print("Logged in: {0}".format(data))
+        action = {
+            'type': 'subscribe_chat_message_logs',
+            'data': {
+                'hostname': os.environ.get('IRC_HOSTNAME'),
+                'roomname': os.environ.get('IRC_ROOMNAME')
+            }
+        }
+        self.sendMessage(json.dumps(action).encode('utf-8'))
+
+    def on_chat_message_logs_fetched(self, data):
+        print('chat message logs fetched: {}'.format(data))
+
+    def on_chat_message_logs_created(self, data):
+        print('chat message logs created: {0}'.format(data))
+
+    def on_chat_message_logs_updated(self, data):
+        print('chat message logs updated: {}'.format(data))
 
 
 if __name__ == '__main__':

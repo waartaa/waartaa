@@ -2,11 +2,14 @@
 
 import asyncio
 import json
+import os
+
 from autobahn.asyncio.websocket import WebSocketServerProtocol, \
     WebSocketServerFactory
 import logging
 
 from ircb.storeclient import UserStore
+from ircb.publishers import MessageLogPublisher
 
 
 class ServerProtocol(WebSocketServerProtocol):
@@ -15,6 +18,7 @@ class ServerProtocol(WebSocketServerProtocol):
         super().__init__(*args, **kwargs)
         self.user = None
         self.log = logging.getLogger()
+        self.publishers = set()
 
     def onConnect(self, request):
         self.request = request
@@ -43,6 +47,44 @@ class ServerProtocol(WebSocketServerProtocol):
             self.user = user
             response = {'type': 'loggedin', 'data': {'status': 'SUCCESS'}}
             self.sendMessage(json.dumps(response).encode('utf-8'))
+
+    @asyncio.coroutine
+    def on_subscribe_chat_message_logs(self, data):
+        if self.user is None:
+            return
+        publisher = MessageLogPublisher(data['hostname'], data['roomname'],
+                                        self.user.id)
+
+        def on_create(data):
+            action = {
+                'type': 'chat_message_logs_created',
+                'id': publisher.signature,
+                'data': data
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        def on_fetch(data):
+            for item in data:
+                action = {
+                    'type': 'chat_message_logs_fetched',
+                    'id': publisher.signature,
+                    'data': data
+                }
+                self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        def on_update(data):
+            action = {
+                'type': 'chat_message_logs_updated',
+                'id': publisher.signature,
+                'data': data
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        publisher.on('create', on_create)
+        publisher.on('fetch', on_fetch)
+        publisher.on('update', on_update)
+
+        publisher.run()
 
     def onClose(self, wasClean, code, reason):
         self.log.info('Websocket connection closed: {0}'.format(reason))
