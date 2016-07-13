@@ -9,7 +9,7 @@ from autobahn.asyncio.websocket import WebSocketServerProtocol, \
 import logging
 
 from ircb.storeclient import UserStore
-from ircb.publishers import MessageLogPublisher
+from ircb.publishers import MessageLogPublisher, NetworkPublisher
 
 
 class ServerProtocol(WebSocketServerProtocol):
@@ -49,6 +49,42 @@ class ServerProtocol(WebSocketServerProtocol):
             self.sendMessage(json.dumps(response).encode('utf-8'))
 
     @asyncio.coroutine
+    def on_subscribe_networks(self, data):
+        if self.user is None:
+            return
+        publisher = NetworkPublisher(self.user.id)
+
+        def on_create(data):
+            action = {
+                'type': 'networks_created',
+                'id': publisher.id,
+                'data': data
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        def on_fetch(data):
+            action = {
+                'type': 'networks_fetched',
+                'id': publisher.id,
+                'data': data
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        def on_update(data):
+            action = {
+                'type': 'networks_updated',
+                'id': publisher.id,
+                'data': data
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        publisher.on('create', on_create)
+        publisher.on('fetch', on_fetch)
+        publisher.on('update', on_update)
+
+        publisher.run()
+
+    @asyncio.coroutine
     def on_subscribe_chat_message_logs(self, data):
         if self.user is None:
             return
@@ -58,24 +94,23 @@ class ServerProtocol(WebSocketServerProtocol):
         def on_create(data):
             action = {
                 'type': 'chat_message_logs_created',
-                'id': publisher.signature,
+                'id': publisher.id,
                 'data': data
             }
             self.sendMessage(json.dumps(action).encode('utf-8'))
 
         def on_fetch(data):
-            for item in data:
-                action = {
-                    'type': 'chat_message_logs_fetched',
-                    'id': publisher.signature,
-                    'data': data
-                }
-                self.sendMessage(json.dumps(action).encode('utf-8'))
+            action = {
+                'type': 'chat_message_logs_fetched',
+                'id': publisher.id,
+                'data': data
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
 
         def on_update(data):
             action = {
                 'type': 'chat_message_logs_updated',
-                'id': publisher.signature,
+                'id': publisher.id,
                 'data': data
             }
             self.sendMessage(json.dumps(action).encode('utf-8'))

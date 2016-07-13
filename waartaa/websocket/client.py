@@ -43,6 +43,12 @@ class ClientProtocol(WebSocketClientProtocol):
     def on_loggedin(self, data):
         print("Logged in: {0}".format(data))
         action = {
+            'type': 'subscribe_networks',
+            'data': {}
+        }
+        self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        action = {
             'type': 'subscribe_chat_message_logs',
             'data': {
                 'hostname': os.environ.get('IRC_HOSTNAME'),
@@ -59,6 +65,15 @@ class ClientProtocol(WebSocketClientProtocol):
 
     def on_chat_message_logs_updated(self, data):
         print('chat message logs updated: {}'.format(data))
+
+    def on_networks_fetched(self, data):
+        print('networks fetched: {0}'.format(data))
+
+    def on_networks_created(self, data):
+        print('networks created: {0}'.format(data))
+
+    def on_networks_updated(self, data):
+        print('networks updated: {0}'.format(data))
 
 
 if __name__ == '__main__':
