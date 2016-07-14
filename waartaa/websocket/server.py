@@ -9,7 +9,9 @@ from autobahn.asyncio.websocket import WebSocketServerProtocol, \
 import logging
 
 from ircb.storeclient import UserStore
-from ircb.publishers import MessageLogPublisher, NetworkPublisher
+from ircb.publishers import (MessageLogPublisher,
+                             NetworkPublisher,
+                             ChannelPublisher)
 
 
 class ServerProtocol(WebSocketServerProtocol):
@@ -73,6 +75,45 @@ class ServerProtocol(WebSocketServerProtocol):
         def on_update(data):
             action = {
                 'type': 'networks_updated',
+                'id': publisher.id,
+                'data': data
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        publisher.on('create', on_create)
+        publisher.on('fetch', on_fetch)
+        publisher.on('update', on_update)
+
+        publisher.run()
+
+    @asyncio.coroutine
+    def on_subscribe_channels(self, data):
+        if self.user is None:
+            return
+        if 'network_id' in data:
+            publisher = ChannelPublisher(self.user.id, data['network_id'])
+        else:
+            publisher = ChannelPublisher(self.user.id)
+
+        def on_create(data):
+            action = {
+                'type': 'channels_created',
+                'id': publisher.id,
+                'data': data
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        def on_fetch(data):
+            action = {
+                'type': 'channels_fetched',
+                'id': publisher.id,
+                'data': data
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
+
+        def on_update(data):
+            action = {
+                'type': 'channels_updated',
                 'id': publisher.id,
                 'data': data
             }

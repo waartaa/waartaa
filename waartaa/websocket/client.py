@@ -31,6 +31,8 @@ class ClientProtocol(WebSocketClientProtocol):
     def onMessage(self, payload, isBinary):
         if isBinary:
             return
+
+        print(payload)
         action = json.loads(payload.decode('utf-8'))
 
         callback = getattr(self, 'on_' + action['type'], None)
@@ -47,6 +49,7 @@ class ClientProtocol(WebSocketClientProtocol):
             'data': {}
         }
         self.sendMessage(json.dumps(action).encode('utf-8'))
+        """
 
         action = {
             'type': 'subscribe_chat_message_logs',
@@ -56,6 +59,7 @@ class ClientProtocol(WebSocketClientProtocol):
             }
         }
         self.sendMessage(json.dumps(action).encode('utf-8'))
+        """
 
     def on_chat_message_logs_fetched(self, data):
         print('chat message logs fetched: {}'.format(data))
@@ -68,12 +72,29 @@ class ClientProtocol(WebSocketClientProtocol):
 
     def on_networks_fetched(self, data):
         print('networks fetched: {0}'.format(data))
+        for item in data:
+            action = {
+                'type': 'subscribe_channels',
+                'data': {
+                    'network_id': item['id']
+                }
+            }
+            self.sendMessage(json.dumps(action).encode('utf-8'))
 
     def on_networks_created(self, data):
         print('networks created: {0}'.format(data))
 
     def on_networks_updated(self, data):
         print('networks updated: {0}'.format(data))
+
+    def on_channels_fetched(self, data):
+        print('channels fetched: {0}'.format(data))
+
+    def on_channels_created(self, data):
+        print('channels created: {0}'.format(data))
+
+    def on_channels_updated(self, data):
+        print('channels updated: {0}'.format(data))
 
 
 if __name__ == '__main__':
