@@ -12,7 +12,16 @@ with open(os.path.join(here, 'CHANGELOG.md')) as f:
 
 def parse_requirements(requirements_file):
     with open(requirements_file, 'r') as f:
-        return [line for line in f if line.strip() and not line.startswith('#')]
+        return [line for line in f if line.strip()
+                and not line.startswith('#')
+                and not line.startswith('-e')]
+
+
+def parse_dependencies(requirements_file):
+    with open(requirements_file, 'r') as f:
+        return [line for line in f if line.strip()
+                and not line.startswith('#')
+                and line.startswith('-e')]
 
 REQUIREMENTS_PATH = 'requirements.txt'
 
@@ -35,7 +44,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=parse_requirements(REQUIREMENTS_PATH),
-    tests_require=parse_requirements(REQUIREMENTS_PATH),
+    tests_requires=parse_requirements(REQUIREMENTS_PATH),
+    dependency_links=parse_dependencies(REQUIREMENTS_PATH),
     test_suite="waartaa",
     entry_points={
         'paste.app_factory': [
