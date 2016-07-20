@@ -21,13 +21,14 @@ export default class App extends Component {
     }
 
     render() {
+      const { children } = this.props;
       return (
         <div>
           <Drawer open={this.state.open}>
             <DrawerFooter/>
           </Drawer>
           <div className="container">
-            {this.props.children}
+            { children }
           </div>
         </div>
       );

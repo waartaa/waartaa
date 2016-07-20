@@ -1,12 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 import { CallbackComponent } from 'redux-oidc';
 
 class CallbackPage extends React.Component {
-  successCallback = (user) => {
-     // the url before redirection was triggered is passed into the user object
-     // and can be accessed like this
-     redirect(user.state.redirectUrl);
+  successCallback = () => {
+    push('/')
   };
 
   render() {

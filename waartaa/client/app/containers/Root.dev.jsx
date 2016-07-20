@@ -4,6 +4,7 @@ import { OidcProvider} from 'redux-oidc';
 import { Router } from 'react-router';
 
 import routes from '../routes';
+import DevTools from './DevTools.jsx';
 import userManager from '../helpers/oidcHelpers.jsx';
 
 export default class Root extends Component {
@@ -11,9 +12,12 @@ export default class Root extends Component {
     const { store, history } = this.props;
     return (
       <Provider store={store}>
-        <OidcProvider store={store} userManager={userManager}>
-          <Router history={history} routes={routes} />
-        </OidcProvider>
+        <div>
+          <OidcProvider store={store} userManager={userManager}>
+            <Router history={history} routes={routes} />
+          </OidcProvider>
+          <DevTools />
+        </div>
       </Provider>
     )
   }
