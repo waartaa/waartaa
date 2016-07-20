@@ -8,7 +8,6 @@ import userManager from '../../helpers/oidcHelpers.jsx';
 export default class LoginController extends Component {
   onFASLoginButtonClick = (event) => {
     event.preventDefault();
-    console.log(userManager.signinRedirect);
     userManager.signinRedirect();
   };
 

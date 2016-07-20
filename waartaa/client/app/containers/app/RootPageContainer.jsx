@@ -9,11 +9,22 @@ export default class RootPageContainer extends React.Component {
   constructor(props) {
     super(props);
   }
-  render () {
+
+  getStyles = () => {
+    const styles = {
+      rightContainer : {
+        paddingLeft: 20,
+      }
+    }
+    return styles;
+  }
+
+  render = () => {
+    const styles = this.getStyles();
+
     return (
-      <div>
+      <div style={styles.rightContainer}>
         <PageTitle />
-        <SocialButtons />
         <LoginController />
       </div>
     );

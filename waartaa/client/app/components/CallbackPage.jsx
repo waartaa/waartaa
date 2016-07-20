@@ -1,38 +1,26 @@
-import React, {Component, PropTypes } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { CallbackComponent } from 'redux-oidc';
-import { bindActionCreators } from 'redux';
-import { push } from 'react-router-redux';
 
-import * as actions from '../actions/actions';
-import {createTokenManager, createTokenManagerConfig} from '../helpers/oidcHelpers';
-
-class CallbackPage extends Component {
-  successCallback = () => {
-    this.props.dispatch(push('/'))
+class CallbackPage extends React.Component {
+  successCallback = (user) => {
+     // the url before redirection was triggered is passed into the user object
+     // and can be accessed like this
+     redirect(user.state.redirectUrl);
   };
-
-  // pass in custom content to render in the CallbackComponent
-  get customContent() {
-    return (
-      <div>Redirecting...</div>
-    );
-  }
 
   render() {
     return (
-      <CallbackComponent
-        successCallback={this.successCallback.bind(this)}
-      >
-        { this.customContent }
+      <CallbackComponent successCallback={this.successCallback}>
+        My custom content!
       </CallbackComponent>
-    );
+    )
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(actions, dispatch)
+    dispatch
   };
 }
 
