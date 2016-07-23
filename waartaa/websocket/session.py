@@ -1,43 +1,29 @@
 # -*- coding: utf-8 -*-
-
 import asyncio
 import json
-import os
-
-from autobahn.asyncio.websocket import WebSocketServerProtocol, \
-    WebSocketServerFactory
-import logging
+import sockjs
 
 from ircb.storeclient import UserStore
-from ircb.publishers import (MessageLogPublisher,
-                             NetworkPublisher,
-                             ChannelPublisher)
+from ircb.publishers import (NetworkPublisher,
+                             ChannelPublisher,
+                             MessageLogPublisher)
 
 
-class ServerProtocol(WebSocketServerProtocol):
+class SockjsSessionHandler(object):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.user = None
-        self.log = logging.getLogger()
-        self.publishers = set()
+    def __init__(self, session):
+        self.session = session
 
-    def onConnect(self, request):
-        self.request = request
+    def on_message(self, message):
+        try:
+            action = json.loads(message)
 
-    def onOpen(self):
-        self.log.info('Connection opened')
-
-    def onMessage(self, payload, isBinary):
-        self.log.info(payload)
-        if isBinary:
-            return
-
-        action = json.loads(payload.decode('utf-8'))
-
-        callback = getattr(self, 'on_' + action['type'], None)
-        if callback:
-            asyncio.Task(callback(action['data']))
+            callback = getattr(self, 'on_' + action['type'], None)
+            if callback:
+                asyncio.Task(callback(action['data']))
+        except Exception as e:
+            print('Unable to handle message: {}'.format(message))
+            self.session.send(message)
 
     @asyncio.coroutine
     def on_login(self, data):
@@ -48,7 +34,7 @@ class ServerProtocol(WebSocketServerProtocol):
         if user:
             self.user = user
             response = {'type': 'loggedin', 'data': {'status': 'SUCCESS'}}
-            self.sendMessage(json.dumps(response).encode('utf-8'))
+            self.session.send(json.dumps(response))
 
     @asyncio.coroutine
     def on_subscribe_networks(self, data):
@@ -62,7 +48,7 @@ class ServerProtocol(WebSocketServerProtocol):
                 'id': publisher.id,
                 'data': data
             }
-            self.sendMessage(json.dumps(action).encode('utf-8'))
+            self.session.send(json.dumps(action))
 
         def on_fetch(data):
             action = {
@@ -70,7 +56,7 @@ class ServerProtocol(WebSocketServerProtocol):
                 'id': publisher.id,
                 'data': data
             }
-            self.sendMessage(json.dumps(action).encode('utf-8'))
+            self.session.send(json.dumps(action))
 
         def on_update(data):
             action = {
@@ -78,7 +64,7 @@ class ServerProtocol(WebSocketServerProtocol):
                 'id': publisher.id,
                 'data': data
             }
-            self.sendMessage(json.dumps(action).encode('utf-8'))
+            self.session.send(json.dumps(action))
 
         publisher.on('create', on_create)
         publisher.on('fetch', on_fetch)
@@ -101,7 +87,7 @@ class ServerProtocol(WebSocketServerProtocol):
                 'id': publisher.id,
                 'data': data
             }
-            self.sendMessage(json.dumps(action).encode('utf-8'))
+            self.session.send(json.dumps(action))
 
         def on_fetch(data):
             action = {
@@ -109,7 +95,7 @@ class ServerProtocol(WebSocketServerProtocol):
                 'id': publisher.id,
                 'data': data
             }
-            self.sendMessage(json.dumps(action).encode('utf-8'))
+            self.session.send(json.dumps(action))
 
         def on_update(data):
             action = {
@@ -117,7 +103,7 @@ class ServerProtocol(WebSocketServerProtocol):
                 'id': publisher.id,
                 'data': data
             }
-            self.sendMessage(json.dumps(action).encode('utf-8'))
+            self.session.send(json.dumps(action))
 
         publisher.on('create', on_create)
         publisher.on('fetch', on_fetch)
@@ -138,7 +124,7 @@ class ServerProtocol(WebSocketServerProtocol):
                 'id': publisher.id,
                 'data': data
             }
-            self.sendMessage(json.dumps(action).encode('utf-8'))
+            self.session.send(json.dumps(action))
 
         def on_fetch(data):
             action = {
@@ -146,7 +132,7 @@ class ServerProtocol(WebSocketServerProtocol):
                 'id': publisher.id,
                 'data': data
             }
-            self.sendMessage(json.dumps(action).encode('utf-8'))
+            self.session.send(json.dumps(action))
 
         def on_update(data):
             action = {
@@ -154,7 +140,7 @@ class ServerProtocol(WebSocketServerProtocol):
                 'id': publisher.id,
                 'data': data
             }
-            self.sendMessage(json.dumps(action).encode('utf-8'))
+            self.session.send(json.dumps(action))
 
         publisher.on('create', on_create)
         publisher.on('fetch', on_fetch)
@@ -162,32 +148,23 @@ class ServerProtocol(WebSocketServerProtocol):
 
         publisher.run()
 
-    def onClose(self, wasClean, code, reason):
-        self.log.info('Websocket connection closed: {0}'.format(reason))
 
+class SockjsSessionHandlerFactory(object):
 
-def run():
-    from ircb.storeclient import initialize
-    from ircb.utils.config import load_config
-    load_config()
-    initialize()
-    host = os.environ.get('HOST') or '127.0.0.1'
-    port = os.environ.get('PORT') or 9999
-    factory = WebSocketServerFactory(
-        'ws://{host}:{port}'.format(host=host, port=port))
-    factory.protocol = ServerProtocol
+    _handlers = {}
 
-    loop = asyncio.get_event_loop()
-    coro = loop.create_server(factory, host, port)
-    server = loop.run_until_complete(coro)
+    @classmethod
+    def get(self, session):
+        return self._handlers.get(session.id)
 
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.close()
-        loop.close()
+    @classmethod
+    def create(self, session):
+        handler = self._handlers.get(session.id)
+        if handler is None:
+            handler = SockjsSessionHandler(session)
+            self._handlers[session.id] = handler
+        return handler
 
-if __name__ == '__main__':
-    run()
+    @classmethod
+    def remove(self, session):
+        self._handlers.pop(session.id, None)

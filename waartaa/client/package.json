@@ -44,6 +44,7 @@
     "react-title-component": "^1.0.1",
     "redux": "^3.5.2",
     "redux-oidc": "^2.0.0-beta.2",
+    "sockjs-client": "^1.0.3",
     "style-loader": "~0.13.1",
     "toastr": "^2.1.2",
     "url-loader": "^0.5.7",
