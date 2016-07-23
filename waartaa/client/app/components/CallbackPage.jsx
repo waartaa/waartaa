@@ -5,12 +5,12 @@ import { CallbackComponent } from 'redux-oidc';
 
 class CallbackPage extends React.Component {
   successCallback = () => {
-    push('/')
+    this.props.dispatch(push('/'));
   };
 
   render() {
     return (
-      <CallbackComponent successCallback={this.successCallback}>
+      <CallbackComponent successCallback={this.successCallback.bind(this)}>
         My custom content!
       </CallbackComponent>
     )

@@ -54,6 +54,5 @@ export default function configureStore(initialState) {
       DevTools.instrument()
     )
   )
-
   return store;
 }

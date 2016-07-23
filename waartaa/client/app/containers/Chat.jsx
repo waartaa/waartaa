@@ -7,7 +7,8 @@ import withWidth from 'material-ui/utils/withWidth';
 import ChatApp from './chat/ChatApp.jsx';
 
 class Chat extends React.Component {
-  render() {
+  render = () => {
+    console.log(this.props.params.channelName);
     return (
       <MuiThemeProvider muiTheme={getMuiTheme()}>
         <ChatApp {...this.props} />
