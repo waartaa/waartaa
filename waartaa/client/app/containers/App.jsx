@@ -21,7 +21,7 @@ export default class App extends Component {
     }
 
     render() {
-      const { children } = this.props;
+      const { children, user } = this.props;
       return (
         <div>
           <Drawer open={this.state.open}>

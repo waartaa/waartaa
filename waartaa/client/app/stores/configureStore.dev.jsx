@@ -50,6 +50,5 @@ export default function configureStore(initialState) {
       type: types.CONNECTED
     });
   }
-
   return store;
 }

@@ -12,7 +12,9 @@ export default (
     <Route path="/" component={MaterialApp}>
       <IndexRoute component={RootPageContainer}/>
     </Route>
-    <Route path="/chat" component={Chat} />
+    <Route path="/chat" component={Chat}>
+      <Route path="/:channelName" component={Chat} />
+    </Route>
     <Route path="/oidc_callback" component={CallbackPage} />
   </Route>
 )
