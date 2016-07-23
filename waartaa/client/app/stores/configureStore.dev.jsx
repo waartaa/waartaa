@@ -1,17 +1,18 @@
-import { createStore } from 'redux';
+import { createStore, compose } from 'redux';
 import rootReducer from '../reducers';
+import { applyMiddleware } from 'redux';
+import oidcMiddleware from '../middleware/middleware.jsx';
+import DevTools from '../containers/DevTools.jsx';
 
 export default function configureStore(initialState) {
   const store = createStore(
     rootReducer,
-    initialState
+    initialState,
+    compose(
+      applyMiddleware(oidcMiddleware),
+      DevTools.instrument()
+    )
   )
 
-  if (module.hot) {
-    module.hot.accept('../reducers', () => {
-      const nextRootReducer = require('../reducers').default
-      store.replaceReducer(nextRootReducer)
-    })
-  }
   return store;
 }

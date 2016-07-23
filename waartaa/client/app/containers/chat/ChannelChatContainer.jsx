@@ -21,6 +21,7 @@ class ChannelChatContainer extends Component {
       chatContainer: {
         minHeight: 400,
         paddingLeft: 20,
+        boxSizing: 'border-box',
       }
     };
     return styles;
@@ -28,12 +29,12 @@ class ChannelChatContainer extends Component {
 
   render = () => {
     const muiTheme = this.props.muiTheme;
-
     const styles = this.getStyles();
 
     if (this.props.width === LARGE) {
       this.state.secondaryDrawerOpen = true;
-      styles.chatContainer.paddingLeft = 280;
+      styles.chatContainer.paddingLeft = 260;
+      styles.chatContainer.paddingRight = 210;
     } else {
       this.state.secondaryDrawerOpen = false;
     }

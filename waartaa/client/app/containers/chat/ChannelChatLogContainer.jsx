@@ -1,19 +1,39 @@
 import React, {Component} from 'react';
 
-import {List, ListItem} from 'material-ui/List';
-import Drawer from 'material-ui/Drawer';
-import Subheader from 'material-ui/Subheader';
+import TextField from 'material-ui/TextField';
+import Divider from 'material-ui/Divider';
 import withWidth, {MEDIUM, LARGE} from 'material-ui/utils/withWidth';
+
+import ChannelChatLog from './ChannelChatLog.jsx';
 
 class ChannelChatLogContainer extends Component {
   constructor(props, context){
     super(props, context);
   }
 
+  getStyles = () => {
+    const styles = {
+      textField: {
+        paddingLeft: 20,
+        paddingRight: 20,
+        boxSizing: 'border-box',
+      }
+    }
+
+    return styles;
+  }
+
   render = () => {
+    const styles = this.getStyles();
+
     return (
       <div>
-        Hello! I am the Future Chat Container
+        <ChannelChatLog />
+        <Divider />
+        <TextField
+          fullWidth={true}
+          style={styles.textField}
+        />
       </div>
     )
   }
