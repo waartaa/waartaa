@@ -14,17 +14,20 @@ const style = {
 }
 
 class LoginForm extends Component {
+  handleSubmit = (event) => {
+    event.preventDefault();
+    console.log('form submitted')
+  };
+
   render() {
     const {
       fields: { username, password },
-      handleSubmit,
       submitting
       } = this.props
-    debugger;
     return (
       <div>
         <Paper style={style} zDepth={1} rounded={false}>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={this.handleSubmit}>
             <TextField
               floatingLabelText="Username"
               floatingLabelFixed={false}

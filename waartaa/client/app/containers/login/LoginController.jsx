@@ -12,12 +12,6 @@ export default class LoginController extends Component {
     userManager.signinRedirect();
   };
 
-  handleSubmit = (event) => {
-    debugger;
-    event.preventDefault();
-    console.log('form submitted')
-  };
-
   render() {
     return (
       <div>
@@ -26,7 +20,7 @@ export default class LoginController extends Component {
           icon={<ActionAndroid/>}
           onMouseUp={this.onFASLoginButtonClick}
         />
-        <LoginForm handleSubmit={this.handleSubmit} submitting={false} />
+        <LoginForm submitting={false} />
       </div>
     );
   }
