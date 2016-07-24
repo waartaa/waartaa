@@ -16,6 +16,11 @@ const style = {
 
 const submit = (values, dispatch) => {
   console.log(values);
+  dispatch({
+    type: 'login',
+    data: values,
+    remote: true
+  });
 };
 
 class LoginForm extends Component {

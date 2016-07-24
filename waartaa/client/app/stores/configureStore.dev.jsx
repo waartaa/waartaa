@@ -44,16 +44,5 @@ export default function configureStore(initialState) {
     )
   )
 
-  sock.onopen = () => {
-    store.dispatch({
-      type: 'login',
-      data: {
-        username: 'rtnpro',
-        password: 'password'
-      },
-      remote: true
-    })
-  }
-
   return store;
 }
