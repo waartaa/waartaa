@@ -13,25 +13,27 @@ const style = {
   textAlign: "center"
 }
 
-class LoginForm extends Component {
-  handleSubmit = (event) => {
-    event.preventDefault();
-    console.log('form submitted')
-  };
 
+const submit = (values, dispatch) => {
+  console.log(values);
+};
+
+class LoginForm extends Component {
   render() {
     const {
       fields: { username, password },
+      handleSubmit,
       submitting
       } = this.props
     return (
       <div>
         <Paper style={style} zDepth={1} rounded={false}>
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={handleSubmit(submit)}>
             <TextField
               floatingLabelText="Username"
               floatingLabelFixed={false}
               fullWidth={true}
+              {...username}
             />
             <br />
             <TextField
@@ -39,6 +41,7 @@ class LoginForm extends Component {
               floatingLabelFixed={false}
               type="password"
               fullWidth={true}
+              {...password}
             />
             <br />
             <RaisedButton label="Login" type="submit" primary={true} />
@@ -54,7 +57,9 @@ LoginForm.propTypes = {
   submitting: PropTypes.bool.isRequired
 }
 
-export default reduxForm({
+LoginForm = reduxForm({
   form: 'simple',
   fields
 })(LoginForm);
+
+export default LoginForm;
