@@ -1,24 +1,12 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import rootReducer from '../reducers';
-import { applyMiddleware } from 'redux';
 import oidcMiddleware from '../middleware/middleware.jsx';
 import DevTools from '../containers/DevTools.jsx';
 import SockJS from 'sockjs-client';
+import createSockjsMiddleware from '../middlewares/sockjs';
 
 var sock = new SockJS('/sockjs');
-
-console.log(sock);
-
-sock.onopen = function() {
-	console.log('open');
-	sock.send(JSON.stringify({
-		type: 'login',
-    data: {
-			username: 'rtnpro',
-			password: 'password'
-		}
-	}));
-}
+var sockjsMiddleware = createSockjsMiddleware(sock);
 
 sock.onmessage = function(e) {
   console.log('Received message')
@@ -50,10 +38,22 @@ export default function configureStore(initialState) {
     rootReducer,
     initialState,
     compose(
+      applyMiddleware(sockjsMiddleware),
       applyMiddleware(oidcMiddleware),
       DevTools.instrument()
     )
   )
+
+  sock.onopen = () => {
+    store.dispatch({
+      type: 'login',
+      data: {
+        username: 'rtnpro',
+        password: 'password'
+      },
+      remote: true
+    })
+  }
 
   return store;
 }
