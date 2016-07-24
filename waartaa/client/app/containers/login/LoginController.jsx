@@ -20,11 +20,6 @@ export default class LoginController extends Component {
   render() {
     return (
       <div>
-        <RaisedButton
-          label="Login with FAS"
-          icon={<ActionAndroid/>}
-          onMouseUp={this.onFASLoginButtonClick}
-        />
         <LoginForm handleSubmit={this.handleSubmit} submitting={false} />
       </div>
     );
