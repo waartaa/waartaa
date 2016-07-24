@@ -4,6 +4,7 @@ import oidcMiddleware from '../middleware/middleware.jsx';
 import DevTools from '../containers/DevTools.jsx';
 import SockJS from 'sockjs-client';
 import createSockjsMiddleware from '../middlewares/sockjs';
+import * as types from '../constants/actionTypes';
 
 var sock = new SockJS('/sockjs');
 var sockjsMiddleware = createSockjsMiddleware(sock);
@@ -43,6 +44,12 @@ export default function configureStore(initialState) {
       DevTools.instrument()
     )
   )
+
+  sock.onopen = () => {
+    store.dispatch({
+      type: types.CONNECTED
+    });
+  }
 
   return store;
 }

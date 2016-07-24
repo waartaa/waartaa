@@ -9,7 +9,8 @@ const rootReducer = combineReducers({
   oidc: reduxReducer,
   routing: routing,
   form: formReducer,
-  authed: authed
+  authed: authed,
+  connection: connection
 });
 
 export default rootReducer
