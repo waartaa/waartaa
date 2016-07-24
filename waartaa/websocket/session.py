@@ -33,7 +33,16 @@ class SockjsSessionHandler(object):
         )
         if user:
             self.user = user
-            response = {'type': 'loggedin', 'data': {'status': 'SUCCESS'}}
+            response = {'type': 'loggedin',
+                        'data': {
+                            'status': 'SUCCESS',
+                            'user': {
+                                'id': user.id,
+                                'username': user.username,
+                                'email': user.email
+                            }
+                        }
+                        }
             self.session.send(json.dumps(response))
 
     @asyncio.coroutine
