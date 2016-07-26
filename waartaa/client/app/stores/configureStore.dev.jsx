@@ -4,6 +4,7 @@ import oidcMiddleware from '../middleware/middleware.jsx';
 import DevTools from '../containers/DevTools.jsx';
 import SockJS from 'sockjs-client';
 import createSockjsMiddleware from '../middlewares/sockjs';
+import * as types from '../constants/actionTypes';
 
 var sock = new SockJS('/sockjs');
 var sockjsMiddleware = createSockjsMiddleware(sock);
@@ -46,13 +47,8 @@ export default function configureStore(initialState) {
 
   sock.onopen = () => {
     store.dispatch({
-      type: 'login',
-      data: {
-        username: 'rtnpro',
-        password: 'password'
-      },
-      remote: true
-    })
+      type: types.CONNECTED
+    });
   }
 
   return store;

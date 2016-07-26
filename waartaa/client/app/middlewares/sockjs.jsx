@@ -7,7 +7,9 @@ export default function createSockjsMiddleware(sock) {
   return ({ dispatch }) => {
     // Wire sockjs to dispatch actions sent by the server.
     sock.onmessage = (e) => {
-      dispatch(JSON.parse(e.data))
+      console.log('Message received');
+      console.log(e.data);
+      dispatch(JSON.parse(e.data));
     }
 
     return next => action => {

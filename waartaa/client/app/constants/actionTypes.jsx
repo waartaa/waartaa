@@ -3,3 +3,4 @@ export const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
 export const AUTHORIZATION_ERROR = 'AUTHORIZATION_ERROR';
 export const LOGOUT = 'LOGOUT';
 export const LOGGEDIN = 'loggedin';
+export const CONNECTED = 'connected';

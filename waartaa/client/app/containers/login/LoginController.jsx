@@ -4,6 +4,7 @@ import ActionAndroid from 'material-ui/svg-icons/action/android';
 import RaisedButton from 'material-ui/RaisedButton';
 
 import userManager from '../../helpers/oidcHelpers.jsx';
+import LoginForm from '../forms/LoginForm';
 
 export default class LoginController extends Component {
   onFASLoginButtonClick = (event) => {
@@ -11,14 +12,15 @@ export default class LoginController extends Component {
     userManager.signinRedirect();
   };
 
+  handleSubmit = (event) => {
+    event.preventDefault();
+    console.log('form submitted')
+  };
+
   render() {
     return (
       <div>
-        <RaisedButton
-          label="Login with FAS"
-          icon={<ActionAndroid/>}
-          onMouseUp={this.onFASLoginButtonClick}
-        />
+        <LoginForm handleSubmit={this.handleSubmit} submitting={false} />
       </div>
     );
   }
