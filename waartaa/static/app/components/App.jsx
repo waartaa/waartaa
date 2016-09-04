@@ -1,25 +1,9 @@
-import React, {Component, PropTypes } from 'react';
-import { connect } from 'react-redux';
-import { CallbackComponent } from 'react-oidc';
-import { push } from 'react-router-redux';
+import React, {Component, PropTypes} from 'react';
 
-
-class CallbackPage extends Component {
-  successCallback = () => {
-    this.props.dispatch(push('/'));
-  }
-  
+class App extends Component {
   render() {
-    return (
-      <CallbackComponent successCallback={this.successCallback.bind(this)} />
-    );
-  }
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatch
+    return 'Hello';
   };
 }
 
-export default connect(null, mapDispatchToProps)(CallbackPage);
+export default App;

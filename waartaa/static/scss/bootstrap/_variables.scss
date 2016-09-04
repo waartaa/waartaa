@@ -1,0 +1,218 @@
+// Variables overrides for fedora-bootstrap
+//
+
+// Table of Contents
+//
+// Colors
+// Options
+// Spacing
+// Body
+// Links
+// Grid breakpoints
+// Grid containers
+// Grid columns
+// Typography
+// Components
+
+//***********************
+// Colors
+//***********************
+// Grayscale and brand colors for use across Bootstrap.
+//
+//
+//$gray-dark:                 #373a3c !default;
+//$gray:                      #55595c !default;
+//$gray-light:                #d5d5d5 !default;
+//$gray-lighter:              #eceeef !default;
+//$gray-lightest:             #f7f7f9 !default;
+
+//$brand-primary:         #428bca;
+//$brand-success:         #79db32;
+//$brand-warning:         #e59728;
+//$brand-danger:          #db3279;
+//$brand-info:            #a07cbc;
+
+//***********************
+// Options
+//***********************
+// Quickly modify global styling by enabling or disabling optional features.
+
+
+//***********************
+// Spacing
+//***********************
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+
+
+//***********************
+// Body
+//***********************
+// Settings for the `<body>` element.
+
+$body-bg:                    #fff;
+
+
+//***********************
+// Links
+//***********************
+// Style anchor elements.
+
+
+//***********************
+// Grid breakpoints
+//***********************
+// Define the minimum and maximum dimensions at which your layout will change,
+// adapting to different screen sizes, for use in media queries.
+
+
+//***********************
+// Grid containers
+//***********************
+$container-narrow-max-widths: (
+  sm: 34rem,    // 480
+  md: 45rem,    // 720
+  lg: 45rem,    // 960
+  xl: 45rem  // 1140
+) !default;
+
+//***********************
+// Grid columns
+//***********************
+// Set the number of columns and specify the width of the gutters.
+
+
+
+//***********************
+// Typography
+//***********************
+// Font, line-height, and color for body text, headings, and more.
+$font-family-sans-serif: "Open Sans";
+$font-family-monospace: "Hack", monospace;
+
+$font-size-h1:               2rem;
+$font-size-h2:               1.75rem;
+$font-size-h3:               1.5rem;
+$font-size-h4:               1.25rem;
+$font-size-h5:               1rem;
+$font-size-h6:               1rem;
+//***********************
+// Components
+//***********************
+
+
+//----------------------------
+// Tables
+//----------------------------
+// Customizes the `.table` component with basic values, each used across all table variations.
+
+
+//----------------------------
+// Buttons
+//----------------------------
+// For each of Bootstrap's buttons, define text, background and border color.
+
+//----------------------------
+// Forms
+//----------------------------
+
+
+//----------------------------
+// Dropdowns
+//----------------------------
+// Dropdown menu container and contents.
+
+
+//----------------------------
+// Navbar
+//----------------------------
+
+
+//----------------------------
+// Navs
+//----------------------------
+
+
+//----------------------------
+// Pagination
+//----------------------------
+
+
+//----------------------------
+// Pager
+//----------------------------
+
+
+//----------------------------
+// Jumbotron
+//----------------------------
+
+
+//----------------------------
+// Form states and alerts
+//----------------------------
+
+
+//----------------------------
+// Tooltips
+//----------------------------
+
+
+//----------------------------
+// Popovers
+//----------------------------
+
+
+//----------------------------
+// Labels
+//----------------------------
+
+
+//----------------------------
+// Modals
+//----------------------------
+
+
+
+//----------------------------
+// Alerts
+//----------------------------
+
+
+//----------------------------
+// Progress bars
+//----------------------------
+
+
+//----------------------------
+// List group
+//----------------------------
+
+
+//----------------------------
+// Image thumbnails
+//----------------------------
+
+
+//----------------------------
+// Breadcrumbs
+//----------------------------
+
+
+//----------------------------
+// Carousel
+//----------------------------
+
+
+//----------------------------
+// Close
+//----------------------------
+
+
+//----------------------------
+// Code
+//----------------------------
+$pre-bg: #fdf6e3;
+$pre-color: #586e75;
+
+$font-size-root: 14px;

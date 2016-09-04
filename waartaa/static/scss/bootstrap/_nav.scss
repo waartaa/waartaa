@@ -1,0 +1,28 @@
+.nav-justified {
+	width:100%;
+	>li {
+		display:table-cell;
+		width:1%;
+		float:none!important; 
+		text-align:center;
+	}
+}
+.nav-underline {
+	.nav-item.active, .nav-item.active:hover {
+		box-shadow:0px -3px 0 0 $brand-primary inset;
+		.nav-link {
+		        color: $brand-primary;
+		}
+	}
+	li:hover {
+		box-shadow:0px -3px 0 0 #ddd inset;
+	}
+	li {
+		padding-top:0.2rem; 
+		padding-bottom:0.2rem;
+	}
+}
+.navbar-underline{
+        background-color: #d5d5d5;
+        border-top: 1px solid darken(#d5d5d5, 5%);
+}
