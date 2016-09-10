@@ -7,7 +7,7 @@
     "start": {
       "presets": [
         "react-hmre"
-      ]  
-    }  
+      ]
+    }
   }
 }

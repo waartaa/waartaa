@@ -10,7 +10,7 @@
     <title>Waartaa</title>
   </head>
 
-  <body style="margin: -8px">
+  <body>
     <div id="app"></div>
     <script src="/static/js/waartaa.js"></script>
   </body>

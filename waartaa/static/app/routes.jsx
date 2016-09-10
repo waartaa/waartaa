@@ -5,7 +5,7 @@ import App from './components/App.jsx';
 import LoginPage from './components/login/LoginPage.jsx';
 
 export default (
-  <Route path="/" component="App">
-    <Route path="/login" component="LoginPage" />
+  <Route path="/">
+    <Route path="/login" component={LoginPage} />
   </Route>
 )

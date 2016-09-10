@@ -1,43 +1,47 @@
 var path = require('path'),
     merge = require('webpack-merge'),
     webpack = require('webpack'),
-	ExtractTextPlugin = require('extract-text-webpack-plugin');
+	  ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-var staticPrefix = 'waartaa/static/';
+var staticPrefix = 'waartaa/static/',
+    distPath = staticPrefix + '/dist';
 
 const TARGET = process.env.npm_lifecycle_event;
-const PATHS = {
-  app: path.join(__dirname, staticPrefix, '/app'),
-  build: path.join(__dirname, staticPrefix, '/js')
-};
-
 process.env.BABEL_ENV = TARGET;
 
 const common = {
   entry: {
-    app: PATHS.app
+    app: path.join(__dirname, staticPrefix, 'app'),
+    'waartaa': path.join(__dirname, staticPrefix, 'scss/waartaa.scss'),
   },
+  context: path.join(__dirname, staticPrefix),
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx'],
+    modulesDirectories: ['node_modules']
+  },
+  resolveLoader: {
+    root: path.resolve(__dirname, 'node_modules')
   },
   output: {
-    path: PATHS.build,
-    filename: 'waartaa.js'
+    path: distPath,
+    filename: 'waartaa.js',
+    sourceMapFilename: '[name].js.map',
   },
   module: {
     loaders: [
       {
         test: /\.jsx?$/,
-        loader: 'babel',
+        exclude: /(node_modules)/,
+        loader: 'babel-loader',
         query: {
           cacheDirectory: true,
           presets: ['react', 'es2015', 'stage-0']
         },
-        include: PATHS.app
       },
       {
         test: /\.scss$/,
-        loaders: ['style', 'css', 'scss'],
+        include: path.join(__dirname, staticPrefix, 'scss'),
+        loader: ExtractTextPlugin.extract('style-loader', 'css-loader!sass-loader')
       },
     ]
   }
@@ -50,7 +54,7 @@ if (TARGET === 'start' || !TARGET) {
     },
     devtool: 'eval-source-map',
     devServer: {
-      contentBase: PATHS.build,
+      contentBase: distPath,
       historyApiFallback: true,
       hot: true,
       inline: true,
@@ -61,10 +65,15 @@ if (TARGET === 'start' || !TARGET) {
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
+      new ExtractTextPlugin('styles.css'),
     ]
   });
 }
 
 if (TARGET === 'build') {
-  module.exports = merge(common, {});
+  module.exports = merge(common, {
+    plugins: [
+      new ExtractTextPlugin('styles.css'),
+    ]
+  });
 }

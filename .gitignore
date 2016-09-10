@@ -11,6 +11,7 @@ build
 __pycache__/
 *.egg-info/
 waartaa/client/static/js/
+waartaa.js
 npm-debug.log
 *hot-update.js*
 dist
