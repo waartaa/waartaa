@@ -1,7 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import rootReducer from '../reducers';
 import oidcMiddleware from '../middleware/middleware.jsx';
-import DevTools from '../containers/DevTools.jsx';
 import SockJS from 'sockjs-client';
 import createSockjsMiddleware from '../middlewares/sockjs';
 import * as types from '../constants/actionTypes';
@@ -41,7 +40,6 @@ export default function configureStore(initialState) {
     compose(
       applyMiddleware(sockjsMiddleware),
       applyMiddleware(oidcMiddleware),
-      DevTools.instrument()
     )
   )
 
