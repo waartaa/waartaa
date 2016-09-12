@@ -12,22 +12,28 @@ sudo dnf install -y libsodium libsodium-devel
 
 ## Development
 
-1. Install the virtualenvwrapper package  
-``sudo dnf install python-virtualenvwrapper``
+* Install the system-level dependencies  
+``sudo dnf install python-virtualenvwrapper libsodium libsodium-devel``
 
-2. Create a virtualenv  
+* Create a virtualenv  
 ``mkvirtualenv waartaa``
 
-3. Install the required packages  
+* Install the required packages  
 ``pip install -r dev_requirements.txt``
 
-4. Run the pyramid development server  
-``pserve development.ini``
+* Waartaa runs on top of ircb. So follow the
+  [instructions](https://github.com/waartaa/ircb#setup) to setup ircb.
 
-5. Move to the waartaa client folder in another window  
+* Run the ircb stores  
+``IRCB_SETTING=ircb.settings.py ircb run server -m allinone --port 9999``
+
+* Run the development server  
+``python waartaa/app.py``
+
+* Move to a different terminal and start  
 ``cd waartaa/client/``
 
-6. Start the server  
+* Build JS assests  
 ``npm start``
 
 ## Contribute
@@ -41,8 +47,3 @@ sudo dnf install -y libsodium libsodium-devel
 
 1. Mailing list: https://groups.google.com/forum/#!forum/waartaa
 1. IRC: **#waartaa** on Freenode
-
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/waartaa/waartaa/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
