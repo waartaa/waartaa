@@ -11,8 +11,8 @@ process.env.BABEL_ENV = TARGET;
 
 const common = {
   entry: {
-    app: path.join(__dirname, staticPrefix, 'app'),
-    'waartaa': path.join(__dirname, staticPrefix, 'scss/waartaa.scss'),
+    waartaa: path.join(__dirname, staticPrefix, 'app'),
+    appcss: path.join(__dirname, staticPrefix, 'scss/waartaa.scss'),
   },
   context: path.join(__dirname, staticPrefix),
   resolve: {
@@ -24,7 +24,7 @@ const common = {
   },
   output: {
     path: distPath,
-    filename: 'waartaa.js',
+    filename: '[name].js',
     sourceMapFilename: '[name].js.map',
   },
   module: {
