@@ -1,7 +1,7 @@
 var path = require('path'),
     merge = require('webpack-merge'),
     webpack = require('webpack'),
-	  ExtractTextPlugin = require('extract-text-webpack-plugin');
+	ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var staticPrefix = 'waartaa/static/',
     distPath = staticPrefix + '/dist';
@@ -11,13 +11,15 @@ process.env.BABEL_ENV = TARGET;
 
 const common = {
   entry: {
-    waartaa: path.join(__dirname, staticPrefix, 'app'),
-    appcss: path.join(__dirname, staticPrefix, 'scss/waartaa.scss'),
+    waartaa: path.join(__dirname, staticPrefix, 'app/index.jsx'),
+    bootstrap: path.join(__dirname, staticPrefix, 'scss/waartaa.scss'),
   },
-  context: path.join(__dirname, staticPrefix),
   resolve: {
     extensions: ['', '.js', '.jsx'],
-    modulesDirectories: ['node_modules']
+    modulesDirectories: ['node_modules'],
+    root: [
+        path.resolve(__dirname, staticPrefix, 'app')
+    ]
   },
   resolveLoader: {
     root: path.resolve(__dirname, 'node_modules')
@@ -49,31 +51,18 @@ const common = {
 
 if (TARGET === 'start' || !TARGET) {
   module.exports = merge(common, {
-    watchOptions: {
-      poll: true
-    },
-    devtool: 'eval-source-map',
-    devServer: {
-      contentBase: distPath,
-      historyApiFallback: true,
-      hot: true,
-      inline: true,
-      progress: true,
-      stats: 'errors-only',
-      host: process.env.HOST,
-      port: process.env.PORT
-    },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
       new ExtractTextPlugin('styles.css'),
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+        },
+      }),
     ]
   });
 }
 
 if (TARGET === 'build') {
-  module.exports = merge(common, {
-    plugins: [
-      new ExtractTextPlugin('styles.css'),
-    ]
-  });
+  module.exports = merge(common, {});
 }
