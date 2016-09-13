@@ -14,5 +14,6 @@
   <body>
     <div id="app"></div>
     <script src="/static/dist/waartaa.js"></script>
+    <script src="/static/dist/bootstrap.js"></script>
   </body>
 </html>
