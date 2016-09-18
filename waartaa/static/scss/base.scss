@@ -1,0 +1,18 @@
+.m-h-75 {
+    min-height: 85vh;
+}
+
+.left-border {
+    border-left: 2px solid #f6f6f6;
+    &:before {
+        content: 'OR';
+		position: absolute;
+		top: 45%;
+		left: -20px;
+		border: 2px solid #f6f6f6;
+		padding: 10px;
+		background-color: white;
+		border-radius: 20px;
+    }
+}
+
