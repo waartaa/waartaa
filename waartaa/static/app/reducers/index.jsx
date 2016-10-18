@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
-import { routerReducer as routing } from 'react-router-redux';
+import { routerReducer } from 'react-router-redux';
 import { reducer as reduxReducer } from 'redux-oidc';
 
+import auth from './auth';
+
 const rootReducer = combineReducers({
-  oidc: reduxReducer,
-  routing: routing
+  auth,
+  routing: routerReducer
 });
 
 export default rootReducer

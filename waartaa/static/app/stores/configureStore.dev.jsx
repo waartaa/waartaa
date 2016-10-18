@@ -1,6 +1,9 @@
 import { createStore, applyMiddleware, compose } from 'redux';
+import { syncHistoryWithStore, routerMiddleware } from 'react-router-redux';
+import createLogger from 'redux-logger';
+import thunk from 'redux-thunk'; 
+
 import rootReducer from '../reducers';
-import oidcMiddleware from '../middleware/middleware.jsx';
 import SockJS from 'sockjs-client';
 
 var sock = new SockJS('/sockjs');
@@ -43,13 +46,25 @@ sock.onmessage = function(e) {
   }
 }
 
-export default function configureStore(initialState) {
+export default function configureStore(baseHistory, initialState) {
+	const routingMiddleware = routerMiddleware(baseHistory);
+	const logger = createLogger();
+	const middleware = applyMiddleware(routingMiddleware, thunk, logger);
+
   const store = createStore(
     rootReducer,
     initialState,
-    compose(
-      applyMiddleware(oidcMiddleware),
-    )
+		middleware
   )
-  return store;
+	const history = syncHistoryWithStore(baseHistory, store)
+
+  if (module.hot) {
+    module.hot
+    .accept('../reducers', () => {
+      const nextRootReducer = require('../reducers/index');
+      store.replaceReducer(nextRootReducer);
+    });
+  }
+
+  return { store, history };
 }
