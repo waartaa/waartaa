@@ -1,12 +1,13 @@
 import { browserHistory } from 'react-router';
 import { logout as logoutOidc } from 'redux-oidc';
-import * as types from '../constants/actionTypes';
-import { getRedirectPath, setRedirectPath } from '../helpers/oidcHelpers';
+import * as types from '../constants/actionTypes.jsx';
 
-export function fetchMessages(channel, user) {
+export function loginUserSucess(token) {
+  localStorage.setItem('token', token);
   return {
-    type: constants.FETCHMESSAGES,
-    channel,
-    user
+    type: LOGIN_USER_SUCCESS,
+    payload: {
+      token: token
+    }
   }
 }

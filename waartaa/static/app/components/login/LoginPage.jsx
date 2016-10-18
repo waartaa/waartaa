@@ -23,6 +23,7 @@ class LoginPage extends Component {
                 <h2 className="text-xs-center p-t-2 p-b-3">Start using waartaa today.</h2>
                 <div className="col-md-6 m-x-auto text-xs-center">
                   <h4 className="p-b-3">Use an existing account</h4>
+                  <button type="button" className="btn btn-outline-primary">Primary</button>
                 </div>
                 <div className="col-md-6 m-x-auto text-xs-center left-border">
                   <h4 className="p-b-3">Create a Waartaa account</h4>
