@@ -1,21 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import {DocumentTitle} from 'react-document-title';
+import Header from './../header/Header';
 
 class LoginPage extends Component {
-  getTitle() {
-    return 'waartaa';
-  }
 
   render() {
     return (
       <div>
-        <div className="masthead">
-          <div className="container">
-            <div className="col-sm-3">
-              <h1>{this.getTitle()}</h1>
-            </div>
-          </div>
-        </div>
+        <Header />
         <div className="bodycontent m-h-75">
           <div className="p-t-2">
             <div className="container">
