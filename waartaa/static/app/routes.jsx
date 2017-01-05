@@ -3,6 +3,7 @@ import { Route, IndexRoute } from 'react-router';
 
 import App from './components/App.jsx';
 import LoginPage from './components/login/LoginPage.jsx';
+
 import { requireAuthentication } from './utils';
 
 export default (

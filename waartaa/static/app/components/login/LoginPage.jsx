@@ -1,9 +1,21 @@
 import React, {Component, PropTypes} from 'react';
 import {DocumentTitle} from 'react-document-title';
 
+import { loginUser } from '../../actions/actions.jsx';
+
 class LoginPage extends Component {
+  constructor(props) {
+    super(props);
+    this.login = this.login.bind(this);
+  }
+
   getTitle() {
     return 'waartaa';
+  }
+
+  login(e) {
+    const { dispatch } = this.props;
+    dispatch(loginUser);
   }
 
   render() {
@@ -33,7 +45,9 @@ class LoginPage extends Component {
                       <div className="form-group row"><input type="text" className="form-control" id="email" placeholder="Email" /></div>
                       <div className="form-group row"><input type="password" className="form-control" id="password" placeholder="Password" /></div>
                       <div className="form-group row"><input type="password" className="form-control" id="password-repeat" placeholder="Password repeat" /></div>
-                      <div className="form-group row"><button type="submit" className="btn btn-primary">Create Account</button></div>
+                      <div className="form-group row">
+                        <button type="submit" className="btn btn-primary" onClick={this.login}>Create Account</button>
+                      </div>
                     </form>
                   </div>
                 </div>
