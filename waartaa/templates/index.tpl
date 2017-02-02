@@ -6,12 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Waartaa">
     <meta name="author" content="rtnpro">
+    <link rel="stylesheet" type="text/css" href="/static/dist/styles.css">
 
     <title>Waartaa</title>
   </head>
 
-  <body style="margin: -8px">
+  <body>
     <div id="app"></div>
-    <script src="/static/js/waartaa.js"></script>
+    <script src="/static/dist/waartaa.js"></script>
+    <script src="/static/dist/bootstrap.js"></script>
   </body>
 </html>

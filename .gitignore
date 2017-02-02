@@ -11,12 +11,12 @@ build
 __pycache__/
 *.egg-info/
 waartaa/client/static/js/
+waartaa.js
 npm-debug.log
 *hot-update.js*
 dist
 env
 client_secrets.json
-static
 node_modules
 build/bundle.js
 oidcHelpers.jsx

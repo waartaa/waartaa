@@ -3,3 +3,5 @@ pyramid_chameleon
 waitress
 -e git+https://github.com/waartaa/ircb.git@develop#egg=ircb
 autobahn
+sockjs
+aiohttp_jinja2

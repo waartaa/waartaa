@@ -28,30 +28,14 @@ def sockjs_handler(msg, session):
 @asyncio.coroutine
 @aiohttp_jinja2.template('index.tpl')
 def index(request):
-    print(request.match_info)
     return {'project': 'waartaa'}
 
 
-@asyncio.coroutine
-def init(loop, host='0.0.0.0', port=6453):
-    app = web.Application()
-
-    aiohttp_jinja2.setup(app,
-                         context_processors=[aiohttp_jinja2.request_processor],
-                         loader=jinja2.FileSystemLoader(
-                             os.path.join(os.path.dirname(__file__),
-                                          'templates')
-                         ))
-    sockjs.add_endpoint(app, sockjs_handler, name='sockjs', prefix='/sockjs')
-
+def setup_routes(app):
     app.router.add_static('/static',
                           os.path.join(os.path.dirname(__file__),
                                        'static'))
     app.router.add_route('GET', '/{path:.*}', index)
-
-    srv = yield from loop.create_server(
-        app.make_handler(logger=logger, access_logger=logger), host, port)
-    return srv
 
 
 def runserver(host='0.0.0.0', port=6453):
@@ -59,8 +43,20 @@ def runserver(host='0.0.0.0', port=6453):
     from ircb.utils.config import load_config
     load_config()
     initialize()
+
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(init(loop, host=host, port=port))
+    app = web.Application(loop=loop)
+    setup_routes(app)
+
+    aiohttp_jinja2.setup(
+        app,
+        context_processors=[aiohttp_jinja2.request_processor],
+        loader=jinja2.FileSystemLoader(
+            os.path.join(os.path.dirname(__file__), 'templates')
+        )
+    )
+    sockjs.add_endpoint(app, sockjs_handler, name='sockjs', prefix='/sockjs')
+    web.run_app(app, host=host, port=port)
     try:
         loop.run_forever()
     except KeyboardInterrupt:
